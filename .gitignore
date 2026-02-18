@@ -23,6 +23,7 @@ misc/
 # Editor directories and files
 .vscode/*
 .cursor/
+.kiro/
 !.vscode/extensions.json
 .idea
 .DS_Store

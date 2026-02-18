@@ -7,3 +7,19 @@
 -7. cancel batch mode after delete or move action
 -8. i18n
 -9. camel case search not working
+
+----
+1. multi account support
+2. soft deletion
+3. introduction page
+4. uninstall form
+5. chatgpt integration
+6. paper crane dev landing page
+7. gemini gems integration and management
+8. advanced prompt template
+9. better acess to prompts
+10. auto sync to local disk
+11. dedicated chat viewer and bulk export
+12. prompt gallery can add images
+13. images viewer and management
+15. option dropdown

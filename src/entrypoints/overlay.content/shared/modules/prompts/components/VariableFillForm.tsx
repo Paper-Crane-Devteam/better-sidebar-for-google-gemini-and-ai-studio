@@ -1,6 +1,13 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { Label } from '@/shared/components/ui/label';
 import { Input } from '@/shared/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/components/ui/select';
 import { useI18n } from '@/shared/hooks/useI18n';
 import type { PromptVariable } from '@/shared/lib/prompt-variables';
 
@@ -49,20 +56,23 @@ export const VariableFillForm = forwardRef<VariableFillFormRef, VariableFillForm
                 {variable.name}
               </Label>
               {variable.kind === 'select' && variable.options ? (
-                <select
-                  id={`var-${variable.name}`}
+                <Select
                   value={values[variable.name] ?? variable.options[0]}
-                  onChange={(e) =>
-                    setValues((prev) => ({ ...prev, [variable.name]: e.target.value }))
+                  onValueChange={(value) =>
+                    setValues((prev) => ({ ...prev, [variable.name]: value }))
                   }
-                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring text-foreground"
                 >
-                  {variable.options.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger id={`var-${variable.name}`}>
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {variable.options.map((opt) => (
+                      <SelectItem key={opt} value={opt}>
+                        {opt}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               ) : (
                 <Input
                   id={`var-${variable.name}`}
