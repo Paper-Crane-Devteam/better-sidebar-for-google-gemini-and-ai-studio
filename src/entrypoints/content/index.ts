@@ -9,12 +9,14 @@ export default defineContentScript({
   matches: [
     'https://aistudio.google.com/*',
     'https://gemini.google.com/*',
-    'https://chatgpt.com/*',
+    // 'https://chatgpt.com/*',
   ],
   runAt: 'document_start',
   main() {
     const platform = detectPlatform();
-    console.log(`Better Sidebar: Content Script Initialized (Platform: ${platform})`);
+    console.log(
+      `Better Sidebar: Content Script Initialized (Platform: ${platform})`,
+    );
 
     switch (platform) {
       case Platform.AI_STUDIO: {
@@ -30,7 +32,9 @@ export default defineContentScript({
         break;
       }
       default:
-        console.warn(`Better Sidebar: Unknown platform (${platform}), no content script loaded`);
+        console.warn(
+          `Better Sidebar: Unknown platform (${platform}), no content script loaded`,
+        );
     }
   },
 });

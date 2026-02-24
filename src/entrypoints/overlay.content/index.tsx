@@ -8,13 +8,13 @@ export default defineContentScript({
   matches: [
     'https://aistudio.google.com/*',
     'https://gemini.google.com/*',
-    'https://chatgpt.com/*',
+    // 'https://chatgpt.com/*',
   ],
   cssInjectionMode: 'ui',
   async main() {
     const platform = detectPlatform();
     console.log(
-      `Better Sidebar: Overlay Content Script Initialized (Platform: ${platform})`
+      `Better Sidebar: Overlay Content Script Initialized (Platform: ${platform})`,
     );
 
     switch (platform) {
@@ -35,7 +35,7 @@ export default defineContentScript({
       }
       default:
         console.warn(
-          `Better Sidebar: Unknown platform (${platform}), overlay not loaded`
+          `Better Sidebar: Unknown platform (${platform}), overlay not loaded`,
         );
     }
   },

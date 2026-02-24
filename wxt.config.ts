@@ -26,7 +26,7 @@ export default defineConfig({
     host_permissions: [
       'https://aistudio.google.com/*',
       'https://gemini.google.com/*',
-      'https://chatgpt.com/*',
+      // 'https://chatgpt.com/*',
     ],
     // Temporarily disabled: sidepanel entry point (action button)
     // action: {
@@ -54,8 +54,16 @@ export default defineConfig({
     },
     web_accessible_resources: [
       {
-        resources: ['main-world.js', 'wa-sqlite-async.mjs', 'wa-sqlite-async.wasm'],
-        matches: ['https://aistudio.google.com/*', 'https://gemini.google.com/*', 'https://chatgpt.com/*'],
+        resources: [
+          'main-world.js',
+          'wa-sqlite-async.mjs',
+          'wa-sqlite-async.wasm',
+        ],
+        matches: [
+          'https://aistudio.google.com/*',
+          'https://gemini.google.com/*',
+          // 'https://chatgpt.com/*',
+        ],
       },
     ],
   },
