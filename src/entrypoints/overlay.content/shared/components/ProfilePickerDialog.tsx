@@ -105,18 +105,18 @@ export const ProfilePickerDialog: React.FC = () => {
     }
   }, [pickerData, newProfileName, loading, closePicker, setLoading]);
 
-  const handleCancel = useCallback(async () => {
-    if (!pickerData) return;
-    try {
-      await browser.runtime.sendMessage({
-        type: 'DISABLE_PLATFORM',
-        payload: { platform: pickerData.platform, disabled: true },
-      });
-    } catch (e) {
-      console.error('Failed to disable platform:', e);
-    }
-    closePicker();
-  }, [pickerData, closePicker]);
+  // const handleCancel = useCallback(async () => {
+  //   if (!pickerData) return;
+  //   try {
+  //     await browser.runtime.sendMessage({
+  //       type: 'DISABLE_PLATFORM',
+  //       payload: { platform: pickerData.platform, disabled: true },
+  //     });
+  //   } catch (e) {
+  //     console.error('Failed to disable platform:', e);
+  //   }
+  //   closePicker();
+  // }, [pickerData, closePicker]);
 
   if (!pickerOpen || !pickerData) return null;
 
@@ -241,7 +241,7 @@ export const ProfilePickerDialog: React.FC = () => {
         </div>
 
         {/* Cancel */}
-        <div className="shrink-0 px-6 pb-6 pt-2">
+        {/* <div className="shrink-0 px-6 pb-6 pt-2">
           <Button
             variant="ghost"
             className="w-full"
@@ -250,7 +250,7 @@ export const ProfilePickerDialog: React.FC = () => {
           >
             Cancel (Disable {platformName} for this session)
           </Button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

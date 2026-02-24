@@ -315,9 +315,11 @@
     "previous30Days": "Previous 30 Days",
     "unknownDate": "Unknown Date"
   },
-  "options": {
-    "title": "Better Sidebar for Gemini & AI Studio Options",
-    "settingsPlaceholder": "Settings placeholder"
+  "popup": {
+    "title": "Better Sidebar",
+    "description": "Configure the platforms where Better Sidebar is active. Disabling a platform will stop the extension from running on that site entirely.",
+    "platforms": "Supported Platforms",
+    "enablePlatform": "Enable on {{platform}}"
   },
   "feedback": {
     "title": "Feedback",
@@ -405,6 +407,29 @@
     "logProcessed": "Processed {{current}}/{{total}}...",
     "logComplete": "Import complete: {{count}} imported.",
     "logCriticalError": "Critical Error: {{message}}"
+  },
+  "rating": {
+    "title": "Are you enjoying this extension?",
+    "description": "Your feedback is very important to us.",
+    "notReally": "Not really",
+    "yes": "Yes, I do!",
+    "awesome": "Awesome!",
+    "rateDescription": "If you could take a minute to rate us 5 stars on the store, it would mean the world to us!",
+    "maybeLater": "Maybe later",
+    "rateUs": "Rate 5 stars",
+    "sorry": "Sorry to hear that",
+    "sorryDescription": "Please let us know how we can improve. You can share your feedback through any of these channels:",
+    "inAppFeedback": "In-app Feedback Tab",
+    "githubIssue": "Submit GitHub Issue",
+    "googleForm": "Fill out Google Form",
+    "skip": "Skip"
+  },
+  "onboarding": {
+    "welcome": "Welcome to Better Sidebar",
+    "description": "Supercharge your workflow on Google AI Studio, Gemini, ChatGPT, and Claude with enhanced file management and beautiful UI.",
+    "getStarted": "Get Started now",
+    "comingSoon": "Coming Soon",
+    "unsupported": "Currently Unsupported"
   }
 }
 

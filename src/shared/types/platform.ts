@@ -20,21 +20,28 @@ export interface PlatformConfig {
   icon: string;
   color: string;
   promptUrlTemplate: (id?: string) => string;
+  supported: boolean;
 }
 
-export const PLATFORM_CONFIG: Record<
-  Platform,
-  PlatformConfig
-> = {
+export const PLATFORM_COLORS = {
+  AI_STUDIO: '#4285F4',
+  GEMINI: '#8E75C2',
+  CHATGPT: '#10a37f',
+  CLAUDE: '#d97757',
+  GRAY: '#888888',
+};
+
+export const PLATFORM_CONFIG: Record<Platform, PlatformConfig> = {
   [Platform.AI_STUDIO]: {
     id: Platform.AI_STUDIO,
     name: 'Google AI Studio',
     hostname: 'aistudio.google.com',
     urlPattern: 'https://aistudio.google.com',
     icon: AIStudioIcon,
-    color: 'blue',
+    color: PLATFORM_COLORS.AI_STUDIO,
     promptUrlTemplate: (id?: string) =>
       `https://aistudio.google.com/prompts/${id || ''}`,
+    supported: true,
   },
   [Platform.GEMINI]: {
     id: Platform.GEMINI,
@@ -42,8 +49,10 @@ export const PLATFORM_CONFIG: Record<
     hostname: 'gemini.google.com',
     urlPattern: 'https://gemini.google.com',
     icon: GeminiIcon,
-    color: 'purple',
-    promptUrlTemplate: (id?: string) => `https://gemini.google.com/app/${id || ''}`,
+    color: PLATFORM_COLORS.GEMINI,
+    promptUrlTemplate: (id?: string) =>
+      `https://gemini.google.com/app/${id || ''}`,
+    supported: true,
   },
   [Platform.CHATGPT]: {
     id: Platform.CHATGPT,
@@ -51,8 +60,9 @@ export const PLATFORM_CONFIG: Record<
     hostname: 'chatgpt.com',
     urlPattern: 'https://chatgpt.com',
     icon: ChatGPTIcon,
-    color: 'green',
+    color: PLATFORM_COLORS.CHATGPT,
     promptUrlTemplate: (id?: string) => `https://chatgpt.com/c/${id || ''}`,
+    supported: true,
   },
   [Platform.CLAUDE]: {
     id: Platform.CLAUDE,
@@ -60,8 +70,9 @@ export const PLATFORM_CONFIG: Record<
     hostname: 'claude.ai',
     urlPattern: 'https://claude.ai',
     icon: ClaudeIcon,
-    color: 'orange',
+    color: PLATFORM_COLORS.CLAUDE,
     promptUrlTemplate: (id?: string) => `https://claude.ai/chat/${id || ''}`,
+    supported: false,
   },
   [Platform.UNKNOWN]: {
     id: Platform.UNKNOWN,
@@ -69,8 +80,9 @@ export const PLATFORM_CONFIG: Record<
     hostname: '',
     urlPattern: '',
     icon: 'question',
-    color: 'gray',
+    color: PLATFORM_COLORS.GRAY,
     promptUrlTemplate: (id?: string) => '',
+    supported: false,
   },
 };
 

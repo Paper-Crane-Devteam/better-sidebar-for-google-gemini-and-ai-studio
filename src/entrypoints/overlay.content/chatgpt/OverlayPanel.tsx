@@ -25,6 +25,7 @@ import { TagsTab } from '../shared/modules/tags/TagsTab';
 import { FeedbackTab } from '../shared/modules/feedback/FeedbackTab';
 import { SettingsModal } from '../shared/modules/settings/SettingsModal';
 import { WhatsNewDialog } from '../shared/modules/whats-new/WhatsNewDialog';
+import { RatingPromptDialog } from '../shared/modules/feedback/RatingPromptDialog';
 import '@/index.scss';
 import { GlobalModal } from '@/shared/components/GlobalModal';
 import { ProfilePickerDialog } from '../shared/components/ProfilePickerDialog';
@@ -36,6 +37,8 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { navigate } from '@/shared/lib/navigation';
 import { useUrl } from '@/shared/hooks/useUrl';
 import { useModuleConfig } from './useModuleConfig';
+import { detectAccount } from '@/entrypoints/content/shared/detect-account';
+import { Platform } from '@/shared/types/platform';
 
 export const OverlayPanel = ({ className }: { className?: string }) => {
   const moduleConfig = useModuleConfig();
@@ -78,6 +81,9 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
     // Listen for updates from background script
     const listener = (message: any) => {
       if (message.type === 'DATA_UPDATED') {
+        // Only process in the active tab — background DB may belong to another profile
+        if (document.visibilityState !== 'visible') return;
+
         console.log('Received DATA_UPDATED signal, refreshing...');
         fetchData(true);
 
@@ -85,7 +91,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
         if (message.updateType === 'SCAN_COMPLETE' && message.payload) {
           // Only set isScanning to false when scan actually completes
           setIsScanning(false);
-          
+
           const count = message.payload.count || 0;
           console.log(`Scan completed, imported ${count} items`);
           if (count > 0) {
@@ -104,9 +110,20 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
 
   // Handle tab activation/visibility change to sync data
   useEffect(() => {
-    const handleVisibilityChange = () => {
+    const handleVisibilityChange = async () => {
       if (document.visibilityState === 'visible') {
-        console.log('Tab became visible, refreshing data...');
+        console.log('Tab became visible, syncing profile and refreshing...');
+        try {
+          const username = await detectAccount(Platform.CHATGPT);
+          if (username) {
+            await browser.runtime.sendMessage({
+              type: 'DETECT_ACCOUNT',
+              payload: { platform: Platform.CHATGPT, username },
+            });
+          }
+        } catch (e) {
+          console.warn('Profile re-sync failed on visibility change:', e);
+        }
         fetchData(true);
       }
     };
@@ -320,6 +337,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
       <WhatsNewDialog />
       <GlobalModal />
       <ProfilePickerDialog />
+      <RatingPromptDialog />
       <GlobalToast />
     </div>
   );

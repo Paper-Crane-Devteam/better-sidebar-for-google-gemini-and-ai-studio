@@ -17,8 +17,9 @@ import { detectAccount } from '../shared/detect-account';
 export async function initGemini() {
   console.log('Better Sidebar: Gemini Content Script Initialized');
 
-  // Profile check: detect current account and verify against profile (non-blocking)
-  (async () => {
+  // Profile check: detect current account and verify against profile
+  // Returns true if profile is resolved and sync is safe
+  const profileReady = (async (): Promise<boolean> => {
     try {
       const username = await detectAccount(Platform.GEMINI);
       if (username) {
@@ -33,6 +34,8 @@ export async function initGemini() {
               detail: response.data,
             }),
           );
+          // Profile not resolved — don't sync to avoid writing to wrong DB
+          return false;
         } else if (response?.data?.action === 'switched') {
           console.log(
             'Better Sidebar: Profile switched to',
@@ -40,15 +43,17 @@ export async function initGemini() {
           );
         }
       }
+      return true;
     } catch (e) {
       console.warn(
         'Better Sidebar: Profile check failed, continuing anyway',
         e,
       );
+      return true; // On error, assume safe (legacy behavior)
     }
   })();
 
-  // Start API Scanner immediately to catch early requests
+  // Start API Scanner immediately to catch early requests (no DB dependency)
   apiScanner.start();
   chatContentScanner.start();
 
@@ -61,8 +66,15 @@ export async function initGemini() {
   };
   (document.head || document.documentElement).prepend(script);
 
-  // Auto-start sync when page is fully loaded
-  const startSync = () => {
+  // Auto-start sync when page is fully loaded AND profile DB is resolved
+  const startSync = async () => {
+    const canSync = await profileReady;
+    if (!canSync) {
+      console.log(
+        'Better Sidebar: Skipping sync — profile not resolved (unbound account)',
+      );
+      return;
+    }
     syncConversations().catch((err) => {
       console.error('Better Sidebar: Auto-sync failed', err);
     });
@@ -71,7 +83,7 @@ export async function initGemini() {
   if (document.readyState === 'complete') {
     startSync();
   } else {
-    window.addEventListener('load', startSync);
+    window.addEventListener('load', () => startSync());
   }
 
   window.addEventListener('GEMINI_CHAT_DELETE', async (event: any) => {

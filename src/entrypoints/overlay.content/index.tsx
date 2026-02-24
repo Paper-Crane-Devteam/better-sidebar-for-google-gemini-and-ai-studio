@@ -2,6 +2,7 @@
 
 import mainStyles from '@/index.scss?inline';
 import { detectPlatform, Platform } from '@/shared/types/platform';
+import { isPlatformEnabled } from '@/shared/lib/platform-enabled-store';
 import '@/locale/i18n';
 
 export default defineContentScript({
@@ -16,6 +17,15 @@ export default defineContentScript({
     console.log(
       `Better Sidebar: Overlay Content Script Initialized (Platform: ${platform})`,
     );
+
+    // Check if this platform is enabled in options
+    const enabled = await isPlatformEnabled(platform);
+    if (!enabled) {
+      console.log(
+        `Better Sidebar: Platform ${platform} is disabled, skipping overlay initialization`,
+      );
+      return;
+    }
 
     switch (platform) {
       case Platform.AI_STUDIO: {

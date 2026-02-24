@@ -5,6 +5,7 @@ import type {
 import type { MessageSender } from './types';
 import { dbReady } from './db';
 import { detectPlatform, Platform } from '@/shared/types/platform';
+import { ensureDbForTab, removeTab } from './tab-profile-map';
 import {
   handleFolders,
   handleConversations,
@@ -31,6 +32,11 @@ const handlers = [
   handleMisc,
 ];
 
+// Clean up tab→db mapping when tabs are closed
+browser.tabs.onRemoved.addListener((tabId) => {
+  removeTab(tabId);
+});
+
 export async function handleMessage(
   message: ExtensionMessage,
   sender: MessageSender,
@@ -49,6 +55,12 @@ export async function handleMessage(
       } catch (e) {
         // Ignore URL parsing errors
       }
+    }
+
+    // Auto-switch DB if sender tab expects a different database
+    // (handles multi-tab with different accounts)
+    if (sender.tab?.id != null) {
+      await ensureDbForTab(sender.tab.id);
     }
 
     for (const handler of handlers) {

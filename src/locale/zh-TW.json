@@ -405,5 +405,21 @@
   "dataManagement": {
     "resetDatabase": "重設資料庫",
     "resetDatabaseConfirm": "您確定要刪除所有儲存的資料嗎？此操作無法復原。"
+  },
+  "rating": {
+    "title": "您喜歡這個插件嗎？",
+    "description": "您的回饋對我們非常重要。",
+    "notReally": "不太喜欢",
+    "yes": "很喜欢",
+    "awesome": "太棒了！",
+    "rateDescription": "如果您能花一分鐘在應用商店裡給我們一個 5 星好評，那將是對我們最大的肯定和支持！",
+    "maybeLater": "以後再說",
+    "rateUs": "去给好评",
+    "sorry": "很抱歉給您帶來不好的體驗",
+    "sorryDescription": "您可以透過以下方式告訴我们您的建議或遇到的問題，我們會儘快改進。",
+    "inAppFeedback": "外挂内回饋 (Feedback Tab)",
+    "githubIssue": "提交 GitHub Issue",
+    "googleForm": "填寫回饋表單",
+    "skip": "跳過"
   }
 }

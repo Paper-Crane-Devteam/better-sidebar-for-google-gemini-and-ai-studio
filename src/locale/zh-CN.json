@@ -315,9 +315,11 @@
     "previous30Days": "最近30天",
     "unknownDate": "未知日期"
   },
-  "options": {
-    "title": "Gemini & AI Studio 增强侧边栏 选项",
-    "settingsPlaceholder": "设置占位符"
+  "popup": {
+    "title": "增强侧边栏",
+    "description": "配置增强侧边栏生效的平台。禁用某个平台后，扩展将不再响应该网站。",
+    "platforms": "支持的平台",
+    "enablePlatform": "在 {{platform}} 上启用"
   },
   "feedback": {
     "title": "反馈",
@@ -405,5 +407,28 @@
     "logProcessed": "已处理 {{current}}/{{total}}...",
     "logComplete": "导入完成：已导入 {{count}} 条。",
     "logCriticalError": "严重错误：{{message}}"
+  },
+  "rating": {
+    "title": "您喜欢这个插件吗？",
+    "description": "您的反馈对我们非常重要。",
+    "notReally": "不太喜欢",
+    "yes": "很喜欢",
+    "awesome": "太棒了！",
+    "rateDescription": "如果您能花一分钟在应用商店里给我们一个 5 星好评，那将是对我们最大的肯定和支持！",
+    "maybeLater": "以后再说",
+    "rateUs": "去给好评",
+    "sorry": "很抱歉给您带来不好的体验",
+    "sorryDescription": "您可以通过以下方式告诉我们您的建议或遇到的问题，我们会尽快改进。",
+    "inAppFeedback": "插件内反馈 (Feedback Tab)",
+    "githubIssue": "提交 GitHub Issue",
+    "googleForm": "填写反馈表单",
+    "skip": "跳过"
+  },
+  "onboarding": {
+    "welcome": "欢迎使用 Better Sidebar",
+    "description": "在 Google AI Studio、Gemini、ChatGPT 和 Claude 上增强您的工作流程，体验更强大的文件管理和精美的 UI 界面。",
+    "getStarted": "立即开始使用",
+    "comingSoon": "即将推出",
+    "unsupported": "暂不支持"
   }
 }

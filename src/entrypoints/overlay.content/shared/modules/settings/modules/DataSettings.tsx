@@ -251,9 +251,6 @@ export const DataSettings = () => {
               <span className="text-sm font-semibold">
                 {activeProfile.name}
               </span>
-              <span className="text-xs text-muted-foreground ml-auto font-mono">
-                {activeProfile.dbName}
-              </span>
             </div>
 
             {/* Accounts */}
@@ -372,7 +369,7 @@ export const DataSettings = () => {
                 return (
                   <div
                     key={profile.id}
-                    className="group flex items-center gap-3 p-3 border rounded-lg hover:bg-accent/50 transition-colors"
+                    className="group relative flex items-center gap-3 p-3 border rounded-lg hover:bg-accent/50 transition-colors"
                   >
                     <User className="h-4 w-4 text-muted-foreground shrink-0" />
                     <div className="flex-1 min-w-0">
@@ -416,9 +413,6 @@ export const DataSettings = () => {
                           <span className="text-sm font-medium">
                             {profile.name}
                           </span>
-                          <span className="text-xs text-muted-foreground ml-2 font-mono">
-                            {profile.dbName}
-                          </span>
                           {accounts.length > 0 && (
                             <div className="flex flex-wrap gap-1 mt-0.5">
                               {accounts.map(([p, u]) => platformBadge(p, u))}
@@ -429,7 +423,7 @@ export const DataSettings = () => {
                     </div>
 
                     {!isRenaming && (
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-accent/90 backdrop-blur-sm rounded-md px-1 py-0.5 shadow-sm">
                         <Button
                           variant="outline"
                           size="sm"

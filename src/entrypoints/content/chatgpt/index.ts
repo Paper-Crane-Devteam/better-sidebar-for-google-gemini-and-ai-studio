@@ -14,8 +14,9 @@ import { detectAccount } from '../shared/detect-account';
 export async function initChatGPT() {
   console.log('Better Sidebar: ChatGPT Content Script Initialized');
 
-  // Profile check: detect current account and verify against profile (non-blocking)
-  (async () => {
+  // Profile check: detect current account and verify against profile
+  // Returns true if profile is resolved and sync is safe
+  const profileReady = (async (): Promise<boolean> => {
     try {
       const username = await detectAccount(Platform.CHATGPT);
       if (username) {
@@ -30,6 +31,7 @@ export async function initChatGPT() {
               detail: response.data,
             }),
           );
+          return false;
         } else if (response?.data?.action === 'switched') {
           console.log(
             'Better Sidebar: Profile switched to',
@@ -37,15 +39,17 @@ export async function initChatGPT() {
           );
         }
       }
+      return true;
     } catch (e) {
       console.warn(
         'Better Sidebar: Profile check failed, continuing anyway',
         e,
       );
+      return true;
     }
   })();
 
-  // Start API Scanner immediately to catch early requests
+  // Start API Scanner immediately to catch early requests (no DB dependency)
   apiScanner.start();
 
   // Inject Main World Script
@@ -57,8 +61,15 @@ export async function initChatGPT() {
   };
   (document.head || document.documentElement).prepend(script);
 
-  // Auto-start sync when page is fully loaded
-  const startSync = () => {
+  // Auto-start sync when page is fully loaded AND profile DB is resolved
+  const startSync = async () => {
+    const canSync = await profileReady;
+    if (!canSync) {
+      console.log(
+        'Better Sidebar: Skipping sync — profile not resolved (unbound account)',
+      );
+      return;
+    }
     syncConversations().catch((err) => {
       console.error('Better Sidebar: Auto-sync failed', err);
     });
@@ -67,7 +78,7 @@ export async function initChatGPT() {
   if (document.readyState === 'complete') {
     startSync();
   } else {
-    window.addEventListener('load', startSync);
+    window.addEventListener('load', () => startSync());
   }
 
   // Listen for new conversation creation from main-world script
