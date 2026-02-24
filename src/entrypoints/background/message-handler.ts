@@ -15,9 +15,11 @@ import {
   handleMessages,
   handlePrompts,
   handleMisc,
+  handleProfile,
 } from './handlers';
 
 const handlers = [
+  handleProfile,
   handleFolders,
   handleConversations,
   handleScan,

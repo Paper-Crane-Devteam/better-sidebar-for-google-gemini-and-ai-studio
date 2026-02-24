@@ -7,3 +7,4 @@ export { handleTags } from './tags';
 export { handleMessages } from './messages';
 export { handlePrompts } from './prompts';
 export { handleMisc } from './misc';
+export { handleProfile } from './profile';

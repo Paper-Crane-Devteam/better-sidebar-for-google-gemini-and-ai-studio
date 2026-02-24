@@ -3,15 +3,49 @@
 import { ExtensionMessage } from '@/shared/types/messages';
 import { scanLibrary } from './tasks/scan-library';
 import { autoSyncHandler } from './tasks/scan-library/sync-library';
-import { apiScanner } from './tasks/scan-library/scan-api'
+import { apiScanner } from './tasks/scan-library/scan-api';
 import { Platform } from '@/shared/types/platform';
+import { detectAccount } from '../shared/detect-account';
 
 /**
  * Initialize AI Studio content script
  * This handles all AI Studio specific logic
  */
-export function initAiStudio() {
+export async function initAiStudio() {
   console.log('Better Sidebar: AI Studio Content Script Initialized');
+
+  // Profile check: detect current account and verify against profile (non-blocking)
+  (async () => {
+    try {
+      const username = await detectAccount(Platform.AI_STUDIO);
+      if (username) {
+        const response = await browser.runtime.sendMessage({
+          type: 'DETECT_ACCOUNT',
+          payload: { platform: Platform.AI_STUDIO, username },
+        });
+        if (response?.data?.action === 'unbound') {
+          // Store on window in case overlay hasn't mounted yet (race condition)
+          (window as any).__PROFILE_UNBOUND_PENDING = response.data;
+          // Also dispatch event for already-mounted listeners
+          window.dispatchEvent(
+            new CustomEvent('PROFILE_ACCOUNT_UNBOUND', {
+              detail: response.data,
+            }),
+          );
+        } else if (response?.data?.action === 'switched') {
+          console.log(
+            'Better Sidebar: Profile switched to',
+            response.data.profileName,
+          );
+        }
+      }
+    } catch (e) {
+      console.warn(
+        'Better Sidebar: Profile check failed, continuing anyway',
+        e,
+      );
+    }
+  })();
 
   // Start auto-sync handler to automatically sync conversations as they load
   autoSyncHandler.start();
@@ -31,7 +65,7 @@ export function initAiStudio() {
     const data = event.detail;
     console.log(
       'Better Sidebar: Content Script received AI_STUDIO_RESPONSE',
-      data
+      data,
     );
 
     try {
@@ -49,10 +83,7 @@ export function initAiStudio() {
         },
       });
     } catch (e) {
-      console.error(
-        'Better Sidebar: Failed to handle AI_STUDIO_RESPONSE',
-        e
-      );
+      console.error('Better Sidebar: Failed to handle AI_STUDIO_RESPONSE', e);
     }
   });
 
@@ -62,7 +93,7 @@ export function initAiStudio() {
       'Better Sidebar: Content Script received AI_STUDIO_PROMPT_UPDATE',
       id,
       title,
-      updated_at
+      updated_at,
     );
     try {
       await browser.runtime.sendMessage({
@@ -72,7 +103,7 @@ export function initAiStudio() {
     } catch (e) {
       console.error(
         'Better Sidebar: Failed to handle AI_STUDIO_PROMPT_UPDATE',
-        e
+        e,
       );
     }
   });
@@ -81,7 +112,7 @@ export function initAiStudio() {
     const { id } = event.detail;
     console.log(
       'Better Sidebar: Content Script received AI_STUDIO_PROMPT_DELETE',
-      id
+      id,
     );
     try {
       await browser.runtime.sendMessage({
@@ -91,7 +122,7 @@ export function initAiStudio() {
     } catch (e) {
       console.error(
         'Better Sidebar: Failed to handle AI_STUDIO_PROMPT_DELETE',
-        e
+        e,
       );
     }
   });
@@ -109,6 +140,6 @@ export function initAiStudio() {
           });
         return true;
       }
-    }
+    },
   );
 }

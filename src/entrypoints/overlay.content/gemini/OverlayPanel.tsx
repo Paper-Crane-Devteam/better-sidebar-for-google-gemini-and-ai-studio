@@ -31,6 +31,7 @@ import { SettingsModal } from '../shared/modules/settings/SettingsModal';
 import { WhatsNewDialog } from '../shared/modules/whats-new/WhatsNewDialog';
 import '@/index.scss';
 import { GlobalModal } from '@/shared/components/GlobalModal';
+import { ProfilePickerDialog } from '../shared/components/ProfilePickerDialog';
 import { GlobalToast } from '@/shared/components/GlobalToast';
 import { useAppInit } from '../shared/hooks/useAppInit';
 import { OverlayToggle } from '../shared/components/OverlayToggle';
@@ -364,10 +365,15 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
             onNavigate={moduleConfig.search.onNavigate}
           />
         ) : activeTab === 'prompts' ? (
-          <PromptsTab menuActions={{...moduleConfig.general.menuActions, ...moduleConfig.prompts.menuActions}} />
+          <PromptsTab
+            menuActions={{
+              ...moduleConfig.general.menuActions,
+              ...moduleConfig.prompts.menuActions,
+            }}
+          />
         ) : activeTab === 'favorites' ? (
-          <FavoritesTab 
-            menuActions={moduleConfig.general.menuActions} 
+          <FavoritesTab
+            menuActions={moduleConfig.general.menuActions}
             visibleFilters={moduleConfig.favorites.visibleFilters}
           />
         ) : activeTab === 'tags' ? (
@@ -383,6 +389,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
       <SettingsModal open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
       <WhatsNewDialog />
       <GlobalModal />
+      <ProfilePickerDialog />
       <GlobalToast />
     </div>
   );

@@ -10,7 +10,7 @@
 
 ----
 1. multi account support
-2. soft deletion
+-2. soft deletion
 3. introduction page
 4. uninstall form
 5. chatgpt integration

@@ -5,13 +5,45 @@ import { ExtensionMessage } from '@/shared/types/messages';
 import { apiScanner } from './tasks/scan-api';
 import { scanConversations } from './tasks/scan-conversations';
 import { syncConversations } from './tasks/sync-conversations';
+import { detectAccount } from '../shared/detect-account';
 
 /**
  * Initialize ChatGPT content script
  * This handles all ChatGPT specific logic
  */
-export function initChatGPT() {
+export async function initChatGPT() {
   console.log('Better Sidebar: ChatGPT Content Script Initialized');
+
+  // Profile check: detect current account and verify against profile (non-blocking)
+  (async () => {
+    try {
+      const username = await detectAccount(Platform.CHATGPT);
+      if (username) {
+        const response = await browser.runtime.sendMessage({
+          type: 'DETECT_ACCOUNT',
+          payload: { platform: Platform.CHATGPT, username },
+        });
+        if (response?.data?.action === 'unbound') {
+          (window as any).__PROFILE_UNBOUND_PENDING = response.data;
+          window.dispatchEvent(
+            new CustomEvent('PROFILE_ACCOUNT_UNBOUND', {
+              detail: response.data,
+            }),
+          );
+        } else if (response?.data?.action === 'switched') {
+          console.log(
+            'Better Sidebar: Profile switched to',
+            response.data.profileName,
+          );
+        }
+      }
+    } catch (e) {
+      console.warn(
+        'Better Sidebar: Profile check failed, continuing anyway',
+        e,
+      );
+    }
+  })();
 
   // Start API Scanner immediately to catch early requests
   apiScanner.start();
@@ -39,64 +71,70 @@ export function initChatGPT() {
   }
 
   // Listen for new conversation creation from main-world script
-  window.addEventListener('BETTER_SIDEBAR_PROMPT_CREATE', async (event: any) => {
-    const data = event.detail;
-    console.log(
-      'Better Sidebar: Content Script received BETTER_SIDEBAR_PROMPT_CREATE',
-      data
-    );
-
-    try {
-      await browser.runtime.sendMessage({
-        type: 'SAVE_CONVERSATION',
-        payload: {
-          id: data.id,
-          title: data.title,
-          external_id: data.id,
-          external_url: `https://chatgpt.com/c/${data.id}`,
-          updated_at: data.created_at ?? Math.floor(Date.now() / 1000),
-          created_at: data.created_at,
-          messages: data.messages,
-        },
-      });
-    } catch (e) {
-      console.error(
-        'Better Sidebar: Failed to handle BETTER_SIDEBAR_PROMPT_CREATE',
-        e
+  window.addEventListener(
+    'BETTER_SIDEBAR_PROMPT_CREATE',
+    async (event: any) => {
+      const data = event.detail;
+      console.log(
+        'Better Sidebar: Content Script received BETTER_SIDEBAR_PROMPT_CREATE',
+        data,
       );
-    }
-  });
+
+      try {
+        await browser.runtime.sendMessage({
+          type: 'SAVE_CONVERSATION',
+          payload: {
+            id: data.id,
+            title: data.title,
+            external_id: data.id,
+            external_url: `https://chatgpt.com/c/${data.id}`,
+            updated_at: data.created_at ?? Math.floor(Date.now() / 1000),
+            created_at: data.created_at,
+            messages: data.messages,
+          },
+        });
+      } catch (e) {
+        console.error(
+          'Better Sidebar: Failed to handle BETTER_SIDEBAR_PROMPT_CREATE',
+          e,
+        );
+      }
+    },
+  );
 
   // Listen for follow-up messages in existing conversations
-  window.addEventListener('CHATGPT_CHAT_CONTENT_RESPONSE', async (event: any) => {
-    const data = event.detail;
-    console.log(
-      'Better Sidebar: Content Script received CHATGPT_CHAT_CONTENT_RESPONSE',
-      data
-    );
-
-    try {
-      // Upsert messages for the conversation
-      await browser.runtime.sendMessage({
-        type: 'UPSERT_MESSAGES',
-        payload: {
-          conversationId: data.conversationId,
-          messages: data.messages,
-        },
-      });
-    } catch (e) {
-      console.error(
-        'Better Sidebar: Failed to handle CHATGPT_CHAT_CONTENT_RESPONSE',
-        e
+  window.addEventListener(
+    'CHATGPT_CHAT_CONTENT_RESPONSE',
+    async (event: any) => {
+      const data = event.detail;
+      console.log(
+        'Better Sidebar: Content Script received CHATGPT_CHAT_CONTENT_RESPONSE',
+        data,
       );
-    }
-  });
+
+      try {
+        // Upsert messages for the conversation
+        await browser.runtime.sendMessage({
+          type: 'UPSERT_MESSAGES',
+          payload: {
+            conversationId: data.conversationId,
+            messages: data.messages,
+          },
+        });
+      } catch (e) {
+        console.error(
+          'Better Sidebar: Failed to handle CHATGPT_CHAT_CONTENT_RESPONSE',
+          e,
+        );
+      }
+    },
+  );
 
   window.addEventListener('CHATGPT_CHAT_DELETE', async (event: any) => {
     const { id } = event.detail;
     console.log(
       'Better Sidebar: Content Script received CHATGPT_CHAT_DELETE',
-      id
+      id,
     );
     try {
       await browser.runtime.sendMessage({
@@ -121,6 +159,6 @@ export function initChatGPT() {
           });
         return true;
       }
-    }
+    },
   );
 }

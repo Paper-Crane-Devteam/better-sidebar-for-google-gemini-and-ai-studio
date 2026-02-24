@@ -151,10 +151,15 @@ async function ensureWorker() {
   }
 }
 
-export const initDB = async () => {
+export const initDB = async (dbName?: string) => {
   await ensureWorker();
   // We can also send an INIT message if needed, but the offscreen script inits worker on load
-  return sendWorkerMessage('INIT');
+  return sendWorkerMessage('INIT', dbName ? { dbName } : undefined);
+};
+
+export const switchDB = async (dbName: string) => {
+  await ensureWorker();
+  return sendWorkerMessage('SWITCH_DB', { dbName });
 };
 
 const sendWorkerMessage = async (type: string, payload?: any): Promise<any> => {

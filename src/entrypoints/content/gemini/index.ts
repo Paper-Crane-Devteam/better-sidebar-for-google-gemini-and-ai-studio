@@ -8,13 +8,45 @@ import { apiScanner } from './tasks/scan-api';
 import { chatContentScanner } from './tasks/scan-chat-content';
 
 import { syncConversations } from './tasks/sync-conversations';
+import { detectAccount } from '../shared/detect-account';
 
 /**
  * Initialize Gemini content script
  * This handles all Gemini specific logic
  */
-export function initGemini() {
+export async function initGemini() {
   console.log('Better Sidebar: Gemini Content Script Initialized');
+
+  // Profile check: detect current account and verify against profile (non-blocking)
+  (async () => {
+    try {
+      const username = await detectAccount(Platform.GEMINI);
+      if (username) {
+        const response = await browser.runtime.sendMessage({
+          type: 'DETECT_ACCOUNT',
+          payload: { platform: Platform.GEMINI, username },
+        });
+        if (response?.data?.action === 'unbound') {
+          (window as any).__PROFILE_UNBOUND_PENDING = response.data;
+          window.dispatchEvent(
+            new CustomEvent('PROFILE_ACCOUNT_UNBOUND', {
+              detail: response.data,
+            }),
+          );
+        } else if (response?.data?.action === 'switched') {
+          console.log(
+            'Better Sidebar: Profile switched to',
+            response.data.profileName,
+          );
+        }
+      }
+    } catch (e) {
+      console.warn(
+        'Better Sidebar: Profile check failed, continuing anyway',
+        e,
+      );
+    }
+  })();
 
   // Start API Scanner immediately to catch early requests
   apiScanner.start();
@@ -46,7 +78,7 @@ export function initGemini() {
     const { id } = event.detail;
     console.log(
       'Better Sidebar: Content Script received GEMINI_CHAT_DELETE',
-      id
+      id,
     );
     try {
       await browser.runtime.sendMessage({
@@ -81,6 +113,6 @@ export function initGemini() {
       //     });
       //   return true;
       // }
-    }
+    },
   );
 }

@@ -6,36 +6,48 @@ import { SCHEMA } from '@/shared/db/schema';
 let db: any = null;
 let initPromise: Promise<boolean> | null = null;
 
-const DB_NAME = 'prompt-manager-for-google-ai-studio.db';
+let dbName = 'prompt-manager-for-google-ai-studio.db';
 const WASM_URL = '/assets/wa-sqlite-async.wasm';
 
 // Request queue to ensure serial execution of DB operations
 let requestQueue = Promise.resolve();
 
-const initDB = async () => {
+const initDB = async (newDbName?: string) => {
+  // If a new name is provided and differs from the current, force re-init
+  if (newDbName && newDbName !== dbName) {
+    dbName = newDbName;
+    db = null;
+    initPromise = null;
+  }
+
   if (db) return true;
   if (initPromise) return initPromise;
 
   initPromise = (async () => {
     try {
-      console.log('Worker: Initializing database...');
+      console.log(`Worker: Initializing database "${dbName}"...`);
 
       // Add 30s timeout for DB initialization
       const initPromise = new Promise(async (resolve, reject) => {
-        const timeoutId = setTimeout(() => reject(new Error('DB Initialization timed out after 30s')), 30000);
-        
+        const timeoutId = setTimeout(
+          () => reject(new Error('DB Initialization timed out after 30s')),
+          30000,
+        );
+
         try {
           const useOpfs = await isOpfsSupported();
-          console.log(`Worker: Storage mode: ${useOpfs ? 'OPFS' : 'IndexedDB'}`);
+          console.log(
+            `Worker: Storage mode: ${useOpfs ? 'OPFS' : 'IndexedDB'}`,
+          );
 
           let database;
           if (useOpfs) {
             database = await initSQLite(
-              useOpfsStorage(DB_NAME, { url: WASM_URL })
+              useOpfsStorage(dbName, { url: WASM_URL }),
             );
           } else {
             database = await initSQLite(
-              useIdbStorage(DB_NAME, { url: WASM_URL })
+              useIdbStorage(dbName, { url: WASM_URL }),
             );
           }
           clearTimeout(timeoutId);
@@ -51,11 +63,11 @@ const initDB = async () => {
       // Initialize Schema
       await db.run('PRAGMA foreign_keys = ON;');
       await db.run(SCHEMA);
-      
+
       // Run Migrations
       await runMigrations(db);
-      
-      console.log('Worker: Database initialized successfully');
+
+      console.log(`Worker: Database "${dbName}" initialized successfully`);
       return true;
     } catch (err) {
       console.error('Worker: Failed to initialize database:', err);
@@ -137,6 +149,23 @@ const runMigrations = async (db: any) => {
 
   } catch (err) {
     console.error('Worker: Migration failed:', err);
+  }
+};
+
+/**
+ * Close the current DB connection and reset state.
+ */
+const closeDB = async () => {
+  if (db) {
+    try {
+      if (typeof db.close === 'function') {
+        await db.close();
+      }
+    } catch (e) {
+      console.warn('Worker: Error closing DB:', e);
+    }
+    db = null;
+    initPromise = null;
   }
 };
 
@@ -274,14 +303,16 @@ const handleImport = async (base64: string, chunk?: { index: number; total: numb
             // 4. Clean up auxiliary files
             for (const suffix of ['-journal', '-wal', '-shm']) {
                 try {
-                    await root.removeEntry(DB_NAME + suffix);
+                    await root.removeEntry(dbName + suffix);
                 } catch (e) {
                     // Ignore if file doesn't exist
                 }
             }
             
             // 5. Overwrite the main DB file
-            const fileHandle = await root.getFileHandle(DB_NAME, { create: true });
+            const fileHandle = await root.getFileHandle(dbName, {
+              create: true,
+            });
             const writable = await fileHandle.createWritable();
             await writable.write(bytes as any);
             await writable.close();
@@ -322,7 +353,17 @@ const processMessage = async (e: MessageEvent) => {
 
     switch (type) {
       case 'INIT': {
-        await initDB();
+        const initDbName = payload?.dbName;
+        await initDB(initDbName);
+        self.postMessage({ id, success: true });
+        break;
+      }
+
+      case 'SWITCH_DB': {
+        const { dbName: newDbName } = payload;
+        console.log(`Worker: Switching database to "${newDbName}"...`);
+        await closeDB();
+        await initDB(newDbName);
         self.postMessage({ id, success: true });
         break;
       }
