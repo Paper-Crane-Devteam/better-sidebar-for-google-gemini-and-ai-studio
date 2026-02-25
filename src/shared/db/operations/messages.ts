@@ -2,7 +2,9 @@ import { runQuery, runCommand, runBatch } from '../index';
 import type { Message } from '../../types/db';
 
 export const messageRepo = {
-  create: async (message: Omit<Message, 'id' | 'timestamp' | 'order_index'>): Promise<void> => {
+  create: async (
+    message: Omit<Message, 'id' | 'timestamp' | 'order_index'>,
+  ): Promise<void> => {
     await runCommand(
       `INSERT INTO messages (id, conversation_id, role, content, message_type, timestamp, order_index) 
        VALUES (hex(randomblob(16)), ?, ?, ?, ?, unixepoch(), 
@@ -13,20 +15,23 @@ export const messageRepo = {
         message.content,
         message.message_type || 'text',
         message.conversation_id,
-      ]
+      ],
     );
   },
 
   bulkInsert: async (
     conversationId: string,
-    messages: Omit<Message, 'id' | 'timestamp' | 'conversation_id' | 'order_index'>[]
+    messages: Omit<
+      Message,
+      'id' | 'timestamp' | 'conversation_id' | 'order_index'
+    >[],
   ): Promise<void> => {
     if (messages.length === 0) return;
 
     // Get current max order_index to ensure continuity
     const result = await runQuery(
       'SELECT COALESCE(MAX(order_index), -1) as max_order FROM messages WHERE conversation_id = ?',
-      [conversationId]
+      [conversationId],
     );
     let currentOrder = (result[0]?.max_order ?? -1) + 1;
 
@@ -47,7 +52,7 @@ export const messageRepo = {
   getByConversationId: async (conversationId: string): Promise<Message[]> => {
     return (await runQuery(
       'SELECT * FROM messages WHERE conversation_id = ? ORDER BY order_index ASC',
-      [conversationId]
+      [conversationId],
     )) as Message[];
   },
 
@@ -63,30 +68,33 @@ export const messageRepo = {
 
   replace: async (
     conversationId: string,
-    messages: Omit<Message, 'id' | 'timestamp' | 'conversation_id' | 'order_index'>[]
+    messages: Omit<
+      Message,
+      'id' | 'timestamp' | 'conversation_id' | 'order_index'
+    >[],
   ): Promise<void> => {
     const operations: { sql: string; bind: any[] }[] = [];
 
     // Delete existing
     operations.push({
-        sql: 'DELETE FROM messages WHERE conversation_id = ?',
-        bind: [conversationId]
+      sql: 'DELETE FROM messages WHERE conversation_id = ?',
+      bind: [conversationId],
     });
 
     if (messages.length > 0) {
-        let currentOrder = 0;
-        messages.forEach((msg) => {
-            operations.push({
-                sql: 'INSERT INTO messages (id, conversation_id, role, content, message_type, timestamp, order_index) VALUES (hex(randomblob(16)), ?, ?, ?, ?, unixepoch(), ?)',
-                bind: [
-                    conversationId,
-                    msg.role,
-                    msg.content,
-                    msg.message_type || 'text',
-                    currentOrder++
-                ]
-            });
+      let currentOrder = 0;
+      messages.forEach((msg) => {
+        operations.push({
+          sql: 'INSERT INTO messages (id, conversation_id, role, content, message_type, timestamp, order_index) VALUES (hex(randomblob(16)), ?, ?, ?, ?, unixepoch(), ?)',
+          bind: [
+            conversationId,
+            msg.role,
+            msg.content,
+            msg.message_type || 'text',
+            currentOrder++,
+          ],
         });
+      });
     }
 
     await runBatch(operations);
@@ -94,20 +102,23 @@ export const messageRepo = {
 
   upsert: async (
     conversationId: string,
-    messages: (Omit<Message, 'id' | 'timestamp' | 'conversation_id' | 'order_index'> & { id: string; created_at?: number | null })[]
+    messages: (Omit<
+      Message,
+      'id' | 'timestamp' | 'conversation_id' | 'order_index'
+    > & { id: string; created_at?: number | null })[],
   ): Promise<void> => {
     if (messages.length === 0) return;
 
     // 1. Check which messages already exist
-    const incomingIds = messages.map(m => m.id);
+    const incomingIds = messages.map((m) => m.id);
     const existingRows = await runQuery(
       `SELECT id FROM messages WHERE id IN (${incomingIds.map(() => '?').join(',')})`,
-      incomingIds
+      incomingIds,
     );
     const existingIds = new Set(existingRows.map((r: any) => r.id));
 
-    const newMessages = messages.filter(m => !existingIds.has(m.id));
-    const updateMessages = messages.filter(m => existingIds.has(m.id));
+    const newMessages = messages.filter((m) => !existingIds.has(m.id));
+    const updateMessages = messages.filter((m) => existingIds.has(m.id));
 
     const operations: { sql: string; bind: any[] }[] = [];
 
@@ -127,33 +138,35 @@ export const messageRepo = {
             msg.message_type || 'text',
             msg.created_at,
             msg.created_at,
-            msg.id
-          ]
+            msg.id,
+          ],
         });
       });
     }
 
     // 3. Prepare Inserts
     if (newMessages.length > 0) {
-      // Sort new messages by timestamp (asc). 
+      // Sort new messages by timestamp (asc).
       // Treat missing timestamps as Infinity so they go to the end
-      newMessages.sort((a, b) => (a.created_at ?? Infinity) - (b.created_at ?? Infinity));
+      newMessages.sort(
+        (a, b) => (a.created_at ?? Infinity) - (b.created_at ?? Infinity),
+      );
 
       // Get DB stats to determine insertion point
       const stats = await runQuery(
         `SELECT MIN(timestamp) as min_ts, MIN(order_index) as min_idx, MAX(order_index) as max_idx 
          FROM messages WHERE conversation_id = ?`,
-        [conversationId]
+        [conversationId],
       );
-      
+
       const dbMinTs = stats[0]?.min_ts;
       const dbMinIdx = stats[0]?.min_idx ?? 0;
       const dbMaxIdx = stats[0]?.max_idx ?? -1;
-      
+
       const firstNewTs = newMessages[0].created_at;
-      
+
       let startIdx = 0;
-      
+
       // If DB has messages, and our new batch starts strictly BEFORE the earliest DB message
       if (dbMinTs !== null && firstNewTs && firstNewTs < dbMinTs) {
         startIdx = dbMinIdx - newMessages.length;
@@ -172,8 +185,8 @@ export const messageRepo = {
             msg.content,
             msg.message_type || 'text',
             msg.created_at,
-            startIdx + i
-          ]
+            startIdx + i,
+          ],
         });
       });
     }
@@ -192,7 +205,8 @@ export const messageRepo = {
       excludeFolderNames?: string[];
       roleFilter?: 'all' | 'user' | 'model';
       platforms?: string[];
-    } = {}
+      conversationId?: string;
+    } = {},
   ): Promise<any[]> => {
     const params: any[] = [];
     const cteParts: string[] = [];
@@ -211,7 +225,7 @@ export const messageRepo = {
             )
         `);
       params.push(
-        ...options.includeFolderNames.map((n) => `%${n.toLowerCase()}%`)
+        ...options.includeFolderNames.map((n) => `%${n.toLowerCase()}%`),
       );
     }
 
@@ -228,7 +242,7 @@ export const messageRepo = {
             )
         `);
       params.push(
-        ...options.excludeFolderNames.map((n) => `%${n.toLowerCase()}%`)
+        ...options.excludeFolderNames.map((n) => `%${n.toLowerCase()}%`),
       );
     }
 
@@ -263,7 +277,7 @@ export const messageRepo = {
       params.push(matchQuery);
     } else {
       console.log('[DB] Short query, fallback to LIKE:', query);
-      
+
       sql += `
         SELECT m.*, c.title as conversation_title, c.folder_id, f.name as folder_name, c.external_url, c.platform
         FROM messages m
@@ -296,6 +310,11 @@ export const messageRepo = {
       params.push(...options.platforms);
     }
 
+    if (options.conversationId) {
+      sql += ` AND m.conversation_id = ?`;
+      params.push(options.conversationId);
+    }
+
     // Fetch more results when post-filtering will reduce the set
     const needsPostFilter = options.wholeWord || options.caseSensitive;
     const limit = needsPostFilter ? 1000 : 500;
@@ -306,27 +325,32 @@ export const messageRepo = {
 
       // Post-filter in memory for wholeWord and/or caseSensitive
       if (needsPostFilter && query.trim().length > 0) {
-         const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-         const flags = options.caseSensitive ? '' : 'i';
-         const pattern = options.wholeWord ? `\\b${escapedQuery}\\b` : escapedQuery;
-         const regex = new RegExp(pattern, flags);
-         
-         results = results.filter((row: any) => {
-            return row.content && regex.test(row.content);
-         });
+        const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const flags = options.caseSensitive ? '' : 'i';
+        const pattern = options.wholeWord
+          ? `\\b${escapedQuery}\\b`
+          : escapedQuery;
+        const regex = new RegExp(pattern, flags);
+
+        results = results.filter((row: any) => {
+          return row.content && regex.test(row.content);
+        });
       }
 
       return results;
     } catch (e) {
       console.error(
         'FTS Search failed, falling back to legacy search (or table missing)',
-        e
+        e,
       );
       throw e;
     }
   },
 
-  getScrollIndex: async (messageId: string, conversationId: string): Promise<number> => {
+  getScrollIndex: async (
+    messageId: string,
+    conversationId: string,
+  ): Promise<number> => {
     const result = await runQuery(
       `SELECT COUNT(*) as scroll_index
        FROM messages m
@@ -334,7 +358,7 @@ export const messageRepo = {
          AND m.role = 'model'
          AND m.message_type != 'thought'
          AND m.order_index < (SELECT order_index FROM messages WHERE id = ?)`,
-      [conversationId, messageId]
+      [conversationId, messageId],
     );
     return result[0]?.scroll_index ?? 0;
   },
@@ -347,7 +371,7 @@ export const messageRepo = {
   getAdjacentMessage: async (
     messageId: string,
     conversationId: string,
-    currentRole: 'user' | 'model'
+    currentRole: 'user' | 'model',
   ): Promise<Message | null> => {
     if (currentRole === 'user') {
       // Find the next model message (order_index > current)
@@ -359,7 +383,7 @@ export const messageRepo = {
            AND m.order_index > (SELECT order_index FROM messages WHERE id = ?)
          ORDER BY m.order_index ASC
          LIMIT 1`,
-        [conversationId, messageId]
+        [conversationId, messageId],
       );
       return result[0] || null;
     } else {
@@ -372,7 +396,7 @@ export const messageRepo = {
            AND m.order_index < (SELECT order_index FROM messages WHERE id = ?)
          ORDER BY m.order_index DESC
          LIMIT 1`,
-        [conversationId, messageId]
+        [conversationId, messageId],
       );
       return result[0] || null;
     }

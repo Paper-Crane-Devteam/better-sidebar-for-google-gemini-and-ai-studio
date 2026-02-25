@@ -52,12 +52,12 @@ export const MoveItemsDialog = ({ onSelect, selectedIds }: MoveItemsDialogProps)
   };
 
   return (
-    <div className="h-[300px] w-full border rounded-md">
+    <div className="min-h-[300px] max-h-[80vh] w-full border rounded-md">
       <ScrollArea className="h-full w-full p-2">
         <div
           className={cn(
             'flex items-center gap-2 py-1 px-2 rounded-sm hover:bg-accent cursor-pointer text-sm w-full mb-1',
-            selectedId === null && 'bg-accent'
+            selectedId === null && 'bg-accent',
           )}
           onClick={() => {
             setSelectedId(null);

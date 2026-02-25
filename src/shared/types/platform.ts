@@ -62,7 +62,7 @@ export const PLATFORM_CONFIG: Record<Platform, PlatformConfig> = {
     icon: ChatGPTIcon,
     color: PLATFORM_COLORS.CHATGPT,
     promptUrlTemplate: (id?: string) => `https://chatgpt.com/c/${id || ''}`,
-    supported: true,
+    supported: false,
   },
   [Platform.CLAUDE]: {
     id: Platform.CLAUDE,

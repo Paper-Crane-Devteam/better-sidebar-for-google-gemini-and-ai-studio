@@ -59,6 +59,7 @@ export function createSearchActions(
               excludeFolderNames,
               roleFilter: options.roleFilter,
               platforms: options.platforms,
+              conversationId: options.conversationId,
             },
           },
         });

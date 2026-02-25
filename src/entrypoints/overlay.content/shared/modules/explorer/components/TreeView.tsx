@@ -233,6 +233,9 @@ export const TreeView = forwardRef<ArboristTreeHandle, TreeViewProps>(({ onSelec
         };
         const allIds = getAllIds(data);
         setExplorerBatchSelection(allIds);
+    },
+    open: (id: string) => {
+        treeRef.current?.open(id);
     }
   }));
 

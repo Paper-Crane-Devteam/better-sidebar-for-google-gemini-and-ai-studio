@@ -70,7 +70,12 @@ export const PromptsTab = ({ menuActions }: PromptsTabProps) => {
   };
 
   const openEditModal = (prompt: any) => {
-    let editFormData: { title: string; content: string; type: 'normal' | 'system'; icon: string } = {
+    let editFormData: {
+      title: string;
+      content: string;
+      type: 'normal' | 'system';
+      icon: string;
+    } = {
       title: prompt.title ?? '',
       content: prompt.content ?? '',
       type: (prompt.type as 'normal' | 'system') ?? 'system',
@@ -99,6 +104,7 @@ export const PromptsTab = ({ menuActions }: PromptsTabProps) => {
   };
 
   const treeRef = useRef<ArboristTreeHandle>(null);
+
 
   // Clear stale selection
   useEffect(() => {
@@ -131,13 +137,16 @@ export const PromptsTab = ({ menuActions }: PromptsTabProps) => {
     let parentId: string | null = null;
     if (selectedNode) {
       if (selectedNode.data.type === 'folder') {
-          parentId = selectedNode.data.id;
+        parentId = selectedNode.data.id;
       } else {
         const item = selectedNode.data.data;
         parentId = item.folder_id || null;
       }
     }
-    const newFolderId = await createPromptFolder(t('sidebar.newFolder'), parentId);
+    const newFolderId = await createPromptFolder(
+      t('sidebar.newFolder'),
+      parentId,
+    );
     if (newFolderId) {
       setTimeout(() => {
         treeRef.current?.edit(newFolderId);
@@ -155,7 +164,12 @@ export const PromptsTab = ({ menuActions }: PromptsTabProps) => {
   };
 
   const handleNewPrompt = () => {
-    let formData: { title: string; content: string; type: 'normal' | 'system'; icon: string } = {
+    let formData: {
+      title: string;
+      content: string;
+      type: 'normal' | 'system';
+      icon: string;
+    } = {
       title: '',
       content: '',
       type: 'system',
@@ -178,7 +192,13 @@ export const PromptsTab = ({ menuActions }: PromptsTabProps) => {
           onChange={(d) => (formData = d)}
           onValidSubmit={() => {
             useModalStore.getState().close();
-            createPrompt(formData.title, formData.content, formData.type, formData.icon, folderId);
+            createPrompt(
+              formData.title,
+              formData.content,
+              formData.type,
+              formData.icon,
+              folderId,
+            );
           }}
         />
       ),
@@ -229,7 +249,7 @@ export const PromptsTab = ({ menuActions }: PromptsTabProps) => {
                 promptFolders.length === 0 &&
                 prompts.length === 0
               ) {
-                 return (
+                return (
                   <div className="flex flex-col items-center justify-center h-full p-4 text-center text-muted-foreground gap-4">
                     <p>{t('prompts.noPrompts')}</p>
                     <Button onClick={handleNewPrompt} className="gap-2">
@@ -240,21 +260,23 @@ export const PromptsTab = ({ menuActions }: PromptsTabProps) => {
                 );
               }
 
-              return <PromptsTree 
-                ref={treeRef} 
-                onSelect={handleSelect} 
-                onPreview={openPreviewModal}
-              />;
+              return (
+                <PromptsTree
+                  ref={treeRef}
+                  onSelect={handleSelect}
+                  onPreview={openPreviewModal}
+                />
+              );
             })()}
           </div>
         </ContextMenuTrigger>
         <ContextMenuContent>
-            <ContextMenuItem onClick={handleCreateRootFolder}>
-              <FolderPlus className="mr-2 h-4 w-4" />
-              {t('sidebar.newFolder')}
-            </ContextMenuItem>
+          <ContextMenuItem onClick={handleCreateRootFolder}>
+            <FolderPlus className="mr-2 h-4 w-4" />
+            {t('sidebar.newFolder')}
+          </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
     </div>
   );
-};
+};;

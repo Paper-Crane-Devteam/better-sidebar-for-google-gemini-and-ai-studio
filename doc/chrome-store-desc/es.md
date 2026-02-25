@@ -5,11 +5,18 @@ Conoce Better Sidebar for Gemini & AI Studio — el potenciador de flujo de trab
 
 Transformamos la interfaz predeterminada de AI Studio en una base de conocimientos poderosa y organizada. Deja de desplazarte sin fin y comienza a organizar tus ideas de manera eficiente.
 
-🔥 NOVEDADES (v2.0.0)
-• 🌟 Soporte para Gemini: ¡Ahora funciona perfectamente con las plataformas Gemini y AI Studio!
-• 🔄 Sincronización Automática: Tus conversaciones se sincronizan automáticamente cuando visitas la página.
-• 🔗 Datos Unificados: Biblioteca de prompts y búsqueda compartida entre Gemini y AI Studio.
-• 🎨 Mejor Interfaz: Opciones mejoradas de vista compacta y relajada para mejor legibilidad.
+🔥 NOVEDADES (v2.1.0)
+• 👥 Perfiles Multicuenta: Soporte para múltiples perfiles, cada uno vinculado a una cuenta separada de Gemini y AI Studio.
+• 📝 Biblioteca de Prompts Mejorada: Soporte para variables tipo opción y composición de prompts (importación de otros prompts).
+• 🔍 Búsqueda de Precisión: Nuevo filtro "Buscar en la conversación actual" para resultados más rápidos y relevantes.
+• ⚙️ Gestor de Plataformas: Nuevo popup de la extensión para alternar plataformas rápidamente y saltar entre ellas.
+
+---
+
+🌟 ASPECTOS DESTACADOS (v2.0.0)
+• 🌟 Soporte para Gemini: ¡Funciona perfectamente con Gemini y AI Studio!
+• 🔄 Sincronización Automática: Las conversaciones se sincronizan al visitar la página.
+• 🔗 Datos Unificados: Biblioteca de prompts y búsqueda compartida en ambas plataformas.
 
 🚀 CARACTERÍSTICAS PRINCIPALES
 

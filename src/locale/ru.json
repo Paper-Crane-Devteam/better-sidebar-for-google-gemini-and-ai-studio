@@ -232,7 +232,7 @@
     "showSidepanel": "Показать боковую панель"
   },
   "tooltip": {
-    "search": "Поиск",
+    "search": "Поиск по заголовку",
     "filterByTags": "Фильтровать по тегам",
     "filterAll": "Фильтр: Все",
     "filterNormalPrompts": "Фильтр: Обычные промпты",

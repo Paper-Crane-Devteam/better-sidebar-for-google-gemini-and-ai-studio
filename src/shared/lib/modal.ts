@@ -61,7 +61,13 @@ export const useModalStore = create<ModalStore>((set) => ({
 }));
 
 export const modal = {
-  confirm: (options: { title: string; content: React.ReactNode; confirmText?: string; cancelText?: string }) => {
+  confirm: (options: {
+    title: string;
+    content: React.ReactNode;
+    confirmText?: string;
+    cancelText?: string;
+    modalClassName?: string;
+  }) => {
     return new Promise<boolean>((resolve) => {
       useModalStore.getState().open({
         type: 'confirm',
@@ -69,6 +75,7 @@ export const modal = {
         content: options.content,
         confirmText: options.confirmText,
         cancelText: options.cancelText,
+        modalClassName: options.modalClassName,
         onConfirm: () => {
           useModalStore.getState().close();
           resolve(true);

@@ -58,6 +58,7 @@ export interface UIState {
       roleFilter: 'all' | 'user' | 'model';
       platforms: string[];
       showOptions: boolean;
+      conversationId?: string;
     };
     activeOptions: {
       caseSensitive: boolean;
@@ -66,6 +67,7 @@ export interface UIState {
       exclude: string;
       roleFilter: 'all' | 'user' | 'model';
       platforms: string[];
+      conversationId?: string;
     };
   };
   prompts: {

@@ -37,11 +37,12 @@ export const BatchToolbar = () => {
     const confirmed = await modal.confirm({
       title: t('batch.moveTitle'),
       content: (
-        <MoveItemsDialog 
-            selectedIds={selectedIds} 
-            onSelect={(id) => targetFolderId = id} 
+        <MoveItemsDialog
+          selectedIds={selectedIds}
+          onSelect={(id) => (targetFolderId = id)}
         />
       ),
+      modalClassName: 'max-w-xl',
       confirmText: t('common.move'),
       cancelText: t('common.cancel'),
     });
@@ -51,6 +52,7 @@ export const BatchToolbar = () => {
         const filesToMove = selectedIds.filter(id => state.prompts.some(c => c.id === id));
         
         await movePromptItems(filesToMove, targetFolderId);
+
         setPromptsBatchSelection([]);
         setPromptsBatchMode(false);
     }

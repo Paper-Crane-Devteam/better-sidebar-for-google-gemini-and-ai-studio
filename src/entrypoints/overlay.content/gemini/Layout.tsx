@@ -96,22 +96,36 @@ export async function initGeminiOverlay(mainStyles: string): Promise<void> {
     
     // Store references to elements we need to toggle
     const elements = {
-        wrapper: null as HTMLElement | null,
-        sideNavMenuBtn: null as HTMLElement | null,
-        searchNavBtn: null as HTMLElement | null,
-        topBarActions: null as HTMLElement | null,
+      wrapper: null as HTMLElement | null,
+      sideNavMenuBtn: null as HTMLElement | null,
+      bardModeSwitcher: null as HTMLElement | null,
+      searchNavBtn: null as HTMLElement | null,
+      topBarActions: null as HTMLElement | null,
     };
 
     // Start looking for external elements
-    waitForElement('.side-nav-menu-button').then(el => {
-        elements.sideNavMenuBtn = el as HTMLElement;
-        // Apply current state
-        const enabled = useAppStore.getState().ui.overlay.isOpen;
-        if (enabled) {
-            (el as HTMLElement).style.position = 'absolute';
-            (el as HTMLElement).style.top = '-9999px';
-            (el as HTMLElement).style.left = '-9999px';
-        }
+    waitForElement('side-nav-menu-button').then((el) => {
+      elements.sideNavMenuBtn = el as HTMLElement;
+      // Apply current state
+      const enabled = useAppStore.getState().ui.overlay.isOpen;
+      if (enabled) {
+        (el as HTMLElement).style.position = 'absolute';
+        (el as HTMLElement).style.top = '-9999px';
+        (el as HTMLElement).style.left = '-9999px';
+      }
+    });
+
+    waitForElement('bard-mode-switcher').then((el) => {
+      elements.bardModeSwitcher = el as HTMLElement;
+      const enabled = useAppStore.getState().ui.overlay.isOpen;
+      if (enabled) {
+        const density = useSettingsStore.getState().layoutDensity;
+        const width = density === 'compact' ? '281px' : '296px';
+        (el as HTMLElement).style.setProperty(
+          '--bard-sidenav-open-closed-width-diff',
+          width,
+        );
+      }
     });
 
     waitForElement('search-nav-button').then(el => {
@@ -223,6 +237,20 @@ export async function initGeminiOverlay(mainStyles: string): Promise<void> {
                 elements.sideNavMenuBtn.style.top = '';
                 elements.sideNavMenuBtn.style.left = '';
             }
+        }
+
+        if (elements.bardModeSwitcher) {
+          if (enabled) {
+            const width = density === 'compact' ? '281px' : '296px';
+            elements.bardModeSwitcher.style.setProperty(
+              '--bard-sidenav-open-closed-width-diff',
+              width,
+            );
+          } else {
+            elements.bardModeSwitcher.style.removeProperty(
+              '--bard-sidenav-open-closed-width-diff',
+            );
+          }
         }
 
         if (elements.searchNavBtn) {

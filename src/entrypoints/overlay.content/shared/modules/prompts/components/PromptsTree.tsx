@@ -56,6 +56,9 @@ export const PromptsTree = forwardRef<ArboristTreeHandle, PromptsTreeProps>(
         treeRef.current?.select(id);
         treeRef.current?.scrollTo(id);
       },
+      open: (id: string) => {
+        treeRef.current?.open(id);
+      },
     }));
 
     const data = useMemo(() => {

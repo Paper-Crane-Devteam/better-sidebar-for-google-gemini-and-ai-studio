@@ -164,6 +164,7 @@ export type ExtensionMessage = (
           excludeFolderNames?: string[];
           roleFilter?: 'all' | 'user' | 'model';
           platforms?: string[];
+          conversationId?: string;
         };
       };
     }

@@ -232,7 +232,7 @@
     "showSidepanel": "Mostrar Painel Lateral"
   },
   "tooltip": {
-    "search": "Pesquisar",
+    "search": "Pesquisar por título",
     "filterByTags": "Filtrar por Tags",
     "filterAll": "Filtro: Todos",
     "filterNormalPrompts": "Filtro: Prompts normais",

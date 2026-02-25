@@ -5,11 +5,18 @@ Meet BETTER SIDEBAR FOR GEMINI & AI STUDIO — the ultimate workflow booster for
 
 We transform the default AI Studio interface into a powerful, organized knowledge base. Stop scrolling endlessly and start organizing your ideas efficiently.
 
-🔥 WHAT'S NEW (v2.0.0)
-• 🌟 Gemini Support: Now works seamlessly with both Gemini and AI Studio platforms!
-• 🔄 Auto-Sync: Your conversations automatically sync when you visit the page.
-• 🔗 Unified Data: Shared prompt library and search across both Gemini and AI Studio.
-• 🎨 Better UI: Enhanced compact and relaxed view options for improved readability.
+🔥 WHAT'S NEW (v2.1.0)
+• 👥 Multi-Account Profiles: Support for multiple profiles, each linked to a separate Gemini and AI Studio account.
+• 📝 Enhanced Prompt Library: Support for option-type variables and prompt composition (importing other prompts).
+• 🔍 Precision Search: New "Search in Current Conversation" filter for faster, more relevant results.
+• ⚙️ Platform Manager: New extension popup to quickly toggle platforms and jump between them.
+
+---
+
+🌟 RECENT HIGHLIGHTS (v2.0.0)
+• 🌟 Gemini Support: Works seamlessly with both Gemini and AI Studio!
+• 🔄 Auto-Sync: Conversations automatically sync when you visit the page.
+• 🔗 Unified Data: Shared prompt library and search across both platforms.
 
 🚀 KEY FEATURES
 

@@ -14,7 +14,7 @@ export const AboutSettings = () => {
             <div className="grid gap-1">
               <h3 className="font-medium">{t('about.appName')}</h3>
               <p className="text-sm text-muted-foreground">
-                {t('about.version')} {t('about.versionNumber')}
+                {t('about.version')} {browser.runtime.getManifest().version}
               </p>
             </div>
             <div className="grid gap-1">

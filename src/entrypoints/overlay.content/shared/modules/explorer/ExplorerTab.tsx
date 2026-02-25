@@ -48,7 +48,7 @@ export const ExplorerTab = ({
     fetchData,
     ui,
     tags: allTags,
-    setIsScanning
+    setIsScanning,
   } = useAppStore();
 
   const { isScanning } = ui.overlay;
@@ -90,10 +90,11 @@ export const ExplorerTab = ({
   // Handle New Chat Creation (Listen to event from Main World)
   useEffect(() => {
     const handleCreate = async (event: any) => {
-      const { id, title, prompt_metadata, created_at, type, messages } = event.detail;
+      const { id, title, prompt_metadata, created_at, type, messages } =
+        event.detail;
       console.log(
         'Better Sidebar for Gemini & AI Studio: Overlay received BETTER_SIDEBAR_PROMPT_CREATE',
-        id
+        id,
       );
 
       let targetFolderId = null;
@@ -124,7 +125,7 @@ export const ExplorerTab = ({
             external_url: getExternalUrl(id),
             folder_id: targetFolderId,
             type,
-            messages
+            messages,
           },
         });
         // Refresh data to show new item immediately
@@ -132,15 +133,19 @@ export const ExplorerTab = ({
       } catch (e) {
         console.error(
           'Better Sidebar for Gemini & AI Studio: Failed to handle BETTER_SIDEBAR_PROMPT_CREATE',
-          e
+          e,
         );
       }
     };
 
     globalThis.addEventListener('BETTER_SIDEBAR_PROMPT_CREATE', handleCreate);
     return () =>
-      globalThis.removeEventListener('BETTER_SIDEBAR_PROMPT_CREATE', handleCreate);
+      globalThis.removeEventListener(
+        'BETTER_SIDEBAR_PROMPT_CREATE',
+        handleCreate,
+      );
   }, [selectedNode, fetchData]);
+
 
   // Handle URL changes to auto-select prompt
   useEffect(() => {
@@ -162,7 +167,7 @@ export const ExplorerTab = ({
 
       if (conversationIdChanged || conversationBecameAvailable) {
         const exists = conversations.some(
-          (c) => c.id === currentConversationId
+          (c) => c.id === currentConversationId,
         );
         if (exists) {
           treeRef.current?.select(currentConversationId);
@@ -307,4 +312,4 @@ export const ExplorerTab = ({
       </ContextMenu>
     </div>
   );
-};
+};;

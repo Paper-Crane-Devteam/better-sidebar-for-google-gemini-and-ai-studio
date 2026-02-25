@@ -232,7 +232,7 @@
     "showSidepanel": "サイドパネルを表示"
   },
   "tooltip": {
-    "search": "検索",
+    "search": "タイトルで検索",
     "filterByTags": "タグでフィルタ",
     "filterAll": "フィルタ：すべて",
     "filterNormalPrompts": "フィルタ：通常プロンプト",

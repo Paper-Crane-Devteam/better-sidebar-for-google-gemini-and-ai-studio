@@ -232,7 +232,7 @@
     "showSidepanel": "顯示側邊欄"
   },
   "tooltip": {
-    "search": "搜尋",
+    "search": "按標題搜尋",
     "filterByTags": "依標籤篩選",
     "filterAll": "篩選：全部",
     "filterNormalPrompts": "篩選：一般 Prompt",
@@ -368,7 +368,11 @@
     "modelResponse": "模型回覆",
     "userPrompt": "使用者提問",
     "noContextFound": "未找到相關訊息",
-    "loadingContext": "載入上下文中..."
+    "loadingContext": "載入上下文中...",
+    "searchScope": "搜尋範圍",
+    "allConversations": "所有對話",
+    "currentConversationOnly": "僅當前對話",
+    "notInConversation": "請先開啟一個對話才能使用此篩選"
   },
   "importHistory": {
     "selectZipHint": "請選擇從 Google 雲端硬碟下載、包含聊天記錄的 ZIP 檔案。",

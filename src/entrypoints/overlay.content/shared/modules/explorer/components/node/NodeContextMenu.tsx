@@ -118,12 +118,19 @@ export const NodeContextMenu = ({
           onSelect={(id) => (targetFolderId = id)}
         />
       ),
+      modalClassName: 'max-w-xl',
       confirmText: t('common.move'),
       cancelText: t('common.cancel'),
     });
 
     if (confirmed) {
       await useAppStore.getState().moveItem(node.data.id, targetFolderId, node.data.type);
+      if (targetFolderId && node.isSelected) {
+        node.tree.open(targetFolderId);
+        setTimeout(() => {
+          node.select();
+        }, 100);
+      }
     }
   };
 

@@ -14,33 +14,37 @@ If you use **Gemini** or **Google AI Studio** heavily, you know the struggle: yo
 
 We built this extension to fix that. It gives you a clean, organized sidebar with folders, tags, and a powerful search engine that actually works across **both platforms**—all while keeping your data 100% local and private.
 
-## 🚀 What's New in v2.0.0?
+## 🚀 What's New in v2.1.0?
 
-This is a groundbreaking release! We've expanded platform support to Gemini and introduced unified data management across both platforms.
+This update brings highly requested multi-account support and major enhancements to the prompt library!
 
-### 🌟 Gemini Platform Support (Major Feature)
-Better Sidebar now works with **both Gemini and AI Studio**!
-*   **Dual Platform Support**: Seamlessly switch between Gemini and AI Studio with the same powerful sidebar features you love.
-*   **Feature Parity**: All core features—folders, tags, search, and prompt library—work identically on both platforms.
+### 👥 Multi-Account Profiles (Major Feature)
+Manage multiple Gemini and AI Studio accounts with ease!
+*   **Switch Profiles**: Create separate profiles for work, personal, or different projects.
+*   **Independent Data**: Each profile maintains its own database, folders, and tags, perfectly synced with the corresponding Google account.
 
-### 🔄 Automatic Conversation Sync
-Your conversations stay up-to-date without manual intervention.
-*   **Real-Time Updates**: The extension automatically syncs your latest conversations when you visit Gemini or AI Studio.
-*   **Seamless Integration**: No more manual "Scan Library" clicks—your sidebar always reflects your current conversation list.
-### 🔗 Unified Data Management
-One library for two platforms—your prompts and search work everywhere.
-*   **Shared Prompt Library**: Create a prompt once, use it on both Gemini and AI Studio. Your entire prompt collection is available across platforms.
-*   **Cross-Platform Search**: Search through conversations from both Gemini and AI Studio simultaneously using the unified search engine.
-*   **Single Source of Truth**: All your data lives in one place, making backup and export simpler.
+### 📝 Enhanced Prompt Library
+Power up your workflow with advanced prompt composition.
+*   **Option Variables**: Define drop-down menus in your prompts for even more flexibility.
+*   **Prompt Composition**: Nest prompts within each other by importing existing prompt templates.
+*   **System Prompt Import**: Easily import system prompts directly in AI Studio.
 
-### 🎨 Improved UI Layouts
-Enhanced visual options for better comfort and productivity.
-*   **Compact View**: A denser layout for users who prefer seeing more information at once.
-*   **Relaxed View**: A more spacious design with better readability for extended use.
+### 🔍 Precision Search
+Find what you need faster with new filtering options.
+*   **Current Conversation Filter**: Limit your search to the active chat for immediate context.
+*   **Refined Indexing**: Faster and more reliable message indexing across both platforms.
 
-### ✨ Performance & Polish
-*   **Optimized Batch Operations**: Improved speed and reliability when performing bulk actions like moving multiple conversations or applying tags.
-*   **UI/UX Refinements**: Fixed numerous interface bugs and smoothed out interactions for a more polished experience across both platforms.
+### ⚙️ Platform Manager
+A new way to control your extension experience.
+*   **New Extension Popup**: Click the extension icon in your browser toolbar to enable/disable platforms.
+*   **Quick Navigation**: Jump directly to Gemini or AI Studio from the popup.
+
+---
+
+### 🌟 Previous Major Highlights (v2.0.0)
+*   **Gemini Platform Support**: Seamlessly manage conversations across both Gemini and AI Studio in one unified sidebar.
+*   **Automatic Conversation Sync**: Your latest conversations are automatically synced when you visit the page.
+*   **Improved UI Layouts**: Enhanced compact and relaxed view options for better readability.
 
 ## ✨ Features
 
@@ -76,6 +80,7 @@ We're just getting started. Here is what's on our mind:
 - [x] **Full Content Search** (Done in v1.1.0!)
 - [x] **Prompt Library** (Done in v1.1.0!)
 - [x] **Gemini Platform Support** (Done in v2.0.0!)
+- [x] **Multi-Account Support** (Done in v2.0.0!)
 - [ ] **Additional Platform Support**: Maybe bring this to ChatGPT or Claude?
 - [ ] **Cloud Sync**: Optional secure sync for those who work across multiple devices.
 - [ ] **AI Auto-Tagging**: Using a local LLM to help organize your chats automatically.

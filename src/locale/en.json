@@ -162,7 +162,7 @@
     "title": "About",
     "appName": "Better Sidebar for Gemini & AI Studio",
     "version": "Version",
-    "versionNumber": "1.1.0",
+    "versionNumber": "2.1.0",
     "developer": "Developer",
     "developerName": "Paper Crane Dev",
     "license": "License",
@@ -232,7 +232,7 @@
     "showSidepanel": "Show Sidepanel"
   },
   "tooltip": {
-    "search": "Search",
+    "search": "Search by title",
     "filterByTags": "Filter by Tags",
     "filterAll": "Filter: All",
     "filterNormalPrompts": "Filter: Normal Prompts",
@@ -374,7 +374,11 @@
     "modelResponse": "Model's Response",
     "userPrompt": "User's Prompt",
     "noContextFound": "No related message found",
-    "loadingContext": "Loading context..."
+    "loadingContext": "Loading context...",
+    "searchScope": "Search Scope",
+    "allConversations": "All conversations",
+    "currentConversationOnly": "Current conversation",
+    "notInConversation": "Open a conversation to use this filter"
   },
   "importHistory": {
     "selectZipHint": "Select the ZIP file downloaded from Google Drive containing your chat history.",

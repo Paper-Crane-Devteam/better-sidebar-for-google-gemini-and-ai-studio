@@ -1,13 +1,6 @@
-export const CURRENT_VERSION = '2.1.0';
+import type { ChangeLogItem } from './types';
 
-export interface ChangeLogItem {
-  version: string;
-  date: string;
-  features: string[];
-  fixes?: string[];
-}
-
-export const CHANGELOG: ChangeLogItem[] = [
+export const changelog: ChangeLogItem[] = [
   {
     version: '2.1.0',
     date: '2026-02-25',
@@ -19,7 +12,7 @@ export const CHANGELOG: ChangeLogItem[] = [
     ],
     fixes: [
       'Restored the system prompt import functionality in AI Studio.',
-      'Fixed an issue where deleted conversations would reappear unexpectedly after scanning.',
+      'Fixed an issue where deleted conversations would reappear unexpectedly after refreshing the page.',
       'Refined Gemini UI styling and restored the official Gemini brand logo.',
     ],
   },

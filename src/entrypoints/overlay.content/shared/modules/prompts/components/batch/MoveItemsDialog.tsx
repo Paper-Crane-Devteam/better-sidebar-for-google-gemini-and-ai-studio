@@ -51,7 +51,7 @@ export const MoveItemsDialog = ({ onSelect, selectedIds }: MoveItemsDialogProps)
   };
 
   return (
-    <div className="h-[300px] w-full border rounded-md">
+    <div className="min-h-[300px] max-h-[80vh] w-full border rounded-md">
       <ScrollArea className="h-full w-full p-2">
         <div
           className={cn(

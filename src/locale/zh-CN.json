@@ -162,7 +162,7 @@
     "title": "关于",
     "appName": "Gemini & AI Studio 增强侧边栏",
     "version": "版本",
-    "versionNumber": "1.1.0",
+    "versionNumber": "2.1.0",
     "developer": "开发者",
     "developerName": "Paper Crane Dev",
     "license": "许可证",
@@ -232,7 +232,7 @@
     "showSidepanel": "显示侧边栏"
   },
   "tooltip": {
-    "search": "搜索",
+    "search": "按标题搜索",
     "filterByTags": "按标签筛选",
     "filterAll": "筛选：全部",
     "filterNormalPrompts": "筛选：普通 Prompt",
@@ -374,7 +374,11 @@
     "modelResponse": "模型回复",
     "userPrompt": "用户提问",
     "noContextFound": "未找到相关消息",
-    "loadingContext": "加载上下文中..."
+    "loadingContext": "加载上下文中...",
+    "searchScope": "搜索范围",
+    "allConversations": "所有对话",
+    "currentConversationOnly": "仅当前对话",
+    "notInConversation": "请先打开一个对话才能使用此筛选"
   },
   "importHistory": {
     "selectZipHint": "选择从 Google 云端硬盘下载的、包含聊天记录的 ZIP 文件。",

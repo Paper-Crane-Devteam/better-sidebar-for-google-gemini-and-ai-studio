@@ -47,11 +47,12 @@ export const BatchToolbar = ({ onSelectAll }: BatchToolbarProps) => {
     const confirmed = await modal.confirm({
       title: t('batch.moveTitle'),
       content: (
-        <MoveItemsDialog 
-            selectedIds={selectedIds} 
-            onSelect={(id) => targetFolderId = id} 
+        <MoveItemsDialog
+          selectedIds={selectedIds}
+          onSelect={(id) => (targetFolderId = id)}
         />
       ),
+      modalClassName: 'max-w-xl',
       confirmText: t('common.move'),
       cancelText: t('common.cancel'),
     });
@@ -65,6 +66,7 @@ export const BatchToolbar = ({ onSelectAll }: BatchToolbarProps) => {
         const filesToMove = selectedIds.filter(id => state.conversations.some(c => c.id === id));
         
         await useAppStore.getState().moveItems(filesToMove, targetFolderId);
+
         setExplorerBatchSelection([]);
         setExplorerBatchMode(false);
     }
@@ -79,10 +81,9 @@ export const BatchToolbar = ({ onSelectAll }: BatchToolbarProps) => {
       const confirmed = await modal.confirm({
         title: t('batch.addTags'),
         content: (
-          <AddTagsDialog 
-              onSelectionChange={(ids) => selectedTagIds = ids} 
-          />
+          <AddTagsDialog onSelectionChange={(ids) => (selectedTagIds = ids)} />
         ),
+        modalClassName: 'max-w-xl',
         confirmText: t('common.save'),
         cancelText: t('common.cancel'),
       });
