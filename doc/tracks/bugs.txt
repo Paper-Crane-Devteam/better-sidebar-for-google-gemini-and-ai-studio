@@ -24,4 +24,5 @@
 13. images viewer and management
 -15. option dropdown
 -16. search in current chat
+14. sync using google drive
 `
