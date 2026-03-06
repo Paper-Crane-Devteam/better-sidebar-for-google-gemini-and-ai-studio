@@ -8,3 +8,4 @@ export { handleMessages } from './messages';
 export { handlePrompts } from './prompts';
 export { handleMisc } from './misc';
 export { handleProfile } from './profile';
+export { handleGdriveSync } from './gdrive-sync';

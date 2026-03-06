@@ -311,6 +311,13 @@ export type ExtensionMessage = (
       type: 'RENAME_PROFILE';
       payload: { profileId: string; name: string };
     }
+  // Google Drive sync
+  | { type: 'GDRIVE_AUTH' }
+  | { type: 'GDRIVE_DISCONNECT' }
+  | { type: 'GDRIVE_GET_STATUS' }
+  | { type: 'GDRIVE_SYNC_UP' }
+  | { type: 'GDRIVE_SYNC_DOWN' }
+  | { type: 'GDRIVE_CHECK_SUPPORT' }
 ) & { platform?: string };
 
 export interface ExtensionResponse {

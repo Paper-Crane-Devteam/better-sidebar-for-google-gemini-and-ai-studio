@@ -22,6 +22,7 @@ export default defineConfig({
       // 'tabs', // Removed to speed up review, we have host permissions
       'scripting',
       'offscreen',
+      'identity',
     ],
     host_permissions: [
       'https://aistudio.google.com/*',

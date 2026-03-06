@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Folder as FolderIcon, MessageSquare, ChevronRight, ChevronDown, FolderOpen, Star, Eye } from 'lucide-react';
+import {
+  Folder as FolderIcon,
+  MessageSquare,
+  ChevronRight,
+  ChevronDown,
+  FolderOpen,
+  Star,
+  Eye,
+} from 'lucide-react';
 import { cn } from '@/shared/lib/utils/utils';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
 import { useAppStore } from '@/shared/lib/store';
@@ -21,11 +29,21 @@ import { NodeProps } from './types';
 import { NodeContent } from './NodeContent';
 import { NodeContextMenu } from './NodeContextMenu';
 import { useDeleteHandler } from '../../hooks/useDeleteHandler';
-import { VariableFillForm, type VariableFillFormRef } from '../VariableFillForm';
+import {
+  VariableFillForm,
+  type VariableFillFormRef,
+} from '../VariableFillForm';
 
 import { toast } from '@/shared/lib/toast';
 
-export const Node = ({ node, style, dragHandle, tree, preview, onPreview }: NodeProps) => {
+export const Node = ({
+  node,
+  style,
+  dragHandle,
+  tree,
+  preview,
+  onPreview,
+}: NodeProps) => {
   const { t } = useI18n();
   const {
     ui,
@@ -41,7 +59,7 @@ export const Node = ({ node, style, dragHandle, tree, preview, onPreview }: Node
   const variableFormRef = useRef<VariableFillFormRef | null>(null);
 
   const isFavorite = favorites.some(
-    (f) => f.target_id === node.data.id && f.target_type === 'prompt'
+    (f) => f.target_id === node.data.id && f.target_type === 'prompt',
   );
   const { isBatchMode, selectedIds: batchSelectedIds } = ui.prompts.batch;
   const isBatchSelected = batchSelectedIds.includes(node.data.id);
@@ -80,16 +98,14 @@ export const Node = ({ node, style, dragHandle, tree, preview, onPreview }: Node
       )
     ) : null;
 
-  const folderIcon = (
-    <FolderIcon className="w-4 h-4 text-foreground/70" />
-  );
+  const folderIcon = <FolderIcon className="w-4 h-4 text-foreground/80" />;
   const fileIcon = <MessageSquare className="w-4 h-4" />;
 
   const handleView = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
     if (onPreview) {
-        onPreview(node.data.data);
+      onPreview(node.data.data);
     }
   };
 
@@ -111,7 +127,9 @@ export const Node = ({ node, style, dragHandle, tree, preview, onPreview }: Node
     if (!content) return;
     // Resolve @import references first
     const resolved = resolveContent(content);
-    const variables = parsePromptVariables(resolved).filter((v) => v.kind !== 'import');
+    const variables = parsePromptVariables(resolved).filter(
+      (v) => v.kind !== 'import',
+    );
     if (variables.length > 0) {
       useModalStore.getState().open({
         type: 'confirm',
@@ -145,14 +163,14 @@ export const Node = ({ node, style, dragHandle, tree, preview, onPreview }: Node
   };
 
   const handleDuplicate = async () => {
-      const { title, content, type, icon, folder_id } = node.data.data;
-      await createPrompt(
-          t('prompts.copyOf', { title }),
-          content,
-          type,
-          icon || '',
-          folder_id
-      );
+    const { title, content, type, icon, folder_id } = node.data.data;
+    await createPrompt(
+      t('prompts.copyOf', { title }),
+      content,
+      type,
+      icon || '',
+      folder_id,
+    );
   };
 
   const innerContent = (
@@ -168,9 +186,7 @@ export const Node = ({ node, style, dragHandle, tree, preview, onPreview }: Node
         }}
         isBatchMode={isBatchMode}
         isBatchSelected={isBatchSelected}
-        onToggleBatchSelection={() =>
-          togglePromptsBatchSelection(node.data.id)
-        }
+        onToggleBatchSelection={() => togglePromptsBatchSelection(node.data.id)}
         isFavorite={isFavorite}
         folderIcon={folderIcon}
         fileIcon={fileIcon}
@@ -181,41 +197,51 @@ export const Node = ({ node, style, dragHandle, tree, preview, onPreview }: Node
         newName={newName}
         setNewName={setNewName}
       />
-        {/* Hover Actions */}
+      {/* Hover Actions */}
       <div
         className={cn(
           'hidden group-hover:flex items-center gap-1 absolute right-2',
-          isContextMenuOpen && 'flex'
+          isContextMenuOpen && 'flex',
         )}
       >
         {isFile && !isBatchMode && (
           <>
-             <SimpleTooltip content={t('prompts.viewPrompt')}>
-                <div
-                  role="button"
-                  className="h-5 w-5 flex items-center justify-center rounded-sm hover:bg-muted/50 cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
-                  onClick={handleView}
-                >
-                  <Eye className="h-3.5 w-3.5" />
-                </div>
-              </SimpleTooltip>
+            <SimpleTooltip content={t('prompts.viewPrompt')}>
+              <div
+                role="button"
+                className="h-5 w-5 flex items-center justify-center rounded-sm hover:bg-muted/50 cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
+                onClick={handleView}
+              >
+                <Eye className="h-3.5 w-3.5" />
+              </div>
+            </SimpleTooltip>
 
-             <SimpleTooltip content={isFavorite ? t('tooltip.removeFromFavorites') : t('tooltip.addToFavorites')}>
-                <div
-                  role="button"
-                  className={cn(
-                    "h-5 w-5 flex items-center justify-center rounded-sm hover:bg-muted/50 cursor-pointer transition-colors",
-                    isFavorite ? "text-yellow-500" : "text-muted-foreground hover:text-foreground"
-                  )}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    toggleFavorite(node.data.id, 'prompt', isFavorite);
-                  }}
-                >
-                  <Star className={cn("h-3.5 w-3.5", isFavorite && "fill-current")} />
-                </div>
-              </SimpleTooltip>
+            <SimpleTooltip
+              content={
+                isFavorite
+                  ? t('tooltip.removeFromFavorites')
+                  : t('tooltip.addToFavorites')
+              }
+            >
+              <div
+                role="button"
+                className={cn(
+                  'h-5 w-5 flex items-center justify-center rounded-sm hover:bg-muted/50 cursor-pointer transition-colors',
+                  isFavorite
+                    ? 'text-yellow-500'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  toggleFavorite(node.data.id, 'prompt', isFavorite);
+                }}
+              >
+                <Star
+                  className={cn('h-3.5 w-3.5', isFavorite && 'fill-current')}
+                />
+              </div>
+            </SimpleTooltip>
           </>
         )}
       </div>
@@ -223,15 +249,21 @@ export const Node = ({ node, style, dragHandle, tree, preview, onPreview }: Node
   );
 
   const commonClasses = cn(
-    'flex items-center gap-1.5 px-1 cursor-pointer group relative pr-2 h-full text-foreground no-underline outline-none text-density rounded-sm',
+    'flex items-center gap-1.5 px-1 cursor-pointer group relative pr-2 h-full no-underline outline-none text-density rounded-sm font-medium text-foreground/80',
     !((node.isSelected && !isFile) || isBatchSelected) && 'hover:bg-accent/50',
     ((node.isSelected && !isFile) || isBatchSelected) && 'node-item-selected',
     node.willReceiveDrop && 'bg-accent/50 border border-primary/40 rounded-sm',
-    isContextMenuOpen && 'bg-accent/50'
+    isContextMenuOpen && 'bg-accent/50',
   );
 
   const content = (
-    <div style={style} className={cn("outline-none", "h-[calc(100%-2px)] w-[calc(100%-4px)] mx-auto mt-[1px]")}>
+    <div
+      style={style}
+      className={cn(
+        'outline-none',
+        'h-[calc(100%-2px)] w-[calc(100%-4px)] mx-auto mt-[1px]',
+      )}
+    >
       <div
         ref={dragHandle}
         role="button"
@@ -251,15 +283,15 @@ export const Node = ({ node, style, dragHandle, tree, preview, onPreview }: Node
           }
 
           if (isFile) {
-              // Copy on click for files (may open variable-fill modal)
-              const content = node.data.data.content || '';
-              tryCopyContent(content);
-              return;
+            // Copy on click for files (may open variable-fill modal)
+            const content = node.data.data.content || '';
+            tryCopyContent(content);
+            return;
           }
 
           node.select();
           if (node.data.type === 'folder') {
-              node.toggle();
+            node.toggle();
           }
         }}
         onKeyDown={(e) => {
@@ -269,7 +301,7 @@ export const Node = ({ node, style, dragHandle, tree, preview, onPreview }: Node
               return;
             }
             if (node.data.type === 'folder') {
-                node.toggle();
+              node.toggle();
             }
           }
         }}

@@ -15,6 +15,11 @@ import {
   Check,
   X,
   CheckCircle2,
+  UploadCloud,
+  DownloadCloud,
+  Link,
+  Unlink,
+  AlertTriangle,
 } from 'lucide-react';
 import { useDataManagement } from '../hooks/useDataManagement';
 import { useI18n } from '@/shared/hooks/useI18n';
@@ -23,6 +28,7 @@ import { PLATFORM_CONFIG, Platform } from '@/shared/types/platform';
 import type { Profile } from '@/shared/lib/profile-registry';
 import { modal } from '@/shared/lib/modal';
 import { toast } from '@/shared/lib/toast';
+import dayjs from 'dayjs';
 
 export const DataSettings = () => {
   const { t } = useI18n();
@@ -30,6 +36,18 @@ export const DataSettings = () => {
   const { exportData, importData, resetData, scanLibrary, isLoading } =
     useDataManagement();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Google Drive sync state
+  const [gdriveSupported, setGdriveSupported] = useState(false);
+  const [gdriveStatus, setGdriveStatus] = useState<{
+    isAuthenticated: boolean;
+    userEmail?: string;
+    lastSyncTime?: number | null;
+  }>({ isAuthenticated: false });
+  const [gdriveSyncing, setGdriveSyncing] = useState<'up' | 'down' | null>(
+    null,
+  );
+  const [gdriveConnecting, setGdriveConnecting] = useState(false);
 
   // Profile management state
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -57,9 +75,106 @@ export const DataSettings = () => {
     }
   };
 
+  const fetchGdriveStatus = async () => {
+    try {
+      const supportRes = await browser.runtime.sendMessage({
+        type: 'GDRIVE_CHECK_SUPPORT',
+      });
+      if (supportRes?.success) {
+        setGdriveSupported(supportRes.data);
+        if (!supportRes.data) return;
+      }
+
+      const res = await browser.runtime.sendMessage({
+        type: 'GDRIVE_GET_STATUS',
+      });
+      if (res?.success) {
+        setGdriveStatus(res.data);
+      }
+    } catch (e) {
+      console.error('Failed to fetch GDrive status:', e);
+    }
+  };
+
   useEffect(() => {
     fetchProfiles();
+    fetchGdriveStatus();
   }, []);
+
+  const handleGdriveConnect = async () => {
+    setGdriveConnecting(true);
+    try {
+      const res = await browser.runtime.sendMessage({ type: 'GDRIVE_AUTH' });
+      if (res?.success) {
+        await fetchGdriveStatus();
+        toast.success(
+          t('data.gdriveConnectedAs', { email: res.data?.userEmail || '' }),
+        );
+      } else {
+        toast.error(res?.error || 'Connection failed');
+      }
+    } catch (e) {
+      console.error('GDrive connect error:', e);
+    } finally {
+      setGdriveConnecting(false);
+    }
+  };
+
+  const handleGdriveDisconnect = async () => {
+    setGdriveConnecting(true);
+    try {
+      await browser.runtime.sendMessage({ type: 'GDRIVE_DISCONNECT' });
+      setGdriveStatus({ isAuthenticated: false });
+    } catch (e) {
+      console.error('GDrive disconnect error:', e);
+    } finally {
+      setGdriveConnecting(false);
+    }
+  };
+
+  const handleGdriveBackup = async () => {
+    setGdriveSyncing('up');
+    try {
+      const res = await browser.runtime.sendMessage({ type: 'GDRIVE_SYNC_UP' });
+      if (res?.success) {
+        toast.success(t('data.gdriveBackupSuccess'));
+        await fetchGdriveStatus();
+      } else {
+        toast.error(res?.error || t('data.gdriveBackupFailed'));
+      }
+    } catch (e) {
+      toast.error(t('data.gdriveBackupFailed'));
+    } finally {
+      setGdriveSyncing(null);
+    }
+  };
+
+  const handleGdriveRestore = async () => {
+    const confirmed = await modal.confirm({
+      title: t('data.gdriveRestore'),
+      content: t('data.gdriveRestoreConfirm'),
+      confirmText: t('data.gdriveRestore'),
+      cancelText: t('common.cancel'),
+    });
+    if (!confirmed) return;
+
+    setGdriveSyncing('down');
+    try {
+      const res = await browser.runtime.sendMessage({
+        type: 'GDRIVE_SYNC_DOWN',
+      });
+      if (res?.success) {
+        toast.success(t('data.gdriveRestoreSuccess'));
+        await fetchGdriveStatus();
+      } else {
+        toast.error(res?.error || t('data.gdriveRestoreFailed'));
+      }
+    } catch (e) {
+      toast.error(t('data.gdriveRestoreFailed'));
+    } finally {
+      setGdriveSyncing(null);
+    }
+  };
 
   const handleImportClick = () => {
     fileInputRef.current?.click();
@@ -236,6 +351,108 @@ export const DataSettings = () => {
           </div>
         </div>
       </div>
+
+      {/* ── Google Drive Sync ── */}
+      {gdriveSupported && (
+        <div className="space-y-2">
+          <h3 className="text-lg font-medium">{t('data.gdriveSync')}</h3>
+          <Separator />
+          <div className="mt-3 p-4 border rounded-lg bg-muted/10 space-y-3">
+            {/* Status */}
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <span className="text-sm font-medium">
+                  {gdriveStatus.isAuthenticated
+                    ? t('data.gdriveConnectedAs', {
+                        email: gdriveStatus.userEmail || '',
+                      })
+                    : t('data.gdriveNotConnected')}
+                </span>
+                {gdriveStatus.lastSyncTime && (
+                  <p className="text-xs text-muted-foreground">
+                    {t('data.gdriveLastSync')}:{' '}
+                    {dayjs
+                      .unix(gdriveStatus.lastSyncTime)
+                      .format('YYYY-MM-DD HH:mm')}
+                  </p>
+                )}
+              </div>
+              {gdriveStatus.isAuthenticated ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  onClick={handleGdriveDisconnect}
+                  disabled={gdriveConnecting || gdriveSyncing !== null}
+                >
+                  {gdriveConnecting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Unlink className="h-4 w-4" />
+                  )}
+                  {t('data.gdriveDisconnect')}
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  onClick={handleGdriveConnect}
+                  disabled={gdriveConnecting}
+                >
+                  {gdriveConnecting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Link className="h-4 w-4" />
+                  )}
+                  {t('data.gdriveConnect')}
+                </Button>
+              )}
+            </div>
+
+            {/* Sync buttons */}
+            {gdriveStatus.isAuthenticated && (
+              <>
+                <Separator />
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 gap-2"
+                    onClick={handleGdriveBackup}
+                    disabled={gdriveSyncing !== null}
+                  >
+                    {gdriveSyncing === 'up' ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <UploadCloud className="h-4 w-4" />
+                    )}
+                    {t('data.gdriveBackup')}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 gap-2"
+                    onClick={handleGdriveRestore}
+                    disabled={gdriveSyncing !== null}
+                  >
+                    {gdriveSyncing === 'down' ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <DownloadCloud className="h-4 w-4" />
+                    )}
+                    {t('data.gdriveRestore')}
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground flex items-start gap-1.5">
+                  <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0 text-yellow-500" />
+                  {t('data.gdriveRestoreWarning')}
+                </p>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ── Profiles & Storage ── */}
       <div className="space-y-2">

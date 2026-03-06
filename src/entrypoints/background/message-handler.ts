@@ -17,6 +17,7 @@ import {
   handlePrompts,
   handleMisc,
   handleProfile,
+  handleGdriveSync,
 } from './handlers';
 
 const handlers = [
@@ -30,6 +31,7 @@ const handlers = [
   handleMessages,
   handlePrompts,
   handleMisc,
+  handleGdriveSync,
 ];
 
 // Clean up tab→db mapping when tabs are closed

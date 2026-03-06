@@ -26,6 +26,7 @@ import { NodeContent } from './NodeContent';
 import { NodeContextMenu } from './NodeContextMenu';
 import { FolderSettingsDialog } from './FolderSettingsDialog';
 import { useDeleteHandler } from '../../hooks/useDeleteHandler';
+import { platform } from 'os';
 
 export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
   const { t } = useI18n();
@@ -141,7 +142,7 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
 
   const folderIcon = (
     <FolderIconComponent
-      className={folderColor ? 'w-4 h-4' : 'w-4 h-4 text-foreground/70'}
+      className={folderColor ? 'w-4 h-4' : 'w-4 h-4 text-foreground/80'}
       style={folderColor ? { color: folderColor } : undefined}
     />
   );
@@ -211,7 +212,7 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
           <SimpleTooltip content={t('folderSettings.title')}>
             <div
               role="button"
-              className="h-5 w-5 flex items-center justify-center rounded-sm hover:bg-muted/50 cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
+              className="h-5 w-5 flex items-center justify-center rounded-sm hover:bg-muted/50 cursor-pointer text-muted-foreground hover:text-foreground transition-colors font-medium"
               onClick={async (e) => {
                 e.stopPropagation();
                 e.preventDefault();
@@ -250,7 +251,7 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
           <SimpleTooltip content={t('tooltip.addToFavorites')}>
             <div
               role="button"
-              className="h-5 w-5 flex items-center justify-center rounded-sm hover:bg-muted/50 cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
+              className="h-5 w-5 flex items-center justify-center rounded-sm hover:bg-muted/50 cursor-pointer text-muted-foreground hover:text-foreground transition-colors font-medium"
               onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
@@ -266,11 +267,12 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
   );
 
   const commonClasses = cn(
-    'flex items-center gap-1.5 px-1 cursor-pointer group relative pr-2 h-full text-foreground no-underline outline-none text-density rounded-sm',
+    'flex items-center gap-1.5 px-1 cursor-pointer group relative pr-2 h-full no-underline outline-none text-density rounded-sm text-foreground/80',
     !(node.isSelected || isBatchSelected) && 'hover:bg-accent/50',
     ((isFile && !isFavorite) || (!isFile && !isTimeGroup)) &&
       'group-hover:pr-8',
     (node.isSelected || isBatchSelected) && 'node-item-selected',
+    'font-medium',
     node.willReceiveDrop && 'bg-accent/50 border border-primary/40 rounded-sm',
     isContextMenuOpen && 'bg-accent/50',
     isContextMenuOpen &&

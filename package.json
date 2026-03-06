@@ -33,6 +33,7 @@
     "@tailwindcss/typography": "^0.5.19",
     "@types/webextension-polyfill": "^0.12.4",
     "ajax-hook": "^3.0.3",
+    "axios": "^1.13.6",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.19",
