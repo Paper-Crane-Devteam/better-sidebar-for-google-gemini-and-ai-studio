@@ -9,9 +9,6 @@ import {
   Copy,
   FileCode,
   X,
-  MessageSquare,
-  User,
-  Bot,
   Loader2,
 } from 'lucide-react';
 import { cn, stripMarkdown } from '@/shared/lib/utils/utils';
@@ -25,7 +22,11 @@ import { toast } from '@/shared/lib/toast';
 import type { Message } from '@/shared/types/db';
 import AIStudioIcon from '@/assets/icons/aistudio.png';
 import GeminiIcon from '@/assets/icons/gemini.svg';
-import { detectPlatform, PLATFORM_CONFIG, Platform } from '@/shared/types/platform';
+import {
+  detectPlatform,
+  PLATFORM_CONFIG,
+  Platform,
+} from '@/shared/types/platform';
 
 export interface SearchResultItem {
   id: string;
@@ -84,18 +85,12 @@ const MessagePreviewContent = ({
 
   const contextLabel =
     match.role === 'user' ? t('search.modelResponse') : t('search.userPrompt');
-  const ContextIcon = match.role === 'user' ? Bot : User;
 
   return (
     <div className="flex flex-col gap-4">
       {/* Main message content */}
       <div className="max-h-[50vh] overflow-y-auto p-2">
         <div className="flex items-center gap-2 mb-2 text-sm text-muted-foreground">
-          {match.role === 'user' ? (
-            <User className="h-4 w-4" />
-          ) : (
-            <Bot className="h-4 w-4" />
-          )}
           <span className="font-medium">
             {match.role === 'user'
               ? t('export.roleUser')
@@ -124,13 +119,12 @@ const MessagePreviewContent = ({
           ) : (
             <ChevronRight className="h-4 w-4" />
           )}
-          <MessageSquare className="h-4 w-4" />
           <span>{t('search.context')}</span>
-          {!isLoading && adjacentMessage && (
+          {/* {!isLoading && adjacentMessage && (
             <span className="text-xs bg-muted px-1.5 py-0.5 rounded">
               {contextLabel}
             </span>
-          )}
+          )} */}
         </button>
 
         {isExpanded && (
@@ -143,7 +137,6 @@ const MessagePreviewContent = ({
             ) : adjacentMessage ? (
               <div className="rounded-lg border bg-muted/30 p-3">
                 <div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground">
-                  <ContextIcon className="h-3.5 w-3.5" />
                   <span className="font-medium">{contextLabel}</span>
                   {adjacentMessage.timestamp && (
                     <span>
@@ -195,7 +188,6 @@ const ResultGroup = ({
         ) : (
           <ChevronRight className="h-4 w-4 shrink-0" />
         )}
-        <MessageSquare className="h-4 w-4 text-muted-foreground shrink-0" />
         <span className="font-medium truncate flex-1">
           {data.conversation.title || untitledLabel}
         </span>
