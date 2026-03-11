@@ -5,47 +5,63 @@ Meet BETTER SIDEBAR FOR GEMINI & AI STUDIO — the ultimate workflow booster for
 
 We transform the default AI Studio interface into a powerful, organized knowledge base. Stop scrolling endlessly and start organizing your ideas efficiently.
 
-🔥 WHAT'S NEW (v2.1.0)
-• 👥 Multi-Account Profiles: Support for multiple profiles, each linked to a separate Gemini and AI Studio account.
-• 📝 Enhanced Prompt Library: Support for option-type variables and prompt composition (importing other prompts).
-• 🔍 Precision Search: New "Search in Current Conversation" filter for faster, more relevant results.
-• ⚙️ Platform Manager: New extension popup to quickly toggle platforms and jump between them.
+🔥 WHAT'S NEW (v2.2.0)
+• 🎨 Gemini UI Customization: Adjust layout widths, hide unnecessary elements, and toggle Focus Mode.
+• ☁️ Google Drive Sync: Manually backup and sync your settings, prompts, and configurations securely via Google Drive.
+• 🌈 Custom Colors & Tags: Assign custom colors to your folders/tags. View tags inline in chat headers.
+• 🖼️ Watermark-Free Images: Downloading generated images in Gemini now automatically removes the watermarks.
 
 ---
 
-🌟 RECENT HIGHLIGHTS (v2.0.0)
-• 🌟 Gemini Support: Works seamlessly with both Gemini and AI Studio!
-• 🔄 Auto-Sync: Conversations automatically sync when you visit the page.
-• 🔗 Unified Data: Shared prompt library and search across both platforms.
-
 🚀 KEY FEATURES
 
-📂 Drag & Drop Folders
-Create nested folders to group your chats by project, client, or topic. Simply drag and drop conversations to keep your workspace clean.
+🌟 Multi-Platform Support
+Manage conversations across both Gemini and Google AI Studio seamlessly in one unified sidebar.
 
-📝 Prompt Library (NEW)
-Build your personal library of reusable prompts. Use variables (e.g., {{topic}}) to create dynamic templates and insert them into chats instantly.
+👥 Multi-Account Profiles
+Create separate profiles for work or personal use. Each maintains its own independent database.
 
-📥 Conversation Export (NEW)
-Export your conversations as Markdown, Plain Text, or JSON for documentation or backup.
+📂 Folders & Colors
+Drag and drop your chats into nested folders. Assign custom colors to folders and tags.
 
-🔍 Deep Search (UPGRADED)
-Don't rely on your memory. Perform full-text searches across every message in your history to find exactly what you're looking for.
+📝 Prompt Library
+Build your personal library of reusable prompts. Supports option variables, prompt composition, and system prompt imports.
+
+☁️ Google Drive Sync (NEW)
+Manually backup and sync your settings, prompts, and config data via Google Drive.
+
+🔍 Precision Search
+Perform full-text searches across every message in your history. Limit search to the active chat for immediate context.
+
+🎨 UI Customization (NEW)
+Advanced layout controls for Gemini, including width adjustments and Focus Mode.
+
+⚙️ Platform Manager
+Use the extension popup to quickly jump between platforms or enable/disable them on the fly.
 
 🏷️ Smart Tagging System
-Assign custom tags to your conversations. Whether it's "Coding", "Creative Writing", or "Debugging", filter your chats instantly.
-
-📊 Timeline View
-Visualize your workflow with a "Today", "Yesterday", and "Last Week" timeline. Pick up exactly where you left off.
+Assign custom tags to your conversations, now visible directly in the chat header.
 
 ⭐ Favorites & Pinning
-Keep your most frequently used prompts at the top for quick access.
+Keep your most frequently used chats or specific prompts at the top for quick access.
+
+🔄 Automatic Sync
+Your latest conversations are automatically synced behind the scenes when you visit the page.
+
+📊 Timeline View
+Visualize your workflow with a "Today", "Yesterday", and "Last Week" timeline.
+
+🖼️ Image Downloads (NEW)
+Automatically remove watermarks when downloading generated images in Gemini.
+
+📥 Conversation Export
+Export your conversations as Markdown, Plain Text, or JSON for documentation or backup.
 
 🌗 Seamless Integration
-Designed to look and feel native. Automatically syncs with AI Studio’s Light and Dark modes.
+Automatically matches the platform's light/dark mode.
 
 💾 Secure Data Backup
-Your data is yours. Export your organization structure (SQL dump) for backup or import it to another device.
+Your data is yours. Export your organization structure (SQL dump) for backup.
 
 🔒 PRIVACY FIRST
 

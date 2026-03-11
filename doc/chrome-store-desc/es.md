@@ -5,47 +5,63 @@ Conoce Better Sidebar for Gemini & AI Studio — el potenciador de flujo de trab
 
 Transformamos la interfaz predeterminada de AI Studio en una base de conocimientos poderosa y organizada. Deja de desplazarte sin fin y comienza a organizar tus ideas de manera eficiente.
 
-🔥 NOVEDADES (v2.1.0)
-• 👥 Perfiles Multicuenta: Soporte para múltiples perfiles, cada uno vinculado a una cuenta separada de Gemini y AI Studio.
-• 📝 Biblioteca de Prompts Mejorada: Soporte para variables tipo opción y composición de prompts (importación de otros prompts).
-• 🔍 Búsqueda de Precisión: Nuevo filtro "Buscar en la conversación actual" para resultados más rápidos y relevantes.
-• ⚙️ Gestor de Plataformas: Nuevo popup de la extensión para alternar plataformas rápidamente y saltar entre ellas.
+🔥 NOVEDADES (v2.2.0)
+• 🎨 Personalización de la UI de Gemini: Ajusta los anchos de diseño, oculta elementos innecesarios y usa el Modo Enfoque.
+• ☁️ Sincronización con Google Drive: Realiza copias de seguridad y sincroniza tu configuración y prompts de forma segura.
+• 🌈 Colores Personalizados y Etiquetas: Asigna colores personalizados a tus carpetas y etiquetas en los encabezados de los chats.
+• 🖼️ Imágenes sin Marca de Agua: La descarga de imágenes generadas en Gemini ahora elimina automáticamente la marca de agua.
 
 ---
 
-🌟 ASPECTOS DESTACADOS (v2.0.0)
-• 🌟 Soporte para Gemini: ¡Funciona perfectamente con Gemini y AI Studio!
-• 🔄 Sincronización Automática: Las conversaciones se sincronizan al visitar la página.
-• 🔗 Datos Unificados: Biblioteca de prompts y búsqueda compartida en ambas plataformas.
-
 🚀 CARACTERÍSTICAS PRINCIPALES
 
-📂 Carpetas de Arrastrar y Soltar
-Crea carpetas anidadas para agrupar tus chats por proyecto, cliente o tema. Simplemente arrastra y suelta conversaciones para mantener tu espacio de trabajo limpio.
+🌟 Soporte Multiplataforma
+Gestiona conversaciones tanto en Gemini como en Google AI Studio sin problemas en una sola barra lateral unificada.
 
-📝 Biblioteca de Prompts (NUEVO)
-Construye tu biblioteca personal de prompts reutilizables. Usa variables (ej. {{tema}}) para crear plantillas dinámicas e insertarlas al instante.
+👥 Perfiles Multicuenta
+Crea perfiles separados para uso laboral o personal. Cada uno mantiene su propia base de datos independiente.
 
-📥 Exportar Conversaciones (NUEVO)
-Exporta tus conversaciones como Markdown, texto plano o JSON para documentación o respaldo.
+📂 Carpetas y Colores
+Arrastra y suelta tus chats en carpetas anidadas. Asigna colores personalizados a carpetas y etiquetas.
 
-🔍 Búsqueda Profunda (MEJORADO)
-No dependas de tu memoria. Realiza búsquedas de texto completo en todos tus mensajes para encontrar exactamente lo que buscas.
+📝 Biblioteca de Prompts
+Construye tu biblioteca personal de prompts reutilizables. Soporta variables de opción, composición de prompts y sistemas.
+
+☁️ Sincronización con Google Drive (NUEVO)
+Haz una copia de seguridad y sincroniza manualmente tu configuración y datos mediante Google Drive.
+
+🔍 Búsqueda de Precisión
+Realiza búsquedas de texto completo en cada mensaje de tu historial. Limita la búsqueda al chat activo.
+
+🎨 Personalización de la UI (NUEVO)
+Controles de diseño avanzados para Gemini, incluyendo el Modo Enfoque.
+
+⚙️ Gestor de Plataformas
+Usa el popup de la extensión para saltar rápidamente entre plataformas o habilitar/deshabilitarlas.
 
 🏷️ Sistema de Etiquetas Inteligente
-Asigna etiquetas personalizadas a tus conversaciones. Ya sea "Programación", "Escritura Creativa" o "Depuración", filtra tus chats al instante.
-
-📊 Vista de Línea de Tiempo
-Visualiza tu flujo de trabajo con una línea de tiempo de "Hoy", "Ayer" y "Semana Pasada". Retoma exactamente donde lo dejaste.
+Asigna etiquetas personalizadas a tus conversaciones, ahora visibles directamente en el encabezado del chat.
 
 ⭐ Favoritos y Fijación
-Mantén tus prompts más utilizados en la parte superior para acceso rápido.
+Mantén tus chats o prompts más utilizados en la parte superior para acceso rápido.
+
+🔄 Sincronización Automática
+Tus últimas conversaciones se sincronizan automáticamente en segundo plano cuando visitas la página.
+
+📊 Vista de Línea de Tiempo
+Visualiza tu flujo de trabajo con una línea de tiempo de "Hoy", "Ayer" y "Semana Pasada".
+
+🖼️ Descarga de Imágenes (NUEVO)
+Elimina automáticamente las marcas de agua al descargar imágenes generadas en Gemini.
+
+📥 Exportar Conversaciones
+Exporta tus conversaciones como Markdown, texto plano o JSON para documentación o respaldo.
 
 🌗 Integración Perfecta
-Diseñado para verse y sentirse nativo. Se sincroniza automáticamente con los modos Claro y Oscuro de AI Studio.
+Se sincroniza automáticamente con los modos Claro y Oscuro de la plataforma.
 
 💾 Respaldo Seguro de Datos
-Tus datos son tuyos. Exporta tu estructura de organización (volcado SQL) para respaldo o impórtala a otro dispositivo.
+Tus datos son tuyos. Exporta tu estructura de organización (volcado SQL) para respaldo.
 
 🔒 PRIVACY FIRST
 

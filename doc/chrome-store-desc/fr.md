@@ -5,44 +5,63 @@ Découvrez Better Sidebar for Gemini & AI Studio — le booster de flux de trava
 
 Nous transformons l'interface par défaut d'AI Studio en une base de connaissances puissante et organisée. Arrêtez de faire défiler sans fin et commencez à organiser vos idées efficacement.
 
-🔥 NOUVEAUTÉS (v2.1.0)
-• 👥 Profils Multi-comptes : Support de plusieurs profils, chacun lié à un compte Gemini et AI Studio distinct.
-• 📝 Bibliothèque de Prompts Améliorée : Support des variables de type option et de la composition de prompts (importation d'autres prompts).
-• 🔍 Recherche de Précision : Nouveau filtre "Rechercher dans la conversation actuelle" pour des résultats plus rapides et pertinents.
-• ⚙️ Gestionnaire de Plateformes : Nouveau popup d'extension pour basculer rapidement entre les plateformes et y accéder directement.
+🔥 NOUVEAUTÉS (v2.2.0)
+• 🎨 Personnalisation de l'interface Gemini : Ajustez les largeurs, masquez les éléments inutiles et basculez en mode Focus.
+• ☁️ Synchronisation Google Drive : Sauvegardez et synchronisez manuellement vos paramètres et prompts en toute sécurité.
+• 🌈 Couleurs & Tags personnalisés : Attribuez des couleurs à vos dossiers/tags. Affichez les tags dans les titres.
+• 🖼️ Images sans filigrane : Le téléchargement d'images générées dans Gemini supprime automatiquement le filigrane.
 
 ---
 
-🌟 POINTS FORTS RÉCENTS (v2.0.0)
-• 🌟 Support de Gemini : Fonctionne parfaitement avec Gemini et AI Studio !
-• 🔄 Synchronisation Automatique : Les conversations se synchronisent lors de la visite.
-• 🔗 Données Unifiées : Bibliothèque de prompts et recherche partagées sur les deux plateformes.
-
 🚀 FONCTIONNALITÉS PRINCIPALES
 
-📂 Dossiers Glisser-Déposer
-Créez des dossiers imbriqués pour regrouper vos conversations par projet, client ou sujet. Glissez-déposez simplement les conversations pour garder votre espace de travail propre.
+🌟 Support Multi-plateformes
+Gérez les conversations de Gemini et Google AI Studio de manière transparente dans une seule barre latérale.
 
-📥 Export des conversations (NOUVEAU)
-Exportez vos conversations en Markdown, texte brut ou JSON pour documentation ou sauvegarde.
+👥 Profils Multi-comptes
+Créez des profils séparés pour le travail ou l'usage personnel avec des bases de données indépendantes.
+
+📂 Dossiers et Couleurs
+Créez des dossiers imbriqués et attribuez des couleurs personnalisées à vos dossiers et tags.
+
+📝 Bibliothèque de Prompts
+Construisez votre bibliothèque de prompts réutilisables. Supporte les variables d'options et l'importation.
+
+☁️ Synchronisation Google Drive (NOUVEAU)
+Sauvegardez et synchronisez vos données de configuration via Google Drive.
+
+🔍 Recherche de Précision
+Effectuez des recherches en texte intégral dans tout votre historique. Limitez la recherche à la conversation active.
+
+🎨 Personnalisation de l'UI (NOUVEAU)
+Contrôles de disposition avancés pour Gemini, y compris le mode Focus.
+
+⚙️ Gestionnaire de Plateformes
+Passez rapidement d'une plateforme à l'autre depuis l'extension.
 
 🏷️ Système de Tags Intelligent
-Attribuez des tags personnalisés à vos conversations. Qu'il s'agisse de "Programmation", "Rédaction Créative" ou "Débogage", filtrez vos conversations instantanément.
-
-🔍 Recherche Puissante
-Ne comptez pas sur votre mémoire. Utilisez notre recherche en temps réel pour trouver n'importe quelle conversation par son titre instantanément.
-
-📊 Vue Chronologique
-Visualisez votre flux de travail avec une chronologie "Aujourd'hui", "Hier" et "Semaine Dernière". Reprenez exactement où vous vous êtes arrêté.
+Attribuez des tags personnalisés, désormais visibles directement dans l'en-tête de la discussion.
 
 ⭐ Favoris et Épinglage
-Gardez vos prompts les plus utilisés en haut pour un accès rapide.
+Gardez vos chats ou prompts les plus utilisés en haut.
+
+🔄 Synchronisation Automatique
+Vos dernières conversations sont automatiquement synchronisées en arrière-plan.
+
+📊 Vue Chronologique
+Visualisez votre workflow avec "Aujourd'hui", "Hier", et "Semaine Dernière".
+
+🖼️ Téléchargement d'Images (NOUVEAU)
+Suppression automatique des filigranes lors du téléchargement d'images dans Gemini.
+
+📥 Export des conversations
+Exportez vos conversations en Markdown, texte brut ou JSON.
 
 🌗 Intégration Parfaite
-Conçu pour avoir l'air et se sentir natif. Se synchronise automatiquement avec les modes Clair et Sombre d'AI Studio.
+Se synchronise automatiquement avec les modes Clair et Sombre.
 
-💾 Sauvegarde Sécurisée des Données
-Vos données vous appartiennent. Exportez votre structure d'organisation (dump SQL) pour sauvegarde ou importez-la sur un autre appareil.
+💾 Sauvegarde Sécurisée
+Vos données vous appartiennent. Exportez votre structure (dump SQL) pour sauvegarde.
 
 🔒 PRIVACY FIRST
 

@@ -4,13 +4,16 @@ import {
   messageRepo,
 } from '@/shared/db/operations';
 import i18n from '@/locale/i18n';
-import type { ExtensionMessage, ExtensionResponse } from '@/shared/types/messages';
+import type {
+  ExtensionMessage,
+  ExtensionResponse,
+} from '@/shared/types/messages';
 import type { MessageSender } from '../types';
 import { notifyDataUpdated } from '../notify';
 
 export async function handleConversations(
   message: ExtensionMessage,
-  _sender: MessageSender
+  _sender: MessageSender,
 ): Promise<ExtensionResponse | null> {
   switch (message.type) {
     case 'GET_CONVERSATIONS': {
@@ -38,7 +41,8 @@ export async function handleConversations(
     }
     case 'DELETE_ITEMS': {
       const { conversationIds, folderIds } = message.payload;
-      if (conversationIds?.length) await conversationRepo.deleteMultiple(conversationIds);
+      if (conversationIds?.length)
+        await conversationRepo.deleteMultiple(conversationIds);
       if (folderIds?.length) await folderRepo.deleteMultiple(folderIds);
       await notifyDataUpdated();
       return { success: true };
@@ -71,10 +75,16 @@ export async function handleConversations(
       if (!folderId) {
         const folders = await folderRepo.getAll(platform);
         const importedName = i18n.t('explorer.imported');
-        folderId = folders.find((f) => f.name === importedName || f.name === 'Imported')?.id;
+        folderId = folders.find(
+          (f) => f.name === importedName || f.name === 'Imported',
+        )?.id;
         if (!folderId) {
           folderId = crypto.randomUUID();
-          await folderRepo.create({ id: folderId, name: importedName, platform });
+          await folderRepo.create({
+            id: folderId,
+            name: importedName,
+            platform,
+          });
         }
       }
       const external_url =
@@ -82,8 +92,8 @@ export async function handleConversations(
         (platform === 'gemini'
           ? `https://gemini.google.com/app/${id}`
           : platform === 'chatgpt'
-          ? `https://chatgpt.com/c/${id}`
-          : `https://aistudio.google.com/prompts/${id}`);
+            ? `https://chatgpt.com/c/${id}`
+            : `https://aistudio.google.com/prompts/${id}`);
       await conversationRepo.save({
         id,
         title,
@@ -92,7 +102,9 @@ export async function handleConversations(
         external_url,
         updated_at: Math.floor(Date.now() / 1000),
         created_at,
-        prompt_metadata: prompt_metadata ? JSON.stringify(prompt_metadata) : null,
+        prompt_metadata: prompt_metadata
+          ? JSON.stringify(prompt_metadata)
+          : null,
         type: type || 'conversation',
         platform,
       });
@@ -104,7 +116,10 @@ export async function handleConversations(
       return { success: true };
     }
     case 'MOVE_CONVERSATIONS': {
-      await conversationRepo.moveMultiple(message.payload.ids, message.payload.folderId);
+      await conversationRepo.moveMultiple(
+        message.payload.ids,
+        message.payload.folderId,
+      );
       return { success: true };
     }
     case 'SYNC_CONVERSATIONS': {
@@ -116,11 +131,35 @@ export async function handleConversations(
       const itemsToSync = items.filter((item) => !deletedSet.has(item.id));
 
       if (itemsToSync.length > 0) {
-        const conversationsToSave = itemsToSync.map((item) => ({
-          ...item,
-          folder_id: null,
-          platform,
-        }));
+        const allExisting = await conversationRepo.getAll(platform);
+        const existingMap = new Map(allExisting.map((c) => [c.id, c]));
+
+        const importedName = i18n.t('explorer.imported');
+        const folders = await folderRepo.getAll(platform);
+        let importedFolderId = folders.find(
+          (f) => f.name === importedName || f.name === 'Imported',
+        )?.id;
+
+        if (!importedFolderId) {
+          importedFolderId = crypto.randomUUID();
+          await folderRepo.create({
+            id: importedFolderId,
+            name: importedName,
+            platform,
+          });
+        }
+
+        const conversationsToSave = itemsToSync.map((item) => {
+          const existing = existingMap.get(item.id);
+          const targetFolderId = existing
+            ? existing.folder_id
+            : importedFolderId;
+          return {
+            ...item,
+            folder_id: targetFolderId,
+            platform,
+          };
+        });
         await conversationRepo.bulkSave(conversationsToSave);
         await notifyDataUpdated();
       }

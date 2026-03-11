@@ -5,16 +5,16 @@ export const changelog: ChangeLogItem[] = [
     version: '2.2.0',
     date: '2026-03-10',
     features: [
-      '🎨 **Gemini UI Customization**: Adjust sidebar, chat content, and input box widths. Hide unnecessary elements (Gemini logo, AI disclaimer, upgrade button) and toggle Focus Mode for a cleaner look.',
-      '🏷️ **Title Tags**: Tags are now displayed next to the conversation title in the header and can be configured directly.',
-      '🖼️ **Watermark-Free Image Downloads**: Downloading generated images in Gemini now automatically removes the watermark.',
-      '☁️ **Google Drive Sync**: Manually backup and sync your settings, prompts, and configurations (excluding chat history) via Google Drive.',
-      '🌈 **Custom Colors**: You can now assign custom colors to your folders and tags for better organization.',
+      '🎨 **Customização da UI do Gemini**: Ajuste a largura da barra lateral, do conteúdo do chat e da caixa de entrada. Oculte elementos desnecessários (logotipo do Gemini, aviso legal de IA, botão de atualização) e ative o Modo de Foco (Focus Mode) para um visual mais limpo.',
+      '🏷️ **Tags no Título**: Tags agora são exibidas ao lado do título da conversa no cabeçalho e podem ser configuradas diretamente.',
+      "🖼️ **Download de Imagens sem Marca d'Água**: O download de imagens geradas no Gemini agora remove automaticamente a marca d'água.",
+      '☁️ **Sincronização com o Google Drive**: Faça backup e sincronize manualmente suas configurações, biblioteca de Prompt e preferências (excluindo o histórico de bate-papo) via Google Drive.',
+      '🌈 **Cores Personalizadas**: Agora você pode atribuir cores personalizadas às suas pastas e tags para melhor organização.',
     ],
     fixes: [
-      'Fixed an issue where user feedback failed to send (apologies for the inconvenience! You can now resend any previous feedback).',
-      'Improved Gemini sidebar animation performance for smoother expanding and collapsing.',
-      'Various minor UI tweaks and experience optimizations.',
+      'Corrigido um problema onde o envio de feedback do usuário falhava (pedimos desculpas pelo inconveniente! Agora você pode reenviar qualquer feedback anterior).',
+      'Melhoria do desempenho da animação da barra lateral do Gemini para expansão e retração mais suaves.',
+      'Vários pequenos ajustes na UI e otimizações de experiência.',
     ],
   },
   {
@@ -59,7 +59,7 @@ export const changelog: ChangeLogItem[] = [
       '❤️ **Open Source**: The code is now open source! Star us on GitHub if you like it!',
     ],
     fixes: [
-      'Moved the "Switch to Original UI" button for better accessibility.',
+      'Moved the "Switch to original UI" button for better accessibility.',
       'Fixed various UI glitches and improved performance.',
     ],
   },

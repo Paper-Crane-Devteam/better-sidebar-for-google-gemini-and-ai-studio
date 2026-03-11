@@ -11,7 +11,10 @@ interface MoveItemsDialogProps {
   selectedIds: string[]; // IDs of items being moved, to prevent moving a folder into itself
 }
 
-export const MoveItemsDialog = ({ onSelect, selectedIds }: MoveItemsDialogProps) => {
+export const MoveItemsDialog = ({
+  onSelect,
+  selectedIds,
+}: MoveItemsDialogProps) => {
   const { t } = useI18n();
   const folders = useAppStore((state) => state.promptFolders);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -75,4 +78,3 @@ export const MoveItemsDialog = ({ onSelect, selectedIds }: MoveItemsDialogProps)
     </div>
   );
 };
-
