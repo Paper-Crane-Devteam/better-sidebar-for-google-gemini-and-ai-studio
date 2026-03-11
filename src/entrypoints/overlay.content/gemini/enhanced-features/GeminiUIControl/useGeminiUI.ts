@@ -24,6 +24,7 @@ export const useGeminiUI = () => {
     hideDisclaimer,
     hideUpgrade,
     zenMode,
+    showSmartScrollbar,
   } = geminiSettings;
   const isSidebarExpanded = useAppStore((s) => s.ui.overlay.isSidebarExpanded);
 
@@ -252,6 +253,9 @@ export const useGeminiUI = () => {
     setHideUpgrade: (v: boolean) => setGeminiFeature('hideUpgrade', v),
     setShowTopBarTag: (v: boolean) => setGeminiFeature('showTopBarTag', v),
     setZenMode: (v: boolean) => setGeminiFeature('zenMode', v),
+    showSmartScrollbar,
+    setShowSmartScrollbar: (v: boolean) =>
+      setGeminiFeature('showSmartScrollbar', v),
     setRemoveWatermark: (v: boolean) =>
       setPegasusGeminiFeature('removeWatermark', v),
   };

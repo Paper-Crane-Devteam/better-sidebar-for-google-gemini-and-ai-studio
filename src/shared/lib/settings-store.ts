@@ -17,6 +17,7 @@ interface GeminiEnhancedFeatures {
   hideUpgrade: boolean;
   showTopBarTag: boolean;
   zenMode: boolean;
+  showSmartScrollbar: boolean;
 }
 
 interface SettingsState {
@@ -149,6 +150,7 @@ export const useSettingsStore = create<SettingsState>()(
           hideUpgrade: false,
           showTopBarTag: false,
           zenMode: false,
+          showSmartScrollbar: true,
         },
       },
 
