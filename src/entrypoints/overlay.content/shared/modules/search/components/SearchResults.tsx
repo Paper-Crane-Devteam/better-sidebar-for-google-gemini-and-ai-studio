@@ -303,7 +303,7 @@ const MatchItem = ({
       i % 2 === 1 ? (
         <span
           key={i}
-          className="bg-yellow-500/30 text-foreground font-medium rounded-[2px] px-0.5"
+          className="bg-yellow-500/30 text-foreground font-medium rounded-[2px]"
         >
           {part}
         </span>

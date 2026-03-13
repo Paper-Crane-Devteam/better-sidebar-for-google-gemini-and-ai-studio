@@ -37,10 +37,17 @@ export const MarkdownRenderer = memo(({ children, className, highlight, highligh
     const regex = new RegExp(`(${pattern})`, flags);
     const parts = text.split(regex);
     
-    return parts.map((part, i) => 
-        (i % 2 === 1) ? 
-            <span key={i} className="bg-yellow-500/30 text-foreground font-medium rounded-[2px] px-0.5">{part}</span> : 
-            part
+    return parts.map((part, i) =>
+      i % 2 === 1 ? (
+        <span
+          key={i}
+          className="bg-yellow-500/30 text-foreground font-medium rounded-[2px]"
+        >
+          {part}
+        </span>
+      ) : (
+        part
+      ),
     );
   };
 
