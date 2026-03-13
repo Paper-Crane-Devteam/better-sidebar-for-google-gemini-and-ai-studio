@@ -173,11 +173,11 @@
     "githubRepository": "GitHub 仓库"
   },
   "sponsor": {
-    "title": "支持开发",
-    "enjoying": "喜欢 Gemini & AI Studio 增强侧边栏 吗？",
-    "description": "这个项目是免费使用的。如果它帮助您提高工作效率，请考虑支持其开发！",
-    "sponsorOnGithub": "在 GitHub 上点星",
-    "buyMeACoffee": "请我喝杯咖啡"
+    "title": "支持我们",
+    "enjoying": "喜欢 Better Sidebar 吗？",
+    "description": "这是一个免费的开源项目，靠爱发电 ❤️ 如果它让你用得顺手，给个好评、点颗星、分享给朋友，或者请我喝杯咖啡，都是对我们最大的鼓励！",
+    "sponsorOnGithub": "去 GitHub 点颗星",
+    "buyMeACoffee": "请我喝杯咖啡 ☕"
   },
   "data": {
     "librarySync": "数据同步",
@@ -478,7 +478,7 @@
     "notReally": "不太喜欢",
     "yes": "很喜欢",
     "awesome": "太棒了！",
-    "rateDescription": "如果您能花一分钟在应用商店里给我们一个 5 星好评，那将是对我们最大的肯定和支持！",
+    "rateDescription": "花一分钟给个 5 星好评，就是对我们最大的肯定 🌟",
     "maybeLater": "以后再说",
     "rateUs": "去给好评",
     "sorry": "很抱歉给您带来不好的体验",
@@ -616,9 +616,9 @@
     "fixes": "改进与修复",
     "welcome": "欢迎使用最新版本！",
     "awesome": "太棒了！",
-    "enjoyingIt": "喜欢 Better Sidebar 吗？",
+    "enjoyingIt": "觉得好用？支持一下 👇",
     "rateUs": "好评",
-    "starOnGithub": "点星",
-    "buyMeACoffee": "咖啡"
+    "starOnGithub": "点星 ⭐",
+    "buyMeACoffee": "咖啡 ☕"
   }
 }

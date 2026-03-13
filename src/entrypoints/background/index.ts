@@ -2,6 +2,8 @@ import type { ExtensionMessage } from '@/shared/types/messages';
 import { handleMessage } from './message-handler';
 import { initPegasusTransport } from '@webext-pegasus/transport/background';
 import { initPegasusBackendStore } from '@/shared/lib/pegasus-store';
+import { dbReady } from './db';
+import { seedDefaultPrompts } from './seed-prompts';
 
 console.log(
   'Better Sidebar for Gemini & AI Studio: Background Service Worker Starting...',
@@ -30,6 +32,8 @@ export default defineBackground(() => {
     setupUninstallUrl();
     if (details.reason === 'install') {
       browser.tabs.create({ url: browser.runtime.getURL('/onboarding.html') });
+      // Seed default prompts after DB is ready
+      dbReady.then(() => seedDefaultPrompts());
     }
   });
 

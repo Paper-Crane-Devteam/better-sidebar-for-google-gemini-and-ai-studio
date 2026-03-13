@@ -173,11 +173,11 @@
     "githubRepository": "GitHub 儲存庫"
   },
   "sponsor": {
-    "title": "支援開發",
-    "enjoying": "喜歡 Gemini & AI Studio 增強側邊欄 嗎？",
-    "description": "此專案可免費使用。如果它幫助您提高工作效率，請考慮支援其開發！",
-    "sponsorOnGithub": "在 GitHub 上按讚",
-    "buyMeACoffee": "請我喝杯咖啡"
+    "title": "支持我們",
+    "enjoying": "喜歡 Better Sidebar 嗎？",
+    "description": "這是一個免費的開源專案，靠愛發電 ❤️ 如果它讓你用得順手，給個好評、點顆星、分享給朋友，或者請我喝杯咖啡，都是對我們最大的鼓勵！",
+    "sponsorOnGithub": "去 GitHub 點顆星",
+    "buyMeACoffee": "請我喝杯咖啡 ☕"
   },
   "data": {
     "librarySync": "資料同步",
@@ -540,7 +540,7 @@
     "notReally": "不太喜歡",
     "yes": "很喜歡",
     "awesome": "太棒了！",
-    "rateDescription": "如果您能花一分鐘在應用商店裡給我們一個 5 星好評，那將是對我們最大的肯定與支持！",
+    "rateDescription": "花一分鐘給個 5 星好評，就是對我們最大的肯定 🌟",
     "maybeLater": "以後再說",
     "rateUs": "去給好評",
     "sorry": "很抱歉給您帶來不好的體驗",
@@ -617,9 +617,9 @@
     "fixes": "改進與修復",
     "welcome": "歡迎使用最新版本！",
     "awesome": "太棒了！",
-    "enjoyingIt": "喜歡 Better Sidebar 嗎？",
+    "enjoyingIt": "覺得好用？支持一下 👇",
     "rateUs": "好評",
-    "starOnGithub": "點星",
-    "buyMeACoffee": "咖啡"
+    "starOnGithub": "點星 ⭐",
+    "buyMeACoffee": "咖啡 ☕"
   }
 }

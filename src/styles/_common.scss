@@ -54,11 +54,11 @@
       background: transparent;
     }
     &::-webkit-scrollbar-thumb {
-      background: hsl(var(--border));
+      background: rgb(var(--border));
       border-radius: 10px;
     }
     &::-webkit-scrollbar-thumb:hover {
-      background: hsl(var(--muted-foreground) / 0.4);
+      background: rgb(var(--muted-foreground) / 0.4);
     }
   }
 }

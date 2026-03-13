@@ -173,11 +173,11 @@
     "githubRepository": "Repositorio de GitHub"
   },
   "sponsor": {
-    "title": "Apoyar el Desarrollo",
-    "enjoying": "¿Disfrutando de la Barra Lateral Mejorada para Gemini y AI Studio?",
-    "description": "Este proyecto es gratuito. Si te ayuda a ser más productivo, ¡considera apoyar su desarrollo!",
-    "sponsorOnGithub": "Dar Estrella en GitHub",
-    "buyMeACoffee": "Cómprame un Café"
+    "title": "Apóyanos",
+    "enjoying": "¿Te gusta Better Sidebar?",
+    "description": "Es un proyecto gratuito y de código abierto, hecho con amor ❤️ Si te resulta útil, una reseña, una estrella en GitHub, compartirlo con amigos o invitarnos a un café son el mejor apoyo que puedes darnos.",
+    "sponsorOnGithub": "Dar estrella en GitHub",
+    "buyMeACoffee": "Invítame un café ☕"
   },
   "data": {
     "librarySync": "Sincronización de Datos",
@@ -479,7 +479,7 @@
     "notReally": "No mucho",
     "yes": "¡Sí, me gusta!",
     "awesome": "¡Genial!",
-    "rateDescription": "Si pudieras tomarte un minuto para darnos 5 estrellas en la tienda, ¡significaría mucho para nosotros!",
+    "rateDescription": "Un minuto para darnos 5 estrellas en la tienda significa mucho para nosotros 🌟",
     "maybeLater": "Quizás más tarde",
     "rateUs": "Valorar 5 estrellas",
     "sorry": "Lamentamos oír eso",
@@ -617,9 +617,9 @@
     "fixes": "Mejoras y correcciones",
     "welcome": "¡Bienvenido a la última versión! Disfruta de las actualizaciones.",
     "awesome": "¡Genial!",
-    "enjoyingIt": "¿Te gusta Better Sidebar?",
+    "enjoyingIt": "¿Te gusta? Muéstranos tu apoyo 👇",
     "rateUs": "Valorar",
-    "starOnGithub": "Estrella",
-    "buyMeACoffee": "Café"
+    "starOnGithub": "Estrella ⭐",
+    "buyMeACoffee": "Café ☕"
   }
 }

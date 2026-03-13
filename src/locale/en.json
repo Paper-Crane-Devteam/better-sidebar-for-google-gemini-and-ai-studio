@@ -173,11 +173,11 @@
     "githubRepository": "GitHub Repository"
   },
   "sponsor": {
-    "title": "Support Development",
-    "enjoying": "Enjoying Better Sidebar for Gemini & AI Studio?",
-    "description": "This project is free to use. If it helps you be more productive, consider supporting its development!",
+    "title": "Support Us",
+    "enjoying": "Enjoying Better Sidebar?",
+    "description": "This is a free, open-source project built with love ❤️ If it makes your workflow better, a rating, a GitHub star, sharing with friends, or buying us a coffee means the world to us!",
     "sponsorOnGithub": "Star on GitHub",
-    "buyMeACoffee": "Buy me a Coffee"
+    "buyMeACoffee": "Buy me a Coffee ☕"
   },
   "data": {
     "librarySync": "Data Sync",
@@ -478,7 +478,7 @@
     "notReally": "Not really",
     "yes": "Yes, I do!",
     "awesome": "Awesome!",
-    "rateDescription": "If you could take a minute to rate us 5 stars on the store, it would mean the world to us!",
+    "rateDescription": "A quick 5-star rating on the store would mean the world to us 🌟",
     "maybeLater": "Maybe later",
     "rateUs": "Rate 5 stars",
     "sorry": "Sorry to hear that",
@@ -616,9 +616,9 @@
     "fixes": "Improvements & Fixes",
     "welcome": "Welcome to the latest version! Enjoy the updates.",
     "awesome": "Awesome!",
-    "enjoyingIt": "Enjoying Better Sidebar?",
+    "enjoyingIt": "Enjoying Better Sidebar? Show some love 👇",
     "rateUs": "Rate",
-    "starOnGithub": "Star",
-    "buyMeACoffee": "Coffee"
+    "starOnGithub": "Star ⭐",
+    "buyMeACoffee": "Coffee ☕"
   }
 }

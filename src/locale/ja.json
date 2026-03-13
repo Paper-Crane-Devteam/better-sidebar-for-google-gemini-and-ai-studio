@@ -173,11 +173,11 @@
     "githubRepository": "GitHub リポジトリ"
   },
   "sponsor": {
-    "title": "開発をサポート",
-    "enjoying": "Gemini & AI Studio 用の拡張サイドバー をお楽しみですか？",
-    "description": "このプロジェクトは無料で使用できます。生産性向上に役立つ場合は、開発のサポートをご検討ください！",
+    "title": "応援する",
+    "enjoying": "Better Sidebar を気に入っていただけましたか？",
+    "description": "無料のオープンソースプロジェクトです ❤️ 役に立てているなら、レビュー・GitHub スター・お友達への紹介・コーヒーのご支援、どれも大きな励みになります！",
     "sponsorOnGithub": "GitHub でスターを付ける",
-    "buyMeACoffee": "コーヒーを一杯"
+    "buyMeACoffee": "コーヒーをおごる ☕"
   },
   "data": {
     "librarySync": "データ同期",
@@ -479,7 +479,7 @@
     "notReally": "あまり",
     "yes": "はい、気に入っています！",
     "awesome": "素晴らしい！",
-    "rateDescription": "ストアで5つ星の評価をいただけると大変嬉しいです！",
+    "rateDescription": "ストアで5つ星の評価をいただけると、とても嬉しいです 🌟",
     "maybeLater": "後で",
     "rateUs": "5つ星で評価",
     "sorry": "お役に立てず申し訳ありません",
@@ -617,9 +617,9 @@
     "fixes": "改善と修正",
     "welcome": "最新バージョンへようこそ！",
     "awesome": "素晴らしい！",
-    "enjoyingIt": "Better Sidebar を気に入りましたか？",
+    "enjoyingIt": "気に入ったら応援してください 👇",
     "rateUs": "評価",
-    "starOnGithub": "スター",
-    "buyMeACoffee": "コーヒー"
+    "starOnGithub": "スター ⭐",
+    "buyMeACoffee": "コーヒー ☕"
   }
 }
