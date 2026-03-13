@@ -12,5 +12,5 @@
 13. gemini gem mangement 
 -14. zen mode
 15. demo video
--16. landing page
+16. landing page
 17. default create conversation folder
