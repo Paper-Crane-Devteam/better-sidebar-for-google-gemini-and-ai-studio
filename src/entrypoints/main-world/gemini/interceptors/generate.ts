@@ -103,6 +103,12 @@ export function handleGenerateResponse(response: any, url: string) {
                 /^c_/,
                 '',
               );
+              const responseMessageId = targetPayload?.[1]?.[1];
+
+              console.log(
+                'Better Sidebar (Gemini): Response Message ID from payload[1][1]:',
+                responseMessageId,
+              );
 
               if (contentCandidate && conversationId) {
                 console.log(
@@ -118,7 +124,8 @@ export function handleGenerateResponse(response: any, url: string) {
                 let title: string | undefined;
                 for (let i = payloads.length - 1; i >= 0; i--) {
                   try {
-                    const t = payloads[i]?.[10]?.[0] || payloads[i]?.[2]?.[11]?.[0];
+                    const t =
+                      payloads[i]?.[10]?.[0] || payloads[i]?.[2]?.[11]?.[0];
                     if (typeof t === 'string' && t) {
                       title = t;
                       break;
@@ -131,11 +138,26 @@ export function handleGenerateResponse(response: any, url: string) {
                 const messages = [];
                 const timestamp = Math.floor(Date.now() / 1000);
 
-                // User Message
+                // User Message — ID from payload[1][1] (r_xxx format)
+                const userMessageId = responseMessageId;
+
+                console.log(
+                  'Better Sidebar (Gemini): User Message ID:',
+                  userMessageId,
+                );
+
+                // Model Message — ID from payload[4][0][0] (rc_xxx format)
+                const modelMessageId = targetPayload?.[4]?.[0]?.[0];
+
+                console.log(
+                  'Better Sidebar (Gemini): Model Message ID:',
+                  modelMessageId,
+                );
+
                 if (prompt) {
                   messages.push({
                     role: 'user',
-                    id: crypto.randomUUID(), // We don't have ID in generate response usually, so generate one
+                    id: userMessageId || crypto.randomUUID(),
                     conversation_id: conversationId,
                     content: prompt,
                     message_type: 'text',
@@ -146,7 +168,7 @@ export function handleGenerateResponse(response: any, url: string) {
                 // Model Message
                 messages.push({
                   role: 'model',
-                  id: crypto.randomUUID(),
+                  id: modelMessageId || crypto.randomUUID(),
                   conversation_id: conversationId,
                   content: contentCandidate,
                   message_type: 'text',

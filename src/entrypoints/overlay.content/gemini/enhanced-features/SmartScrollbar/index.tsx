@@ -1,80 +1,102 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { ChevronDown, ChevronUp, MessageSquare } from 'lucide-react';
-import { useConversationNodes } from './useConversationNodes';
+import {
+  ChevronsLeft,
+  ChevronsRight,
+  List,
+  PanelRightClose,
+} from 'lucide-react';
 import { cn } from '@/shared/lib/utils/utils';
-import { OverflowTooltip } from '@/shared/components/ui/overflow-tooltip';
+import { useConversationNodes } from './useConversationNodes';
+import { SmartScrollbarExpandedView } from './SmartScrollbarExpandedView';
+import { SmartScrollbarNormalView } from './SmartScrollbarNormalView';
+import { SmartScrollbarMinimizedView } from './SmartScrollbarMinimizedView';
+
+/**
+ * 3 parallel modes:
+ * - 'normal'    — hover opens a compact panel with nodes; mouse-leave closes
+ * - 'maximized' — hover opens a wider panel with full content; mouse-leave closes
+ * - 'minimized' — small icon; click shows title + restore button
+ *
+ * Normal ↔ Maximized are siblings (both hover-to-open).
+ * Minimized is a collapsed icon state reachable from either.
+ */
+type ScrollbarMode = 'normal' | 'maximized' | 'minimized';
 
 export const SmartScrollbar: React.FC = () => {
   const { nodes, activeNodeId, scrollToNode } = useConversationNodes();
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [mode, setMode] = useState<ScrollbarMode>('normal');
   const [isHovered, setIsHovered] = useState(false);
-  const expandedRef = useRef<HTMLDivElement>(null);
-  const collapsedRef = useRef<HTMLDivElement>(null);
-  const activeNodeRef = useRef<HTMLDivElement>(null);
 
-  // Track whether the user has manually scrolled inside each list.
-  // Resets only on conversation switch.
-  const userScrolledExpandedRef = useRef(false);
-  const userScrolledCollapsedRef = useRef(false);
-  const prevNodesLenRef = useRef(nodes.length);
+  const normalRef = useRef<HTMLDivElement>(null!);
+  const expandedRef = useRef<HTMLDivElement>(null!);
+  const activeNodeRef = useRef<HTMLDivElement>(null!);
+  const expandedActiveRef = useRef<HTMLDivElement>(null!);
 
-  // Reset scroll flags when conversation changes (nodes go to 0 then rebuild)
+  const prevHoveredRef = useRef(false);
+
+  // Scroll to active node when hover opens the panel
   useEffect(() => {
-    if (nodes.length === 0 && prevNodesLenRef.current > 0) {
-      userScrolledExpandedRef.current = false;
-      userScrolledCollapsedRef.current = false;
-    }
-    prevNodesLenRef.current = nodes.length;
-  }, [nodes.length]);
+    const justHovered = isHovered && !prevHoveredRef.current;
+    prevHoveredRef.current = isHovered;
 
-  const handleExpandedScroll = useCallback(() => {
-    userScrolledExpandedRef.current = true;
-  }, []);
-
-  const handleCollapsedScroll = useCallback(() => {
-    userScrolledCollapsedRef.current = true;
-  }, []);
-
-  // Scroll to bottom instantly on first expand/hover per conversation
-  useEffect(() => {
-    if (!isHovered && !isExpanded) return;
+    if (!justHovered) return;
 
     requestAnimationFrame(() => {
-      if (isExpanded && expandedRef.current && !userScrolledExpandedRef.current) {
-        expandedRef.current.scrollTop = expandedRef.current.scrollHeight;
-      }
-      if (!isExpanded && isHovered && collapsedRef.current && !userScrolledCollapsedRef.current) {
-        collapsedRef.current.scrollTop = collapsedRef.current.scrollHeight;
+      if (mode === 'maximized') {
+        if (expandedActiveRef.current) {
+          expandedActiveRef.current.scrollIntoView({ block: 'center' });
+        } else if (expandedRef.current) {
+          expandedRef.current.scrollTop = expandedRef.current.scrollHeight;
+        }
+      } else if (mode === 'normal') {
+        if (activeNodeRef.current) {
+          activeNodeRef.current.scrollIntoView({ block: 'center' });
+        } else if (normalRef.current) {
+          normalRef.current.scrollTop = normalRef.current.scrollHeight;
+        }
       }
     });
-  }, [isHovered, isExpanded]);
+  }, [isHovered, mode]);
 
-  // Auto-scroll the collapsed sidebar to keep active node visible
+  // Auto-scroll to keep active node visible when it changes
   useEffect(() => {
-    if (activeNodeRef.current && collapsedRef.current && !isExpanded) {
-      const container = collapsedRef.current;
-      const activeEl = activeNodeRef.current;
-      const containerRect = container.getBoundingClientRect();
-      const activeRect = activeEl.getBoundingClientRect();
+    if (!isHovered) return;
+    const ref = mode === 'maximized' ? expandedRef : normalRef;
+    const activeRef = mode === 'maximized' ? expandedActiveRef : activeNodeRef;
+    if (!activeRef.current || !ref.current) return;
 
-      if (
-        activeRect.top < containerRect.top ||
-        activeRect.bottom > containerRect.bottom
-      ) {
-        activeEl.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
-      }
+    const container = ref.current;
+    const activeEl = activeRef.current;
+    const containerRect = container.getBoundingClientRect();
+    const activeRect = activeEl.getBoundingClientRect();
+
+    if (
+      activeRect.top < containerRect.top ||
+      activeRect.bottom > containerRect.bottom
+    ) {
+      activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-  }, [activeNodeId, isExpanded]);
+  }, [activeNodeId, isHovered, mode]);
+
+  const handleTitleClick = useCallback(() => {
+    // Clicking title closes the hover panel (same as mouse-leave)
+    setIsHovered(false);
+  }, []);
 
   if (nodes.length === 0) return null;
 
-  const truncateText = (text: string, maxLen: number) => {
-    if (text.length <= maxLen) return text;
-    return text.substring(0, maxLen) + '…';
-  };
+  // Minimized mode renders its own isolated UI
+  if (mode === 'minimized') {
+    return (
+      <SmartScrollbarMinimizedView
+        nodeCount={nodes.length}
+        onRestore={() => setMode('normal')}
+      />
+    );
+  }
+
+  const isMaximized = mode === 'maximized';
+  const panelOpen = isHovered;
 
   return (
     <div
@@ -86,197 +108,159 @@ export const SmartScrollbar: React.FC = () => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Main Container */}
       <div
         className={cn(
           'flex flex-col',
           'transition-all duration-300 ease-out',
-          isExpanded
-            ? 'w-[300px] max-h-[70vh]'
-            : isHovered
-              ? 'w-[220px] max-h-[60vh]'
-              : 'w-[40px] max-h-[60vh]',
+          panelOpen
+            ? isMaximized
+              ? 'w-[300px] max-h-[70vh]'
+              : 'w-[220px] max-h-[60vh]'
+            : 'w-[40px] max-h-[60vh]',
         )}
       >
-        {/* Header - Toggle Button */}
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
+        {/* Header */}
+        <div
           className={cn(
-            'flex items-center gap-2.5 px-3 py-2.5',
+            'flex items-center gap-2 px-3 py-2.5',
             'rounded-tl-xl rounded-tr-none',
             'border border-r-0 border-border/30',
             'bg-background/80 backdrop-blur-xl',
-            'text-muted-foreground hover:text-foreground',
+            'text-muted-foreground',
+            'shadow-lg shadow-black/5',
             'transition-all duration-200',
-            'hover:bg-accent/50',
-            'shadow-lg shadow-black/5',
           )}
-          title={isExpanded ? 'Collapse outline' : 'Expand outline'}
         >
-          <MessageSquare className="h-4 w-4 shrink-0" />
-          {(isExpanded || isHovered) && (
-            <span className="text-[16px] font-semibold truncate flex-1 text-left animate-in fade-in duration-200">
-              {isExpanded ? 'Conversation Outline' : `${nodes.length} messages`}
-            </span>
-          )}
-          {(isExpanded || isHovered) &&
-            (isExpanded ? (
-              <ChevronUp className="h-3 w-3 shrink-0" />
-            ) : (
-              <ChevronDown className="h-3 w-3 shrink-0" />
-            ))}
-        </button>
+          <List className="h-4 w-4 shrink-0" />
 
-        {/* Expanded: Full outline view — always mounted, hidden when not expanded */}
-        <div
-          ref={expandedRef}
-          onScroll={handleExpandedScroll}
-          className={cn(
-            'flex-1 overflow-y-auto overflow-x-hidden',
-            'border border-r-0 border-t-0 border-border/30',
-            'bg-background/80 backdrop-blur-xl',
-            'rounded-bl-xl',
-            'shadow-lg shadow-black/5',
-            'custom-scrollbar',
-            'transition-all duration-300',
-            !isExpanded && 'hidden',
-          )}
-        >
-          <div className="py-2.5">
-            {nodes.map((node, index) => (
-              <div
-                key={node.id}
-                onClick={() => node.inDom && scrollToNode(node.id)}
+          {panelOpen && (
+            <>
+              {/* Title — click to close */}
+              <span
+                onClick={handleTitleClick}
                 className={cn(
-                  'group flex items-start gap-3 px-3.5 py-2.5 mx-1.5 rounded-lg',
-                  'transition-all duration-150',
-                  node.inDom
-                    ? 'cursor-pointer hover:bg-accent/60'
-                    : 'cursor-default opacity-40',
-                  node.inDom && node.id === activeNodeId
-                    ? 'bg-primary/10 text-primary'
-                    : node.inDom
-                      ? 'text-muted-foreground hover:text-foreground'
-                      : 'text-muted-foreground',
+                  'text-[16px] font-semibold truncate flex-1 text-left',
+                  'animate-in fade-in duration-200',
+                  'cursor-pointer hover:text-foreground',
                 )}
               >
-                {/* Index Circle */}
-                <div
-                  className={cn(
-                    'flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold mt-0.5',
-                    'transition-colors duration-150',
-                    node.inDom && node.id === activeNodeId
-                      ? 'bg-primary text-primary-foreground shadow-sm shadow-primary/30'
-                      : 'bg-muted/60 text-muted-foreground group-hover:bg-muted',
-                  )}
-                >
-                  {index + 1}
-                </div>
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  <p
-                    className={cn(
-                      'text-sm leading-relaxed',
-                      node.inDom && node.id === activeNodeId
-                        ? 'font-semibold'
-                        : 'font-medium',
-                    )}
-                  >
-                    {truncateText(node.content, 80)}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+                {isMaximized
+                  ? 'Conversation Outline'
+                  : `${nodes.length} messages`}
+              </span>
 
-        {/* Collapsed: Mini scrollbar with dots/nodes — always mounted, hidden when expanded */}
-        <div
-          ref={collapsedRef}
-          onScroll={handleCollapsedScroll}
-          className={cn(
-            'flex-1 overflow-y-auto overflow-x-hidden',
-            'border border-r-0 border-t-0 border-border/30',
-            'bg-background/80 backdrop-blur-xl',
-            'rounded-bl-xl',
-            'shadow-lg shadow-black/5',
-            'custom-scrollbar',
-            'transition-all duration-300',
-            isExpanded && 'hidden',
-          )}
-        >
-          <div className="flex flex-col items-center py-2.5 gap-1">
-            {nodes.map((node) => (
-              <div
-                key={node.id}
-                ref={node.id === activeNodeId ? activeNodeRef : null}
-                onClick={() => node.inDom && scrollToNode(node.id)}
-                className={cn(
-                  'group relative flex items-center justify-center',
-                  'transition-all duration-200',
-                  node.inDom ? 'cursor-pointer' : 'cursor-default opacity-40',
-                  isHovered ? 'w-full px-2.5 py-1.5' : 'p-1.5',
-                )}
-              >
-                {isHovered ? (
-                  /* Hovered: show truncated text with overflow tooltip */
-                  <div
-                    className={cn(
-                      'flex items-center gap-2 w-full rounded-md px-2 py-1',
-                      'transition-all duration-150',
-                      node.inDom && 'hover:bg-accent/60',
-                      node.inDom && node.id === activeNodeId ? 'bg-primary/10' : '',
-                    )}
-                  >
-                    <div
+              {/* Action buttons */}
+              <div className="flex items-center gap-0.5 shrink-0">
+                {isMaximized ? (
+                  <>
+                    {/* Restore to normal */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMode('normal');
+                      }}
                       className={cn(
-                        'h-1.5 w-1.5 rounded-full shrink-0',
-                        'transition-all duration-200',
-                        node.inDom && node.id === activeNodeId
-                          ? 'bg-primary scale-125 shadow-sm shadow-primary/40'
-                          : 'bg-muted-foreground/40 group-hover:bg-muted-foreground/70',
+                        'p-1 rounded-md',
+                        'hover:bg-accent/60 hover:text-foreground',
+                        'transition-colors duration-150',
                       )}
-                    />
-                    <OverflowTooltip
-                      content={node.content}
-                      placement="left"
-                      offset={24}
-                      className={cn(
-                        'text-sm',
-                        'animate-in fade-in slide-in-from-right-2 duration-200',
-                        node.inDom && node.id === activeNodeId
-                          ? 'text-primary font-semibold'
-                          : 'text-muted-foreground group-hover:text-foreground',
-                      )}
-                      tooltipClassName="text-sm"
+                      title="Restore to compact view"
                     >
-                      {truncateText(node.content, 25)}
-                    </OverflowTooltip>
-                  </div>
-                ) : (
-                  /* Default: minimal dots */
-                  <div className="relative">
-                    <div
+                      <ChevronsRight className="h-3.5 w-3.5" />
+                    </button>
+                    {/* Minimize to icon */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMode('minimized');
+                      }}
                       className={cn(
-                        'rounded-full transition-all duration-200',
-                        node.inDom && node.id === activeNodeId
-                          ? 'h-3 w-3 bg-primary shadow-md shadow-primary/30'
-                          : node.inDom
-                            ? 'h-1.5 w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/60 hover:scale-150'
-                            : 'h-1.5 w-1.5 bg-muted-foreground/15',
+                        'p-1 rounded-md',
+                        'hover:bg-accent/60 hover:text-foreground',
+                        'transition-colors duration-150',
                       )}
-                    />
-                    {/* Active indicator glow */}
-                    {node.inDom && node.id === activeNodeId && (
-                      <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
-                    )}
-                  </div>
+                      title="Collapse to icon"
+                    >
+                      <PanelRightClose className="h-3.5 w-3.5" />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    {/* Maximize */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMode('maximized');
+                      }}
+                      className={cn(
+                        'p-1 rounded-md',
+                        'hover:bg-accent/60 hover:text-foreground',
+                        'transition-colors duration-150',
+                      )}
+                      title="Expand to full outline"
+                    >
+                      <ChevronsLeft className="h-3.5 w-3.5" />
+                    </button>
+                    {/* Minimize to icon */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMode('minimized');
+                      }}
+                      className={cn(
+                        'p-1 rounded-md',
+                        'hover:bg-accent/60 hover:text-foreground',
+                        'transition-colors duration-150',
+                      )}
+                      title="Collapse to icon"
+                    >
+                      <PanelRightClose className="h-3.5 w-3.5" />
+                    </button>
+                  </>
                 )}
               </div>
-            ))}
-          </div>
+            </>
+          )}
         </div>
+
+        {/* Content area — only visible when hovered */}
+        {panelOpen && (
+          <>
+            {isMaximized ? (
+              <SmartScrollbarExpandedView
+                nodes={nodes}
+                activeNodeId={activeNodeId}
+                scrollToNode={scrollToNode}
+                containerRef={expandedRef}
+                activeNodeRef={expandedActiveRef}
+                visible
+              />
+            ) : (
+              <SmartScrollbarNormalView
+                nodes={nodes}
+                activeNodeId={activeNodeId}
+                scrollToNode={scrollToNode}
+                containerRef={normalRef}
+                activeNodeRef={activeNodeRef}
+                visible
+              />
+            )}
+          </>
+        )}
+
+        {/* Dots when not hovered — show active node indicator */}
+        {!panelOpen && (
+          <SmartScrollbarNormalView
+            nodes={nodes}
+            activeNodeId={activeNodeId}
+            scrollToNode={scrollToNode}
+            containerRef={normalRef}
+            activeNodeRef={activeNodeRef}
+            visible
+            dotsOnly
+          />
+        )}
       </div>
     </div>
   );
-};
+};;
