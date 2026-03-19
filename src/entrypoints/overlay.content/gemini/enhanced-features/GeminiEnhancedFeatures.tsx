@@ -4,6 +4,7 @@ import { GeminiUIControl } from './GeminiUIControl';
 import { TopBarTagFeature } from './TopBarTagFeature';
 import { ZenModeFeature } from './ZenModeFeature';
 import { SmartScrollbarFeature } from './SmartScrollbar/SmartScrollbarFeature';
+import { QuickResendFeature } from './QuickResendFeature';
 
 /**
  * Container for all Gemini enhanced features.
@@ -18,6 +19,7 @@ export const GeminiEnhancedFeatures = () => {
       <GeminiUIControl />
       <ZenModeFeature />
       <SmartScrollbarFeature />
+      <QuickResendFeature />
     </>
   );
 };

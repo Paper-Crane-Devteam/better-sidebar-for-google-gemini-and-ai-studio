@@ -37,6 +37,7 @@ const getDefaultLanguage = ():
 
 interface PegasusState {
   language: 'zh-CN' | 'zh-TW' | 'en' | 'ja' | 'pt' | 'es' | 'ru';
+  defaultSyncFolderId: string | null; // null = "Imported" folder, '__root__' = root level, string = folder ID
   enhancedFeatures: {
     gemini: {
       removeWatermark: boolean;
@@ -49,10 +50,12 @@ interface PegasusState {
   setLanguage: (
     language: 'zh-CN' | 'zh-TW' | 'en' | 'ja' | 'pt' | 'es' | 'ru',
   ) => void;
+  setDefaultSyncFolderId: (folderId: string | null) => void;
 }
 
 export const usePegasusStore = create<PegasusState>()((set) => ({
   language: getDefaultLanguage(),
+  defaultSyncFolderId: null,
   enhancedFeatures: {
     gemini: {
       removeWatermark: true,
@@ -70,6 +73,7 @@ export const usePegasusStore = create<PegasusState>()((set) => ({
       },
     })),
   setLanguage: (language) => set({ language }),
+  setDefaultSyncFolderId: (defaultSyncFolderId) => set({ defaultSyncFolderId }),
 }));
 
 export const STORE_NAME = 'pegasusGlobalStore';

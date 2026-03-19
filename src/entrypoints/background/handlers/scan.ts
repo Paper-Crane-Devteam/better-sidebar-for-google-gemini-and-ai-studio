@@ -1,10 +1,10 @@
-import { folderRepo, conversationRepo } from '@/shared/db/operations';
+import { conversationRepo } from '@/shared/db/operations';
 import { navigate } from '@/shared/lib/navigation';
-import i18n from '@/locale/i18n';
 import type { ExtensionMessage, ExtensionResponse } from '@/shared/types/messages';
 import type { MessageSender } from '../types';
 import { notifyDataUpdated } from '../notify';
 import { Platform } from '@/shared/types/platform';
+import { resolveSyncFolderId } from './resolve-sync-folder';
 
 function getPageLocalStorage(key: string): string | null {
   try {
@@ -98,20 +98,11 @@ export async function handleScan(
         const existingMap = new Map(allExisting.map((c) => [c.external_id, c]));
         newCount = items.filter((item) => !existingMap.has(item.external_id)).length;
 
-        const importedFolderName = i18n.t('explorer.imported');
-        const folders = await folderRepo.getAll(platform);
-        let importedFolderId = folders.find(
-          (f) => f.name === importedFolderName || f.name === 'Imported'
-        )?.id;
-
-        if (!importedFolderId) {
-          importedFolderId = crypto.randomUUID();
-          await folderRepo.create({ id: importedFolderId, name: importedFolderName, platform });
-        }
+        const defaultFolderId = await resolveSyncFolderId(platform);
 
         const conversationsToSave = items.map((item) => {
           const existing = existingMap.get(item.external_id);
-          const targetFolderId = existing? existing.folder_id : importedFolderId;
+          const targetFolderId = existing? existing.folder_id : defaultFolderId;
           return { ...item, folder_id: targetFolderId, platform };
         });
 

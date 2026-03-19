@@ -39,11 +39,13 @@ export const querySelectorDeep = (
  * @param selector - CSS selector to wait for
  * @returns Promise that resolves when element is found
  */
-export const waitForElement = (selector: string): Promise<Element> => {
+export const waitForElement = (selector: string, timeout = 10000): Promise<Element | null> => {
   return new Promise((resolve) => {
+    const start = Date.now();
     const check = () => {
       const el = querySelectorDeep(selector);
       if (el) resolve(el);
+      else if (Date.now() - start > timeout) resolve(null);
       else requestAnimationFrame(check);
     };
     check();

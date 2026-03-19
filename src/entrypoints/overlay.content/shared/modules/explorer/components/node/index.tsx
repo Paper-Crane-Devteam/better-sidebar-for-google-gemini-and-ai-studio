@@ -16,6 +16,7 @@ import { navigateToConversation } from '@/shared/lib/navigation';
 import { useAppStore } from '@/shared/lib/store';
 import { modal } from '@/shared/lib/modal';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { useCurrentConversationId } from '../../../../hooks/useCurrentConversationId';
 import {
   ContextMenu,
   ContextMenuTrigger,
@@ -43,6 +44,7 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
     renameItem,
   } = useAppStore();
   const { handleDelete: deleteHandler } = useDeleteHandler();
+  const currentConversationId = useCurrentConversationId();
   const [newName, setNewName] = useState(node.data.name);
   const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
 
@@ -75,6 +77,8 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
   }
 
   const isActive = node.isSelected || isBatchSelected;
+  const isCurrentConversation =
+    isFile && node.data.id === currentConversationId;
   const hasHoverActions =
     (isFile && !isFavorite && !isBatchMode) ||
     (!isFile && !isTimeGroup && !isBatchMode);
@@ -221,10 +225,12 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
     'cursor-pointer group relative',
     'no-underline outline-none rounded-sm',
     'text-density text-foreground/80 font-medium',
-    // Hover: only apply default hover when not active
-    !isActive && 'hover:bg-accent/50',
-    // Selection state: use node-item-selected for non-colored, inline style for colored
+    // Hover: only apply default hover when not active and not current conversation
+    !isActive && !isCurrentConversation && 'hover:bg-accent/50',
+    // Selection state: use node-item-selected for non-colored, inline style for colored (highest priority)
     isActive && !folderColor && 'node-item-selected',
+    // Current conversation state: lighter highlight when not actively selected (lower priority)
+    !isActive && isCurrentConversation && 'node-item-current',
     // Expand right padding on hover to make room for action buttons
     hasHoverActions && 'group-hover:pr-8',
     // Drag-over state

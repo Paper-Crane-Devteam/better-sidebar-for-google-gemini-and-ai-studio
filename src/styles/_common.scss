@@ -45,6 +45,16 @@
     @apply bg-accent;
   }
 
+  /* Current Conversation Indicator (lighter than selected) */
+  .node-item-current {
+    @apply bg-accent/60;
+  }
+
+  /* Folder child tint (for items inside uncolored folders) */
+  .node-folder-child {
+    background-color: rgba(var(--foreground) / 0.04);
+  }
+
   /* Colored Tag Item: hover uses the tag's own color at low opacity */
   .tag-item-colored {
     &:hover {

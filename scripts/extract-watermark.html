@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head><title>Extract Watermark Template</title></head>
+<body>
+<h3>Extract Watermark Template from Solid-Color Background Image</h3>
+<p>1. Choose a watermarked image with a solid color background (white, blue, etc.)</p>
+<p>2. The script auto-detects the background color from a non-watermark area</p>
+<p>3. Adjust size/margin if needed, then click Extract</p>
+<input type="file" id="fileInput" accept="image/*" />
+<br/><br/>
+<label>Watermark size: <input type="number" id="size" value="100" /></label>
+<label>Margin from edge: <input type="number" id="margin" value="63" /></label>
+<br/><br/>
+<button id="extract" disabled>Extract</button>
+<br/><br/>
+<div>
+  <h4>Detected background color: <span id="bgColor">-</span></h4>
+  <h4>Preview - Raw watermark region:</h4>
+  <canvas id="previewRaw" style="border:1px solid #ccc; image-rendering: pixelated;" width="200" height="200"></canvas>
+  <h4>Preview - Extracted alpha template (white on black = watermark strength):</h4>
+  <canvas id="previewAlpha" style="border:1px solid #ccc; background:#000; image-rendering: pixelated;" width="200" height="200"></canvas>
+</div>
+<br/>
+<div>
+  <h4>Base64 Data URL (copy this entire string):</h4>
+  <textarea id="output" rows="8" cols="120" readonly></textarea>
+  <br/><button id="copyBtn" disabled>Copy to Clipboard</button>
+</div>
+
+<script>
+const fileInput = document.getElementById('fileInput');
+const extractBtn = document.getElementById('extract');
+const copyBtn = document.getElementById('copyBtn');
+const previewRaw = document.getElementById('previewRaw');
+const previewAlpha = document.getElementById('previewAlpha');
+const output = document.getElementById('output');
+const bgColorSpan = document.getElementById('bgColor');
+let loadedImg = null;
+
+fileInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const img = new Image();
+  img.onload = () => {
+    loadedImg = img;
+    extractBtn.disabled = false;
+    document.title = `Loaded: ${img.width}x${img.height}`;
+  };
+  img.src = URL.createObjectURL(file);
+});
+
+extractBtn.addEventListener('click', () => {
+  if (!loadedImg) return;
+  const size = parseInt(document.getElementById('size').value);
+  const margin = parseInt(document.getElementById('margin').value);
+  const wmX = loadedImg.width - margin - size;
+  const wmY = loadedImg.height - margin - size;
+
+  // Draw full image
+  const full = document.createElement('canvas');
+  full.width = loadedImg.width;
+  full.height = loadedImg.height;
+  const fctx = full.getContext('2d');
+  fctx.drawImage(loadedImg, 0, 0);
+
+  // Sample background color from top-left 20x20 area (far from watermark)
+  const sampleData = fctx.getImageData(10, 10, 20, 20);
+  let bgR = 0, bgG = 0, bgB = 0;
+  const sampleCount = 20 * 20;
+  for (let i = 0; i < sampleCount; i++) {
+    bgR += sampleData.data[i * 4];
+    bgG += sampleData.data[i * 4 + 1];
+    bgB += sampleData.data[i * 4 + 2];
+  }
+  bgR = Math.round(bgR / sampleCount);
+  bgG = Math.round(bgG / sampleCount);
+  bgB = Math.round(bgB / sampleCount);
+  bgColorSpan.textContent = `rgb(${bgR}, ${bgG}, ${bgB})`;
+
+  // Extract watermark region
+  const regionData = fctx.getImageData(wmX, wmY, size, size);
+
+  // Show raw preview
+  previewRaw.width = size;
+  previewRaw.height = size;
+  previewRaw.getContext('2d').putImageData(regionData, 0, 0);
+
+  // Compute alpha template
+  // Watermark model: output = bg * (1 - alpha) + 255 * alpha
+  // So: alpha = (output - bg) / (255 - bg)  for each channel
+  // We take the max alpha across R,G,B channels
+  const alphaCanvas = document.createElement('canvas');
+  alphaCanvas.width = size;
+  alphaCanvas.height = size;
+  const actx = alphaCanvas.getContext('2d');
+  const alphaImageData = actx.createImageData(size, size);
+
+  for (let i = 0; i < size * size; i++) {
+    const r = regionData.data[i * 4];
+    const g = regionData.data[i * 4 + 1];
+    const b = regionData.data[i * 4 + 2];
+
+    // Calculate alpha for each channel, take max
+    const aR = bgR < 255 ? (r - bgR) / (255 - bgR) : 0;
+    const aG = bgG < 255 ? (g - bgG) / (255 - bgG) : 0;
+    const aB = bgB < 255 ? (b - bgB) / (255 - bgB) : 0;
+    const alpha = Math.max(0, Math.min(1, Math.max(aR, aG, aB)));
+
+    // Store as grayscale (white = full watermark, black = no watermark)
+    const val = Math.round(alpha * 255);
+    alphaImageData.data[i * 4] = val;
+    alphaImageData.data[i * 4 + 1] = val;
+    alphaImageData.data[i * 4 + 2] = val;
+    alphaImageData.data[i * 4 + 3] = 255;
+  }
+
+  // Show alpha preview
+  previewAlpha.width = size;
+  previewAlpha.height = size;
+  previewAlpha.getContext('2d').putImageData(alphaImageData, 0, 0);
+
+  // Output as data URL
+  actx.putImageData(alphaImageData, 0, 0);
+  const dataUrl = alphaCanvas.toDataURL('image/png');
+  output.value = dataUrl;
+  copyBtn.disabled = false;
+
+  console.log(`Image: ${loadedImg.width}x${loadedImg.height}`);
+  console.log(`Background: rgb(${bgR},${bgG},${bgB})`);
+  console.log(`Watermark region: (${wmX},${wmY}) ${size}x${size}`);
+  console.log('Data URL length:', dataUrl.length);
+});
+
+copyBtn.addEventListener('click', () => {
+  navigator.clipboard.writeText(output.value);
+  copyBtn.textContent = 'Copied!';
+  setTimeout(() => copyBtn.textContent = 'Copy to Clipboard', 2000);
+});
+</script>
+</body>
+</html>

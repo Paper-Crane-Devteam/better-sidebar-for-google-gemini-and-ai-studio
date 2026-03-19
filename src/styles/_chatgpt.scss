@@ -167,6 +167,17 @@
     color: rgb(var(--foreground));
   }
 
+  /* Current Conversation Indicator - ChatGPT Specific */
+  .theme-chatgpt .node-item-current,
+  :host(.theme-chatgpt) .node-item-current {
+    background-color: rgb(var(--muted) / 0.5);
+  }
+
+  .theme-chatgpt.dark .node-item-current,
+  :host(.theme-chatgpt.dark) .node-item-current {
+    background-color: rgb(var(--muted) / 0.5);
+  }
+
   /* ChatGPT-specific button styles if needed */
   .theme-chatgpt button,
   :host(.theme-chatgpt) button {

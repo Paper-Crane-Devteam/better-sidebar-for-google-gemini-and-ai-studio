@@ -4,6 +4,7 @@ import { useArboristTree, STORAGE_KEY } from '../hooks/useArboristTree';
 import { useAppStore } from '@/shared/lib/store';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { Node } from './node';
+import { FolderTintRow } from './node/FolderTintRow';
 import { NodeData, ArboristTreeHandle } from '../types';
 import { useI18n } from '@/shared/hooks/useI18n';
 
@@ -290,6 +291,7 @@ export const TreeView = forwardRef<ArboristTreeHandle, TreeViewProps>(
           searchMatch={(node, term) =>
             node.data.name.toLowerCase().includes(term.toLowerCase())
           }
+          renderRow={FolderTintRow}
         >
           {NodeWrapper}
         </Tree>

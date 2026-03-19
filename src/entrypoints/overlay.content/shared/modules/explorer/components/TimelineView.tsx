@@ -4,6 +4,7 @@ import { useArboristTree, STORAGE_KEY } from '../hooks/useArboristTree';
 import { useAppStore } from '@/shared/lib/store';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { Node } from './node';
+import { FolderTintRow } from './node/FolderTintRow';
 import { NodeData, ArboristTreeHandle } from '../types';
 import { useI18n } from '@/shared/hooks/useI18n';
 
@@ -269,6 +270,7 @@ export const TimelineView = forwardRef<ArboristTreeHandle, TimelineViewProps>(
           }
           disableDrag={true}
           disableDrop={true}
+          renderRow={FolderTintRow}
         >
           {NodeWrapper}
         </Tree>

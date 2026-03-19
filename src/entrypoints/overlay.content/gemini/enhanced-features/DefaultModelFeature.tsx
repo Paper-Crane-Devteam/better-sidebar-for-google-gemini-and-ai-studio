@@ -58,9 +58,13 @@ export const DefaultModelFeature = () => {
   const [portalTarget, setPortalTarget] = useState<Element | null>(null);
   const hasAutoSwitchedRef = useRef(false);
 
-  // 1. Auto Selection
+  // 1. Auto Selection — only for new conversations (URL has no conversation ID)
   useEffect(() => {
     if (defaultModel === 'default') return;
+
+    // If the URL contains a conversation ID (e.g. /app/abc123 or /gem/abc123), skip auto-switch
+    const isExistingConversation = /\/(app|gem)\/[a-zA-Z0-9_-]+/.test(window.location.pathname);
+    if (isExistingConversation) return;
     
     const checkAndSwitchModel = async () => {
       // Wait for the switcher to appear (it can be delayed on initial load)
@@ -125,7 +129,9 @@ export const DefaultModelFeature = () => {
       await new Promise(r => setTimeout(r, 100));
       
       const targetSubstr = MODEL_MAPPING[defaultModel];
-      const options = document.querySelectorAll('.cdk-overlay-container [role="menuitemradio"]');
+      const options = document.querySelectorAll(
+        '.cdk-overlay-container [role="menuitemradio"],.cdk-overlay-container [role="menuitem"]',
+      );
       
       options.forEach((opt: Element) => {
         const titleEl = opt.querySelector('.mode-title');

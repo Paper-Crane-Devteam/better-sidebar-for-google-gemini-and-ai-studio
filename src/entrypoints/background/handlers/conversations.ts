@@ -3,13 +3,13 @@ import {
   conversationRepo,
   messageRepo,
 } from '@/shared/db/operations';
-import i18n from '@/locale/i18n';
 import type {
   ExtensionMessage,
   ExtensionResponse,
 } from '@/shared/types/messages';
 import type { MessageSender } from '../types';
 import { notifyDataUpdated } from '../notify';
+import { resolveSyncFolderId } from './resolve-sync-folder';
 
 export async function handleConversations(
   message: ExtensionMessage,
@@ -73,19 +73,7 @@ export async function handleConversations(
       const platform = payloadPlatform ?? message.platform ?? 'aistudio';
       let folderId = providedFolderId;
       if (!folderId) {
-        const folders = await folderRepo.getAll(platform);
-        const importedName = i18n.t('explorer.imported');
-        folderId = folders.find(
-          (f) => f.name === importedName || f.name === 'Imported',
-        )?.id;
-        if (!folderId) {
-          folderId = crypto.randomUUID();
-          await folderRepo.create({
-            id: folderId,
-            name: importedName,
-            platform,
-          });
-        }
+        folderId = await resolveSyncFolderId(platform);
       }
       const external_url =
         providedExternalUrl ??
@@ -134,26 +122,13 @@ export async function handleConversations(
         const allExisting = await conversationRepo.getAll(platform);
         const existingMap = new Map(allExisting.map((c) => [c.id, c]));
 
-        const importedName = i18n.t('explorer.imported');
-        const folders = await folderRepo.getAll(platform);
-        let importedFolderId = folders.find(
-          (f) => f.name === importedName || f.name === 'Imported',
-        )?.id;
-
-        if (!importedFolderId) {
-          importedFolderId = crypto.randomUUID();
-          await folderRepo.create({
-            id: importedFolderId,
-            name: importedName,
-            platform,
-          });
-        }
+        const defaultFolderId = await resolveSyncFolderId(platform);
 
         const conversationsToSave = itemsToSync.map((item) => {
           const existing = existingMap.get(item.id);
           const targetFolderId = existing
             ? existing.folder_id
-            : importedFolderId;
+            : defaultFolderId;
           return {
             ...item,
             folder_id: targetFolderId,

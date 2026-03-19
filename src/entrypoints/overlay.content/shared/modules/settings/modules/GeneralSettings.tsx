@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Button } from '../../../components/ui/button';
 import { Separator } from '../../../components/ui/separator';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
-import { Moon, Sun, Monitor, ChevronDown } from 'lucide-react';
+import { Moon, Sun, Monitor, ChevronDown, Folder } from 'lucide-react';
 import { Switch } from '@/shared/components/ui/switch';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { usePegasusStore } from '@/shared/lib/pegasus-store';
 import { useTheme } from '../hooks/useTheme';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { useAppStore } from '@/shared/lib/store';
 import { detectPlatform, Platform } from '@/shared/types/platform';
+import { FolderPicker } from '@/shared/components/FolderPicker';
+import { useModalStore } from '@/shared/lib/modal';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,10 +33,20 @@ export const GeneralSettings = () => {
     setShortcutVisible,
   } = useSettingsStore();
 
-  const { language, setLanguage } = usePegasusStore();
+  const { language, setLanguage, defaultSyncFolderId, setDefaultSyncFolderId } = usePegasusStore();
+  const folders = useAppStore((state) => state.folders);
 
   const { theme, setTheme } = useTheme();
   const platform = detectPlatform();
+  const openModal = useModalStore((state) => state.open);
+  const closeModal = useModalStore((state) => state.close);
+
+  const selectedFolderName = useMemo(() => {
+    if (!defaultSyncFolderId) return t('settings.defaultSyncFolderImported');
+    if (defaultSyncFolderId === '__root__') return t('moveItemsDialog.rootLevel');
+    const folder = folders.find((f) => f.id === defaultSyncFolderId);
+    return folder?.name ?? t('settings.defaultSyncFolderImported');
+  }, [defaultSyncFolderId, folders, t]);
 
   return (
     <div className="space-y-6">
@@ -381,6 +394,61 @@ export const GeneralSettings = () => {
                 {t('settings.newTab')}
               </Button>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <span className="text-sm font-medium">
+                  {t('settings.defaultSyncFolder')}
+                </span>
+                <p className="text-xs text-muted-foreground">
+                  {t('settings.defaultSyncFolderDescription')}
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 px-3 text-xs min-w-[120px] justify-between"
+                onClick={() => {
+                  openModal({
+                    id: 'default-sync-folder',
+                    type: 'info',
+                    title: t('settings.defaultSyncFolder'),
+                    content: (
+                      <FolderPicker
+                        folders={folders}
+                        onSelect={(folderId) => {
+                          setDefaultSyncFolderId(folderId === null ? '__root__' : folderId);
+                          closeModal();
+                        }}
+                        initialSelectedId={
+                          defaultSyncFolderId === '__root__' ? null : defaultSyncFolderId
+                        }
+                        className="min-h-[200px] max-h-[300px]"
+                      />
+                    ),
+                    confirmText: t('common.cancel'),
+                    onConfirm: () => closeModal(),
+                    onCancel: () => closeModal(),
+                  });
+                }}
+              >
+                <Folder className="h-3 w-3 mr-1.5 shrink-0" />
+                <span className="truncate max-w-[140px]">{selectedFolderName}</span>
+                <ChevronDown className="h-3 w-3 ml-2 opacity-50 shrink-0" />
+              </Button>
+            </div>
+            {defaultSyncFolderId && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2 text-xs text-muted-foreground"
+                onClick={() => setDefaultSyncFolderId(null)}
+              >
+                ↩ {t('settings.defaultSyncFolderImported')}
+              </Button>
+            )}
           </div>
         </div>
       </div>

@@ -146,6 +146,12 @@
     font-weight: 500;
   }
 
+  /* Current Conversation Indicator - Gemini Specific */
+  .theme-gemini .node-item-current,
+  :host(.theme-gemini) .node-item-current {
+    background-color: color-mix(in srgb, var(--gem-sys-color--primary-container) 60%, transparent);
+  }
+
   /* Custom Slider Styles */
   .theme-gemini .ui-slider,
   :host(.theme-gemini) .ui-slider {

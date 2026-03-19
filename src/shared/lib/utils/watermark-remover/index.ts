@@ -1,4 +1,4 @@
-import { bg48DataUrl, bg96DataUrl } from './imageFile';
+import { bg48DataUrl, bg96DataUrl, bg100DataUrl } from './imageFile';
 
 /**
  * Watermark Removal Engine
@@ -58,9 +58,22 @@ function removeWatermark(
 
 // ============= Watermark Config Detection =============
 function getWatermarkInfo(width: number, height: number): WatermarkPosition {
+  const isXLarge = width > 2048 || height > 2048;
   const isLarge = width > 1024 && height > 1024;
-  const size = isLarge ? 96 : 48;
-  const margin = isLarge ? 64 : 32;
+
+  let size: number;
+  let margin: number;
+  if (isXLarge) {
+    size = 100;
+    margin = 63;
+  } else if (isLarge) {
+    size = 96;
+    margin = 64;
+  } else {
+    size = 48;
+    margin = 32;
+  }
+
   return {
     size,
     x: Math.floor(width - margin - size),
@@ -83,22 +96,21 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 
 // ============= Watermark Engine =============
 export class WatermarkEngine {
-  private bg48: HTMLImageElement;
-  private bg96: HTMLImageElement;
+  private bgImages: Record<number, HTMLImageElement> = {};
   private alphaMaps: Record<number, Float32Array> = {};
 
-  private constructor(bg48: HTMLImageElement, bg96: HTMLImageElement) {
-    this.bg48 = bg48;
-    this.bg96 = bg96;
+  private constructor(images: Record<number, HTMLImageElement>) {
+    this.bgImages = images;
   }
 
   static async create(): Promise<WatermarkEngine> {
     try {
-      const [bg48, bg96] = await Promise.all([
+      const [bg48, bg96, bg100] = await Promise.all([
         loadImage(bg48DataUrl),
         loadImage(bg96DataUrl),
+        loadImage(bg100DataUrl),
       ]);
-      return new WatermarkEngine(bg48, bg96);
+      return new WatermarkEngine({ 48: bg48, 96: bg96, 100: bg100 });
     } catch (e) {
       console.error('Failed to load watermark assets.', e);
       throw e;
@@ -114,7 +126,10 @@ export class WatermarkEngine {
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('Could not get canvas context');
 
-    ctx.drawImage(size === 48 ? this.bg48 : this.bg96, 0, 0);
+    // Use native template if available, otherwise pick closest and scale
+    const srcImg = this.bgImages[size]
+      ?? this.bgImages[size <= 48 ? 48 : size <= 96 ? 96 : 100];
+    ctx.drawImage(srcImg, 0, 0, size, size);
     const map = calculateAlphaMap(ctx.getImageData(0, 0, size, size));
     this.alphaMaps[size] = map;
     return map;

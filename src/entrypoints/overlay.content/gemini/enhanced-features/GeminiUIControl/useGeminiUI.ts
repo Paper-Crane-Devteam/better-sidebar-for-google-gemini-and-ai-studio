@@ -25,8 +25,7 @@ export const useGeminiUI = () => {
     hideUpgrade,
     zenMode,
     showSmartScrollbar,
-  } = geminiSettings;
-  const isSidebarExpanded = useAppStore((s) => s.ui.overlay.isSidebarExpanded);
+  } = geminiSettings;  const isSidebarExpanded = useAppStore((s) => s.ui.overlay.isSidebarExpanded);
 
   const [showUpgradeOption, setShowUpgradeOption] = useState(false);
 
@@ -214,8 +213,7 @@ export const useGeminiUI = () => {
   // This element's width is calculated as current closed width + this diff.
   useEffect(() => {
     const updateBardModeSwitcher = (el?: HTMLElement) => {
-      const bardModeSwitcher =
-        el || (document.querySelector('bard-mode-switcher') as HTMLElement);
+      const bardModeSwitcher = el;
       if (bardModeSwitcher) {
         const density = useSettingsStore.getState().layoutDensity;
         const closedWidth = density === 'compact' ? 56 : 64;
@@ -227,7 +225,7 @@ export const useGeminiUI = () => {
       }
     };
 
-    waitForElement('bard-mode-switcher').then((el) => {
+    waitForElement('main>div>bard-mode-switcher').then((el) => {
       updateBardModeSwitcher(el as HTMLElement);
     });
   }, [storeSidebarWidth]);
@@ -268,5 +266,7 @@ export const useGeminiUI = () => {
       setGeminiFeature('showSmartScrollbar', v),
     setRemoveWatermark: (v: boolean) =>
       setPegasusGeminiFeature('removeWatermark', v),
+    quickResend: geminiSettings.quickResend,
+    setQuickResend: (v: boolean) => setGeminiFeature('quickResend', v),
   };
 };

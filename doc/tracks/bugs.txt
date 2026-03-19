@@ -14,7 +14,7 @@
 -3. introduction page
 -4. uninstall form
 5. chatgpt integration
-6. paper crane dev landing page
+-6. paper crane dev landing page
 7. gemini gems integration and management
 -8. advanced prompt template
 9. better acess to prompts
@@ -24,5 +24,5 @@
 13. images viewer and management
 -15. option dropdown
 -16. search in current chat
-14. sync using google drive
+-14. sync using google drive
 `

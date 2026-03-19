@@ -18,6 +18,7 @@ interface GeminiEnhancedFeatures {
   showTopBarTag: boolean;
   zenMode: boolean;
   showSmartScrollbar: boolean;
+  quickResend: boolean;
 }
 
 interface SettingsState {
@@ -151,6 +152,7 @@ export const useSettingsStore = create<SettingsState>()(
           showTopBarTag: true,
           zenMode: false,
           showSmartScrollbar: true,
+          quickResend: false,
         },
       },
 
