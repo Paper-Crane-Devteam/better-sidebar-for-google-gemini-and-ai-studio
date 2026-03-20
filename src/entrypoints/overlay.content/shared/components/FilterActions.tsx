@@ -38,13 +38,10 @@ export const FilterActions = ({
       {visibleFilters.includes('search') && (
         <SimpleTooltip content={t('tooltip.search')}>
           <Button
-            variant={search.isOpen ? "secondary" : "ghost"}
+            variant={(search.isOpen || search.query) ? "secondary" : "ghost"}
             size="icon"
             className="h-7 w-7"
             onClick={() => {
-              if (search.isOpen) {
-                search.setQuery('');
-              }
               search.setIsOpen(!search.isOpen);
             }}
           >
@@ -56,13 +53,10 @@ export const FilterActions = ({
       {visibleFilters.includes('tags') && (
         <SimpleTooltip content={t('tooltip.filterByTags')}>
           <Button
-            variant={tags.isOpen ? "secondary" : "ghost"}
+            variant={(tags.isOpen || tags.selected.length > 0) ? "secondary" : "ghost"}
             size="icon"
             className="h-7 w-7"
             onClick={() => {
-              if (tags.isOpen) {
-                tags.setSelected([]);
-              }
               tags.setIsOpen(!tags.isOpen);
             }}
           >

@@ -35,13 +35,10 @@ export const PromptsFilterActions = ({ filter, showFavoritesFilter = true }: Pro
     <div className="flex items-center gap-0.5">
       <SimpleTooltip content={t('tooltip.search')}>
         <Button
-          variant={search.isOpen ? "secondary" : "ghost"}
+          variant={(search.isOpen || search.query) ? "secondary" : "ghost"}
           size="icon"
           className="h-7 w-7"
           onClick={() => {
-            if (search.isOpen) {
-              search.setQuery('');
-            }
             search.setIsOpen(!search.isOpen);
           }}
         >
