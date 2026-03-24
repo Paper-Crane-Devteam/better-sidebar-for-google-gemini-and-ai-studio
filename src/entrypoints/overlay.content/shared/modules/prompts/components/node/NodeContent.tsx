@@ -1,10 +1,6 @@
 import React from 'react';
 import { NodeProps } from './types';
-import { SimpleTooltip } from '@/shared/components/ui/tooltip';
-import { Star } from 'lucide-react';
-import { BatchSelectionCheckbox } from '../batch/BatchSelectionCheckbox';
-import { cn } from '@/shared/lib/utils/utils';
-import { RenameForm } from './RenameForm';
+import { FolderTreeNodeContent } from '../../../../components/folder-tree';
 import { PromptIconDisplay } from '../../lib/prompt-icons';
 
 interface NodeContentProps extends NodeProps {
@@ -35,60 +31,36 @@ export const NodeContent = ({
   newName,
   setNewName,
 }: NodeContentProps) => {
-  const isTimeGroup = node.data.data?.isTimeGroup;
   const isFile = node.data.type === 'file';
 
   let displayFileIcon = fileIcon;
   if (isFile && node.data.data?.icon) {
     displayFileIcon = (
-      <PromptIconDisplay name={node.data.data.icon} className="h-4 w-4 shrink-0 text-muted-foreground" />
+      <PromptIconDisplay
+        name={node.data.data.icon}
+        className="h-4 w-4 shrink-0 text-muted-foreground"
+      />
     );
   }
 
   return (
-    <>
-      {isBatchMode && !isTimeGroup && (
-        <BatchSelectionCheckbox
-          checked={isBatchSelected}
-          onChange={onToggleBatchSelection}
-          className="ml-1"
-        />
-      )}
-
-      <div
-        role="button"
-        tabIndex={0}
-        className={cn(
-          'w-4 h-4 flex items-center justify-center shrink-0 text-muted-foreground',
-          isFile && isBatchMode && 'hidden'
-        )}
-        onClick={handleToggle}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            handleToggle(e as any);
-          }
-        }}
-      >
-        {toggleIcon}
-      </div>
-
-      <div className="w-4 h-4 flex items-center justify-center shrink-0 text-muted-foreground">
-        {node.data.type === 'folder' ? folderIcon : displayFileIcon}
-      </div>
-
-      <div className="flex-1 min-w-0 flex items-center gap-1 overflow-hidden">
-        {node.isEditing ? (
-          <RenameForm node={node} newName={newName} setNewName={setNewName} />
-        ) : isFile ? (
-          <SimpleTooltip content={node.data.name}>
-            <span className="truncate text-sm select-none">
-              {node.data.name}
-            </span>
-          </SimpleTooltip>
-        ) : (
-          <span className="truncate text-sm select-none">{node.data.name}</span>
-        )}
-      </div>
-    </>
+    <FolderTreeNodeContent
+      node={node}
+      folderIcon={folderIcon}
+      fileIcon={displayFileIcon}
+      toggleIcon={toggleIcon}
+      handleToggle={handleToggle}
+      batchMode={
+        isBatchMode
+          ? {
+              enabled: true,
+              selected: isBatchSelected,
+              onToggle: onToggleBatchSelection,
+            }
+          : undefined
+      }
+      newName={newName}
+      setNewName={setNewName}
+    />
   );
 };

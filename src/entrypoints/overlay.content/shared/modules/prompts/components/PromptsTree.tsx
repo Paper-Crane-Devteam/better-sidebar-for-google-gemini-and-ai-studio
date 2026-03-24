@@ -1,11 +1,16 @@
 import React, { useMemo, forwardRef, useImperativeHandle } from 'react';
-import { Tree, NodeRendererProps } from 'react-arborist';
-import { usePromptsTree, STORAGE_KEY } from '../hooks/usePromptsTree';
 import { useAppStore } from '@/shared/lib/store';
-import { useSettingsStore } from '@/shared/lib/settings-store';
 import { Node } from './node';
-import { NodeData, ArboristTreeHandle } from '../types';
+import {
+  FolderTree,
+  FolderTreeHandle,
+  FolderTreeNodeData,
+  NodeRendererProps,
+} from '../../../components/folder-tree';
+import { ArboristTreeHandle } from '../types';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { useDeleteHandler } from '../hooks/useDeleteHandler';
+import { STORAGE_KEY } from '../hooks/usePromptsTree';
 
 export type { ArboristTreeHandle } from '../types';
 
@@ -14,57 +19,35 @@ interface PromptsTreeProps {
   onPreview: (prompt: any) => void;
 }
 
-const NodeWrapper = (
-  props: NodeRendererProps<NodeData> & { onPreview: (prompt: any) => void },
-) => {
-  return <Node {...props} onPreview={props.onPreview} />;
-};
-
 export const PromptsTree = forwardRef<ArboristTreeHandle, PromptsTreeProps>(
   ({ onSelect, onPreview }, ref) => {
-    const {
-      treeRef,
-      containerRef,
-      dimensions,
-      folders,
-      conversations,
-      searchTerm,
-      initialOpenState,
-      ui,
-      onMove,
-      onRename,
-      onDelete,
-      handleToggle,
-    } = usePromptsTree();
-
     const { t } = useI18n();
-    const { favorites } = useAppStore();
+    const {
+      promptFolders,
+      prompts,
+      favorites,
+      movePromptItem,
+      renamePromptItem,
+      createPromptFolder,
+      ui,
+    } = useAppStore();
+    const { handleDelete } = useDeleteHandler();
     const { sortOrder, typeFilter, onlyFavorites } = ui.prompts;
-    const layoutDensity = useSettingsStore((state) => state.layoutDensity);
+    const { query: searchTerm } = ui.prompts.search;
 
-    const rowHeight = layoutDensity === 'compact' ? 32 : 38;
+    const folderTreeRef = React.useRef<FolderTreeHandle>(null);
 
     useImperativeHandle(ref, () => ({
-      collapseAll: () => {
-        treeRef.current?.closeAll();
-        localStorage.removeItem(STORAGE_KEY);
-      },
-      edit: (id: string) => {
-        treeRef.current?.edit(id);
-      },
-      select: (id: string) => {
-        treeRef.current?.select(id);
-        treeRef.current?.scrollTo(id);
-      },
-      open: (id: string) => {
-        treeRef.current?.open(id);
-      },
+      collapseAll: () => folderTreeRef.current?.collapseAll(),
+      edit: (id: string) => folderTreeRef.current?.edit(id),
+      select: (id: string) => folderTreeRef.current?.select(id),
+      open: (id: string) => folderTreeRef.current?.open?.(id),
     }));
 
     const data = useMemo(() => {
-      const folderMap = new Map<string, NodeData>();
+      const folderMap = new Map<string, FolderTreeNodeData>();
 
-      folders.forEach((f) => {
+      promptFolders.forEach((f) => {
         folderMap.set(f.id, {
           id: f.id,
           name: f.name,
@@ -74,9 +57,8 @@ export const PromptsTree = forwardRef<ArboristTreeHandle, PromptsTreeProps>(
         });
       });
 
-      const rootNodes: NodeData[] = [];
-
-      let filteredPrompts = conversations;
+      const rootNodes: FolderTreeNodeData[] = [];
+      let filteredPrompts = prompts;
 
       if (typeFilter !== 'all') {
         filteredPrompts = filteredPrompts.filter((c) => {
@@ -95,7 +77,7 @@ export const PromptsTree = forwardRef<ArboristTreeHandle, PromptsTreeProps>(
       }
 
       filteredPrompts.forEach((c) => {
-        const item: NodeData = {
+        const item: FolderTreeNodeData = {
           id: c.id,
           name: c.title || t('common.untitled'),
           type: 'file',
@@ -109,7 +91,7 @@ export const PromptsTree = forwardRef<ArboristTreeHandle, PromptsTreeProps>(
         }
       });
 
-      folders.forEach((f) => {
+      promptFolders.forEach((f) => {
         const node = folderMap.get(f.id);
         if (!node) return;
 
@@ -126,32 +108,22 @@ export const PromptsTree = forwardRef<ArboristTreeHandle, PromptsTreeProps>(
           .map((f) => f.target_id),
       );
 
-      const sortNodes = (nodes: NodeData[]) => {
+      const sortNodes = (nodes: FolderTreeNodeData[]) => {
         nodes.sort((a, b) => {
           const isAFav = favoriteIds.has(a.id);
           const isBFav = favoriteIds.has(b.id);
-
           if (isAFav && !isBFav) return -1;
           if (!isAFav && isBFav) return 1;
-
-          if (a.type !== b.type) {
-            return a.type === 'folder' ? -1 : 1;
-          }
+          if (a.type !== b.type) return a.type === 'folder' ? -1 : 1;
 
           if (sortOrder === 'date') {
-            if (a.type === 'folder') {
-              return a.name.localeCompare(b.name);
-            }
-
+            if (a.type === 'folder') return a.name.localeCompare(b.name);
             let dateA = a.data?.updated_at || a.data?.created_at || 0;
             let dateB = b.data?.updated_at || b.data?.created_at || 0;
-
             if (dateA > 0) dateA *= 1000;
             if (dateB > 0) dateB *= 1000;
-
             return dateB - dateA;
           }
-
           return a.name.localeCompare(b.name);
         });
         nodes.forEach((node) => {
@@ -161,41 +133,32 @@ export const PromptsTree = forwardRef<ArboristTreeHandle, PromptsTreeProps>(
 
       sortNodes(rootNodes);
       return rootNodes;
-    }, [
-      folders,
-      conversations,
-      sortOrder,
-      favorites,
-      typeFilter,
-      onlyFavorites,
-      t,
-    ]);
+    }, [promptFolders, prompts, sortOrder, favorites, typeFilter, onlyFavorites, t]);
 
     return (
-      <div ref={containerRef} className="h-full w-full">
-        <Tree
-          padding={2}
-          ref={treeRef}
-          data={data}
-          onMove={onMove}
-          onRename={onRename}
-          onDelete={onDelete}
-          onSelect={onSelect}
-          onToggle={handleToggle}
-          width={dimensions.width}
-          height={dimensions.height}
-          indent={20}
-          rowHeight={rowHeight}
-          openByDefault={false}
-          initialOpenState={initialOpenState}
-          searchTerm={searchTerm}
-          searchMatch={(node, term) =>
-            node.data.name.toLowerCase().includes(term.toLowerCase())
-          }
-        >
-          {(props) => <NodeWrapper {...props} onPreview={onPreview} />}
-        </Tree>
-      </div>
+      <FolderTree
+        ref={folderTreeRef}
+        data={data}
+        storageKey={STORAGE_KEY}
+        folders={promptFolders}
+        searchTerm={searchTerm}
+        onSelect={onSelect}
+        onMoveItem={async (id, parentId, type) => {
+          await movePromptItem(id, parentId, type);
+        }}
+        onRenameItem={async (id, name, type) => {
+          await renamePromptItem(id, name, type);
+        }}
+        onDeleteItems={async (ids) => {
+          await handleDelete(ids);
+        }}
+        onCreateFolder={async (name, parentId) => {
+          return createPromptFolder(name, parentId);
+        }}
+        renderNode={(props: NodeRendererProps<FolderTreeNodeData>) => (
+          <Node {...props} onPreview={onPreview} />
+        )}
+      />
     );
   },
 );

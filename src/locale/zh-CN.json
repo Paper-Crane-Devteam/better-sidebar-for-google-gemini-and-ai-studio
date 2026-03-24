@@ -296,8 +296,8 @@
     "deleteItem": "删除项目",
     "deleteConfirm": "您确定要删除 \"{{name}}\" 吗？",
     "deleteFolderConfirm": "您确定要删除文件夹 \"{{name}}\" 及其包含的所有内容吗？",
-    "deleteNote": "注意：删除的项目可以通过从 AI Studio 重新导入来恢复。",
-    "deleteFolderNote": "注意：删除的文件夹无法恢复，但对话可以从 AI Studio 重新导入。",
+    "deleteNote": "注意：删除的项目可以通过扫描聊天列表来恢复。",
+    "deleteFolderNote": "注意：删除的文件夹无法恢复，但对话可以通过扫描聊天列表来恢复。",
     "openInNewTab": "在新标签页打开",
     "moveTo": "移动到...",
     "export": "导出",
@@ -497,7 +497,11 @@
     "description": "在 Google AI Studio、Gemini、ChatGPT 和 Claude 上增强您的工作流程，体验更强大的文件管理和精美的 UI 界面。",
     "getStarted": "立即开始使用",
     "comingSoon": "即将推出",
-    "unsupported": "暂不支持"
+    "unsupported": "暂不支持",
+    "openSourceNote": "免费开源，由一位独立开发者维护。感谢你的支持！",
+    "loginRequired": "请先登录 AI 平台 — 侧边栏会在你登录平台页面后自动激活。",
+    "uiUpdateNote": "如果侧边栏突然不能用了，很可能是平台 UI 更新导致的。请更新插件或稍等修复，我会第一时间处理！",
+    "feedbackNote": "遇到问题？随时使用内置的反馈功能告诉我，我会第一时间修复。请不要直接打差评哦！"
   },
   "guidedTour": {
     "next": "下一步",
@@ -599,7 +603,7 @@
     "quickResendDesc": "无需修改内容即可重新发送消息",
     "defaultModel": "默认模型：",
     "defaultModelSelect": "选择",
-    "defaultModelNone": "默认（无）"
+    "defaultModelNone": "无"
   },
   "topBarTag": {
     "removeTag": "移除标签",

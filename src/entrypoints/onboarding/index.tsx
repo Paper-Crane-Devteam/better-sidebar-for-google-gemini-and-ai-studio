@@ -47,7 +47,7 @@ const Onboarding = () => {
 
       <div className="relative z-10 max-w-4xl w-full px-6 py-12 flex flex-col items-center">
         {/* Header section */}
-        <div className="flex flex-col items-center text-center space-y-8 mb-16 max-w-2xl">
+        <div className="flex flex-col items-center text-center space-y-8 mb-10 max-w-2xl">
           <div className="relative w-28 h-28 rounded-3xl bg-gradient-to-br from-cyan-400 to-indigo-600 shadow-2xl shadow-indigo-500/30 flex items-center justify-center overflow-hidden animate-in zoom-in duration-700">
             <div className="absolute inset-0 bg-white/10 backdrop-blur-sm" />
             <img
@@ -67,8 +67,18 @@ const Onboarding = () => {
           </div>
         </div>
 
+        {/* Open-source note */}
+        <div className="flex items-center gap-3 px-5 py-3 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 fill-mode-both">
+          <svg className="w-5 h-5 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+          <p className="text-sm text-emerald-700 dark:text-emerald-400 font-medium">
+            {t('onboarding.openSourceNote')}
+          </p>
+        </div>
+
         {/* Features / Platforms Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl mb-16 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300 fill-mode-both">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl mb-12 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300 fill-mode-both">
           {platformsToShow.map((config) => {
             const isSupported = config.supported;
 
@@ -134,6 +144,47 @@ const Onboarding = () => {
               </a>
             );
           })}
+        </div>
+
+        {/* Tips section */}
+        <div className="w-full max-w-3xl mb-14 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-400 fill-mode-both">
+          <div className="grid gap-3">
+            {/* Login required */}
+            <div className="flex items-start gap-4 p-4 rounded-xl bg-card/40 backdrop-blur-xl border border-border/50">
+              <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0 mt-0.5">
+                <svg className="w-[18px] h-[18px] text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                </svg>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed pt-1.5">
+                {t('onboarding.loginRequired')}
+              </p>
+            </div>
+
+            {/* UI update note */}
+            <div className="flex items-start gap-4 p-4 rounded-xl bg-card/40 backdrop-blur-xl border border-border/50">
+              <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0 mt-0.5">
+                <svg className="w-[18px] h-[18px] text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed pt-1.5">
+                {t('onboarding.uiUpdateNote')}
+              </p>
+            </div>
+
+            {/* Feedback note */}
+            <div className="flex items-start gap-4 p-4 rounded-xl bg-card/40 backdrop-blur-xl border border-border/50">
+              <div className="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center shrink-0 mt-0.5">
+                <svg className="w-[18px] h-[18px] text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed pt-1.5">
+                {t('onboarding.feedbackNote')}
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Call to Action */}

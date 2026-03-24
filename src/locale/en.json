@@ -296,8 +296,8 @@
     "deleteItem": "Delete Item",
     "deleteConfirm": "Are you sure you want to delete \"{{name}}\"?",
     "deleteFolderConfirm": "Are you sure you want to delete the folder \"{{name}}\" and all its contents?",
-    "deleteNote": "Note: Deleted items can be restored by re-importing them from AI Studio.",
-    "deleteFolderNote": "Note: Deleted folders cannot be restored, but conversations can be re-imported from AI Studio.",
+    "deleteNote": "Note: Deleted items can be restored by scanning the chat list.",
+    "deleteFolderNote": "Note: Deleted folders cannot be restored, but conversations can be recovered by scanning the chat list.",
     "openInNewTab": "Open in New Tab",
     "moveTo": "Move to...",
     "export": "Export",
@@ -497,7 +497,11 @@
     "description": "Supercharge your workflow on Google AI Studio, Gemini, ChatGPT, and Claude with enhanced file management and beautiful UI.",
     "getStarted": "Get Started now",
     "comingSoon": "Coming Soon",
-    "unsupported": "Currently Unsupported"
+    "unsupported": "Currently Unsupported",
+    "openSourceNote": "Free & open-source, built and maintained by a solo developer. Thank you for your support!",
+    "loginRequired": "Please log in to the AI platform first — the sidebar activates on the platform page after you sign in.",
+    "uiUpdateNote": "If the sidebar stops working, it's likely due to a platform UI update. Please update the extension or wait for a fix — I'll patch it ASAP!",
+    "feedbackNote": "Run into a bug? Use the built-in feedback feature anytime — I'll get on it right away. Please don't leave a bad review before reaching out!"
   },
   "guidedTour": {
     "next": "Next",
@@ -599,7 +603,7 @@
     "quickResendDesc": "Resend messages without editing",
     "defaultModel": "Default Model:",
     "defaultModelSelect": "Select",
-    "defaultModelNone": "Default (None)"
+    "defaultModelNone": "None"
   },
   "topBarTag": {
     "removeTag": "Remove tag",

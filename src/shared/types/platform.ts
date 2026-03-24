@@ -89,12 +89,25 @@ export const PLATFORM_CONFIG: Record<Platform, PlatformConfig> = {
 /**
  * Detect current platform based on hostname
  * Can be used in content scripts and main-world scripts
+ * Results are cached when called without arguments (auto-detect mode)
  */
-export function detectPlatform(
-  hostname: string = typeof window !== 'undefined'
-    ? window.location.hostname
-    : ''
-): Platform {
+let _cachedPlatform: Platform | null = null;
+
+export function detectPlatform(hostname?: string): Platform {
+  // If no explicit hostname, use cache or auto-detect and cache
+  if (hostname === undefined) {
+    if (_cachedPlatform !== null) return _cachedPlatform;
+    hostname =
+      typeof window !== 'undefined' ? window.location.hostname : '';
+    const result = _detectPlatform(hostname);
+    _cachedPlatform = result;
+    return result;
+  }
+  // Explicit hostname — always compute
+  return _detectPlatform(hostname);
+}
+
+function _detectPlatform(hostname: string): Platform {
   for (const [platform, config] of Object.entries(PLATFORM_CONFIG)) {
     if (hostname === config.hostname) {
       console.log('Detected platform:', platform);

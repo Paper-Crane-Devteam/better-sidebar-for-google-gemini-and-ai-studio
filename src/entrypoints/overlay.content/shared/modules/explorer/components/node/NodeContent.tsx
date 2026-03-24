@@ -1,10 +1,7 @@
 import React from 'react';
 import { NodeProps } from './types';
-import { SimpleTooltip } from '@/shared/components/ui/tooltip';
 import { Star } from 'lucide-react';
-import { BatchSelectionCheckbox } from '../batch/BatchSelectionCheckbox';
-import { cn } from '@/shared/lib/utils/utils';
-import { RenameForm } from './RenameForm';
+import { FolderTreeNodeContent } from '../../../../components/folder-tree';
 
 interface NodeContentProps extends NodeProps {
   isBatchMode: boolean;
@@ -38,61 +35,28 @@ export const NodeContent = ({
   newName,
   setNewName,
 }: NodeContentProps) => {
-  const isTimeGroup = node.data.data?.isTimeGroup;
-  const isFile = node.data.type === 'file';
-
   return (
-    <>
-      {isBatchMode && (
-        <BatchSelectionCheckbox
-          checked={isBatchSelected}
-          indeterminate={isBatchIndeterminate}
-          onChange={onToggleBatchSelection}
-          className="ml-1"
-        />
-      )}
-
-      <div
-        role="button"
-        tabIndex={0}
-        className={cn(
-          'w-4 h-4 flex items-center justify-center shrink-0 text-muted-foreground',
-          isFile && isBatchMode && 'hidden',
-        )}
-        onClick={handleToggle}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            handleToggle(e as any);
-          }
-        }}
-      >
-        {toggleIcon}
-      </div>
-
-      {node.data.type === 'folder' && (
-        <div className="w-4 h-4 flex items-center justify-center shrink-0">
-          {folderIcon}
-        </div>
-      )}
-
-      <div className="flex-1 min-w-0 flex items-center gap-1 overflow-hidden justify-between">
-        {node.isEditing ? (
-          <RenameForm node={node} newName={newName} setNewName={setNewName} />
-        ) : isFile ? (
-          <SimpleTooltip content={node.data.name}>
-            <span className="truncate text-sm select-none">
-              {node.data.name}
-            </span>
-          </SimpleTooltip>
-        ) : (
-          <span
-            className="truncate text-sm select-none"
-            style={folderColor ? { color: folderColor } : undefined}
-          >
-            {node.data.name}
-          </span>
-        )}
-        {isFavorite && (
+    <FolderTreeNodeContent
+      node={node}
+      folderIcon={folderIcon}
+      fileIcon={null}
+      toggleIcon={toggleIcon}
+      handleToggle={handleToggle}
+      folderColor={folderColor}
+      batchMode={
+        isBatchMode
+          ? {
+              enabled: true,
+              selected: isBatchSelected,
+              indeterminate: isBatchIndeterminate,
+              onToggle: onToggleBatchSelection,
+            }
+          : undefined
+      }
+      newName={newName}
+      setNewName={setNewName}
+      nameAddon={
+        isFavorite ? (
           <div
             role="button"
             className="h-5 w-5 shrink-0 flex items-center justify-center rounded-md hover:bg-muted/50 transition-colors"
@@ -100,8 +64,8 @@ export const NodeContent = ({
           >
             <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
           </div>
-        )}
-      </div>
-    </>
+        ) : undefined
+      }
+    />
   );
 };

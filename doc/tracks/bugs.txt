@@ -25,4 +25,5 @@
 -15. option dropdown
 -16. search in current chat
 -14. sync using google drive
+15. smartscrollbar: reedit should clear previous message, open expanded view flicker, expanded view to normal view btn logic
 `

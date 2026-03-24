@@ -57,6 +57,9 @@ export const TimelineView = forwardRef<ArboristTreeHandle, TimelineViewProps>(
         });
         setExplorerBatchSelection(ids);
       },
+      open: (id: string) => {
+        treeRef.current?.open(id);
+      },
     }));
 
     const data = useMemo(() => {

@@ -1,6 +1,3 @@
-import { NodeRendererProps } from 'react-arborist';
-import { NodeData } from '../../types';
+import { FolderTreeNodeProps } from '../../../../components/folder-tree';
 
-export interface NodeProps extends NodeRendererProps<NodeData> {
-}
-
+export type NodeProps = FolderTreeNodeProps;

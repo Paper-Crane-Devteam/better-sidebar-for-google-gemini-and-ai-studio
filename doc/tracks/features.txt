@@ -18,3 +18,4 @@
 -20. default model only work on new chat
 -21. selected chat not focused style
 -22. folder block background
+-23. add message on welcome(should login;if broken, maybe ui update; please report bug on feedback)
