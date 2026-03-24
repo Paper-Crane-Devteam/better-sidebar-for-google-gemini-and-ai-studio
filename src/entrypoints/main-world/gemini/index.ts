@@ -3,6 +3,7 @@ import { handleGenerateResponse } from './interceptors/generate';
 import { handleChatContentResponse } from './interceptors/chat-content';
 import { handleListChatResponse } from './interceptors/list-chat';
 import { handleDeleteResponse } from './interceptors/delete';
+import { handleCreateGemResponse } from './interceptors/create-gem';
 import { handleDownloadResponse } from './interceptors/download';
 
 export function initGeminiInterceptors() {
@@ -45,6 +46,8 @@ export function initGeminiInterceptors() {
             handleListChatResponse(response, url);
           } else if (url.includes('rpcids=GzXR5e')) {
             handleDeleteResponse(response, url);
+          } else if (url.includes('rpcids=CNgdBe')) {
+            handleCreateGemResponse(response, url);
           }
         }
       } catch (e) {

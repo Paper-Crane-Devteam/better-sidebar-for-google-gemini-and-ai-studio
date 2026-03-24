@@ -6,6 +6,7 @@ import { ExtensionMessage } from '@/shared/types/messages';
 import { scanLibrary } from './tasks/scan-library';
 import { apiScanner } from './tasks/scan-api';
 import { chatContentScanner } from './tasks/scan-chat-content';
+import { gemCreationScanner } from './tasks/scan-gem-creation';
 
 import { syncConversations } from './tasks/sync-conversations';
 // import { initImageProcessor } from './tasks/process-images';
@@ -57,6 +58,7 @@ export async function initGemini() {
   // Start API Scanner immediately to catch early requests (no DB dependency)
   apiScanner.start();
   chatContentScanner.start();
+  gemCreationScanner.start();
 
   // Start image watermark processor (MutationObserver on img tags)
   // initImageProcessor().catch((e) => {

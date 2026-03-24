@@ -621,6 +621,23 @@
   "footer": {
     "madeWith": "Better Sidebar • Paper Crane Dev が ♥️ を込めて制作"
   },
+  "gems": {
+    "title": "Gems",
+    "noGems": "Gems が見つかりません。",
+    "noGemsDescription": "Gemini から同期すると、ここに Gems が表示されます。",
+    "newGemChat": "新しい Gem チャット",
+    "conversations": "件の会話",
+    "openGem": "Gem を開く",
+    "openInNewTab": "新しいタブで開く",
+    "deleteGem": "Gem を削除",
+    "deleteGemConfirm": "\"{{name}}\" を削除しますか？この Gem の会話はリンク解除されます。",
+    "renameGem": "Gem の名前を変更",
+    "createGem": "Gem を作成",
+    "selectGem": "Gem を選択",
+    "searchGems": "Gems を検索...",
+    "chatWithLastGem": "{{name}} とチャット",
+    "empty": "Gems がまだありません。作成するか Gemini から同期してください。"
+  },
   "whatsNew": {
     "title": "v{{version}} の新機能",
     "features": "新機能",

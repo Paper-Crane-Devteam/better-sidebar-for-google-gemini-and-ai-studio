@@ -27,6 +27,7 @@ interface SettingsState {
   newChatBehavior: 'current-tab' | 'new-tab';
   autoScanLibrary: boolean;
   overlayPosition: 'bottom-left' | 'bottom-right';
+  lastCreatedGemId: string | null;
   explorer: {
     viewMode: 'tree' | 'timeline';
     sortOrder: 'alpha' | 'date';
@@ -67,6 +68,7 @@ interface SettingsState {
     key: K,
     value: GeminiEnhancedFeatures[K],
   ) => void;
+  setLastCreatedGemId: (id: string | null) => void;
 }
 
 const storage: StateStorage = {
@@ -122,6 +124,7 @@ export const useSettingsStore = create<SettingsState>()(
       newChatBehavior: 'current-tab',
       autoScanLibrary: false,
       overlayPosition: 'bottom-left',
+      lastCreatedGemId: null,
       explorer: {
         viewMode: 'tree',
         sortOrder: 'date',
@@ -196,6 +199,7 @@ export const useSettingsStore = create<SettingsState>()(
             gemini: { ...state.enhancedFeatures.gemini, [key]: value },
           },
         })),
+      setLastCreatedGemId: (id) => set({ lastCreatedGemId: id }),
     }),
     {
       name: getStorageName(),

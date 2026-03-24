@@ -4,6 +4,7 @@ import {
   ConversationTag,
   Prompt,
   PromptFolder,
+  Gem,
 } from '../../types/db';
 import type { Platform } from '../../types/platform';
 
@@ -26,6 +27,7 @@ export interface Conversation {
   external_id?: string;
   type?: 'conversation' | 'text-to-image';
   platform?: string;
+  gem_id?: string | null;
 }
 
 export interface UIState {
@@ -40,7 +42,8 @@ export interface UIState {
       | 'feedback'
       | 'settings'
       | 'search'
-      | 'prompts';
+      | 'prompts'
+      | 'gems';
     isSettingsOpen: boolean;
     isScanning: boolean;
     showSqlInterface: boolean;
@@ -92,6 +95,12 @@ export interface UIState {
     tags: { isOpen: boolean; selected: string[] };
     typeFilter: 'all' | 'conversation' | 'text-to-image';
   };
+  gems: {
+    search: { isOpen: boolean; query: string };
+    tags: { isOpen: boolean; selected: string[] };
+    onlyFavorites: boolean;
+    sortOrder: 'alpha' | 'date';
+  };
 }
 
 export interface AppState {
@@ -102,6 +111,7 @@ export interface AppState {
   favorites: Favorite[];
   tags: Tag[];
   conversationTags: ConversationTag[];
+  gems: Gem[];
   isLoading: boolean;
   ui: UIState;
 
@@ -162,7 +172,8 @@ export interface AppState {
       | 'feedback'
       | 'settings'
       | 'search'
-      | 'prompts',
+      | 'prompts'
+      | 'gems',
   ) => void;
   setIsScanning: (isScanning: boolean) => void;
   setShowSqlInterface: (show: boolean) => void;
@@ -226,6 +237,13 @@ export interface AppState {
   setPromptsBatchMode: (isBatchMode: boolean) => void;
   setPromptsBatchSelection: (selectedIds: string[]) => void;
   togglePromptsBatchSelection: (id: string) => void;
+
+  // Gems
+  setGems: (gems: Gem[]) => void;
+  setGemsSearch: (isOpen: boolean, query?: string) => void;
+  setGemsTags: (isOpen: boolean, selected?: string[]) => void;
+  setGemsOnlyFavorites: (onlyFavorites: boolean) => void;
+  setGemsSortOrder: (order: 'alpha' | 'date') => void;
 }
 
 export type SetState = (

@@ -23,6 +23,20 @@ export interface Conversation {
   created_at: number;
   prompt_metadata: any;
   deleted_at: number | null; // Unix timestamp in seconds, NULL = active (not deleted)
+  gem_id: string | null;
+}
+
+export interface Gem {
+  id: string;
+  name: string;
+  external_id: string | null;
+  external_url: string | null;
+  icon_url: string | null;
+  description: string | null;
+  platform: string;
+  order_index: number;
+  created_at: number;
+  updated_at: number;
 }
 
 export interface Message {

@@ -621,6 +621,23 @@
   "footer": {
     "madeWith": "Better Sidebar • Сделано с ♥️ от Paper Crane Dev"
   },
+  "gems": {
+    "title": "Gems",
+    "noGems": "Gems не найдены.",
+    "noGemsDescription": "Gems появятся здесь после синхронизации из Gemini.",
+    "newGemChat": "Новый чат с Gem",
+    "conversations": "диалогов",
+    "openGem": "Открыть Gem",
+    "openInNewTab": "Открыть в новой вкладке",
+    "deleteGem": "Удалить Gem",
+    "deleteGemConfirm": "Вы уверены, что хотите удалить \"{{name}}\"? Диалоги этого Gem будут отвязаны.",
+    "renameGem": "Переименовать Gem",
+    "createGem": "Создать Gem",
+    "selectGem": "Выбрать Gem",
+    "searchGems": "Поиск gems...",
+    "chatWithLastGem": "Чат с {{name}}",
+    "empty": "Gems пока нет. Создайте или синхронизируйте из Gemini."
+  },
   "whatsNew": {
     "title": "Что нового в v{{version}}",
     "features": "Новые возможности",

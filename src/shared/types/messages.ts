@@ -311,6 +311,43 @@ export type ExtensionMessage = (
       type: 'RENAME_PROFILE';
       payload: { profileId: string; name: string };
     }
+  // Gems
+  | { type: 'GET_GEMS' }
+  | {
+      type: 'SAVE_GEM';
+      payload: {
+        id: string;
+        name: string;
+        external_id?: string;
+        external_url?: string;
+        icon_url?: string;
+        description?: string;
+        platform?: string;
+      };
+    }
+  | {
+      type: 'SAVE_GEMS';
+      payload: {
+        gems: {
+          id: string;
+          name: string;
+          external_id?: string;
+          external_url?: string;
+          icon_url?: string;
+          description?: string;
+          platform?: string;
+        }[];
+      };
+    }
+  | { type: 'DELETE_GEM'; payload: { id: string } }
+  | {
+      type: 'UPDATE_GEM';
+      payload: {
+        id: string;
+        updates: Partial<{ name: string; description: string; icon_url: string }>;
+      };
+    }
+  | { type: 'GET_GEM_CONVERSATIONS'; payload: { gemId: string } }
   // Google Drive sync
   | { type: 'GDRIVE_AUTH' }
   | { type: 'GDRIVE_DISCONNECT' }

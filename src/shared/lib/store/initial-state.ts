@@ -27,6 +27,12 @@ export const initialUIState: UIState = {
     tags: { isOpen: false, selected: [] },
     typeFilter: 'all',
   },
+  gems: {
+    search: { isOpen: false, query: '' },
+    tags: { isOpen: false, selected: [] },
+    onlyFavorites: false,
+    sortOrder: 'alpha',
+  },
   prompts: {
     search: { isOpen: false, query: '' },
     typeFilter: 'all',

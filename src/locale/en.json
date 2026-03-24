@@ -21,7 +21,8 @@
     "search": "Search",
     "tags": "Tags",
     "feedback": "Feedback",
-    "settings": "Settings"
+    "settings": "Settings",
+    "gems": "Gems"
   },
   "sidebar": {
     "newConversation": "New Conversation",
@@ -619,6 +620,23 @@
   },
   "footer": {
     "madeWith": "Better Sidebar • Made with ♥️ by Paper Crane Dev"
+  },
+  "gems": {
+    "title": "Gems",
+    "noGems": "No gems found.",
+    "noGemsDescription": "Gems will appear here when synced from Gemini.",
+    "newGemChat": "New Gem Chat",
+    "conversations": "conversations",
+    "openGem": "Open Gem",
+    "openInNewTab": "Open in New Tab",
+    "deleteGem": "Delete Gem",
+    "deleteGemConfirm": "Are you sure you want to delete \"{{name}}\"? Conversations under this gem will be unlinked.",
+    "renameGem": "Rename Gem",
+    "createGem": "Create Gem",
+    "selectGem": "Select a Gem",
+    "searchGems": "Search gems...",
+    "chatWithLastGem": "Chat with {{name}}",
+    "empty": "No gems yet. Create one or sync from Gemini."
   },
   "whatsNew": {
     "title": "What's New in v{{version}}",

@@ -11,6 +11,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   favorites: [],
   tags: [],
   conversationTags: [],
+  gems: [],
   isLoading: false,
   ui: initialUIState,
 

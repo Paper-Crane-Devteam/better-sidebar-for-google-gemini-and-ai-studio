@@ -621,6 +621,23 @@
   "footer": {
     "madeWith": "Better Sidebar • Feito com ♥️ por Paper Crane Dev"
   },
+  "gems": {
+    "title": "Gems",
+    "noGems": "Nenhum gem encontrado.",
+    "noGemsDescription": "Os gems aparecerão aqui quando sincronizados do Gemini.",
+    "newGemChat": "Novo chat com Gem",
+    "conversations": "conversas",
+    "openGem": "Abrir Gem",
+    "openInNewTab": "Abrir em nova aba",
+    "deleteGem": "Excluir Gem",
+    "deleteGemConfirm": "Tem certeza de que deseja excluir \"{{name}}\"? As conversas sob este gem serão desvinculadas.",
+    "renameGem": "Renomear Gem",
+    "createGem": "Criar Gem",
+    "selectGem": "Selecionar um Gem",
+    "searchGems": "Pesquisar gems...",
+    "chatWithLastGem": "Conversar com {{name}}",
+    "empty": "Nenhum gem ainda. Crie um ou sincronize do Gemini."
+  },
   "whatsNew": {
     "title": "Novidades na v{{version}}",
     "features": "Novos recursos",

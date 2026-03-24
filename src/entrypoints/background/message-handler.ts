@@ -18,6 +18,7 @@ import {
   handleMisc,
   handleProfile,
   handleGdriveSync,
+  handleGems,
 } from './handlers';
 
 const handlers = [
@@ -30,6 +31,7 @@ const handlers = [
   handleTags,
   handleMessages,
   handlePrompts,
+  handleGems,
   handleMisc,
   handleGdriveSync,
 ];

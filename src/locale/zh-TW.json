@@ -621,6 +621,23 @@
   "footer": {
     "madeWith": "Better Sidebar • 由 Paper Crane Dev 用 ♥️ 打造"
   },
+  "gems": {
+    "title": "Gems",
+    "noGems": "找不到 Gems",
+    "noGemsDescription": "從 Gemini 同步後，Gems 將顯示在這裡。",
+    "newGemChat": "新增 Gem 對話",
+    "conversations": "則對話",
+    "openGem": "開啟 Gem",
+    "openInNewTab": "在新標籤頁開啟",
+    "deleteGem": "刪除 Gem",
+    "deleteGemConfirm": "確定要刪除 \"{{name}}\" 嗎？該 Gem 下的對話將被取消關聯。",
+    "renameGem": "重新命名 Gem",
+    "createGem": "建立 Gem",
+    "selectGem": "選擇一個 Gem",
+    "searchGems": "搜尋 Gems...",
+    "chatWithLastGem": "與 {{name}} 對話",
+    "empty": "尚無 Gems。建立一個或從 Gemini 同步。"
+  },
   "whatsNew": {
     "title": "v{{version}} 更新內容",
     "features": "新功能",

@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS conversations (
   created_at INTEGER DEFAULT (unixepoch()),
   prompt_metadata TEXT,
   deleted_at INTEGER DEFAULT NULL, -- soft delete: unix timestamp in seconds, NULL = active
+  gem_id TEXT,
   FOREIGN KEY(folder_id) REFERENCES folders(id) ON DELETE CASCADE
 );
 
@@ -116,4 +117,19 @@ END;
 INSERT INTO messages_fts(id, content) 
 SELECT id, content FROM messages 
 WHERE (SELECT COUNT(*) FROM messages_fts) = 0;
+
+CREATE TABLE IF NOT EXISTS gems (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  external_id TEXT UNIQUE,
+  external_url TEXT,
+  icon_url TEXT,
+  description TEXT,
+  platform TEXT DEFAULT 'gemini',
+  order_index INTEGER DEFAULT 0,
+  created_at INTEGER DEFAULT (unixepoch()),
+  updated_at INTEGER DEFAULT (unixepoch())
+);
+
+CREATE INDEX IF NOT EXISTS idx_gems_platform ON gems(platform);
 `;

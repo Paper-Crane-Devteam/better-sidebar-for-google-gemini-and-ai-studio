@@ -5,10 +5,10 @@ import type {
   PromptsTypeFilter,
 } from '../types/filter';
 
-export function useStoreFilter(slice: 'explorer' | 'favorites'): FilterState<ExplorerTypeFilter>;
+export function useStoreFilter(slice: 'explorer' | 'favorites' | 'gems'): FilterState<ExplorerTypeFilter>;
 export function useStoreFilter(slice: 'prompts'): FilterState<PromptsTypeFilter>;
 export function useStoreFilter(
-  slice: 'explorer' | 'favorites' | 'prompts'
+  slice: 'explorer' | 'favorites' | 'prompts' | 'gems'
 ): FilterState<ExplorerTypeFilter> | FilterState<PromptsTypeFilter> {
   const store = useAppStore();
 
@@ -17,28 +17,34 @@ export function useStoreFilter(
       ? store.ui.explorer
       : slice === 'favorites'
         ? store.ui.favorites
-        : store.ui.prompts;
+        : slice === 'gems'
+          ? store.ui.gems
+          : store.ui.prompts;
 
   const setIsSearchOpen = (isOpen: boolean) => {
     if (slice === 'explorer') store.setExplorerSearch(isOpen);
     else if (slice === 'favorites') store.setFavoritesSearch(isOpen);
+    else if (slice === 'gems') store.setGemsSearch(isOpen);
     else store.setPromptsSearch(isOpen);
   };
 
   const setSearchQuery = (query: string) => {
     if (slice === 'explorer') store.setExplorerSearch(true, query);
     else if (slice === 'favorites') store.setFavoritesSearch(true, query);
+    else if (slice === 'gems') store.setGemsSearch(true, query);
     else store.setPromptsSearch(true, query);
   };
 
   const setIsTagsOpen = (isOpen: boolean) => {
     if (slice === 'explorer') store.setExplorerTags(isOpen);
     else if (slice === 'favorites') store.setFavoritesTags(isOpen);
+    else if (slice === 'gems') store.setGemsTags(isOpen);
   };
 
   const setSelectedTags = (selected: string[]) => {
     if (slice === 'explorer') store.setExplorerTags(true, selected);
     else if (slice === 'favorites') store.setFavoritesTags(true, selected);
+    else if (slice === 'gems') store.setGemsTags(true, selected);
   };
 
   const setTypeFilter = (value: ExplorerTypeFilter | PromptsTypeFilter) => {
@@ -49,6 +55,7 @@ export function useStoreFilter(
 
   const setOnlyFavorites = (value: boolean) => {
     if (slice === 'explorer') store.setExplorerOnlyFavorites(value);
+    else if (slice === 'gems') store.setGemsOnlyFavorites(value);
     else if (slice === 'prompts') store.setPromptsOnlyFavorites(value);
   };
 
@@ -66,16 +73,18 @@ export function useStoreFilter(
       setSelected: setSelectedTags,
     },
     type: {
-      value: uiState.typeFilter,
+      value: (uiState as any).typeFilter ?? 'all',
       setValue: setTypeFilter,
     },
     onlyFavorites: {
       value:
         slice === 'explorer'
           ? store.ui.explorer.onlyFavorites
-          : slice === 'prompts'
-            ? store.ui.prompts.onlyFavorites
-            : false,
+          : slice === 'gems'
+            ? store.ui.gems.onlyFavorites
+            : slice === 'prompts'
+              ? store.ui.prompts.onlyFavorites
+              : false,
       setValue: setOnlyFavorites,
     },
   } as FilterState<ExplorerTypeFilter> | FilterState<PromptsTypeFilter>;

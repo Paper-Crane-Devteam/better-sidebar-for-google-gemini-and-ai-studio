@@ -52,7 +52,6 @@ const TreeViewNode = ({
       <div
         className={cn(
           'flex items-center gap-2 py-1 px-2 rounded-sm hover:bg-accent cursor-pointer text-sm w-full',
-          level > 0 && `ml-${level * 4}`,
           selectedId === item.id && 'bg-accent'
         )}
         style={{ paddingLeft: `${level * 12 + 8}px` }}

@@ -21,7 +21,8 @@
     "search": "搜索",
     "tags": "标签",
     "feedback": "反馈",
-    "settings": "设置"
+    "settings": "设置",
+    "gems": "Gems"
   },
   "sidebar": {
     "newConversation": "新建对话",
@@ -619,6 +620,23 @@
   },
   "footer": {
     "madeWith": "Better Sidebar • 由 Paper Crane Dev 用 ♥️ 打造"
+  },
+  "gems": {
+    "title": "Gems",
+    "noGems": "暂无 Gems",
+    "noGemsDescription": "从 Gemini 同步后，Gems 将显示在这里。",
+    "newGemChat": "新建 Gem 对话",
+    "conversations": "条对话",
+    "openGem": "打开 Gem",
+    "openInNewTab": "在新标签页打开",
+    "deleteGem": "删除 Gem",
+    "deleteGemConfirm": "确定要删除 \"{{name}}\" 吗？该 Gem 下的对话将被取消关联。",
+    "renameGem": "重命名 Gem",
+    "createGem": "创建 Gem",
+    "selectGem": "选择一个 Gem",
+    "searchGems": "搜索 Gems...",
+    "chatWithLastGem": "与 {{name}} 对话",
+    "empty": "暂无 Gems。创建一个或从 Gemini 同步。"
   },
   "whatsNew": {
     "title": "v{{version}} 更新内容",

@@ -6,6 +6,7 @@ import { createSearchActions } from './search';
 import { createDataActions } from './data';
 import { createTagActions } from './tags';
 import { createPromptsActions } from './prompts';
+import { createGemsActions } from './gems';
 
 export function createAllActions(set: SetState, get: GetState) {
   return {
@@ -16,5 +17,6 @@ export function createAllActions(set: SetState, get: GetState) {
     ...createDataActions(set, get),
     ...createTagActions(get),
     ...createPromptsActions(set, get),
+    ...createGemsActions(set, get),
   };
 }

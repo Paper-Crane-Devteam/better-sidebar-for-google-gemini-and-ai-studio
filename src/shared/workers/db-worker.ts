@@ -2,6 +2,7 @@ import { initSQLite, isOpfsSupported } from '@subframe7536/sqlite-wasm';
 import { useIdbStorage } from '@subframe7536/sqlite-wasm/idb';
 import { useOpfsStorage } from '@subframe7536/sqlite-wasm/opfs';
 import { SCHEMA } from '@/shared/db/schema';
+import { runMigrations } from './migrations';
 
 let db: any = null;
 let initPromise: Promise<boolean> | null = null;
@@ -79,110 +80,7 @@ const initDB = async (newDbName?: string) => {
   return initPromise;
 };
 
-const runMigrations = async (db: any) => {
-  console.log('Worker: Checking for migrations...');
 
-  try {
-    // Helper to check if a column exists in a table
-    const hasColumn = async (
-      table: string,
-      column: string,
-    ): Promise<boolean> => {
-      const columns = await db.run(`PRAGMA table_info(${table})`);
-      return columns.some((col: any) => col.name === column);
-    };
-
-    // Migration: Add order_index to messages if missing
-    if (!(await hasColumn('messages', 'order_index'))) {
-      console.log('Worker: Migrating messages table - adding order_index');
-      await db.run(
-        'ALTER TABLE messages ADD COLUMN order_index INTEGER DEFAULT 0',
-      );
-    }
-
-    // Migration: Add message_type to messages if missing
-    if (!(await hasColumn('messages', 'message_type'))) {
-      console.log('Worker: Migrating messages table - adding message_type');
-      await db.run(
-        "ALTER TABLE messages ADD COLUMN message_type TEXT DEFAULT 'text'",
-      );
-    }
-
-    // Migration: Add order_index to conversations if missing
-    if (!(await hasColumn('conversations', 'order_index'))) {
-      console.log('Worker: Migrating conversations table - adding order_index');
-      await db.run(
-        'ALTER TABLE conversations ADD COLUMN order_index INTEGER DEFAULT 0',
-      );
-    }
-
-    // Migration: Add prompt_metadata to conversations if missing
-    if (!(await hasColumn('conversations', 'prompt_metadata'))) {
-      console.log(
-        'Worker: Migrating conversations table - adding prompt_metadata',
-      );
-      await db.run('ALTER TABLE conversations ADD COLUMN prompt_metadata TEXT');
-    }
-
-    // Migration: Add type to conversations if missing
-    if (!(await hasColumn('conversations', 'type'))) {
-      console.log('Worker: Migrating conversations table - adding type');
-      await db.run(
-        "ALTER TABLE conversations ADD COLUMN type TEXT DEFAULT 'conversation'",
-      );
-    }
-
-    // Migration: Add platform to conversations if missing
-    if (!(await hasColumn('conversations', 'platform'))) {
-      console.log('Worker: Migrating conversations table - adding platform');
-      await db.run(
-        "ALTER TABLE conversations ADD COLUMN platform TEXT DEFAULT 'aistudio'",
-      );
-    }
-
-    // Always ensure platform index exists (moved out of SCHEMA to avoid startup errors on old DBs)
-    await db.run(
-      'CREATE INDEX IF NOT EXISTS idx_conversations_platform ON conversations(platform)',
-    );
-
-    // Migration: Add order_index to folders if missing
-    if (!(await hasColumn('folders', 'order_index'))) {
-      console.log('Worker: Migrating folders table - adding order_index');
-      await db.run(
-        'ALTER TABLE folders ADD COLUMN order_index INTEGER DEFAULT 0',
-      );
-    }
-
-    // Migration: Add platform to folders if missing
-    if (!(await hasColumn('folders', 'platform'))) {
-      console.log('Worker: Migrating folders table - adding platform');
-      await db.run(
-        "ALTER TABLE folders ADD COLUMN platform TEXT DEFAULT 'aistudio'",
-      );
-    }
-
-    // Migration: Add deleted_at to conversations if missing (soft deletion)
-    if (!(await hasColumn('conversations', 'deleted_at'))) {
-      console.log(
-        'Worker: Migrating conversations table - adding deleted_at for soft deletion',
-      );
-      await db.run(
-        'ALTER TABLE conversations ADD COLUMN deleted_at INTEGER DEFAULT NULL',
-      );
-      await db.run(
-        'CREATE INDEX IF NOT EXISTS idx_conversations_deleted ON conversations(deleted_at)',
-      );
-    }
-
-    // Migration: Add color to folders if missing
-    if (!(await hasColumn('folders', 'color'))) {
-      console.log('Worker: Migrating folders table - adding color');
-      await db.run('ALTER TABLE folders ADD COLUMN color TEXT');
-    }
-  } catch (err) {
-    console.error('Worker: Migration failed:', err);
-  }
-};
 
 /**
  * Close the current DB connection and reset state.

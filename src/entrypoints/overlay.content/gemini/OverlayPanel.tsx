@@ -27,6 +27,7 @@ import { SearchTab } from '../shared/modules/search/SearchTab';
 import { FavoritesTab } from '../shared/modules/favorites/FavoritesTab';
 import { TagsTab } from '../shared/modules/tags/TagsTab';
 import { FeedbackTab } from '../shared/modules/feedback/FeedbackTab';
+import { GemsTab } from '../shared/modules/gems/GemsTab';
 import { SettingsModal } from '../shared/modules/settings/SettingsModal';
 import { WhatsNewDialog } from '../shared/modules/whats-new/WhatsNewDialog';
 import '@/index.scss';
@@ -152,7 +153,8 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
       | 'feedback'
       | 'settings'
       | 'search'
-      | 'prompts',
+      | 'prompts'
+      | 'gems',
   ) => {
     if (tab === 'settings') {
       setIsSettingsOpen(true);
@@ -316,10 +318,10 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
 
           {(shortcuts?.gems ?? true) && (
             <Button
-              variant="ghost"
+              variant={activeTab === 'gems' ? 'secondary' : 'ghost'}
               size="icon"
-              title={t('shortcuts.gems')}
-              onClick={() => navigate('https://gemini.google.com/gems/view')}
+              title={t('tabs.gems')}
+              onClick={() => handleTabChange('gems')}
               className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
               data-tour-id="tour-gems"
             >
@@ -406,6 +408,8 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
           />
         ) : activeTab === 'tags' ? (
           <TagsTab menuActions={moduleConfig.general.menuActions} />
+        ) : activeTab === 'gems' ? (
+          <GemsTab menuActions={moduleConfig.general.menuActions} />
         ) : activeTab === 'feedback' ? (
           <FeedbackTab />
         ) : (
