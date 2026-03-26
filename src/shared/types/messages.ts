@@ -67,6 +67,7 @@ export type ExtensionMessage = (
         folderId?: string | null;
         type?: string;
         platform?: string;
+        gem_id?: string | null;
       };
     }
   | { type: 'SCAN_LIBRARY' }

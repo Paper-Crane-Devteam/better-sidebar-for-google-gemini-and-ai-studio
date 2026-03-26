@@ -176,6 +176,10 @@ export function handleGenerateResponse(response: any, url: string) {
                 });
 
                 if (title) {
+                  // Detect if this is a gem conversation from the current URL
+                  const gemUrlMatch = /\/gem\/([^/]+)/.exec(globalThis.location?.pathname || '');
+                  const gemId = gemUrlMatch ? gemUrlMatch[1] : undefined;
+
                   globalThis.dispatchEvent(
                     new CustomEvent('BETTER_SIDEBAR_PROMPT_CREATE', {
                       detail: {
@@ -184,6 +188,7 @@ export function handleGenerateResponse(response: any, url: string) {
                         messages,
                         created_at: timestamp,
                         type: 'conversation',
+                        gem_id: gemId,
                       },
                     }),
                   );

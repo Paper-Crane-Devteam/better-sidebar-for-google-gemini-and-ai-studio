@@ -68,6 +68,7 @@ export async function handleConversations(
         folderId: providedFolderId,
         type,
         platform: payloadPlatform,
+        gem_id,
       } = message.payload;
 
       const platform = payloadPlatform ?? message.platform ?? 'aistudio';
@@ -95,6 +96,7 @@ export async function handleConversations(
           : null,
         type: type || 'conversation',
         platform,
+        gem_id: gem_id || null,
       });
       await notifyDataUpdated();
       return { success: true };

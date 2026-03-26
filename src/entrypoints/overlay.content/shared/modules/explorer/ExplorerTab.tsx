@@ -90,7 +90,7 @@ export const ExplorerTab = ({
   // Handle New Chat Creation (Listen to event from Main World)
   useEffect(() => {
     const handleCreate = async (event: any) => {
-      const { id, title, prompt_metadata, created_at, type, messages } =
+      const { id, title, prompt_metadata, created_at, type, messages, gem_id } =
         event.detail;
       console.log(
         'Better Sidebar for Gemini & AI Studio: Overlay received BETTER_SIDEBAR_PROMPT_CREATE',
@@ -126,6 +126,7 @@ export const ExplorerTab = ({
             folder_id: targetFolderId,
             type,
             messages,
+            gem_id: gem_id || undefined,
           },
         });
         // Refresh data to show new item immediately
