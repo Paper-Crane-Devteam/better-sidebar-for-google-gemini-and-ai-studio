@@ -100,7 +100,7 @@ export const SidePanelMenu = ({
             </DropdownMenuItem>
         )}
         
-        {(onToggleViewMode || menuActions?.onImportAiStudioSystem || handleScanLibrary) && !(menuActions?.onViewGems || menuActions?.onScanGems) && <DropdownMenuSeparator />}
+        {(onToggleViewMode || menuActions?.onImportAiStudioSystem || handleScanLibrary || menuActions?.onViewGems || menuActions?.onScanGems) && <DropdownMenuSeparator />}
         
         {/* Gem Actions */}
         {menuActions?.onViewGems && (
@@ -116,7 +116,7 @@ export const SidePanelMenu = ({
             </DropdownMenuItem>
         )}
         
-        {(onToggleViewMode || menuActions?.onImportAiStudioSystem || handleScanLibrary || menuActions?.onViewGems || menuActions?.onScanGems) && <DropdownMenuSeparator />}
+        {(menuActions?.onViewGems || menuActions?.onScanGems) && <DropdownMenuSeparator />}
         {menuActions?.onViewHistory && (
           <DropdownMenuItem onClick={menuActions.onViewHistory}>
             <History className="mr-2 h-4 w-4" />
