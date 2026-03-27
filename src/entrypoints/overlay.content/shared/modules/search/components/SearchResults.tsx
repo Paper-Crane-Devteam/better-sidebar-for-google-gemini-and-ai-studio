@@ -17,6 +17,7 @@ import { navigate } from '@/shared/lib/navigation';
 import { browser } from 'wxt/browser';
 import { MarkdownRenderer } from '@/shared/components/MarkdownRenderer';
 import { Button } from '@/shared/components/ui/button';
+import { SimpleTooltip } from '@/shared/components/ui/tooltip';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { toast } from '@/shared/lib/toast';
 import type { Message } from '@/shared/types/db';
@@ -344,30 +345,33 @@ const MatchItem = ({
       ),
       headerActions: (
         <>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleCopyAsText}
-            title={t('search.copyAsText')}
-          >
-            <Copy className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleCopyAsMarkdown}
-            title={t('search.copyAsMarkdown')}
-          >
-            <FileCode className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => useModalStore.getState().close()}
-            title={t('common.close')}
-          >
-            <X className="h-4 w-4" />
-          </Button>
+          <SimpleTooltip content={t('search.copyAsText')}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCopyAsText}
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+          </SimpleTooltip>
+          <SimpleTooltip content={t('search.copyAsMarkdown')}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCopyAsMarkdown}
+            >
+              <FileCode className="h-4 w-4" />
+            </Button>
+          </SimpleTooltip>
+          <SimpleTooltip content={t('common.close')}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => useModalStore.getState().close()}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </SimpleTooltip>
         </>
       ),
       modalClassName: 'max-w-4xl',
@@ -396,13 +400,14 @@ const MatchItem = ({
   return (
     <div className="relative group" onClick={handlePreview}>
       {getHighlightedText(match.content, activeQuery)}
-      <button
-        onClick={handleNavigation}
-        className="absolute top-2 right-2 p-1.5 bg-background/90 text-foreground rounded opacity-0 group-hover:opacity-100 transition-opacity border shadow-sm hover:bg-accent z-10"
-        title={t('search.jumpToConversation')}
-      >
-        <ExternalLink className="h-3.5 w-3.5" />
-      </button>
+      <SimpleTooltip content={t('search.jumpToConversation')}>
+        <button
+          onClick={handleNavigation}
+          className="absolute top-2 right-2 p-1.5 bg-background/90 text-foreground rounded opacity-0 group-hover:opacity-100 transition-opacity border shadow-sm hover:bg-accent z-10"
+        >
+          <ExternalLink className="h-3.5 w-3.5" />
+        </button>
+      </SimpleTooltip>
     </div>
   );
 };

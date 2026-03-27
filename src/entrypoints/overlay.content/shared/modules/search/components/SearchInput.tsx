@@ -55,36 +55,38 @@ export const SearchInput = () => {
           autoFocus
         />
         <div className="absolute right-1 flex items-center gap-0.5">
-          <Button
-            variant="ghost"
-            size="icon"
-            className={cn(
-              'h-7 w-7',
-              options.caseSensitive && 'bg-accent text-accent-foreground',
-            )}
-            onClick={() => {
-              setSearchOptions({ caseSensitive: !options.caseSensitive });
-              debouncedSearch();
-            }}
-            title={t('search.matchCase')}
-          >
-            <CaseSensitive className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className={cn(
-              'h-7 w-7',
-              options.wholeWord && 'bg-accent text-accent-foreground',
-            )}
-            onClick={() => {
-              setSearchOptions({ wholeWord: !options.wholeWord });
-              debouncedSearch();
-            }}
-            title={t('search.wholeWord')}
-          >
-            <Type className="h-4 w-4" />
-          </Button>
+          <SimpleTooltip content={t('search.matchCase')}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                'h-7 w-7',
+                options.caseSensitive && 'bg-accent text-accent-foreground',
+              )}
+              onClick={() => {
+                setSearchOptions({ caseSensitive: !options.caseSensitive });
+                debouncedSearch();
+              }}
+            >
+              <CaseSensitive className="h-4 w-4" />
+            </Button>
+          </SimpleTooltip>
+          <SimpleTooltip content={t('search.wholeWord')}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                'h-7 w-7',
+                options.wholeWord && 'bg-accent text-accent-foreground',
+              )}
+              onClick={() => {
+                setSearchOptions({ wholeWord: !options.wholeWord });
+                debouncedSearch();
+              }}
+            >
+              <Type className="h-4 w-4" />
+            </Button>
+          </SimpleTooltip>
         </div>
       </div>
 

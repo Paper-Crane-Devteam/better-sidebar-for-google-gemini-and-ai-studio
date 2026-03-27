@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAppStore } from '@/shared/lib/store';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { Button } from '../shared/components/ui/button';
+import { SimpleTooltip } from '@/shared/components/ui/tooltip';
 import { Separator } from '../shared/components/ui/separator';
 import {
   Files,
@@ -189,15 +190,16 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
     >
       {/* Sidebar Tabs */}
       <div className="sidebar-nav border-r flex flex-col items-center bg-muted/20 shrink-0">
-        <Button
-          variant="ghost"
-          size="icon"
-          title={t('tooltip.toggleMenu')}
-          onClick={handleMainMenuClick}
-          className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-        >
-          <Menu className="sidebar-icon" />
-        </Button>
+        <SimpleTooltip content={t('tooltip.toggleMenu')}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleMainMenuClick}
+            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+          >
+            <Menu className="sidebar-icon" />
+          </Button>
+        </SimpleTooltip>
         <Separator className="w-8 my-1" />
 
         <div
@@ -207,36 +209,39 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               : 'hidden'
           }
         >
-          <Button
-            variant="ghost"
-            size="icon"
-            title={t('tooltip.newChat')}
-            onClick={() => moduleConfig.explorer.onNewChat()}
-            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-          >
-            <SquarePen className="sidebar-icon" />
-          </Button>
-          <div className="flex-1" />
-          {shortcuts?.originalUI && (
+          <SimpleTooltip content={t('tooltip.newChat')}>
             <Button
               variant="ghost"
               size="icon"
-              title={t('shortcuts.originalUI')}
-              onClick={() => setIsFeatureEnabled(false)}
+              onClick={() => moduleConfig.explorer.onNewChat()}
               className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
             >
-              <LogOut className="sidebar-icon" />
+              <SquarePen className="sidebar-icon" />
             </Button>
+          </SimpleTooltip>
+          <div className="flex-1" />
+          {shortcuts?.originalUI && (
+            <SimpleTooltip content={t('shortcuts.originalUI')}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsFeatureEnabled(false)}
+                className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              >
+                <LogOut className="sidebar-icon" />
+              </Button>
+            </SimpleTooltip>
           )}
-          <Button
-            variant={isSettingsOpen ? 'secondary' : 'ghost'}
-            size="icon"
-            title={t('tabs.settings')}
-            onClick={() => handleTabChange('settings')}
-            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-          >
-            <Settings className="sidebar-icon" />
-          </Button>
+          <SimpleTooltip content={t('tabs.settings')}>
+            <Button
+              variant={isSettingsOpen ? 'secondary' : 'ghost'}
+              size="icon"
+              onClick={() => handleTabChange('settings')}
+              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+            >
+              <Settings className="sidebar-icon" />
+            </Button>
+          </SimpleTooltip>
         </div>
 
         <div
@@ -246,124 +251,134 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               : 'hidden'
           }
         >
-          <Button
-            variant={activeTab === 'files' ? 'secondary' : 'ghost'}
-            size="icon"
-            title={t('tabs.files')}
-            onClick={() => handleTabChange('files')}
-            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-            data-tour-id="tour-files"
-          >
-            <Files className="sidebar-icon" />
-          </Button>
-          <Button
-            variant={activeTab === 'search' ? 'secondary' : 'ghost'}
-            size="icon"
-            title={t('tabs.search')}
-            onClick={() => handleTabChange('search')}
-            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-            data-tour-id="tour-search"
-          >
-            <Search className="sidebar-icon" />
-          </Button>
-          <Button
-            variant={activeTab === 'prompts' ? 'secondary' : 'ghost'}
-            size="icon"
-            title={t('tabs.prompts')}
-            onClick={() => handleTabChange('prompts')}
-            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-            data-tour-id="tour-prompts"
-          >
-            <Sparkles className="sidebar-icon" />
-          </Button>
-          {shortcuts?.favorites && (
+          <SimpleTooltip content={t('tabs.files')}>
             <Button
-              variant={activeTab === 'favorites' ? 'secondary' : 'ghost'}
+              variant={activeTab === 'files' ? 'secondary' : 'ghost'}
               size="icon"
-              title={t('tabs.favorites')}
-              onClick={() => handleTabChange('favorites')}
+              onClick={() => handleTabChange('files')}
               className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-              data-tour-id="tour-favorites"
+              data-tour-id="tour-files"
             >
-              <Star className="sidebar-icon" />
+              <Files className="sidebar-icon" />
             </Button>
+          </SimpleTooltip>
+          <SimpleTooltip content={t('tabs.search')}>
+            <Button
+              variant={activeTab === 'search' ? 'secondary' : 'ghost'}
+              size="icon"
+              onClick={() => handleTabChange('search')}
+              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              data-tour-id="tour-search"
+            >
+              <Search className="sidebar-icon" />
+            </Button>
+          </SimpleTooltip>
+          <SimpleTooltip content={t('tabs.prompts')}>
+            <Button
+              variant={activeTab === 'prompts' ? 'secondary' : 'ghost'}
+              size="icon"
+              onClick={() => handleTabChange('prompts')}
+              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              data-tour-id="tour-prompts"
+            >
+              <Sparkles className="sidebar-icon" />
+            </Button>
+          </SimpleTooltip>
+          {shortcuts?.favorites && (
+            <SimpleTooltip content={t('tabs.favorites')}>
+              <Button
+                variant={activeTab === 'favorites' ? 'secondary' : 'ghost'}
+                size="icon"
+                onClick={() => handleTabChange('favorites')}
+                className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+                data-tour-id="tour-favorites"
+              >
+                <Star className="sidebar-icon" />
+              </Button>
+            </SimpleTooltip>
           )}
-          <Button
-            variant={activeTab === 'tags' ? 'secondary' : 'ghost'}
-            size="icon"
-            title={t('tabs.tags')}
-            onClick={() => handleTabChange('tags')}
-            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-            data-tour-id="tour-tags"
-          >
-            <Tag className="sidebar-icon" />
-          </Button>
+          <SimpleTooltip content={t('tabs.tags')}>
+            <Button
+              variant={activeTab === 'tags' ? 'secondary' : 'ghost'}
+              size="icon"
+              onClick={() => handleTabChange('tags')}
+              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              data-tour-id="tour-tags"
+            >
+              <Tag className="sidebar-icon" />
+            </Button>
+          </SimpleTooltip>
 
           {((shortcuts?.myStuff ?? true) || (shortcuts?.gems ?? true)) && (
             <Separator className="w-8 my-1" />
           )}
 
           {(shortcuts?.myStuff ?? true) && (
-            <Button
-              variant="ghost"
-              size="icon"
-              title={t('shortcuts.myStuff')}
-              onClick={() => navigate('https://gemini.google.com/mystuff')}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-              data-tour-id="tour-mystuff"
-            >
-              <Library className="sidebar-icon" />
-            </Button>
+            <SimpleTooltip content={t('shortcuts.myStuff')}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate('https://gemini.google.com/mystuff')}
+                className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+                data-tour-id="tour-mystuff"
+              >
+                <Library className="sidebar-icon" />
+              </Button>
+            </SimpleTooltip>
           )}
 
           {(shortcuts?.gems ?? true) && (
-            <Button
-              variant={activeTab === 'gems' ? 'secondary' : 'ghost'}
-              size="icon"
-              title={t('tabs.gems')}
-              onClick={() => handleTabChange('gems')}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-              data-tour-id="tour-gems"
-            >
-              <Gem className="sidebar-icon" />
-            </Button>
+            <SimpleTooltip content={t('tabs.gems')}>
+              <Button
+                variant={activeTab === 'gems' ? 'secondary' : 'ghost'}
+                size="icon"
+                onClick={() => handleTabChange('gems')}
+                className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+                data-tour-id="tour-gems"
+              >
+                <Gem className="sidebar-icon" />
+              </Button>
+            </SimpleTooltip>
           )}
 
           <div className="flex-1" />
 
           {shortcuts?.originalUI && (
-            <Button
-              variant="ghost"
-              size="icon"
-              title={t('shortcuts.originalUI')}
-              onClick={() => setIsFeatureEnabled(false)}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-              data-tour-id="tour-original-ui"
-            >
-              <LogOut className="sidebar-icon" />
-            </Button>
+            <SimpleTooltip content={t('shortcuts.originalUI')}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsFeatureEnabled(false)}
+                className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+                data-tour-id="tour-original-ui"
+              >
+                <LogOut className="sidebar-icon" />
+              </Button>
+            </SimpleTooltip>
           )}
 
-          <Button
-            variant={activeTab === 'feedback' ? 'secondary' : 'ghost'}
-            size="icon"
-            title={t('tabs.feedback')}
-            onClick={() => handleTabChange('feedback')}
-            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-            data-tour-id="tour-feedback"
-          >
-            <MessageSquare className="sidebar-icon" />
-          </Button>
-          <Button
-            variant={isSettingsOpen ? 'secondary' : 'ghost'}
-            size="icon"
-            title={t('tabs.settings')}
-            onClick={() => handleTabChange('settings')}
-            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-            data-tour-id="tour-settings"
-          >
-            <Settings className="sidebar-icon" />
-          </Button>
+          <SimpleTooltip content={t('tabs.feedback')}>
+            <Button
+              variant={activeTab === 'feedback' ? 'secondary' : 'ghost'}
+              size="icon"
+              onClick={() => handleTabChange('feedback')}
+              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              data-tour-id="tour-feedback"
+            >
+              <MessageSquare className="sidebar-icon" />
+            </Button>
+          </SimpleTooltip>
+          <SimpleTooltip content={t('tabs.settings')}>
+            <Button
+              variant={isSettingsOpen ? 'secondary' : 'ghost'}
+              size="icon"
+              onClick={() => handleTabChange('settings')}
+              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              data-tour-id="tour-settings"
+            >
+              <Settings className="sidebar-icon" />
+            </Button>
+          </SimpleTooltip>
         </div>
       </div>
 

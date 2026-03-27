@@ -4,6 +4,7 @@ import { Info } from 'lucide-react';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Button } from '@/shared/components/ui/button';
+import { SimpleTooltip } from '@/shared/components/ui/tooltip';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -151,15 +152,16 @@ export const CreatePromptForm = ({ initialValues, onChange, formRef, onValidSubm
           <div className="flex items-center gap-2">
             <DropdownMenu open={iconDropdownOpen} onOpenChange={setIconDropdownOpen}>
               <DropdownMenuTrigger asChild>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="shrink-0 h-9 w-9"
-                  title={icon}
-                >
-                  <PromptIconDisplay name={icon} className="h-4 w-4" />
-                </Button>
+                <SimpleTooltip content={icon}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    className="shrink-0 h-9 w-9"
+                  >
+                    <PromptIconDisplay name={icon} className="h-4 w-4" />
+                  </Button>
+                </SimpleTooltip>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
@@ -175,23 +177,24 @@ export const CreatePromptForm = ({ initialValues, onChange, formRef, onValidSubm
                     const IconComponent = getPromptIconComponent(name);
                     if (!IconComponent) return null;
                     return (
-                      <button
-                        key={name}
-                        type="button"
-                        onClick={() => {
-                          setIcon(name);
-                          setIconTouchedByUser(true);
-                          setIconDropdownOpen(false);
-                        }}
-                        className={cn(
-                          'flex h-9 w-9 items-center justify-center rounded-md text-popover-foreground',
-                          'hover:bg-accent hover:text-accent-foreground transition-colors',
-                          icon === name && 'bg-accent text-accent-foreground'
-                        )}
-                        title={name}
-                      >
-                        <IconComponent className="h-4 w-4" />
-                      </button>
+                      <SimpleTooltip content={name}>
+                        <button
+                          key={name}
+                          type="button"
+                          onClick={() => {
+                            setIcon(name);
+                            setIconTouchedByUser(true);
+                            setIconDropdownOpen(false);
+                          }}
+                          className={cn(
+                            'flex h-9 w-9 items-center justify-center rounded-md text-popover-foreground',
+                            'hover:bg-accent hover:text-accent-foreground transition-colors',
+                            icon === name && 'bg-accent text-accent-foreground'
+                          )}
+                        >
+                          <IconComponent className="h-4 w-4" />
+                        </button>
+                      </SimpleTooltip>
                     );
                   })}
                 </div>

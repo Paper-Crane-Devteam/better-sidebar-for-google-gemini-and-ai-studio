@@ -40,6 +40,7 @@ import { modal } from '@/shared/lib/modal';
 import { MoveItemsDialog } from '../batch/MoveItemsDialog';
 import { NodeProps } from './types';
 import { detectPlatform, PLATFORM_CONFIG } from '@/shared/types/platform';
+import { SimpleTooltip } from '@/shared/components/ui/tooltip';
 import { FOLDER_COLOR_PRESETS } from '@/shared/lib/folder-colors';
 
 interface NodeContextMenuProps extends NodeProps {
@@ -361,29 +362,30 @@ export const NodeContextMenu = ({
             >
               <div className="flex flex-wrap gap-1.5 max-w-[180px]">
                 {/* Default (no color) */}
-                <button
-                  type="button"
-                  className="w-6 h-6 rounded-full border-2 border-border flex items-center justify-center hover:scale-110 transition-transform"
-                  onClick={() => onColorChange(null)}
-                  title={t('folderSettings.defaultColor')}
-                >
-                  {folderColor === null && (
-                    <Check className="w-3 h-3 text-muted-foreground" />
-                  )}
-                </button>
-                {FOLDER_COLOR_PRESETS.map((preset) => (
+                <SimpleTooltip content={t('folderSettings.defaultColor')}>
                   <button
-                    key={preset.value}
                     type="button"
-                    className="w-6 h-6 rounded-full border-2 border-transparent flex items-center justify-center hover:scale-110 transition-transform"
-                    style={{ backgroundColor: preset.value }}
-                    onClick={() => onColorChange(preset.value)}
-                    title={t(preset.labelKey)}
+                    className="w-6 h-6 rounded-full border-2 border-border flex items-center justify-center hover:scale-110 transition-transform"
+                    onClick={() => onColorChange(null)}
                   >
-                    {folderColor === preset.value && (
-                      <Check className="w-3 h-3 text-white drop-shadow-sm" />
+                    {folderColor === null && (
+                      <Check className="w-3 h-3 text-muted-foreground" />
                     )}
                   </button>
+                </SimpleTooltip>
+                {FOLDER_COLOR_PRESETS.map((preset) => (
+                  <SimpleTooltip key={preset.value} content={t(preset.labelKey)}>
+                    <button
+                      type="button"
+                      className="w-6 h-6 rounded-full border-2 border-transparent flex items-center justify-center hover:scale-110 transition-transform"
+                      style={{ backgroundColor: preset.value }}
+                      onClick={() => onColorChange(preset.value)}
+                    >
+                      {folderColor === preset.value && (
+                        <Check className="w-3 h-3 text-white drop-shadow-sm" />
+                      )}
+                    </button>
+                  </SimpleTooltip>
                 ))}
               </div>
             </ContextMenuSubContent>

@@ -4,6 +4,8 @@ import { FOLDER_COLOR_PRESETS } from '@/shared/lib/folder-colors';
 import { Check, X } from 'lucide-react';
 import { cn } from '@/shared/lib/utils/utils';
 
+import { SimpleTooltip } from '@/shared/components/ui/tooltip';
+
 interface FolderSettingsDialogProps {
   initialName: string;
   initialColor: string | null;
@@ -56,40 +58,41 @@ export const FolderSettingsDialog = ({
         {/* Preset Colors Grid */}
         <div className="flex flex-wrap gap-2">
           {/* Default (no color) */}
-          <button
-            type="button"
-            className={cn(
-              'w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all',
-              color === null
-                ? 'border-primary scale-110'
-                : 'border-border hover:border-muted-foreground/50 hover:scale-105',
-            )}
-            onClick={() => setColor(null)}
-            title={t('folderSettings.defaultColor')}
-          >
-            {color === null && (
-              <X className="w-3.5 h-3.5 text-muted-foreground" />
-            )}
-          </button>
-
-          {FOLDER_COLOR_PRESETS.map((preset) => (
+          <SimpleTooltip content={t('folderSettings.defaultColor')}>
             <button
-              key={preset.value}
               type="button"
               className={cn(
                 'w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all',
-                color === preset.value
+                color === null
                   ? 'border-primary scale-110'
-                  : 'border-transparent hover:scale-105',
+                  : 'border-border hover:border-muted-foreground/50 hover:scale-105',
               )}
-              style={{ backgroundColor: preset.value }}
-              onClick={() => setColor(preset.value)}
-              title={t(preset.labelKey)}
+              onClick={() => setColor(null)}
             >
-              {color === preset.value && (
-                <Check className="w-3.5 h-3.5 text-white drop-shadow-sm" />
+              {color === null && (
+                <X className="w-3.5 h-3.5 text-muted-foreground" />
               )}
             </button>
+          </SimpleTooltip>
+
+          {FOLDER_COLOR_PRESETS.map((preset) => (
+            <SimpleTooltip key={preset.value} content={t(preset.labelKey)}>
+              <button
+                type="button"
+                className={cn(
+                  'w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all',
+                  color === preset.value
+                    ? 'border-primary scale-110'
+                    : 'border-transparent hover:scale-105',
+                )}
+                style={{ backgroundColor: preset.value }}
+                onClick={() => setColor(preset.value)}
+              >
+                {color === preset.value && (
+                  <Check className="w-3.5 h-3.5 text-white drop-shadow-sm" />
+                )}
+              </button>
+            </SimpleTooltip>
           ))}
         </div>
 

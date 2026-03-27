@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAppStore } from '@/shared/lib/store';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { Button } from '../shared/components/ui/button';
+import { SimpleTooltip } from '@/shared/components/ui/tooltip';
 import { Separator } from '../shared/components/ui/separator';
 import {
   Files,
@@ -228,128 +229,139 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
     >
       {/* Sidebar Tabs */}
       <div className="sidebar-nav border-r flex flex-col items-center bg-muted/20 shrink-0">
-        <Button
-          variant={activeTab === 'files' ? 'secondary' : 'ghost'}
-          size="icon"
-          title={t('tabs.files')}
-          onClick={() => handleTabChange('files')}
-          className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-        >
-          <Files className="sidebar-icon" />
-        </Button>
-        <Button
-          variant={activeTab === 'search' ? 'secondary' : 'ghost'}
-          size="icon"
-          title={t('tabs.search')}
-          onClick={() => handleTabChange('search')}
-          className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-        >
-          <Search className="sidebar-icon" />
-        </Button>
-        <Button
-          variant={activeTab === 'prompts' ? 'secondary' : 'ghost'}
-          size="icon"
-          title={t('tabs.prompts')}
-          onClick={() => handleTabChange('prompts')}
-          className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-        >
-          <Sparkles className="sidebar-icon" />
-        </Button>
-        {shortcuts?.favorites && (
+        <SimpleTooltip content={t('tabs.files')}>
           <Button
-            variant={activeTab === 'favorites' ? 'secondary' : 'ghost'}
+            variant={activeTab === 'files' ? 'secondary' : 'ghost'}
             size="icon"
-            title={t('tabs.favorites')}
-            onClick={() => handleTabChange('favorites')}
+            onClick={() => handleTabChange('files')}
             className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
           >
-            <Star className="sidebar-icon" />
+            <Files className="sidebar-icon" />
           </Button>
+        </SimpleTooltip>
+        <SimpleTooltip content={t('tabs.search')}>
+          <Button
+            variant={activeTab === 'search' ? 'secondary' : 'ghost'}
+            size="icon"
+            onClick={() => handleTabChange('search')}
+            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+          >
+            <Search className="sidebar-icon" />
+          </Button>
+        </SimpleTooltip>
+        <SimpleTooltip content={t('tabs.prompts')}>
+          <Button
+            variant={activeTab === 'prompts' ? 'secondary' : 'ghost'}
+            size="icon"
+            onClick={() => handleTabChange('prompts')}
+            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+          >
+            <Sparkles className="sidebar-icon" />
+          </Button>
+        </SimpleTooltip>
+        {shortcuts?.favorites && (
+          <SimpleTooltip content={t('tabs.favorites')}>
+            <Button
+              variant={activeTab === 'favorites' ? 'secondary' : 'ghost'}
+              size="icon"
+              onClick={() => handleTabChange('favorites')}
+              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+            >
+              <Star className="sidebar-icon" />
+            </Button>
+          </SimpleTooltip>
         )}
-        <Button
-          variant={activeTab === 'tags' ? 'secondary' : 'ghost'}
-          size="icon"
-          title={t('tabs.tags')}
-          onClick={() => handleTabChange('tags')}
-          className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-        >
-          <Tag className="sidebar-icon" />
-        </Button>
+        <SimpleTooltip content={t('tabs.tags')}>
+          <Button
+            variant={activeTab === 'tags' ? 'secondary' : 'ghost'}
+            size="icon"
+            onClick={() => handleTabChange('tags')}
+            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+          >
+            <Tag className="sidebar-icon" />
+          </Button>
+        </SimpleTooltip>
 
         {(shortcuts?.build ||
           shortcuts?.dashboard ||
           shortcuts?.documentation) && <Separator className="w-8 my-1" />}
 
         {shortcuts?.build && (
-          <Button
-            variant="ghost"
-            size="icon"
-            title={t('shortcuts.build')}
-            onClick={() => handleNavigation('/apps')}
-            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-          >
-            <Hammer className="sidebar-icon" />
-          </Button>
+          <SimpleTooltip content={t('shortcuts.build')}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleNavigation('/apps')}
+              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+            >
+              <Hammer className="sidebar-icon" />
+            </Button>
+          </SimpleTooltip>
         )}
 
         {shortcuts?.dashboard && (
-          <Button
-            variant="ghost"
-            size="icon"
-            title={t('shortcuts.dashboard')}
-            onClick={() => handleNavigation('/api-keys')}
-            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-          >
-            <LayoutDashboard className="sidebar-icon" />
-          </Button>
+          <SimpleTooltip content={t('shortcuts.dashboard')}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleNavigation('/api-keys')}
+              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+            >
+              <LayoutDashboard className="sidebar-icon" />
+            </Button>
+          </SimpleTooltip>
         )}
 
         {shortcuts?.documentation && (
-          <Button
-            variant="ghost"
-            size="icon"
-            title={t('shortcuts.documentation')}
-            onClick={() =>
-              handleExternalLink('https://ai.google.dev/gemini-api/docs')
-            }
-            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-          >
-            <BookOpen className="sidebar-icon" />
-          </Button>
+          <SimpleTooltip content={t('shortcuts.documentation')}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() =>
+                handleExternalLink('https://ai.google.dev/gemini-api/docs')
+              }
+              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+            >
+              <BookOpen className="sidebar-icon" />
+            </Button>
+          </SimpleTooltip>
         )}
 
         <div className="flex-1" />
 
         {shortcuts?.originalUI && (
-          <Button
-            variant="ghost"
-            size="icon"
-            title={t('shortcuts.originalUI')}
-            onClick={() => setIsUIVisible(false)}
-            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-          >
-            <LogOut className="sidebar-icon" />
-          </Button>
+          <SimpleTooltip content={t('shortcuts.originalUI')}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsUIVisible(false)}
+              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+            >
+              <LogOut className="sidebar-icon" />
+            </Button>
+          </SimpleTooltip>
         )}
 
-        <Button
-          variant={activeTab === 'feedback' ? 'secondary' : 'ghost'}
-          size="icon"
-          title={t('tabs.feedback')}
-          onClick={() => handleTabChange('feedback')}
-          className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-        >
-          <MessageSquare className="sidebar-icon" />
-        </Button>
-        <Button
-          variant={isSettingsOpen ? 'secondary' : 'ghost'}
-          size="icon"
-          title={t('tabs.settings')}
-          onClick={() => handleTabChange('settings')}
-          className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-        >
-          <Settings className="sidebar-icon" />
-        </Button>
+        <SimpleTooltip content={t('tabs.feedback')}>
+          <Button
+            variant={activeTab === 'feedback' ? 'secondary' : 'ghost'}
+            size="icon"
+            onClick={() => handleTabChange('feedback')}
+            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+          >
+            <MessageSquare className="sidebar-icon" />
+          </Button>
+        </SimpleTooltip>
+        <SimpleTooltip content={t('tabs.settings')}>
+          <Button
+            variant={isSettingsOpen ? 'secondary' : 'ghost'}
+            size="icon"
+            onClick={() => handleTabChange('settings')}
+            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+          >
+            <Settings className="sidebar-icon" />
+          </Button>
+        </SimpleTooltip>
       </div>
 
       {/* Main Content Area */}

@@ -146,40 +146,43 @@ const TopBarTagUI = ({ container }: { container: Element }) => {
           >
             <span className="truncate max-w-[120px]">{tag.name}</span>
             {isEditing && (
-              <div
-                className="flex items-center justify-center rounded-sm hover:bg-black/10 dark:hover:bg-white/10 cursor-pointer p-0.5 -mr-1 shrink-0 ml-1"
-                onClick={(e) => handleRemoveEditingTag(tag.id, e)}
-                title={t('topBarTag.removeTag')}
-              >
-                <X className="w-2.5 h-2.5 opacity-70 hover:opacity-100" />
-              </div>
+              <SimpleTooltip content={t('topBarTag.removeTag')}>
+                <div
+                  className="flex items-center justify-center rounded-sm hover:bg-black/10 dark:hover:bg-white/10 cursor-pointer p-0.5 -mr-1 shrink-0 ml-1"
+                  onClick={(e) => handleRemoveEditingTag(tag.id, e)}
+                >
+                  <X className="w-2.5 h-2.5 opacity-70 hover:opacity-100" />
+                </div>
+              </SimpleTooltip>
             )}
           </span>
         </SimpleTooltip>
       ))}
 
       {!isEditing && (
-        <button
-          onClick={handleStartEdit}
-          className={`flex items-center justify-center w-6 h-6 rounded-md hover:bg-accent hover:text-accent-foreground text-muted-foreground transition-all outline-none shrink-0 ${
-            isHovered ? 'opacity-100 visible' : 'opacity-0 invisible'
-          }`}
-          title={t('topBarTag.editTags')}
-        >
-          <Pencil className="w-3.5 h-3.5" />
-        </button>
+        <SimpleTooltip content={t('topBarTag.editTags')}>
+          <button
+            onClick={handleStartEdit}
+            className={`flex items-center justify-center w-6 h-6 rounded-md hover:bg-accent hover:text-accent-foreground text-muted-foreground transition-all outline-none shrink-0 ${
+              isHovered ? 'opacity-100 visible' : 'opacity-0 invisible'
+            }`}
+          >
+            <Pencil className="w-3.5 h-3.5" />
+          </button>
+        </SimpleTooltip>
       )}
 
       {isEditing && (
         <div className="flex items-center gap-1 ml-1">
           <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
             <DropdownMenuTrigger asChild>
-              <button
-                className="flex items-center justify-center w-6 h-6 rounded-md hover:bg-accent hover:text-accent-foreground text-muted-foreground transition-colors outline-none shrink-0 border border-dashed border-border"
-                title={t('topBarTag.addTag')}
-              >
-                <Plus className="w-3.5 h-3.5" />
-              </button>
+              <SimpleTooltip content={t('topBarTag.addTag')}>
+                <button
+                  className="flex items-center justify-center w-6 h-6 rounded-md hover:bg-accent hover:text-accent-foreground text-muted-foreground transition-colors outline-none shrink-0 border border-dashed border-border"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                </button>
+              </SimpleTooltip>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               container={container as HTMLElement}
@@ -218,21 +221,23 @@ const TopBarTagUI = ({ container }: { container: Element }) => {
 
           <div className="w-px h-4 bg-border mx-0.5" />
 
-          <button
-            onClick={handleConfirm}
-            className="flex items-center justify-center w-6 h-6 rounded-md hover:bg-green-100 hover:text-green-600 dark:hover:bg-green-900/30 dark:hover:text-green-400 text-muted-foreground transition-colors outline-none shrink-0"
-            title={t('topBarTag.saveChanges')}
-          >
-            <Check className="w-3.5 h-3.5" />
-          </button>
+          <SimpleTooltip content={t('topBarTag.saveChanges')}>
+            <button
+              onClick={handleConfirm}
+              className="flex items-center justify-center w-6 h-6 rounded-md hover:bg-green-100 hover:text-green-600 dark:hover:bg-green-900/30 dark:hover:text-green-400 text-muted-foreground transition-colors outline-none shrink-0"
+            >
+              <Check className="w-3.5 h-3.5" />
+            </button>
+          </SimpleTooltip>
 
-          <button
-            onClick={handleCancel}
-            className="flex items-center justify-center w-6 h-6 rounded-md hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:text-red-400 text-muted-foreground transition-colors outline-none shrink-0"
-            title={t('topBarTag.cancel')}
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
+          <SimpleTooltip content={t('topBarTag.cancel')}>
+            <button
+              onClick={handleCancel}
+              className="flex items-center justify-center w-6 h-6 rounded-md hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:text-red-400 text-muted-foreground transition-colors outline-none shrink-0"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </SimpleTooltip>
         </div>
       )}
     </div>,
