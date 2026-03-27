@@ -302,16 +302,23 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
             {/* Hover action buttons */}
             <div
               className={cn(
-                'hidden group-hover:flex items-center gap-1 absolute right-2',
+                'hidden group-hover:flex items-center gap-1 absolute right-0 pr-2 top-0 bottom-0',
+                'node-action-bar',
                 isContextMenuOpen && 'flex',
               )}
+              style={coloredSelectedStyle ? { backgroundColor: coloredSelectedStyle.backgroundColor } : undefined}
             >
+              <div
+                className="absolute inset-y-0 -left-6 w-6 pointer-events-none [background:inherit] [mask-image:linear-gradient(to_right,transparent,black)]"
+                style={coloredSelectedStyle ? { backgroundColor: coloredSelectedStyle.backgroundColor } : undefined}
+              />
+
               {/* Folder settings button */}
               {!isFile && !isTimeGroup && !isBatchMode && (
                 <SimpleTooltip content={t('folderSettings.title')}>
                   <div
                     role="button"
-                    className="h-5 w-5 flex items-center justify-center rounded-sm hover:bg-muted/50 cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
+                    className="h-5 w-5 flex items-center justify-center rounded-sm cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
                     onClick={async (e) => {
                       e.stopPropagation();
                       e.preventDefault();
@@ -350,7 +357,7 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
                 <SimpleTooltip content={t('tooltip.addToFavorites')}>
                   <div
                     role="button"
-                    className="h-5 w-5 flex items-center justify-center rounded-sm hover:bg-muted/50 cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
+                    className="h-5 w-5 flex items-center justify-center rounded-sm cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
                     onClick={(e) => {
                       e.stopPropagation();
                       e.preventDefault();

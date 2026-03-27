@@ -152,6 +152,20 @@
     background-color: color-mix(in srgb, var(--gem-sys-color--primary-container) 60%, transparent);
   }
 
+  /* Node action bar - Gemini Specific */
+  .theme-gemini .node-item-selected .node-action-bar,
+  :host(.theme-gemini) .node-item-selected .node-action-bar {
+    background-color: var(--gem-sys-color--primary-container);
+  }
+  .theme-gemini .node-item-current .node-action-bar,
+  :host(.theme-gemini) .node-item-current .node-action-bar {
+    background-color: color-mix(in srgb, var(--gem-sys-color--primary-container) 60%, rgb(var(--background)));
+  }
+  .theme-gemini .group:hover:not(.node-item-selected):not(.node-item-current) > .node-action-bar,
+  :host(.theme-gemini) .group:hover:not(.node-item-selected):not(.node-item-current) > .node-action-bar {
+    background-color: color-mix(in srgb, rgb(var(--accent)) 50%, rgb(var(--background)));
+  }
+
   /* Custom Slider Styles */
   .theme-gemini .ui-slider,
   :host(.theme-gemini) .ui-slider {

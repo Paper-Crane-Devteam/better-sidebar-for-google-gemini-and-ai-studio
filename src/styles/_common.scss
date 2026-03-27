@@ -50,6 +50,20 @@
     @apply bg-accent/60;
   }
 
+  /* Node hover action bar – solid background that follows the node state */
+  .node-action-bar {
+    @apply bg-background;
+  }
+  .node-item-selected .node-action-bar {
+    @apply bg-accent;
+  }
+  .node-item-current .node-action-bar {
+    background-color: color-mix(in srgb, rgb(var(--accent)) 60%, rgb(var(--background)));
+  }
+  .group:hover:not(.node-item-selected):not(.node-item-current) > .node-action-bar {
+    background-color: color-mix(in srgb, rgb(var(--accent)) 50%, rgb(var(--background)));
+  }
+
   /* Folder child tint (for items inside uncolored folders) */
   .node-folder-child {
     background-color: rgba(var(--foreground) / 0.04);

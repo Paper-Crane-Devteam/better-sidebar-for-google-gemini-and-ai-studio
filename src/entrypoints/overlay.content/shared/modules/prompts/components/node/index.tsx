@@ -200,16 +200,18 @@ export const Node = ({
       {/* Hover Actions */}
       <div
         className={cn(
-          'hidden group-hover:flex items-center gap-1 absolute right-2',
+          'hidden group-hover:flex items-center gap-1 absolute right-0 pr-2 top-0 bottom-0',
+          'node-action-bar',
           isContextMenuOpen && 'flex',
         )}
       >
+        <div className="absolute inset-y-0 -left-6 w-6 pointer-events-none [background:inherit] [mask-image:linear-gradient(to_right,transparent,black)]" />
         {isFile && !isBatchMode && (
           <>
             <SimpleTooltip content={t('prompts.viewPrompt')}>
               <div
                 role="button"
-                className="h-5 w-5 flex items-center justify-center rounded-sm hover:bg-muted/50 cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
+                className="h-5 w-5 flex items-center justify-center rounded-sm cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
                 onClick={handleView}
               >
                 <Eye className="h-3.5 w-3.5" />
@@ -226,7 +228,7 @@ export const Node = ({
               <div
                 role="button"
                 className={cn(
-                  'h-5 w-5 flex items-center justify-center rounded-sm hover:bg-muted/50 cursor-pointer transition-colors',
+                  'h-5 w-5 flex items-center justify-center rounded-sm cursor-pointer transition-colors',
                   isFavorite
                     ? 'text-yellow-500'
                     : 'text-muted-foreground hover:text-foreground',

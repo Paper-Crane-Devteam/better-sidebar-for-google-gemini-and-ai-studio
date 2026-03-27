@@ -178,6 +178,16 @@
     background-color: rgb(var(--muted) / 0.5);
   }
 
+  /* Node action bar - ChatGPT Specific */
+  .theme-chatgpt .node-item-selected .node-action-bar,
+  :host(.theme-chatgpt) .node-item-selected .node-action-bar {
+    background-color: rgb(var(--muted));
+  }
+  .theme-chatgpt .node-item-current .node-action-bar,
+  :host(.theme-chatgpt) .node-item-current .node-action-bar {
+    background-color: color-mix(in srgb, rgb(var(--muted)) 50%, rgb(var(--background)));
+  }
+
   /* ChatGPT-specific button styles if needed */
   .theme-chatgpt button,
   :host(.theme-chatgpt) button {
