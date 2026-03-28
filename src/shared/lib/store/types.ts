@@ -25,7 +25,7 @@ export interface Conversation {
   prompt_metadata?: any;
   external_url?: string;
   external_id?: string;
-  type?: 'conversation' | 'text-to-image';
+  type?: 'conversation' | 'text-to-image' | 'gem';
   platform?: string;
   gem_id?: string | null;
 }
@@ -84,7 +84,7 @@ export interface UIState {
   explorer: {
     search: { isOpen: boolean; query: string };
     tags: { isOpen: boolean; selected: string[] };
-    typeFilter: 'all' | 'conversation' | 'text-to-image';
+    typeFilter: 'all' | 'conversation' | 'text-to-image' | 'gem';
     onlyFavorites: boolean;
     sortOrder: 'alpha' | 'date';
     viewMode: 'tree' | 'timeline';
@@ -93,7 +93,7 @@ export interface UIState {
   favorites: {
     search: { isOpen: boolean; query: string };
     tags: { isOpen: boolean; selected: string[] };
-    typeFilter: 'all' | 'conversation' | 'text-to-image';
+    typeFilter: 'all' | 'conversation' | 'text-to-image' | 'gem';
   };
   gems: {
     search: { isOpen: boolean; query: string };
@@ -180,7 +180,7 @@ export interface AppState {
   setExplorerSearch: (isOpen: boolean, query?: string) => void;
   setExplorerTags: (isOpen: boolean, selected?: string[]) => void;
   setExplorerTypeFilter: (
-    filter: 'all' | 'conversation' | 'text-to-image',
+    filter: 'all' | 'conversation' | 'text-to-image' | 'gem',
   ) => void;
   setExplorerOnlyFavorites: (onlyFavorites: boolean) => void;
   setExplorerSortOrder: (order: 'alpha' | 'date') => void;
@@ -192,7 +192,7 @@ export interface AppState {
   setFavoritesSearch: (isOpen: boolean, query?: string) => void;
   setFavoritesTags: (isOpen: boolean, selected?: string[]) => void;
   setFavoritesTypeFilter: (
-    filter: 'all' | 'conversation' | 'text-to-image',
+    filter: 'all' | 'conversation' | 'text-to-image' | 'gem',
   ) => void;
 
   setSearchQuery: (query: string) => void;

@@ -25,6 +25,7 @@ interface GemsHeaderProps {
     onSwitchToOriginalUI?: () => void;
     onViewGems?: () => void;
     onScanGems?: () => void;
+    isScanningGems?: boolean;
   };
   isScanningGems?: boolean;
 }
@@ -108,7 +109,7 @@ export const GemsHeader = ({
             </Button>
           </SimpleTooltip>
 
-          <SidePanelMenu menuActions={menuActions} />
+          <SidePanelMenu menuActions={{ ...menuActions, isScanningGems }} />
         </div>
       </div>
 

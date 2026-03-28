@@ -1,11 +1,13 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { Gem as GemIcon, Search } from 'lucide-react';
+import { Gem as GemIcon, Search, Plus, ScanSearch, Loader2 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils/utils';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useAppStore } from '@/shared/lib/store';
-import { navigateToGem } from '@/shared/lib/navigation';
+import { navigateToGem, navigate } from '@/shared/lib/navigation';
 import { useModalStore } from '@/shared/lib/modal';
 import { useSettingsStore } from '@/shared/lib/settings-store';
+import { Button } from '@/shared/components/ui/button';
+import { toast } from '@/shared/lib/toast';
 import type { Gem } from '@/shared/types/db';
 
 const ITEM_HEIGHT = 36;
@@ -18,13 +20,14 @@ interface GemPickerContentProps {
 
 export const GemPickerContent = ({ lastSelectedGemId }: GemPickerContentProps) => {
   const { t } = useI18n();
-  const { gems } = useAppStore();
+  const { gems, fetchData } = useAppStore();
   const close = useModalStore((s) => s.close);
   const [search, setSearch] = useState('');
   const [activeIndex, setActiveIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const [scrollTop, setScrollTop] = useState(0);
+  const [isScanning, setIsScanning] = useState(false);
 
   const filtered = useMemo(() => {
     if (!search.trim()) return gems;
@@ -47,6 +50,30 @@ export const GemPickerContent = ({ lastSelectedGemId }: GemPickerContentProps) =
     },
     [close],
   );
+
+  const handleCreateGem = useCallback(() => {
+    close();
+    navigate('https://gemini.google.com/gems/create');
+  }, [close]);
+
+  const handleScanGems = useCallback(async () => {
+    if (isScanning) return;
+    setIsScanning(true);
+    try {
+      const response = await browser.runtime.sendMessage({
+        type: 'START_GEM_SCAN',
+      });
+      if (response?.success) {
+        await fetchData(true);
+      } else {
+        toast.error(response?.error || 'Scan failed');
+      }
+    } catch (err) {
+      console.error('Gem scan error:', err);
+    } finally {
+      setIsScanning(false);
+    }
+  }, [isScanning, fetchData]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -124,8 +151,33 @@ export const GemPickerContent = ({ lastSelectedGemId }: GemPickerContentProps) =
         onScroll={handleScroll}
       >
         {filtered.length === 0 ? (
-          <div className="text-center text-muted-foreground text-sm py-6">
-            {t('gems.noGems')}
+          <div className="flex flex-col items-center justify-center text-center text-muted-foreground text-sm py-6 gap-3">
+            <span>{gems.length === 0 ? t('gems.noGems') : t('gems.noGems')}</span>
+            {gems.length === 0 && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCreateGem}
+                >
+                  <Plus className="h-3.5 w-3.5 mr-1" />
+                  {t('gems.createGem')}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={isScanning}
+                  onClick={handleScanGems}
+                >
+                  {isScanning ? (
+                    <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+                  ) : (
+                    <ScanSearch className="h-3.5 w-3.5 mr-1" />
+                  )}
+                  {t('gems.scanGems')}
+                </Button>
+              </div>
+            )}
           </div>
         ) : (
           <div style={{ height: totalHeight, position: 'relative' }}>

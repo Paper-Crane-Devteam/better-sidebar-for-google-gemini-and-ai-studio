@@ -62,8 +62,6 @@ export const gemRepo = {
   },
 
   delete: async (id: string): Promise<void> => {
-    // Unlink conversations from this gem first
-    await runCommand('UPDATE conversations SET gem_id = NULL WHERE gem_id = ?', [id]);
     await runCommand('DELETE FROM gems WHERE id = ?', [id]);
   },
 

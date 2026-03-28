@@ -72,6 +72,7 @@ export type ExtensionMessage = (
     }
   | { type: 'SCAN_LIBRARY' }
   | { type: 'START_LIBRARY_SCAN' }
+  | { type: 'START_GEM_SCAN' }
   | { type: 'START_SYNC_CONVERSATIONS' }
   | { type: 'SYNC_CONVERSATIONS'; payload: { items: any[] } }
   | { type: 'GET_PAGE_LOCAL_STORAGE'; payload: { key: string } }
@@ -90,6 +91,7 @@ export type ExtensionMessage = (
           prompt_metadata?: any;
           type?: string;
           folder_id?: string | null;
+          gem_id?: string | null;
         }[];
       };
     }

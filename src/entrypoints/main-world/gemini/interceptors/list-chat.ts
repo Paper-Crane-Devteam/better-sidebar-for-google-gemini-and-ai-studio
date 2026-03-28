@@ -58,10 +58,13 @@ export function handleListChatResponse(response: any, url: string) {
                              }
                              
                              if (id) {
+                                const gemId = chatItem?.[7] || null;
                                 items.push({
                                     id: id.replace(/^c_/, ''),
                                     title,
                                     created_at: createdAtSeconds,
+                                    type: gemId ? 'gem' : 'conversation',
+                                    gem_id: gemId,
                                 });
                              }
                          } catch (itemErr) {

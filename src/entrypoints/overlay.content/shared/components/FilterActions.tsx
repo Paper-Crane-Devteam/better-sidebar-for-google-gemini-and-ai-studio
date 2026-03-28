@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/shared/components/ui/button';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
-import { Search, Tags, MessageSquare, Image as ImageIcon, LayoutGrid, Star } from 'lucide-react';
+import { Search, Tags, MessageSquare, Image as ImageIcon, LayoutGrid, Star, Gem } from 'lucide-react';
 import type { FilterState, ExplorerTypeFilter } from '../types/filter';
 import { useI18n } from '@/shared/hooks/useI18n';
 
@@ -29,6 +29,7 @@ export const FilterActions = ({
     switch (type.value) {
       case 'conversation': return t('tooltip.filterConversations');
       case 'text-to-image': return t('tooltip.filterImages');
+      case 'gem': return t('tooltip.filterGems');
       default: return t('tooltip.filterAll');
     }
   };
@@ -76,6 +77,7 @@ export const FilterActions = ({
               {type.value === 'all' && <LayoutGrid className="h-4 w-4" />}
               {type.value === 'conversation' && <MessageSquare className="h-4 w-4" />}
               {type.value === 'text-to-image' && <ImageIcon className="h-4 w-4" />}
+              {type.value === 'gem' && <Gem className="h-4 w-4" />}
           </Button>
         </SimpleTooltip>
       )}

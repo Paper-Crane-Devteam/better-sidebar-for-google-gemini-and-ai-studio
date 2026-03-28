@@ -7,6 +7,7 @@ import { scanLibrary } from './tasks/scan-library';
 import { apiScanner } from './tasks/scan-api';
 import { chatContentScanner } from './tasks/scan-chat-content';
 import { gemCreationScanner } from './tasks/scan-gem-creation';
+import { scanGems } from './tasks/scan-gems';
 
 import { syncConversations } from './tasks/sync-conversations';
 // import { initImageProcessor } from './tasks/process-images';
@@ -115,6 +116,16 @@ export async function initGemini() {
     (message: ExtensionMessage, _sender, sendResponse) => {
       if (message.type === 'START_LIBRARY_SCAN') {
         scanLibrary()
+          .then((count) => {
+            sendResponse({ success: true, data: { count } });
+          })
+          .catch((err) => {
+            sendResponse({ success: false, error: err.message });
+          });
+        return true;
+      }
+      if (message.type === 'START_GEM_SCAN') {
+        scanGems()
           .then((count) => {
             sendResponse({ success: true, data: { count } });
           })

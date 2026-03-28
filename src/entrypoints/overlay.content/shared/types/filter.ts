@@ -1,5 +1,5 @@
 /** Explorer / Favorites: filter by conversation vs text-to-image */
-export type ExplorerTypeFilter = 'all' | 'conversation' | 'text-to-image';
+export type ExplorerTypeFilter = 'all' | 'conversation' | 'text-to-image' | 'gem';
 
 /** Prompts: filter by normal vs system prompt */
 export type PromptsTypeFilter = 'all' | 'normal' | 'system';

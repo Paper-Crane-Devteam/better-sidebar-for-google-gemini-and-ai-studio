@@ -26,6 +26,7 @@ interface SidePanelMenuProps {
     onImportAiStudioSystem?: () => void;
     onViewGems?: () => void;
     onScanGems?: () => void;
+    isScanningGems?: boolean;
   };
 }
 
@@ -110,9 +111,9 @@ export const SidePanelMenu = ({
             </DropdownMenuItem>
         )}
         {menuActions?.onScanGems && (
-            <DropdownMenuItem onClick={menuActions.onScanGems}>
-                <RefreshCw className="mr-2 h-4 w-4" />
-                <span>{t('gems.scanGems')}</span>
+            <DropdownMenuItem onClick={menuActions.onScanGems} disabled={menuActions.isScanningGems}>
+                <RefreshCw className={`mr-2 h-4 w-4 ${menuActions.isScanningGems ? 'animate-spin' : ''}`} />
+                <span>{menuActions.isScanningGems ? t('gems.scanningGems') : t('gems.scanGems')}</span>
             </DropdownMenuItem>
         )}
         

@@ -171,15 +171,26 @@ export const GemNode = ({
               </span>
             )}
 
-            {/* Favorite star */}
-            {isFile && isFavorite && (
-              <Star className="w-3 h-3 fill-yellow-400 text-yellow-400 shrink-0" />
-            )}
-
             {/* Name */}
-            <span className="truncate flex-1 text-sm">
-              {node.data.name}
-            </span>
+            <div className="flex-1 min-w-0 flex items-center gap-1 overflow-hidden justify-between">
+              <span className="truncate text-sm">
+                {node.data.name}
+              </span>
+              {/* Favorite star - after name, matching library style */}
+              {isFile && isFavorite && (
+                <div
+                  role="button"
+                  className="h-5 w-5 shrink-0 flex items-center justify-center rounded-md hover:bg-muted/50 transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    toggleFavorite(node.data.id, 'conversation', true);
+                  }}
+                >
+                  <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
+                </div>
+              )}
+            </div>
 
             {/* Hover actions for files */}
             {isFile && !isFavorite && (

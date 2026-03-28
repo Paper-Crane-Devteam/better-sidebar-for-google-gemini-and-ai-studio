@@ -177,7 +177,7 @@ export function handleGenerateResponse(response: any, url: string) {
 
                 if (title) {
                   // Detect if this is a gem conversation from the current URL
-                  const gemUrlMatch = /\/gem\/([^/]+)/.exec(globalThis.location?.pathname || '');
+                  const gemUrlMatch = /\/gem\/([^/]+?)(?:\/|$)/.exec(globalThis.location?.pathname || '');
                   const gemId = gemUrlMatch ? gemUrlMatch[1] : undefined;
 
                   globalThis.dispatchEvent(
@@ -187,7 +187,7 @@ export function handleGenerateResponse(response: any, url: string) {
                         title,
                         messages,
                         created_at: timestamp,
-                        type: 'conversation',
+                        type: 'gem',
                         gem_id: gemId,
                       },
                     }),

@@ -34,6 +34,7 @@ export const dbAdmin = {
       await runCommand('DROP TABLE IF EXISTS folders');
       await runCommand('DROP TABLE IF EXISTS prompts');
       await runCommand('DROP TABLE IF EXISTS prompt_folders');
+      await runCommand('DROP TABLE IF EXISTS gems');
 
       // Re-initialize tables (SCHEMA contains multiple statements, so we don't pass bind to avoid sqlite3 limitations)
       await runCommand(SCHEMA);

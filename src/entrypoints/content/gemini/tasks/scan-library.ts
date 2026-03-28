@@ -124,6 +124,8 @@ export async function scanLibrary() {
     updated_at: item.created_at ?? Math.floor(Date.now() / 1000),
     created_at: item.created_at,
     platform: Platform.GEMINI,
+    type: item.type || 'conversation',
+    gem_id: item.gem_id || null,
   }));
 
   console.log(`Sending ${payloadItems.length} scanned items to background...`);
