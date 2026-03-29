@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Folder as FolderIcon,
   MessageSquare,
+  MessageSquarePlus,
   ChevronRight,
   ChevronDown,
   FolderOpen,
@@ -27,9 +28,11 @@ import { NodeContent } from './NodeContent';
 import { NodeContextMenu } from './NodeContextMenu';
 import { FolderSettingsDialog } from './FolderSettingsDialog';
 import { useDeleteHandler } from '../../hooks/useDeleteHandler';
+import { useExplorerContext } from '../../ExplorerContext';
 
 export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
   const { t } = useI18n();
+  const { onNewChat } = useExplorerContext();
   const {
     conversationTags,
     addTagToConversation,
@@ -90,7 +93,7 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
   const isCurrentConversation =
     isFile && node.data.id === currentConversationId;
   const hasHoverActions =
-    (isFile && !isFavorite && !isBatchMode) ||
+    (isFile && !isBatchMode) ||
     (!isFile && !isTimeGroup && !isBatchMode);
 
   // --- Handlers ---
@@ -242,12 +245,14 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
     // Current conversation state: lighter highlight when not actively selected (lower priority)
     !isActive && isCurrentConversation && 'node-item-current',
     // Expand right padding on hover to make room for action buttons
-    hasHoverActions && 'group-hover:pr-8',
+    hasHoverActions && isFile && 'group-hover:pr-8',
+    hasHoverActions && !isFile && !isTimeGroup && 'group-hover:pr-14',
     // Drag-over state
     node.willReceiveDrop && 'bg-accent/50 border border-primary/40 rounded-sm',
     // Context menu open state
     isContextMenuOpen && !folderColor && 'bg-accent/50',
-    isContextMenuOpen && hasHoverActions && 'pr-8',
+    isContextMenuOpen && hasHoverActions && isFile && 'pr-8',
+    isContextMenuOpen && hasHoverActions && !isFile && !isTimeGroup && 'pr-14',
   );
 
   return (
@@ -313,6 +318,24 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
                 style={coloredSelectedStyle ? { backgroundColor: coloredSelectedStyle.backgroundColor } : undefined}
               />
 
+              {/* New chat button for folders */}
+              {!isFile && !isTimeGroup && !isBatchMode && onNewChat && (
+                <SimpleTooltip content={t('tooltip.newChat')}>
+                  <div
+                    role="button"
+                    className="h-5 w-5 flex items-center justify-center rounded-sm cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      node.select();
+                      onNewChat();
+                    }}
+                  >
+                    <MessageSquarePlus className="h-3.5 w-3.5" />
+                  </div>
+                </SimpleTooltip>
+              )}
+
               {/* Folder settings button */}
               {!isFile && !isTimeGroup && !isBatchMode && (
                 <SimpleTooltip content={t('folderSettings.title')}>
@@ -353,18 +376,23 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
                   </div>
                 </SimpleTooltip>
               )}
-              {isFile && !isFavorite && !isBatchMode && (
-                <SimpleTooltip content={t('tooltip.addToFavorites')}>
+              {isFile && !isBatchMode && (
+                <SimpleTooltip content={isFavorite ? t('tooltip.removeFromFavorites') : t('tooltip.addToFavorites')}>
                   <div
                     role="button"
-                    className="h-5 w-5 flex items-center justify-center rounded-sm cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
+                    className={cn(
+                      'h-5 w-5 flex items-center justify-center rounded-sm cursor-pointer transition-colors',
+                      isFavorite
+                        ? 'text-yellow-500'
+                        : 'text-muted-foreground hover:text-foreground',
+                    )}
                     onClick={(e) => {
                       e.stopPropagation();
                       e.preventDefault();
                       toggleFavorite(node.data.id, 'conversation', isFavorite);
                     }}
                   >
-                    <Star className="h-3.5 w-3.5" />
+                    <Star className={cn('h-3.5 w-3.5', isFavorite && 'fill-current')} />
                   </div>
                 </SimpleTooltip>
               )}

@@ -19,9 +19,10 @@ const INITIAL_DETECT_DELAY_MS = 500;
 
 // ── URL helpers ──────────────────────────────────────────────────────
 const EXTERNAL_ID_RE = /\/app\/([a-zA-Z0-9_-]+)/;
+const GEM_CONVO_ID_RE = /\/gem\/[^/]+\/([a-zA-Z0-9_-]+)/;
 
 function extractExternalId(path: string): string | null {
-  return EXTERNAL_ID_RE.exec(path)?.[1] || null;
+  return EXTERNAL_ID_RE.exec(path)?.[1] || GEM_CONVO_ID_RE.exec(path)?.[1] || null;
 }
 
 // ── Message → Node mappers ───────────────────────────────────────────

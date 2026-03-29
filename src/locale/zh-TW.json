@@ -503,7 +503,7 @@
     "steps": {
       "files": {
         "title": "對話總管",
-        "description": "瀏覽、整理並管理所有對話。建立資料夾、拖曳排序，右鍵可進行更多操作。"
+        "description": "瀏覽、整理並管理所有對話。建立資料夾、拖曳排序，右鍵可進行更多操作。<br/>最近的對話會自動掃描。如需查看完整列表，請點擊 <b>⋮</b> 選單中的「<span style='color:#a5b4fc;font-weight:600'>掃描</span>」選項。"
       },
       "search": {
         "title": "全文搜尋",

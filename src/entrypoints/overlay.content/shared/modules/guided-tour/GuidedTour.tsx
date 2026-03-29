@@ -399,9 +399,8 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                 color: 'rgba(255,255,255,0.7)',
                 lineHeight: 1.6,
               }}
-            >
-              {t(step.descriptionKey)}
-            </p>
+              dangerouslySetInnerHTML={{ __html: t(step.descriptionKey) }}
+            />
 
             {/* Progress bar */}
             <div

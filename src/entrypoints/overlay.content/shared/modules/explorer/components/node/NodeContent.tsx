@@ -1,6 +1,5 @@
 import React from 'react';
 import { NodeProps } from './types';
-import { Star } from 'lucide-react';
 import { FolderTreeNodeContent } from '../../../../components/folder-tree';
 
 interface NodeContentProps extends NodeProps {
@@ -58,17 +57,7 @@ export const NodeContent = ({
       }
       newName={newName}
       setNewName={setNewName}
-      nameAddon={
-        isFavorite ? (
-          <div
-            role="button"
-            className="h-5 w-5 shrink-0 flex items-center justify-center rounded-md hover:bg-muted/50 transition-colors"
-            onClick={onToggleFavorite}
-          >
-            <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
-          </div>
-        ) : undefined
-      }
+      nameAddon={undefined}
     />
   );
 };

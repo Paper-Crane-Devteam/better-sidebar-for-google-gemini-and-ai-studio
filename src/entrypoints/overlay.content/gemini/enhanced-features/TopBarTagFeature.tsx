@@ -175,15 +175,13 @@ const TopBarTagUI = ({ container }: { container: Element }) => {
       {isEditing && (
         <div className="flex items-center gap-1 ml-1">
           <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-            <DropdownMenuTrigger asChild>
-              <SimpleTooltip content={t('topBarTag.addTag')}>
-                <button
-                  className="flex items-center justify-center w-6 h-6 rounded-md hover:bg-accent hover:text-accent-foreground text-muted-foreground transition-colors outline-none shrink-0 border border-dashed border-border"
-                >
+            <SimpleTooltip content={t('topBarTag.addTag')}>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center justify-center w-6 h-6 rounded-md hover:bg-accent hover:text-accent-foreground text-muted-foreground transition-colors outline-none shrink-0 border border-dashed border-border">
                   <Plus className="w-3.5 h-3.5" />
                 </button>
-              </SimpleTooltip>
-            </DropdownMenuTrigger>
+              </DropdownMenuTrigger>
+            </SimpleTooltip>
             <DropdownMenuContent
               container={container as HTMLElement}
               align="start"

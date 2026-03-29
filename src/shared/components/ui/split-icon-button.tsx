@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { cn } from '@/shared/lib/utils/utils';
 import { Button, type ButtonProps } from './button';
 import { SimpleTooltip } from './tooltip';
@@ -14,6 +14,7 @@ export interface SplitDropdownItem {
   icon?: LucideIcon;
   onClick: () => void;
   disabled?: boolean;
+  closeOnClick?: boolean;
 }
 
 interface SplitIconButtonProps {
@@ -36,6 +37,7 @@ export const SplitIconButton = ({
   dropdownItems,
 }: SplitIconButtonProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   if (!dropdownItems || dropdownItems.length === 0) {
     return (
@@ -67,7 +69,7 @@ export const SplitIconButton = ({
         </Button>
       </SimpleTooltip>
 
-      <DropdownMenu>
+      <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
         <DropdownMenuTrigger asChild>
           <button
             className="absolute bottom-0 right-0 w-[9px] h-[9px] flex items-center justify-center cursor-pointer bg-transparent border-none p-0 outline-none"
@@ -98,7 +100,12 @@ export const SplitIconButton = ({
                     'hover:bg-accent hover:text-accent-foreground',
                     item.disabled && 'pointer-events-none opacity-50',
                   )}
-                  onClick={item.onClick}
+                  onClick={(e) => {
+                    if (item.closeOnClick) {
+                      setDropdownOpen(false);
+                    }
+                    item.onClick();
+                  }}
                   disabled={item.disabled}
                 >
                   {item.icon && <item.icon className="h-4 w-4" />}

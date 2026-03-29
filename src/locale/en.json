@@ -519,7 +519,7 @@
     "steps": {
       "files": {
         "title": "Conversation Explorer",
-        "description": "Browse, organize, and manage all your conversations. Create folders, drag to sort, and right-click for more options."
+        "description": "Browse, organize, and manage all your conversations. Create folders, drag to sort, and right-click for more options.<br/>Recent conversations are scanned automatically. To view the full list, use the \"<span style='color:#a5b4fc;font-weight:600'>Scan</span>\" option in the <b>⋮</b> menu."
       },
       "search": {
         "title": "Full-Text Search",

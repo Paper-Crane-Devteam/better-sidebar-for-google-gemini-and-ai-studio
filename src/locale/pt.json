@@ -519,7 +519,7 @@
     "steps": {
       "files": {
         "title": "Explorador de conversas",
-        "description": "Navegue, organize e gerencie todas as suas conversas. Crie pastas, arraste para ordenar e clique com o botão direito para mais opções."
+        "description": "Navegue, organize e gerencie todas as suas conversas. Crie pastas, arraste para ordenar e clique com o botão direito para mais opções.<br/>As conversas recentes são escaneadas automaticamente. Para ver a lista completa, use a opção \"<span style='color:#a5b4fc;font-weight:600'>Escanear</span>\" no menu <b>⋮</b>."
       },
       "search": {
         "title": "Pesquisa de texto completo",

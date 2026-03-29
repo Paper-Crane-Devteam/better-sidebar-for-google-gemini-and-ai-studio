@@ -519,7 +519,7 @@
     "steps": {
       "files": {
         "title": "Explorador de conversaciones",
-        "description": "Explora, organiza y gestiona todas tus conversaciones. Crea carpetas, arrastra para ordenar y haz clic derecho para más opciones."
+        "description": "Explora, organiza y gestiona todas tus conversaciones. Crea carpetas, arrastra para ordenar y haz clic derecho para más opciones.<br/>Las conversaciones recientes se escanean automáticamente. Para ver la lista completa, usa la opción \"<span style='color:#a5b4fc;font-weight:600'>Escanear</span>\" en el menú <b>⋮</b>."
       },
       "search": {
         "title": "Búsqueda de texto completo",

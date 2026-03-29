@@ -144,6 +144,7 @@ const GemSplitButton = () => {
           label: t('gems.selectGem'),
           icon: GemIcon,
           onClick: handleNewGemChat,
+          closeOnClick: true,
         },
       ]}
     />

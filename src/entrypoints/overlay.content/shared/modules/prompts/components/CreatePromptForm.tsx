@@ -28,7 +28,12 @@ interface CreatePromptFormProps {
     type: 'normal' | 'system';
     icon: string;
   };
-  onChange: (data: { title: string; content: string; type: 'normal' | 'system'; icon: string }) => void;
+  onChange: (data: {
+    title: string;
+    content: string;
+    type: 'normal' | 'system';
+    icon: string;
+  }) => void;
   /** Ref to the form element so parent can trigger requestSubmit() on modal confirm */
   formRef?: React.RefObject<HTMLFormElement | null>;
   /** Called when form is submitted and passes validation (title + content required, title max 100) */
@@ -40,12 +45,22 @@ const DEFAULT_ICON_BY_TYPE: Record<'normal' | 'system', string> = {
   normal: 'User',
 };
 
-export const CreatePromptForm = ({ initialValues, onChange, formRef, onValidSubmit }: CreatePromptFormProps) => {
+export const CreatePromptForm = ({
+  initialValues,
+  onChange,
+  formRef,
+  onValidSubmit,
+}: CreatePromptFormProps) => {
   const { t } = useI18n();
   const [title, setTitle] = useState(initialValues?.title || '');
   const [content, setContent] = useState(initialValues?.content || '');
-  const [type, setType] = useState<'normal' | 'system'>(initialValues?.type ?? 'system');
-  const [icon, setIcon] = useState(initialValues?.icon || DEFAULT_ICON_BY_TYPE[initialValues?.type ?? 'system']);
+  const [type, setType] = useState<'normal' | 'system'>(
+    initialValues?.type ?? 'system',
+  );
+  const [icon, setIcon] = useState(
+    initialValues?.icon ||
+      DEFAULT_ICON_BY_TYPE[initialValues?.type ?? 'system'],
+  );
   const [iconDropdownOpen, setIconDropdownOpen] = useState(false);
   /** True after user explicitly picks an icon from dropdown; then we don't override icon when type changes */
   const [iconTouchedByUser, setIconTouchedByUser] = useState(false);
@@ -61,26 +76,37 @@ export const CreatePromptForm = ({ initialValues, onChange, formRef, onValidSubm
           </p>
           {/* Basic variable */}
           <div className="rounded-md bg-secondary/40 border p-3 text-xs">
-            <p className="font-medium text-foreground mb-2">{t('prompts.variablePromptModalExample')}</p>
+            <p className="font-medium text-foreground mb-2">
+              {t('prompts.variablePromptModalExample')}
+            </p>
             <pre className="whitespace-pre-wrap break-words font-mono text-foreground/90">
-              Write a {'{{tone}}'} email to {'{{recipient}}'} about {'{{topic}}'}.
+              Write a {'{{tone}}'} email to {'{{recipient}}'} about{' '}
+              {'{{topic}}'}.
             </pre>
           </div>
           {/* Dropdown variable */}
           <div className="rounded-md bg-secondary/40 border p-3 text-xs">
-            <p className="font-medium text-foreground mb-2">{t('prompts.dropdownVariableExample')}</p>
+            <p className="font-medium text-foreground mb-2">
+              {t('prompts.dropdownVariableExample')}
+            </p>
             <pre className="whitespace-pre-wrap break-words font-mono text-foreground/90">
               {'{{tone:professional,humorous,concise}}'}
             </pre>
-            <p className="mt-1.5 text-muted-foreground">{t('prompts.dropdownVariableHint')}</p>
+            <p className="mt-1.5 text-muted-foreground">
+              {t('prompts.dropdownVariableHint')}
+            </p>
           </div>
           {/* @import */}
           <div className="rounded-md bg-secondary/40 border p-3 text-xs">
-            <p className="font-medium text-foreground mb-2">{t('prompts.importExample')}</p>
+            <p className="font-medium text-foreground mb-2">
+              {t('prompts.importExample')}
+            </p>
             <pre className="whitespace-pre-wrap break-words font-mono text-foreground/90">
               {'{{@import:General System Instructions}}'}
             </pre>
-            <p className="mt-1.5 text-muted-foreground">{t('prompts.importHint')}</p>
+            <p className="mt-1.5 text-muted-foreground">
+              {t('prompts.importHint')}
+            </p>
           </div>
         </div>
       ),
@@ -105,7 +131,11 @@ export const CreatePromptForm = ({ initialValues, onChange, formRef, onValidSubm
   };
 
   return (
-    <Form.Root ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4 py-2 -mx-0.5 px-0.5">
+    <Form.Root
+      ref={formRef}
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-4 py-2 -mx-0.5 px-0.5"
+    >
       {/* Type: label on top, radios below */}
       <div className="grid gap-2">
         <Label>{t('prompts.type')}</Label>
@@ -142,7 +172,10 @@ export const CreatePromptForm = ({ initialValues, onChange, formRef, onValidSubm
             <Form.Label asChild>
               <Label htmlFor="title">{t('prompts.title')}</Label>
             </Form.Label>
-            <Form.Message match="valueMissing" className="text-xs text-destructive">
+            <Form.Message
+              match="valueMissing"
+              className="text-xs text-destructive"
+            >
               {t('prompts.titleRequired')}
             </Form.Message>
             <Form.Message match="tooLong" className="text-xs text-destructive">
@@ -150,9 +183,12 @@ export const CreatePromptForm = ({ initialValues, onChange, formRef, onValidSubm
             </Form.Message>
           </div>
           <div className="flex items-center gap-2">
-            <DropdownMenu open={iconDropdownOpen} onOpenChange={setIconDropdownOpen}>
-              <DropdownMenuTrigger asChild>
-                <SimpleTooltip content={icon}>
+            <DropdownMenu
+              open={iconDropdownOpen}
+              onOpenChange={setIconDropdownOpen}
+            >
+              <SimpleTooltip content={icon}>
+                <DropdownMenuTrigger asChild>
                   <Button
                     type="button"
                     variant="outline"
@@ -161,15 +197,15 @@ export const CreatePromptForm = ({ initialValues, onChange, formRef, onValidSubm
                   >
                     <PromptIconDisplay name={icon} className="h-4 w-4" />
                   </Button>
-                </SimpleTooltip>
-              </DropdownMenuTrigger>
+                </DropdownMenuTrigger>
+              </SimpleTooltip>
               <DropdownMenuContent
                 align="end"
                 className={cn(
                   'z-[100] max-h-[280px] overflow-y-auto min-w-[200px] shadow-md rounded-md p-2',
                   'bg-popover text-popover-foreground border border-border',
                   '[--popover:255_255_255] [--popover-foreground:50_48_44] [--accent:228_228_226] [--accent-foreground:50_48_44] [--border:238_238_236]',
-                  'dark:[--popover:31_31_31] dark:[--popover-foreground:212_212_212] dark:[--accent:42_42_42] dark:[--accent-foreground:212_212_212] dark:[--border:42_42_42]'
+                  'dark:[--popover:31_31_31] dark:[--popover-foreground:212_212_212] dark:[--accent:42_42_42] dark:[--accent-foreground:212_212_212] dark:[--border:42_42_42]',
                 )}
               >
                 <div className="grid grid-cols-4 gap-1">
@@ -189,7 +225,7 @@ export const CreatePromptForm = ({ initialValues, onChange, formRef, onValidSubm
                           className={cn(
                             'flex h-9 w-9 items-center justify-center rounded-md text-popover-foreground',
                             'hover:bg-accent hover:text-accent-foreground transition-colors',
-                            icon === name && 'bg-accent text-accent-foreground'
+                            icon === name && 'bg-accent text-accent-foreground',
                           )}
                         >
                           <IconComponent className="h-4 w-4" />
@@ -232,7 +268,10 @@ export const CreatePromptForm = ({ initialValues, onChange, formRef, onValidSubm
                 {t('prompts.variablePromptHint')}
               </button>
             </div>
-            <Form.Message match="valueMissing" className="text-xs text-destructive">
+            <Form.Message
+              match="valueMissing"
+              className="text-xs text-destructive"
+            >
               {t('prompts.contentRequired')}
             </Form.Message>
           </div>
@@ -244,7 +283,7 @@ export const CreatePromptForm = ({ initialValues, onChange, formRef, onValidSubm
               className={cn(
                 'flex min-h-[240px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm',
                 'placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
-                'disabled:cursor-not-allowed disabled:opacity-50 resize-y'
+                'disabled:cursor-not-allowed disabled:opacity-50 resize-y',
               )}
               value={content}
               onChange={(e) => setContent(e.target.value)}

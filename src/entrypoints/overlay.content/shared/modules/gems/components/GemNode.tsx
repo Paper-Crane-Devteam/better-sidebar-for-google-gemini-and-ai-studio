@@ -123,7 +123,7 @@ export const GemNode = ({
     )
   ) : null;
 
-  const hasHoverActions = isFile && !isFavorite;
+  const hasHoverActions = isFile;
 
   const nodeClasses = cn(
     'flex items-center gap-1.5 px-1 pr-2 h-full',
@@ -176,24 +176,10 @@ export const GemNode = ({
               <span className="truncate text-sm">
                 {node.data.name}
               </span>
-              {/* Favorite star - after name, matching library style */}
-              {isFile && isFavorite && (
-                <div
-                  role="button"
-                  className="h-5 w-5 shrink-0 flex items-center justify-center rounded-md hover:bg-muted/50 transition-colors"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    toggleFavorite(node.data.id, 'conversation', true);
-                  }}
-                >
-                  <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
-                </div>
-              )}
             </div>
 
             {/* Hover actions for files */}
-            {isFile && !isFavorite && (
+            {isFile && (
               <div
                 className={cn(
                   'hidden group-hover:flex items-center gap-1 absolute right-0 pr-2 top-0 bottom-0',
@@ -202,17 +188,22 @@ export const GemNode = ({
                 )}
               >
                 <div className="absolute inset-y-0 -left-6 w-6 pointer-events-none [background:inherit] [mask-image:linear-gradient(to_right,transparent,black)]" />
-                <SimpleTooltip content={t('tooltip.addToFavorites')}>
+                <SimpleTooltip content={isFavorite ? t('tooltip.removeFromFavorites') : t('tooltip.addToFavorites')}>
                   <div
                     role="button"
-                    className="h-5 w-5 flex items-center justify-center rounded-sm cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
+                    className={cn(
+                      'h-5 w-5 flex items-center justify-center rounded-sm cursor-pointer transition-colors',
+                      isFavorite
+                        ? 'text-yellow-500'
+                        : 'text-muted-foreground hover:text-foreground',
+                    )}
                     onClick={(e) => {
                       e.stopPropagation();
                       e.preventDefault();
-                      toggleFavorite(node.data.id, 'conversation', false);
+                      toggleFavorite(node.data.id, 'conversation', isFavorite);
                     }}
                   >
-                    <Star className="h-3.5 w-3.5" />
+                    <Star className={cn('h-3.5 w-3.5', isFavorite && 'fill-current')} />
                   </div>
                 </SimpleTooltip>
               </div>

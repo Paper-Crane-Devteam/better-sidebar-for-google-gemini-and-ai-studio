@@ -20,6 +20,7 @@ import {
 import type { ExplorerTypeFilter } from '../../types/filter';
 import type { SplitDropdownItem } from '@/shared/components/ui/split-icon-button';
 import { getExternalUrl } from '../../utils';
+import { ExplorerContext } from './ExplorerContext';
 
 interface ExplorerTabProps {
   onNewChat: () => void;
@@ -241,6 +242,7 @@ export const ExplorerTab = ({
   };
 
   return (
+    <ExplorerContext.Provider value={{ onNewChat }}>
     <div className="flex flex-col h-full w-full relative">
       {isScanning && (
         <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background/50 backdrop-blur-[1px] gap-2">
@@ -316,5 +318,6 @@ export const ExplorerTab = ({
         )}
       </ContextMenu>
     </div>
+    </ExplorerContext.Provider>
   );
 };;
