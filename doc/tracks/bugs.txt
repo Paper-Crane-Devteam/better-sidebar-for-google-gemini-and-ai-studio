@@ -30,3 +30,4 @@
 17. gem favorite style
 18. a/b ui compatible
 19, create new chat twice cause the chatbox floating in the middle
+20. hover on favorite then cursor up, the tooltip float at the top left
