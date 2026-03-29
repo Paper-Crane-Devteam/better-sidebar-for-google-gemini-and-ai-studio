@@ -26,8 +26,8 @@
 -16. search in current chat
 -14. sync using google drive
 15. smartscrollbar: reedit should clear previous message, open expanded view flicker, expanded view to normal view btn logic
-16. open gem select lose focus
-17. gem favorite style
+-16. open gem select lose focus
+-17. gem favorite style
 18. a/b ui compatible
 19, create new chat twice cause the chatbox floating in the middle
 20. hover on favorite then cursor up, the tooltip float at the top left
