@@ -182,6 +182,12 @@ export async function initGeminiOverlay(mainStyles: string): Promise<void> {
           wrapper.style.width = '100%';
           wrapper.style.overflow = 'hidden';
 
+          // Prevent all mouse/pointer events from bubbling out to Gemini's native listeners
+          const stopPropagation = (e: Event) => e.stopPropagation();
+          for (const evt of ['click', 'mousedown', 'mouseup', 'pointerdown', 'pointerup', 'contextmenu']) {
+            wrapper.addEventListener(evt, stopPropagation);
+          }
+
           container.appendChild(wrapper);
           elements.wrapper = wrapper;
 
