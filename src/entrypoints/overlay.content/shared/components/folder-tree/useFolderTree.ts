@@ -116,7 +116,7 @@ export const useFolderTree = (options: UseFolderTreeOptions) => {
   };
 
   const handleCreateFolder = async (parentId: string) => {
-    const newFolderId = await onCreateFolder(t('node.newFolder'), parentId);
+    const newFolderId = await onCreateFolder(t('node.newFolderName'), parentId);
     if (newFolderId) {
       treeRef.current?.open(parentId);
       setTimeout(() => {

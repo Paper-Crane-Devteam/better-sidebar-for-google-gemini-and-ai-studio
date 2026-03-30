@@ -19,7 +19,6 @@ import {
 
 import type { ExplorerTypeFilter } from '../../types/filter';
 import type { SplitDropdownItem } from '@/shared/components/ui/split-icon-button';
-import { getExternalUrl } from '../../utils';
 import { ExplorerContext } from './ExplorerContext';
 
 interface ExplorerTabProps {
@@ -91,53 +90,38 @@ export const ExplorerTab = ({
     }
   }, [folders, conversations, selectedNode]);
 
-  // Handle New Chat Creation (Listen to event from Main World)
+  // Handle New Chat Creation — assign to selected folder if one is active.
+  // The actual DB save is handled by PromptCreateScanner in the content script,
+  // so this only needs to move the conversation when a folder is selected.
   useEffect(() => {
     const handleCreate = async (event: any) => {
-      const { id, title, prompt_metadata, created_at, type, messages, gem_id } =
-        event.detail;
-      console.log(
-        'Better Sidebar for Gemini & AI Studio: Overlay received BETTER_SIDEBAR_PROMPT_CREATE',
-        id,
-      );
+      const { id } = event.detail;
 
-      let targetFolderId = null;
+      let targetFolderId: string | null = null;
       if (selectedNode) {
         if (selectedNode.data.type === 'folder') {
-          // Check if it's a virtual time group folder
-          if (selectedNode.data.data?.isTimeGroup) {
-            targetFolderId = null;
-          } else {
+          if (!selectedNode.data.data?.isTimeGroup) {
             targetFolderId = selectedNode.data.id;
           }
         } else {
-          const item = selectedNode.data.data;
-          targetFolderId = item.folder_id || null;
+          targetFolderId = selectedNode.data.data?.folder_id || null;
         }
       }
 
+      // Always refresh so the new item appears immediately
+      fetchData(true);
+
+      if (!targetFolderId) return;
+
       try {
         await browser.runtime.sendMessage({
-          type: 'SAVE_CONVERSATION',
-          payload: {
-            id,
-            title,
-            prompt_metadata,
-            created_at,
-            updated_at: created_at,
-            external_id: id,
-            external_url: getExternalUrl(id),
-            folder_id: targetFolderId,
-            type,
-            messages,
-            gem_id: gem_id || undefined,
-          },
+          type: 'MOVE_CONVERSATION',
+          payload: { id, folderId: targetFolderId },
         });
-        // Refresh data to show new item immediately
         fetchData(true);
       } catch (e) {
         console.error(
-          'Better Sidebar for Gemini & AI Studio: Failed to handle BETTER_SIDEBAR_PROMPT_CREATE',
+          'Better Sidebar for Gemini & AI Studio: Failed to move new conversation to folder',
           e,
         );
       }

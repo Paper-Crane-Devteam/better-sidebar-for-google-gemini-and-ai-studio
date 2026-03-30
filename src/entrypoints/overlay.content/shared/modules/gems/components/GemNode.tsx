@@ -4,10 +4,11 @@ import {
   ChevronRight,
   ChevronDown,
   Star,
+  Plus,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils/utils';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
-import { navigateToConversation, navigateToGem } from '@/shared/lib/navigation';
+import { navigateToConversation, navigateToGem, navigate } from '@/shared/lib/navigation';
 import { useAppStore } from '@/shared/lib/store';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useCurrentConversationId } from '../../../../shared/hooks/useCurrentConversationId';
@@ -215,6 +216,12 @@ export const GemNode = ({
       {isGem && (
         <ContextMenuContent className="z-[9999]">
           <ContextMenuItem
+            onClick={() => navigate('https://gemini.google.com/gems/create')}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            {t('gems.createGem')}
+          </ContextMenuItem>
+          <ContextMenuItem
             onClick={() => {
               const gemUrl = node.data.data?.external_url;
               if (gemUrl) navigateToGem(gemUrl);
@@ -230,12 +237,6 @@ export const GemNode = ({
             }}
           >
             {t('gems.openInNewTab')}
-          </ContextMenuItem>
-          <ContextMenuItem
-            onClick={handleDeleteGem}
-            className="text-destructive"
-          >
-            {t('gems.deleteGem')}
           </ContextMenuItem>
         </ContextMenuContent>
       )}

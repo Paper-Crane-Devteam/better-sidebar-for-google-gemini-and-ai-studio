@@ -161,7 +161,7 @@
     "switchToOriginalUI": "切换到原始侧边栏",
     "viewHistory": "查看历史",
     "importHistory": "导入历史",
-    "scanChatList": "扫描聊天列表",
+    "scanChatList": "导入聊天列表",
     "scanning": "扫描中...",
     "sqlQuery": "SQL 查询",
     "settings": "设置"
@@ -271,6 +271,7 @@
     "removeFromFavorites": "从收藏中移除",
     "more": "更多",
     "newChat": "新建对话",
+    "newPrompt": "新建提示词",
     "build": "构建",
     "dashboard": "仪表盘",
     "documentation": "文档",
@@ -288,7 +289,8 @@
     "newChat": "新建对话"
   },
   "node": {
-    "newFolder": "新建文件夹",
+    "newFolder": "创建子文件夹",
+    "newFolderName": "新建文件夹",
     "rename": "重命名",
     "delete": "删除",
     "removeFromFavorites": "从收藏中移除",
@@ -298,8 +300,8 @@
     "deleteItem": "删除项目",
     "deleteConfirm": "您确定要删除 \"{{name}}\" 吗？",
     "deleteFolderConfirm": "您确定要删除文件夹 \"{{name}}\" 及其包含的所有内容吗？",
-    "deleteNote": "注意：删除的项目可以通过扫描聊天列表来恢复。",
-    "deleteFolderNote": "注意：删除的文件夹无法恢复，但对话可以通过扫描聊天列表来恢复。",
+    "deleteNote": "注意：删除的项目可以通过导入聊天列表来恢复。",
+    "deleteFolderNote": "注意：删除的文件夹无法恢复，但对话可以通过导入聊天列表来恢复。",
     "openInNewTab": "在新标签页打开",
     "moveTo": "移动到...",
     "export": "导出",
@@ -641,8 +643,8 @@
     "chatWithLastGem": "与 {{name}} 对话",
     "empty": "暂无 Gems。创建一个或从 Gemini 同步。",
     "viewGems": "查看 Gems",
-    "scanGems": "扫描 Gems",
-    "scanningGems": "扫描中..."
+    "scanGems": "导入 Gems",
+    "scanningGems": "导入中..."
   },
   "whatsNew": {
     "title": "v{{version}} 更新内容",
@@ -654,5 +656,13 @@
     "rateUs": "好评",
     "starOnGithub": "点星 ⭐",
     "buyMeACoffee": "咖啡 ☕"
+  },
+  "firstInstall": {
+    "title": "是否导入对话列表？",
+    "description": "插件默认只会录入最近的对话。",
+    "detail": "你可以现在导入完整的对话列表，这样所有对话都会显示在侧边栏中——包括你还没打开过的旧对话。",
+    "hint": "你也可以之后随时在菜单中手动导入。",
+    "importAll": "立即导入",
+    "skip": "以后再说"
   }
 }

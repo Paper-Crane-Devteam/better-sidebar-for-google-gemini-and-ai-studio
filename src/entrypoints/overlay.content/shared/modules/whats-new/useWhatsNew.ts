@@ -14,12 +14,6 @@ export const useWhatsNew = () => {
         const result = await browser.storage.local.get(STORAGE_KEY);
         const lastSeenVersion = result[STORAGE_KEY];
 
-        // Simple string comparison for now, or use semver if needed
-        // If lastSeenVersion is undefined (new user or first time feature),
-        // or if current version is different/newer.
-        // NOTE: For a "What's New" specifically for *updates*, we might want to skip for brand new installs.
-        // But usually showing it once is fine.
-
         if (lastSeenVersion !== CURRENT_VERSION) {
           setIsOpen(true);
         }

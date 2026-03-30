@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -53,42 +53,52 @@ export const SidePanelMenu = ({
 
   const [open, setOpen] = useState(false);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
 
-  const cancelClose = useCallback(() => {
+  const isInsideContent = (target: EventTarget | null): boolean => {
+    if (!target || !contentRef.current) return false;
+    return contentRef.current.contains(target as Node);
+  };
+
+  const cancelClose = () => {
     if (closeTimerRef.current) {
       clearTimeout(closeTimerRef.current);
       closeTimerRef.current = null;
     }
-  }, []);
+  };
 
-  const scheduleClose = useCallback(() => {
+  const scheduleClose = () => {
     cancelClose();
-    closeTimerRef.current = setTimeout(() => setOpen(false), 150);
-  }, [cancelClose]);
+    closeTimerRef.current = setTimeout(() => setOpen(false), 100);
+  };
 
-  const handleTriggerEnter = useCallback(() => {
-    cancelClose();
-    setOpen(true);
-  }, [cancelClose]);
+  const handleTriggerLeave = (e: React.PointerEvent) => {
+    if (isInsideContent(e.relatedTarget)) return;
+    scheduleClose();
+  };
 
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
+    <DropdownMenu open={open} onOpenChange={(v) => { if (v) setOpen(true); }}>
       <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
             size="icon"
             className="data-[state=open]:bg-accent data-[state=open]:text-accent-foreground"
-            onMouseEnter={handleTriggerEnter}
-            onMouseLeave={scheduleClose}
+            onPointerEnter={() => { cancelClose(); setOpen(true); }}
+            onPointerLeave={handleTriggerLeave}
           >
             <MoreVertical className="h-4 w-4" />
           </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
+        ref={contentRef}
         align="end"
+        sideOffset={4}
         className="w-56 z-[9999]"
-        onMouseEnter={cancelClose}
-        onMouseLeave={scheduleClose}
+        onPointerEnter={cancelClose}
+        onPointerLeave={scheduleClose}
+        onPointerDownOutside={() => setOpen(false)}
+        onEscapeKeyDown={() => setOpen(false)}
       >
         {/* Section 1: Folder/Tree Actions */}
         {onNewFolder && (

@@ -132,7 +132,7 @@ export const useSettingsStore = create<SettingsState>()(
         enableRightClickRename: false,
       },
       shortcuts: {
-        favorites: true,
+        favorites: false,
         build: true,
         dashboard: true,
         documentation: true,

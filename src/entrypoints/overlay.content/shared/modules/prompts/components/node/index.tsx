@@ -86,7 +86,7 @@ export const Node = ({
   }
 
   const handleCreateFolder = async (parentId: string) => {
-    const newFolderId = await createPromptFolder(t('node.newFolder'), parentId);
+    const newFolderId = await createPromptFolder(t('node.newFolderName'), parentId);
     if (newFolderId) {
       tree.open(parentId);
       setTimeout(() => {

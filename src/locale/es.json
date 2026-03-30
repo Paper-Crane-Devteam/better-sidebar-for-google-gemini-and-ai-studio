@@ -21,7 +21,8 @@
     "search": "Buscar",
     "tags": "Etiquetas",
     "feedback": "Comentarios",
-    "settings": "Configuración"
+    "settings": "Configuración",
+    "gems": "Gems"
   },
   "sidebar": {
     "newConversation": "Nueva Conversación",
@@ -160,7 +161,7 @@
     "switchToOriginalUI": "Cambiar a Barra Lateral Original",
     "viewHistory": "Ver Historial",
     "importHistory": "Importar Historial",
-    "scanChatList": "Escanear Lista de Chats",
+    "scanChatList": "Importar Lista de Chats",
     "scanning": "Escaneando...",
     "sqlQuery": "Consulta SQL",
     "settings": "Configuración"
@@ -270,6 +271,7 @@
     "removeFromFavorites": "Quitar de favoritos",
     "more": "Más",
     "newChat": "Nueva Conversación",
+    "newPrompt": "Nuevo Prompt",
     "build": "Build",
     "dashboard": "Panel",
     "documentation": "Documentación",
@@ -287,7 +289,8 @@
     "newChat": "Nuevo Chat"
   },
   "node": {
-    "newFolder": "Nueva Carpeta",
+    "newFolder": "Crear Subcarpeta",
+    "newFolderName": "Nueva Carpeta",
     "rename": "Renombrar",
     "delete": "Eliminar",
     "removeFromFavorites": "Quitar de Favoritos",
@@ -297,8 +300,8 @@
     "deleteItem": "Eliminar Elemento",
     "deleteConfirm": "¿Estás seguro de que deseas eliminar \"{{name}}\"?",
     "deleteFolderConfirm": "¿Estás seguro de que deseas eliminar la carpeta \"{{name}}\" y todo su contenido?",
-    "deleteNote": "Nota: Los elementos eliminados se pueden restaurar escaneando la lista de chats.",
-    "deleteFolderNote": "Nota: Las carpetas eliminadas no se pueden restaurar, pero las conversaciones se pueden recuperar escaneando la lista de chats.",
+    "deleteNote": "Nota: Los elementos eliminados se pueden restaurar importando la lista de chats.",
+    "deleteFolderNote": "Nota: Las carpetas eliminadas no se pueden restaurar, pero las conversaciones se pueden recuperar importando la lista de chats.",
     "openInNewTab": "Abrir en Nueva Pestaña",
     "moveTo": "Mover a...",
     "export": "Exportar",
@@ -641,8 +644,8 @@
     "chatWithLastGem": "Chatear con {{name}}",
     "empty": "Aún no hay gems. Crea uno o sincroniza desde Gemini.",
     "viewGems": "Ver Gems",
-    "scanGems": "Escanear Gems",
-    "scanningGems": "Escaneando..."
+    "scanGems": "Importar Gems",
+    "scanningGems": "Importando..."
   },
   "whatsNew": {
     "title": "Novedades en v{{version}}",
@@ -654,5 +657,13 @@
     "rateUs": "Valorar",
     "starOnGithub": "Estrella ⭐",
     "buyMeACoffee": "Café ☕"
+  },
+  "firstInstall": {
+    "title": "¿Importar lista de conversaciones?",
+    "description": "Por defecto, la extensión solo registra las conversaciones recientes.",
+    "detail": "Puedes importar la lista completa de conversaciones ahora para que todas aparezcan en la barra lateral, incluidas las más antiguas que aún no has abierto.",
+    "hint": "También puedes hacerlo más tarde desde el menú.",
+    "importAll": "Importar ahora",
+    "skip": "Quizás luego"
   }
 }

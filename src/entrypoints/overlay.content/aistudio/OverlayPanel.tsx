@@ -26,6 +26,7 @@ import { TagsTab } from '../shared/modules/tags/TagsTab';
 import { FeedbackTab } from '../shared/modules/feedback/FeedbackTab';
 import { SettingsModal } from '../shared/modules/settings/SettingsModal';
 import { WhatsNewDialog } from '../shared/modules/whats-new/WhatsNewDialog';
+import { FirstInstallPrompt } from '../shared/modules/whats-new/FirstInstallPrompt';
 import { RatingPromptDialog } from '../shared/modules/feedback/RatingPromptDialog';
 import '@/index.scss';
 import { GlobalModal } from '@/shared/components/GlobalModal';
@@ -401,6 +402,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
       </div>
       <SettingsModal open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
       <WhatsNewDialog />
+      <FirstInstallPrompt />
       <RatingPromptDialog />
       <GlobalModal />
       <ProfilePickerDialog />

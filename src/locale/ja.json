@@ -21,7 +21,8 @@
     "search": "検索",
     "tags": "タグ",
     "feedback": "フィードバック",
-    "settings": "設定"
+    "settings": "設定",
+    "gems": "Gems"
   },
   "sidebar": {
     "newConversation": "新しい会話",
@@ -160,7 +161,7 @@
     "switchToOriginalUI": "元のサイドバーに切り替え",
     "viewHistory": "履歴を表示",
     "importHistory": "履歴をインポート",
-    "scanChatList": "チャットリストをスキャン",
+    "scanChatList": "チャットリストをインポート",
     "scanning": "スキャン中...",
     "sqlQuery": "SQL クエリ",
     "settings": "設定"
@@ -270,6 +271,7 @@
     "removeFromFavorites": "お気に入りから削除",
     "more": "その他",
     "newChat": "新しい会話",
+    "newPrompt": "新しいプロンプト",
     "build": "Build",
     "dashboard": "ダッシュボード",
     "documentation": "ドキュメント",
@@ -287,7 +289,8 @@
     "newChat": "新しいチャット"
   },
   "node": {
-    "newFolder": "新しいフォルダ",
+    "newFolder": "サブフォルダを作成",
+    "newFolderName": "新しいフォルダ",
     "rename": "名前を変更",
     "delete": "削除",
     "removeFromFavorites": "お気に入りから削除",
@@ -296,9 +299,10 @@
     "noTagsCreated": "タグが作成されていません",
     "deleteItem": "項目を削除",
     "deleteConfirm": "\"{{name}}\" を削除してもよろしいですか？",
+
     "deleteFolderConfirm": "フォルダ \"{{name}}\" とそのすべての内容を削除してもよろしいですか？",
-    "deleteNote": "注意：削除された項目は、チャットリストをスキャンすることで復元できます。",
-    "deleteFolderNote": "注意：削除されたフォルダは復元できませんが、会話はチャットリストをスキャンすることで復元できます。",
+    "deleteNote": "注意：削除された項目は、チャットリストをインポートすることで復元できます。",
+    "deleteFolderNote": "注意：削除されたフォルダは復元できませんが、会話はチャットリストをインポートすることで復元できます。",
     "openInNewTab": "新しいタブで開く",
     "moveTo": "移動...",
     "export": "エクスポート",
@@ -641,8 +645,8 @@
     "chatWithLastGem": "{{name}} とチャット",
     "empty": "Gems がまだありません。作成するか Gemini から同期してください。",
     "viewGems": "Gems を表示",
-    "scanGems": "Gems をスキャン",
-    "scanningGems": "スキャン中..."
+    "scanGems": "Gems をインポート",
+    "scanningGems": "インポート中..."
   },
   "whatsNew": {
     "title": "v{{version}} の新機能",
@@ -654,5 +658,13 @@
     "rateUs": "評価",
     "starOnGithub": "スター ⭐",
     "buyMeACoffee": "コーヒー ☕"
+  },
+  "firstInstall": {
+    "title": "会話リストをインポートしますか？",
+    "description": "デフォルトでは、最近の会話のみが記録されます。",
+    "detail": "今すぐ完全な会話リストをインポートすると、まだ開いていない古い会話も含めてすべてサイドバーに表示されます。",
+    "hint": "この操作はメニューからいつでも実行できます。",
+    "importAll": "今すぐインポート",
+    "skip": "あとで"
   }
 }

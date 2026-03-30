@@ -342,7 +342,7 @@ export const GeminiUIControl = () => {
                       className="text-xs font-semibold cursor-pointer"
                       onClick={() => setShowSmartScrollbar(!showSmartScrollbar)}
                     >
-                      Smart Scrollbar
+                      Smart Scrollbar(Experimental)
                     </Label>
                     <p className="text-[10px] text-muted-foreground">
                       Show conversation navigation on the right side

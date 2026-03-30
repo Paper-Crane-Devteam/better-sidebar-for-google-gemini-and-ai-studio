@@ -161,7 +161,7 @@
     "switchToOriginalUI": "Switch to Original Sidebar",
     "viewHistory": "View History",
     "importHistory": "Import History",
-    "scanChatList": "Scan Chat List",
+    "scanChatList": "Import Chat List",
     "scanning": "Scanning...",
     "sqlQuery": "SQL Query",
     "settings": "Settings"
@@ -271,6 +271,7 @@
     "removeFromFavorites": "Remove from favorites",
     "more": "More",
     "newChat": "New Conversation",
+    "newPrompt": "New Prompt",
     "build": "Build",
     "dashboard": "Dashboard",
     "documentation": "Documentation",
@@ -288,7 +289,8 @@
     "newChat": "New Chat"
   },
   "node": {
-    "newFolder": "New Folder",
+    "newFolder": "Create Subfolder",
+    "newFolderName": "New Folder",
     "rename": "Rename",
     "delete": "Delete",
     "removeFromFavorites": "Remove from Favorites",
@@ -298,8 +300,8 @@
     "deleteItem": "Delete Item",
     "deleteConfirm": "Are you sure you want to delete \"{{name}}\"?",
     "deleteFolderConfirm": "Are you sure you want to delete the folder \"{{name}}\" and all its contents?",
-    "deleteNote": "Note: Deleted items can be restored by scanning the chat list.",
-    "deleteFolderNote": "Note: Deleted folders cannot be restored, but conversations can be recovered by scanning the chat list.",
+    "deleteNote": "Note: Deleted items can be restored by importing the chat list.",
+    "deleteFolderNote": "Note: Deleted folders cannot be restored, but conversations can be recovered by importing the chat list.",
     "openInNewTab": "Open in New Tab",
     "moveTo": "Move to...",
     "export": "Export",
@@ -641,8 +643,8 @@
     "chatWithLastGem": "Chat with {{name}}",
     "empty": "No gems yet. Create one or sync from Gemini.",
     "viewGems": "View Gems",
-    "scanGems": "Scan Gems",
-    "scanningGems": "Scanning..."
+    "scanGems": "Import Gems",
+    "scanningGems": "Importing..."
   },
   "whatsNew": {
     "title": "What's New in v{{version}}",
@@ -654,5 +656,13 @@
     "rateUs": "Rate",
     "starOnGithub": "Star ⭐",
     "buyMeACoffee": "Coffee ☕"
+  },
+  "firstInstall": {
+    "title": "Import Conversation List?",
+    "description": "By default, the extension only captures your recent conversations.",
+    "detail": "You can import your full conversation list right now so everything shows up in the sidebar — including older chats you haven't opened yet.",
+    "hint": "You can always do this later from the menu.",
+    "importAll": "Import Now",
+    "skip": "Maybe Later"
   }
 }

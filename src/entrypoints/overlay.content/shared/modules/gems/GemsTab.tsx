@@ -61,8 +61,6 @@ export const GemsTab = ({ menuActions }: GemsTabProps) => {
 
   const allMenuActions = {
     ...menuActions,
-    onViewGems: handleViewGems,
-    onScanGems: handleScanGems,
     isScanningGems,
   };
 
@@ -73,6 +71,8 @@ export const GemsTab = ({ menuActions }: GemsTabProps) => {
         filter={filter}
         menuActions={allMenuActions}
         isScanningGems={isScanningGems}
+        onViewGems={handleViewGems}
+        onScanGems={handleScanGems}
       />
 
       <FilterBar filter={filter} allTags={allTags} />

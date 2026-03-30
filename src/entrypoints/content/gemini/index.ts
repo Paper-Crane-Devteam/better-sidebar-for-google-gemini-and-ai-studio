@@ -7,6 +7,7 @@ import { scanLibrary } from './tasks/scan-library';
 import { apiScanner } from './tasks/scan-api';
 import { chatContentScanner } from './tasks/scan-chat-content';
 import { gemCreationScanner } from './tasks/scan-gem-creation';
+import { promptCreateScanner } from './tasks/scan-prompt-create';
 import { scanGems } from './tasks/scan-gems';
 
 import { syncConversations } from './tasks/sync-conversations';
@@ -60,6 +61,7 @@ export async function initGemini() {
   apiScanner.start();
   chatContentScanner.start();
   gemCreationScanner.start();
+  promptCreateScanner.start();
 
   // Start image watermark processor (MutationObserver on img tags)
   // initImageProcessor().catch((e) => {

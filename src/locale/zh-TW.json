@@ -21,7 +21,8 @@
     "search": "搜尋",
     "tags": "標籤",
     "feedback": "意見回饋",
-    "settings": "設定"
+    "settings": "設定",
+    "gems": "Gems"
   },
   "sidebar": {
     "newConversation": "新增對話",
@@ -160,7 +161,7 @@
     "switchToOriginalUI": "切換到原始側邊欄",
     "viewHistory": "檢視歷史",
     "importHistory": "匯入歷史",
-    "scanChatList": "掃描聊天清單",
+    "scanChatList": "匯入聊天清單",
     "scanning": "掃描中...",
     "sqlQuery": "SQL 查詢",
     "settings": "設定"
@@ -270,6 +271,7 @@
     "removeFromFavorites": "從收藏中移除",
     "more": "更多",
     "newChat": "新增對話",
+    "newPrompt": "新增提示詞",
     "build": "建置",
     "dashboard": "儀表板",
     "documentation": "文件",
@@ -287,7 +289,8 @@
     "newChat": "新增對話"
   },
   "node": {
-    "newFolder": "新增資料夾",
+    "newFolder": "建立子資料夾",
+    "newFolderName": "新增資料夾",
     "rename": "重新命名",
     "delete": "刪除",
     "removeFromFavorites": "從收藏中移除",
@@ -297,8 +300,8 @@
     "deleteItem": "刪除項目",
     "deleteConfirm": "您確定要刪除 \"{{name}}\" 嗎？",
     "deleteFolderConfirm": "您確定要刪除資料夾 \"{{name}}\" 及其包含的所有內容嗎？",
-    "deleteNote": "注意：刪除的項目可以透過掃描聊天列表來還原。",
-    "deleteFolderNote": "注意：刪除的資料夾無法還原，但對話可以透過掃描聊天列表來還原。",
+    "deleteNote": "注意：刪除的項目可以透過匯入聊天清單來還原。",
+    "deleteFolderNote": "注意：刪除的資料夾無法還原，但對話可以透過匯入聊天清單來還原。",
     "openInNewTab": "在新標籤頁開啟",
     "moveTo": "移動到...",
     "export": "匯出",
@@ -359,8 +362,6 @@
     "addTag": "新增標籤",
     "exitBatchMode": "離開批次模式",
     "selectAll": "全選",
-    "selectedCount": "已選 {{count}} 項",
-    "selectItems": "選擇項目",
     "selectedCount": "已選取 {{count}} 項",
     "selectItems": "選取項目"
   },
@@ -643,8 +644,8 @@
     "chatWithLastGem": "與 {{name}} 對話",
     "empty": "尚無 Gems。建立一個或從 Gemini 同步。",
     "viewGems": "檢視 Gems",
-    "scanGems": "掃描 Gems",
-    "scanningGems": "掃描中..."
+    "scanGems": "匯入 Gems",
+    "scanningGems": "匯入中..."
   },
   "whatsNew": {
     "title": "v{{version}} 更新內容",
@@ -656,5 +657,13 @@
     "rateUs": "好評",
     "starOnGithub": "點星 ⭐",
     "buyMeACoffee": "咖啡 ☕"
+  },
+  "firstInstall": {
+    "title": "是否匯入對話列表？",
+    "description": "插件預設只會錄入最近的對話。",
+    "detail": "你可以現在匯入完整的對話列表，這樣所有對話都會顯示在側邊欄中——包括你還沒開啟過的舊對話。",
+    "hint": "你也可以之後隨時在選單中手動匯入。",
+    "importAll": "立即匯入",
+    "skip": "以後再說"
   }
 }

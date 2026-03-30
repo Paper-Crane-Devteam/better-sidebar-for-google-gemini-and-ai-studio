@@ -130,7 +130,7 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
   };
 
   const handleCreateFolder = async (parentId: string) => {
-    const newFolderId = await createFolder(t('node.newFolder'), parentId);
+    const newFolderId = await createFolder(t('node.newFolderName'), parentId);
     if (newFolderId) {
       tree.open(parentId);
       setTimeout(() => {

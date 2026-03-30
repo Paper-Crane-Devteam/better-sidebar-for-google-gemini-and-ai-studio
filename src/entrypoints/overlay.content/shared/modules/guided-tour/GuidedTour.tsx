@@ -53,7 +53,6 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
 }) => {
   const { t } = useI18n();
   const [targetRect, setTargetRect] = useState<TargetRect | null>(null);
-  const [isAnimating, setIsAnimating] = useState(false);
   const [showContent, setShowContent] = useState(false);
   const portalRef = useRef<HTMLDivElement | null>(null);
 
@@ -125,14 +124,16 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
       return;
     }
 
-    setIsAnimating(true);
-    setShowContent(false);
+    // Update spotlight position immediately — the CSS transition on the SVG
+    // cutout handles the smooth movement. No opacity fade on the overlay so
+    // the shadow never disappears between steps.
+    updateTargetPosition();
 
+    // Brief delay before showing the tooltip so the spotlight arrives first
+    setShowContent(false);
     const timer = setTimeout(() => {
-      updateTargetPosition();
-      setIsAnimating(false);
       setShowContent(true);
-    }, 200);
+    }, 150);
 
     return () => clearTimeout(timer);
   }, [currentStep, isActive, updateTargetPosition]);
@@ -247,8 +248,6 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
           style={{
             position: 'absolute',
             inset: 0,
-            transition: 'opacity 0.3s ease',
-            opacity: isAnimating ? 0.5 : 1,
           }}
         >
           <defs>

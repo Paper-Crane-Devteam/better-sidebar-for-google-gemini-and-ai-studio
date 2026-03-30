@@ -112,7 +112,7 @@ export const PromptsHeader = ({
               <FolderPlus className="h-4 w-4" />
             </Button>
           </SimpleTooltip>
-          <SimpleTooltip content={t('tooltip.newChat')}>
+          <SimpleTooltip content={t('tooltip.newPrompt')}>
             <Button
               variant="ghost"
               size="icon"
