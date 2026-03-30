@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/shared/components/ui/button';
-import { Trash2, FolderInput, Tag as TagIcon, CheckSquare, X } from 'lucide-react';
+import { EyeOff, FolderInput, Tag as TagIcon, CheckSquare, X } from 'lucide-react';
 import { useAppStore } from '@/shared/lib/store';
 import { modal } from '@/shared/lib/modal';
 import { MoveItemsDialog } from './MoveItemsDialog';
@@ -26,9 +26,9 @@ export const BatchToolbar = ({ onSelectAll }: BatchToolbarProps) => {
     if (validIds.length === 0) return;
 
     const confirmed = await modal.confirm({
-      title: t('batch.deleteConfirmTitle', { count: validIds.length }),
-      content: t('batch.deleteConfirmMessage'),
-      confirmText: t('common.delete'),
+      title: t('batch.hideConfirmTitle', { count: validIds.length }),
+      content: t('batch.hideConfirmMessage'),
+      confirmText: t('common.hide'),
       cancelText: t('common.cancel'),
     });
 
@@ -128,9 +128,9 @@ export const BatchToolbar = ({ onSelectAll }: BatchToolbarProps) => {
 
         <div className="w-[1px] h-4 bg-border mx-0.5" />
 
-        <SimpleTooltip content={t('batch.deleteSelected')}>
+        <SimpleTooltip content={t('batch.hideSelected')}>
           <Button variant="ghost" size="icon" className="h-7 w-7" disabled={selectedIds.length === 0} onClick={handleDelete}>
-            <Trash2 className="h-4 w-4" />
+            <EyeOff className="h-4 w-4" />
           </Button>
         </SimpleTooltip>
 

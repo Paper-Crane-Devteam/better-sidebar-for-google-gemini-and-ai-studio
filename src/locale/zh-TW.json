@@ -5,6 +5,7 @@
     "confirm": "確認",
     "create": "建立",
     "delete": "刪除",
+    "hide": "隱藏",
     "edit": "編輯",
     "save": "儲存",
     "close": "關閉",
@@ -258,6 +259,7 @@
     "showSidepanel": "顯示側邊欄"
   },
   "tooltip": {
+    "moreOptions": "更多選項",
     "search": "按標題搜尋",
     "filterByTags": "依標籤篩選",
     "filterAll": "篩選：全部",
@@ -293,14 +295,18 @@
     "newFolderName": "新增資料夾",
     "rename": "重新命名",
     "delete": "刪除",
+    "hide": "隱藏",
     "removeFromFavorites": "從收藏中移除",
     "addToFavorites": "新增至收藏",
     "tags": "標籤",
     "noTagsCreated": "未建立標籤",
     "deleteItem": "刪除項目",
+    "hideItem": "隱藏項目",
     "deleteConfirm": "您確定要刪除 \"{{name}}\" 嗎？",
+    "hideConfirm": "您確定要隱藏 \"{{name}}\" 嗎？",
     "deleteFolderConfirm": "您確定要刪除資料夾 \"{{name}}\" 及其包含的所有內容嗎？",
     "deleteNote": "注意：刪除的項目可以透過匯入聊天清單來還原。",
+    "hideNote": "注意：隱藏的項目可以透過匯入聊天清單來還原。",
     "deleteFolderNote": "注意：刪除的資料夾無法還原，但對話可以透過匯入聊天清單來還原。",
     "openInNewTab": "在新標籤頁開啟",
     "moveTo": "移動到...",
@@ -353,11 +359,14 @@
   },
   "batch": {
     "deleteConfirmTitle": "刪除 {{count}} 個項目",
+    "hideConfirmTitle": "隱藏 {{count}} 個項目",
     "deleteConfirmMessage": "您確定要刪除選取的項目嗎？",
+    "hideConfirmMessage": "您確定要隱藏選取的項目嗎？",
     "moveTitle": "移動到資料夾",
     "addTags": "新增標籤",
     "batchSelection": "批次選取",
     "deleteSelected": "刪除選取項",
+    "hideSelected": "隱藏選取項",
     "moveSelected": "移動選取項",
     "addTag": "新增標籤",
     "exitBatchMode": "離開批次模式",
@@ -410,7 +419,7 @@
   },
   "search": {
     "title": "搜尋",
-    "placeholder": "搜尋",
+    "placeholder": "全文搜尋",
     "wholeWord": "全字符合",
     "matchCase": "區分大小寫",
     "copyAsText": "複製為純文字",
@@ -610,7 +619,9 @@
     "quickResendDesc": "無需修改內容即可重新發送訊息",
     "defaultModel": "預設模型：",
     "defaultModelSelect": "選擇",
-    "defaultModelNone": "無"
+    "defaultModelNone": "無",
+    "smartScrollbar": "智慧捲軸（實驗性）",
+    "smartScrollbarDesc": "在右側顯示對話導覽"
   },
   "topBarTag": {
     "removeTag": "移除標籤",
@@ -629,6 +640,8 @@
   },
   "gems": {
     "title": "Gems",
+    "untitledGem": "未命名 Gem",
+    "scanFailed": "掃描失敗",
     "noGems": "找不到 Gems",
     "noGemsDescription": "從 Gemini 同步後，Gems 將顯示在這裡。",
     "newGemChat": "新增 Gem 對話",
@@ -657,6 +670,14 @@
     "rateUs": "好評",
     "starOnGithub": "點星 ⭐",
     "buyMeACoffee": "咖啡 ☕"
+  },
+  "smartScrollbar": {
+    "conversationOutline": "對話大綱",
+    "messages": "{{count}} 則訊息",
+    "restoreOutline": "還原大綱",
+    "restoreToCompactView": "還原為緊湊檢視",
+    "collapseToIcon": "摺疊為圖示",
+    "expandToFullOutline": "展開完整大綱"
   },
   "firstInstall": {
     "title": "是否匯入對話列表？",

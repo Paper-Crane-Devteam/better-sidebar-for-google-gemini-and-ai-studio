@@ -102,9 +102,9 @@ export const GemNode = ({
 
   const handleDeleteConversation = async () => {
     const confirmed = await modal.confirm({
-      title: t('node.delete'),
-      content: t('node.deleteConfirm'),
-      confirmText: t('common.delete'),
+      title: t('node.hideItem'),
+      content: t('node.hideConfirm'),
+      confirmText: t('common.hide'),
       cancelText: t('common.cancel'),
     });
     if (confirmed) {

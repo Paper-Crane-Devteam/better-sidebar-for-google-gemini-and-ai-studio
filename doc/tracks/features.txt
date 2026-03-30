@@ -23,3 +23,4 @@
 25. customize tab icon and order
 26. scroll to top and bottom button
 27. keyboard shortcuts
+28. real deletion of chats

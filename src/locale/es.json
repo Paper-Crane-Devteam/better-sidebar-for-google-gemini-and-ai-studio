@@ -5,6 +5,7 @@
     "confirm": "Confirmar",
     "create": "Crear",
     "delete": "Eliminar",
+    "hide": "Ocultar",
     "edit": "Editar",
     "save": "Guardar",
     "close": "Cerrar",
@@ -258,6 +259,7 @@
     "showSidepanel": "Mostrar Panel Lateral"
   },
   "tooltip": {
+    "moreOptions": "Más opciones",
     "search": "Buscar por título",
     "filterByTags": "Filtrar por Etiquetas",
     "filterAll": "Filtro: Todos",
@@ -293,14 +295,18 @@
     "newFolderName": "Nueva Carpeta",
     "rename": "Renombrar",
     "delete": "Eliminar",
+    "hide": "Ocultar",
     "removeFromFavorites": "Quitar de Favoritos",
     "addToFavorites": "Añadir a Favoritos",
     "tags": "Etiquetas",
     "noTagsCreated": "No se han creado etiquetas",
     "deleteItem": "Eliminar Elemento",
+    "hideItem": "Ocultar Elemento",
     "deleteConfirm": "¿Estás seguro de que deseas eliminar \"{{name}}\"?",
+    "hideConfirm": "¿Estás seguro de que deseas ocultar \"{{name}}\"?",
     "deleteFolderConfirm": "¿Estás seguro de que deseas eliminar la carpeta \"{{name}}\" y todo su contenido?",
     "deleteNote": "Nota: Los elementos eliminados se pueden restaurar importando la lista de chats.",
+    "hideNote": "Nota: Los elementos ocultos se pueden restaurar importando la lista de chats.",
     "deleteFolderNote": "Nota: Las carpetas eliminadas no se pueden restaurar, pero las conversaciones se pueden recuperar importando la lista de chats.",
     "openInNewTab": "Abrir en Nueva Pestaña",
     "moveTo": "Mover a...",
@@ -353,11 +359,14 @@
   },
   "batch": {
     "deleteConfirmTitle": "Eliminar {{count}} Elementos",
+    "hideConfirmTitle": "Ocultar {{count}} Elementos",
     "deleteConfirmMessage": "¿Estás seguro de que deseas eliminar los elementos seleccionados?",
+    "hideConfirmMessage": "¿Estás seguro de que deseas ocultar los elementos seleccionados?",
     "moveTitle": "Mover a Carpeta",
     "addTags": "Añadir Etiquetas",
     "batchSelection": "Selección por Lotes",
     "deleteSelected": "Eliminar Seleccionados",
+    "hideSelected": "Ocultar Seleccionados",
     "moveSelected": "Mover Seleccionados",
     "addTag": "Añadir Etiqueta",
     "exitBatchMode": "Salir del Modo de Lotes",
@@ -410,7 +419,7 @@
   },
   "search": {
     "title": "Buscar",
-    "placeholder": "Buscar",
+    "placeholder": "Búsqueda de texto completo",
     "wholeWord": "Palabra completa",
     "matchCase": "Distinguir mayúsculas",
     "copyAsText": "Copiar como texto",
@@ -610,7 +619,9 @@
     "quickResendDesc": "Reenviar mensajes sin editar",
     "defaultModel": "Modelo Predeterminado:",
     "defaultModelSelect": "Seleccionar",
-    "defaultModelNone": "Ninguno"
+    "defaultModelNone": "Ninguno",
+    "smartScrollbar": "Barra de desplazamiento inteligente (Experimental)",
+    "smartScrollbarDesc": "Mostrar navegación de conversación en el lado derecho"
   },
   "topBarTag": {
     "removeTag": "Eliminar etiqueta",
@@ -629,6 +640,8 @@
   },
   "gems": {
     "title": "Gems",
+    "untitledGem": "Gem sin título",
+    "scanFailed": "Error en el escaneo",
     "noGems": "No se encontraron gems.",
     "noGemsDescription": "Los gems aparecerán aquí cuando se sincronicen desde Gemini.",
     "newGemChat": "Nuevo chat con Gem",
@@ -657,6 +670,14 @@
     "rateUs": "Valorar",
     "starOnGithub": "Estrella ⭐",
     "buyMeACoffee": "Café ☕"
+  },
+  "smartScrollbar": {
+    "conversationOutline": "Esquema de Conversación",
+    "messages": "{{count}} mensajes",
+    "restoreOutline": "Restaurar esquema",
+    "restoreToCompactView": "Restaurar a vista compacta",
+    "collapseToIcon": "Contraer a icono",
+    "expandToFullOutline": "Expandir a esquema completo"
   },
   "firstInstall": {
     "title": "¿Importar lista de conversaciones?",

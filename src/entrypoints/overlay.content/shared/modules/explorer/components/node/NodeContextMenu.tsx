@@ -35,6 +35,7 @@ import {
   FolderInput,
   Palette,
   Check,
+  EyeOff,
 } from 'lucide-react';
 import { modal } from '@/shared/lib/modal';
 import { MoveItemsDialog } from '../batch/MoveItemsDialog';
@@ -394,10 +395,19 @@ export const NodeContextMenu = ({
       )}
       <ContextMenuItem
         onClick={onDelete}
-        className="text-destructive focus:text-destructive"
+        className={isFile ? '' : 'text-destructive focus:text-destructive'}
       >
-        <Trash2 className="mr-2 h-4 w-4" />
-        {t('node.delete')}
+        {isFile ? (
+          <>
+            <EyeOff className="mr-2 h-4 w-4" />
+            {t('node.hide')}
+          </>
+        ) : (
+          <>
+            <Trash2 className="mr-2 h-4 w-4" />
+            {t('node.delete')}
+          </>
+        )}
       </ContextMenuItem>
     </ContextMenuContent>
   );

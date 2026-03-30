@@ -5,6 +5,7 @@
     "confirm": "確認",
     "create": "作成",
     "delete": "削除",
+    "hide": "非表示",
     "edit": "編集",
     "save": "保存",
     "close": "閉じる",
@@ -258,6 +259,7 @@
     "showSidepanel": "サイドパネルを表示"
   },
   "tooltip": {
+    "moreOptions": "その他のオプション",
     "search": "タイトルで検索",
     "filterByTags": "タグでフィルタ",
     "filterAll": "フィルタ：すべて",
@@ -293,15 +295,19 @@
     "newFolderName": "新しいフォルダ",
     "rename": "名前を変更",
     "delete": "削除",
+    "hide": "非表示",
     "removeFromFavorites": "お気に入りから削除",
     "addToFavorites": "お気に入りに追加",
     "tags": "タグ",
     "noTagsCreated": "タグが作成されていません",
     "deleteItem": "項目を削除",
+    "hideItem": "項目を非表示",
     "deleteConfirm": "\"{{name}}\" を削除してもよろしいですか？",
+    "hideConfirm": "\"{{name}}\" を非表示にしてもよろしいですか？",
 
     "deleteFolderConfirm": "フォルダ \"{{name}}\" とそのすべての内容を削除してもよろしいですか？",
     "deleteNote": "注意：削除された項目は、チャットリストをインポートすることで復元できます。",
+    "hideNote": "注意：非表示にした項目は、チャットリストをインポートすることで復元できます。",
     "deleteFolderNote": "注意：削除されたフォルダは復元できませんが、会話はチャットリストをインポートすることで復元できます。",
     "openInNewTab": "新しいタブで開く",
     "moveTo": "移動...",
@@ -354,11 +360,14 @@
   },
   "batch": {
     "deleteConfirmTitle": "{{count}} 個の項目を削除",
+    "hideConfirmTitle": "{{count}} 個の項目を非表示",
     "deleteConfirmMessage": "選択した項目を削除してもよろしいですか？",
+    "hideConfirmMessage": "選択した項目を非表示にしてもよろしいですか？",
     "moveTitle": "フォルダに移動",
     "addTags": "タグを追加",
     "batchSelection": "一括選択",
     "deleteSelected": "選択した項目を削除",
+    "hideSelected": "選択した項目を非表示",
     "moveSelected": "選択した項目を移動",
     "addTag": "タグを追加",
     "exitBatchMode": "一括モードを終了",
@@ -411,7 +420,7 @@
   },
   "search": {
     "title": "検索",
-    "placeholder": "検索",
+    "placeholder": "全文検索",
     "wholeWord": "単語全体に一致",
     "matchCase": "大文字と小文字を区別",
     "copyAsText": "テキストとしてコピー",
@@ -611,7 +620,9 @@
     "quickResendDesc": "編集なしでメッセージを再送信",
     "defaultModel": "デフォルトモデル：",
     "defaultModelSelect": "選択",
-    "defaultModelNone": "なし"
+    "defaultModelNone": "なし",
+    "smartScrollbar": "スマートスクロールバー（実験的）",
+    "smartScrollbarDesc": "右側に会話ナビゲーションを表示"
   },
   "topBarTag": {
     "removeTag": "タグを削除",
@@ -630,6 +641,8 @@
   },
   "gems": {
     "title": "Gems",
+    "untitledGem": "無題の Gem",
+    "scanFailed": "スキャン失敗",
     "noGems": "Gems が見つかりません。",
     "noGemsDescription": "Gemini から同期すると、ここに Gems が表示されます。",
     "newGemChat": "新しい Gem チャット",
@@ -658,6 +671,14 @@
     "rateUs": "評価",
     "starOnGithub": "スター ⭐",
     "buyMeACoffee": "コーヒー ☕"
+  },
+  "smartScrollbar": {
+    "conversationOutline": "会話アウトライン",
+    "messages": "{{count}} 件のメッセージ",
+    "restoreOutline": "アウトラインを復元",
+    "restoreToCompactView": "コンパクトビューに戻す",
+    "collapseToIcon": "アイコンに折りたたむ",
+    "expandToFullOutline": "完全なアウトラインに展開"
   },
   "firstInstall": {
     "title": "会話リストをインポートしますか？",

@@ -50,7 +50,7 @@ export const GemsTab = ({ menuActions }: GemsTabProps) => {
         await fetchData(true);
       } else {
         console.error('Gem scan failed:', response?.error);
-        toast.error(response?.error || 'Scan failed');
+        toast.error(response?.error || t('gems.scanFailed'));
       }
     } catch (err) {
       console.error('Gem scan error:', err);

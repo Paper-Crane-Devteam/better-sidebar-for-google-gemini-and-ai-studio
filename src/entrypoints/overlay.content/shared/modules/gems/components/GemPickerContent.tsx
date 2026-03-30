@@ -66,7 +66,7 @@ export const GemPickerContent = ({ lastSelectedGemId }: GemPickerContentProps) =
       if (response?.success) {
         await fetchData(true);
       } else {
-        toast.error(response?.error || 'Scan failed');
+        toast.error(response?.error || t('gems.scanFailed'));
       }
     } catch (err) {
       console.error('Gem scan error:', err);

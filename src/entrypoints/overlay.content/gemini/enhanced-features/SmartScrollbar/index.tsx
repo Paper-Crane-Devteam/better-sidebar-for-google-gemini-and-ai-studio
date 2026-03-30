@@ -6,10 +6,12 @@ import {
   PanelRightClose,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils/utils';
+import { SimpleTooltip } from '@/shared/components/ui/tooltip';
 import { useConversationNodes } from './useConversationNodes';
 import { SmartScrollbarExpandedView } from './SmartScrollbarExpandedView';
 import { SmartScrollbarNormalView } from './SmartScrollbarNormalView';
 import { SmartScrollbarMinimizedView } from './SmartScrollbarMinimizedView';
+import { useI18n } from '@/shared/hooks/useI18n';
 
 /**
  * 3 parallel modes:
@@ -25,6 +27,7 @@ type ScrollbarMode = 'normal' | 'maximized' | 'minimized';
 export const SmartScrollbar: React.FC = () => {
   const { nodes, activeNodeId, scrollToNode } = useConversationNodes();
   const userCount = nodes.filter((n) => n.role === 'user').length;
+  const { t } = useI18n();
   const [mode, setMode] = useState<ScrollbarMode>('normal');
   const [isHovered, setIsHovered] = useState(false);
 
@@ -144,8 +147,8 @@ export const SmartScrollbar: React.FC = () => {
                 )}
               >
                 {isMaximized
-                  ? 'Conversation Outline'
-                  : `${userCount} messages`}
+                  ? t('smartScrollbar.conversationOutline')
+                  : t('smartScrollbar.messages', { count: userCount })}
               </span>
 
               {/* Action buttons */}
@@ -153,68 +156,72 @@ export const SmartScrollbar: React.FC = () => {
                 {isMaximized ? (
                   <>
                     {/* Restore to normal */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setMode('normal');
-                      }}
-                      className={cn(
-                        'p-1 rounded-md',
-                        'hover:bg-accent/60 hover:text-foreground',
-                        'transition-colors duration-150',
-                      )}
-                      title="Restore to compact view"
-                    >
-                      <ChevronsRight className="h-3.5 w-3.5" />
-                    </button>
+                    <SimpleTooltip content={t('smartScrollbar.restoreToCompactView')}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setMode('normal');
+                        }}
+                        className={cn(
+                          'p-1 rounded-md',
+                          'hover:bg-accent/60 hover:text-foreground',
+                          'transition-colors duration-150',
+                        )}
+                      >
+                        <ChevronsRight className="h-3.5 w-3.5" />
+                      </button>
+                    </SimpleTooltip>
                     {/* Minimize to icon */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setMode('minimized');
-                      }}
-                      className={cn(
-                        'p-1 rounded-md',
-                        'hover:bg-accent/60 hover:text-foreground',
-                        'transition-colors duration-150',
-                      )}
-                      title="Collapse to icon"
-                    >
-                      <PanelRightClose className="h-3.5 w-3.5" />
-                    </button>
+                    <SimpleTooltip content={t('smartScrollbar.collapseToIcon')}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setMode('minimized');
+                        }}
+                        className={cn(
+                          'p-1 rounded-md',
+                          'hover:bg-accent/60 hover:text-foreground',
+                          'transition-colors duration-150',
+                        )}
+                      >
+                        <PanelRightClose className="h-3.5 w-3.5" />
+                      </button>
+                    </SimpleTooltip>
                   </>
                 ) : (
                   <>
                     {/* Maximize */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setMode('maximized');
-                      }}
-                      className={cn(
-                        'p-1 rounded-md',
-                        'hover:bg-accent/60 hover:text-foreground',
-                        'transition-colors duration-150',
-                      )}
-                      title="Expand to full outline"
-                    >
-                      <ChevronsLeft className="h-3.5 w-3.5" />
-                    </button>
+                    <SimpleTooltip content={t('smartScrollbar.expandToFullOutline')}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setMode('maximized');
+                        }}
+                        className={cn(
+                          'p-1 rounded-md',
+                          'hover:bg-accent/60 hover:text-foreground',
+                          'transition-colors duration-150',
+                        )}
+                      >
+                        <ChevronsLeft className="h-3.5 w-3.5" />
+                      </button>
+                    </SimpleTooltip>
                     {/* Minimize to icon */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setMode('minimized');
-                      }}
-                      className={cn(
-                        'p-1 rounded-md',
-                        'hover:bg-accent/60 hover:text-foreground',
-                        'transition-colors duration-150',
-                      )}
-                      title="Collapse to icon"
-                    >
-                      <PanelRightClose className="h-3.5 w-3.5" />
-                    </button>
+                    <SimpleTooltip content={t('smartScrollbar.collapseToIcon')}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setMode('minimized');
+                        }}
+                        className={cn(
+                          'p-1 rounded-md',
+                          'hover:bg-accent/60 hover:text-foreground',
+                          'transition-colors duration-150',
+                        )}
+                      >
+                        <PanelRightClose className="h-3.5 w-3.5" />
+                      </button>
+                    </SimpleTooltip>
                   </>
                 )}
               </div>

@@ -5,6 +5,7 @@
     "confirm": "Подтвердить",
     "create": "Создать",
     "delete": "Удалить",
+    "hide": "Скрыть",
     "edit": "Редактировать",
     "save": "Сохранить",
     "close": "Закрыть",
@@ -258,6 +259,7 @@
     "showSidepanel": "Показать боковую панель"
   },
   "tooltip": {
+    "moreOptions": "Дополнительные параметры",
     "search": "Поиск по заголовку",
     "filterByTags": "Фильтровать по тегам",
     "filterAll": "Фильтр: Все",
@@ -293,14 +295,18 @@
     "newFolderName": "Новая папка",
     "rename": "Переименовать",
     "delete": "Удалить",
+    "hide": "Скрыть",
     "removeFromFavorites": "Удалить из избранного",
     "addToFavorites": "Добавить в избранное",
     "tags": "Теги",
     "noTagsCreated": "Теги не созданы",
     "deleteItem": "Удалить элемент",
+    "hideItem": "Скрыть элемент",
     "deleteConfirm": "Вы уверены, что хотите удалить \"{{name}}\"?",
+    "hideConfirm": "Вы уверены, что хотите скрыть \"{{name}}\"?",
     "deleteFolderConfirm": "Вы уверены, что хотите удалить папку \"{{name}}\" и всё её содержимое?",
     "deleteNote": "Примечание: Удалённые элементы можно восстановить, импортировав список чатов.",
+    "hideNote": "Примечание: Скрытые элементы можно восстановить, импортировав список чатов.",
     "deleteFolderNote": "Примечание: Удалённые папки нельзя восстановить, но диалоги можно восстановить, импортировав список чатов.",
     "openInNewTab": "Открыть в новой вкладке",
     "moveTo": "Переместить в...",
@@ -353,11 +359,14 @@
   },
   "batch": {
     "deleteConfirmTitle": "Удалить {{count}} элементов",
+    "hideConfirmTitle": "Скрыть {{count}} элементов",
     "deleteConfirmMessage": "Вы уверены, что хотите удалить выбранные элементы?",
+    "hideConfirmMessage": "Вы уверены, что хотите скрыть выбранные элементы?",
     "moveTitle": "Переместить в папку",
     "addTags": "Добавить теги",
     "batchSelection": "Массовый выбор",
     "deleteSelected": "Удалить выбранные",
+    "hideSelected": "Скрыть выбранные",
     "moveSelected": "Переместить выбранные",
     "addTag": "Добавить тег",
     "exitBatchMode": "Выйти из режима массового выбора",
@@ -410,7 +419,7 @@
   },
   "search": {
     "title": "Поиск",
-    "placeholder": "Поиск",
+    "placeholder": "Полнотекстовый поиск",
     "wholeWord": "Целое слово",
     "matchCase": "Учитывать регистр",
     "copyAsText": "Копировать как текст",
@@ -610,7 +619,9 @@
     "quickResendDesc": "Повторная отправка сообщений без редактирования",
     "defaultModel": "Модель по умолчанию:",
     "defaultModelSelect": "Выбрать",
-    "defaultModelNone": "нет"
+    "defaultModelNone": "нет",
+    "smartScrollbar": "Умная полоса прокрутки (Экспериментально)",
+    "smartScrollbarDesc": "Показывать навигацию по беседе справа"
   },
   "topBarTag": {
     "removeTag": "Удалить тег",
@@ -629,6 +640,8 @@
   },
   "gems": {
     "title": "Gems",
+    "untitledGem": "Gem без названия",
+    "scanFailed": "Ошибка сканирования",
     "noGems": "Gems не найдены.",
     "noGemsDescription": "Gems появятся здесь после синхронизации из Gemini.",
     "newGemChat": "Новый чат с Gem",
@@ -657,6 +670,14 @@
     "rateUs": "Оценить",
     "starOnGithub": "Звезда ⭐",
     "buyMeACoffee": "Кофе ☕"
+  },
+  "smartScrollbar": {
+    "conversationOutline": "Структура диалога",
+    "messages": "{{count}} сообщений",
+    "restoreOutline": "Восстановить структуру",
+    "restoreToCompactView": "Вернуть компактный вид",
+    "collapseToIcon": "Свернуть в иконку",
+    "expandToFullOutline": "Развернуть полную структуру"
   },
   "firstInstall": {
     "title": "Импортировать список разговоров?",

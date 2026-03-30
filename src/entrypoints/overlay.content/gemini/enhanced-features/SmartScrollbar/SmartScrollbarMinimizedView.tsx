@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { List, PanelRightOpen } from 'lucide-react';
 import { cn } from '@/shared/lib/utils/utils';
+import { SimpleTooltip } from '@/shared/components/ui/tooltip';
+import { useI18n } from '@/shared/hooks/useI18n';
 
 interface Props {
   nodeCount: number;
@@ -17,6 +19,7 @@ export const SmartScrollbarMinimizedView: React.FC<Props> = ({
   onRestore,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const { t } = useI18n();
 
   return (
     <div
@@ -52,20 +55,21 @@ export const SmartScrollbarMinimizedView: React.FC<Props> = ({
             >
               {nodeCount} messages
             </span>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onRestore();
-              }}
-              className={cn(
-                'p-1 rounded-md shrink-0',
-                'hover:bg-accent/60 hover:text-foreground',
-                'transition-colors duration-150',
-              )}
-              title="Restore outline"
-            >
-              <PanelRightOpen className="h-3.5 w-3.5" />
-            </button>
+            <SimpleTooltip content={t('smartScrollbar.restoreOutline')}>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRestore();
+                }}
+                className={cn(
+                  'p-1 rounded-md shrink-0',
+                  'hover:bg-accent/60 hover:text-foreground',
+                  'transition-colors duration-150',
+                )}
+              >
+                <PanelRightOpen className="h-3.5 w-3.5" />
+              </button>
+            </SimpleTooltip>
           </>
         )}
       </div>

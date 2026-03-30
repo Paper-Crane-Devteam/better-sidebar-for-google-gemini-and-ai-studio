@@ -5,11 +5,13 @@ Découvrez Better Sidebar for Gemini & AI Studio — le booster de flux de trava
 
 Nous transformons l'interface par défaut d'AI Studio en une base de connaissances puissante et organisée. Arrêtez de faire défiler sans fin et commencez à organiser vos idées efficacement.
 
-🔥 NOUVEAUTÉS (v2.2.0)
-• 🎨 Personnalisation de l'interface Gemini : Ajustez les largeurs, masquez les éléments inutiles et basculez en mode Focus.
-• ☁️ Synchronisation Google Drive : Sauvegardez et synchronisez manuellement vos paramètres et prompts en toute sécurité.
-• 🌈 Couleurs & Tags personnalisés : Attribuez des couleurs à vos dossiers/tags. Affichez les tags dans les titres.
-• 🖼️ Images sans filigrane : Le téléchargement d'images générées dans Gemini supprime automatiquement le filigrane.
+🔥 NOUVEAUTÉS (v2.3.0)
+• 🔍 Recherche chaînée : Combinez les filtres titre, tag et type pour trouver n'importe quelle conversation instantanément.
+• 💎 Gestion des Gems (Gemini) : Parcourez, filtrez, créez et discutez avec vos Gems directement depuis la barre latérale.
+• 📜 Barre de défilement intelligente (Gemini) : Accédez à n'importe quel message dans les longues conversations grâce à une barre visuelle.
+• 🤖 Modèle par défaut (Gemini) : Définissez un modèle par défaut — chaque nouvelle conversation l'utilise automatiquement.
+• ✏️ Renvoi rapide : Renvoyez des messages sans les modifier. Cliquez simplement sur renvoyer.
+• 🎨 Améliorations UI : Indicateur de chat actif, dossiers colorés, tooltips repensés et opérations par lots améliorées.
 
 ---
 
@@ -21,19 +23,31 @@ Gérez les conversations de Gemini et Google AI Studio de manière transparente 
 👥 Profils Multi-comptes
 Créez des profils séparés pour le travail ou l'usage personnel avec des bases de données indépendantes.
 
+🔍 Recherche Chaînée (NOUVEAU)
+Filtrez les conversations en combinant plusieurs conditions — titre, tag et type — pour des résultats ultra précis.
+
+💎 Gestion des Gems (NOUVEAU)
+Intégration complète des Gems — parcourez, filtrez, créez et démarrez des conversations avec vos Gems depuis la barre latérale.
+
+📜 Barre de Défilement Intelligente (NOUVEAU)
+Une barre visuelle pour les conversations Gemini. Accédez directement à n'importe quel message dans les longs chats.
+
+🤖 Modèle par Défaut (NOUVEAU)
+Définissez un modèle par défaut pour Gemini et chaque nouvelle conversation l'utilisera automatiquement.
+
 📂 Dossiers et Couleurs
 Créez des dossiers imbriqués et attribuez des couleurs personnalisées à vos dossiers et tags.
 
 📝 Bibliothèque de Prompts
 Construisez votre bibliothèque de prompts réutilisables. Supporte les variables d'options et l'importation.
 
-☁️ Synchronisation Google Drive (NOUVEAU)
+☁️ Synchronisation Google Drive
 Sauvegardez et synchronisez vos données de configuration via Google Drive.
 
 🔍 Recherche de Précision
 Effectuez des recherches en texte intégral dans tout votre historique. Limitez la recherche à la conversation active.
 
-🎨 Personnalisation de l'UI (NOUVEAU)
+🎨 Personnalisation de l'UI
 Contrôles de disposition avancés pour Gemini, y compris le mode Focus.
 
 ⚙️ Gestionnaire de Plateformes
@@ -51,8 +65,8 @@ Vos dernières conversations sont automatiquement synchronisées en arrière-pla
 📊 Vue Chronologique
 Visualisez votre workflow avec "Aujourd'hui", "Hier", et "Semaine Dernière".
 
-🖼️ Téléchargement d'Images (NOUVEAU)
-Suppression automatique des filigranes lors du téléchargement d'images dans Gemini.
+🖼️ Téléchargement d'Images sans Filigrane
+Suppression automatique des filigranes lors du téléchargement d'images dans Gemini, y compris les images HD des comptes Pro.
 
 📥 Export des conversations
 Exportez vos conversations en Markdown, texte brut ou JSON.

@@ -8,6 +8,7 @@ import {
   DropdownMenuContent,
 } from './dropdown-menu';
 import type { LucideIcon } from 'lucide-react';
+import { useI18n } from '@/shared/hooks/useI18n';
 
 export interface SplitDropdownItem {
   label: string;
@@ -38,6 +39,7 @@ export const SplitIconButton = ({
 }: SplitIconButtonProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const { t } = useI18n();
 
   if (!dropdownItems || dropdownItems.length === 0) {
     return (
@@ -73,7 +75,7 @@ export const SplitIconButton = ({
         <DropdownMenuTrigger asChild>
           <button
             className="absolute bottom-0 right-0 w-[9px] h-[9px] flex items-center justify-center cursor-pointer bg-transparent border-none p-0 outline-none"
-            aria-label="More options"
+            aria-label={t('tooltip.moreOptions')}
           >
             <svg
               width="5"

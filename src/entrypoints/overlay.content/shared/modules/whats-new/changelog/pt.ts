@@ -2,6 +2,26 @@ import type { ChangeLogItem } from './types';
 
 export const changelog: ChangeLogItem[] = [
   {
+    version: '2.3.0',
+    date: '2026-03-30',
+    features: [
+      '🔍 **Pesquisa encadeada**: Filtre conversas combinando múltiplas condições — título, tag e tipo — para resultados ultra precisos.',
+      '📂 **Pastas padrão**: Configure pastas padrão para sincronização e importação, para que novas conversas sejam organizadas automaticamente.',
+      '📜 **Barra de rolagem inteligente** (Gemini): Uma barra visual que permite pular diretamente para qualquer mensagem em conversas longas.',
+      '💎 **Gerenciamento de Gems** (Gemini): Integração completa de Gems — navegue, filtre, crie e inicie conversas com seus Gems diretamente da barra lateral.',
+      '🤖 **Modelo padrão** (Gemini): Defina um modelo padrão e cada nova conversa o utilizará automaticamente.',
+      '✏️ **Reenvio rápido** (Gemini): Reenvie uma mensagem sem precisar editá-la — basta clicar em reenviar.',
+    ],
+    fixes: [
+      "Corrigida a remoção de marca d'água para imagens HD de contas Pro.",
+      'A conversa atual agora tem um estilo de seleção claro para que você sempre saiba qual chat está ativo.',
+      'Os fundos das pastas agora correspondem à cor atribuída para maior consistência visual.',
+      'Tooltips redesenhados com visual mais limpo e tempo de resposta mais rápido.',
+      'Melhoria da interface e experiência das operações em lote.',
+      'Diversas melhorias de detalhes e correções de bugs conhecidos.',
+    ],
+  },
+  {
     version: '2.2.0',
     date: '2026-03-10',
     features: [

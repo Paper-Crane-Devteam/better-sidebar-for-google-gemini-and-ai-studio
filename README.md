@@ -14,26 +14,29 @@ If you use **Gemini** or **Google AI Studio** heavily, you know the struggle: yo
 
 We built this extension to fix that. It gives you a clean, organized sidebar with folders, tags, and a powerful search engine that actually works across **both platforms**—all while keeping your data 100% local and private.
 
-## 🚀 What's New in v2.2.0?
+## 🚀 What's New in v2.3.0
 
-This update brings advanced Gemini UI customization, Google Drive sync, and custom color organization!
+This update brings powerful Gemini-native features and a refined search & organization experience.
 
-### 🎨 Gemini UI Customization
+### 🔍 Chained Search
 
-Take control of your Gemini experience. Adjust sidebar, chat content, and input box widths. Hide unnecessary elements (Gemini logo, AI disclaimer, upgrade button) and toggle Focus Mode for a cleaner look.
+Filter conversations by combining multiple conditions — title, tag, and type — all at once. Finding that one specific chat is now effortless.
 
-### ☁️ Google Drive Sync
+### 💎 Gem Management (Gemini)
 
-Manually backup and sync your settings, prompts, and configurations (excluding chat history) securely via Google Drive.
+Full Gem integration right in the sidebar. Browse, filter, create Gems, and jump into Gem conversations without leaving your workflow.
 
-### 🌈 Custom Colors & Tags
+### 📜 Smart Scrollbar (Gemini)
 
-- **Custom Colors**: You can now assign custom colors to your folders and tags for better visual organization.
-- **Title Tags**: Tags are now displayed directly next to the conversation title in the header and can be configured on the fly.
+A visual scrollbar overlay for long conversations. Jump directly to any message — no more endless scrolling to find that one response from earlier.
 
-### 🖼️ Watermark-Free Image Downloads
+### 🤖 Default Model (Gemini)
 
-Downloading generated images in Gemini now automatically removes the watermark.
+Set your preferred model once, and every new conversation will use it automatically. No more re-selecting each time.
+
+### ✏️ Quick Resend & UI Polish
+
+Resend messages without editing, enjoy a clearer active-chat indicator, color-matched folder backgrounds, redesigned tooltips, and a smoother batch operation experience.
 
 ---
 
@@ -45,7 +48,11 @@ Here is what Better Sidebar can do for you:
 | :---------------------------- | :------------------------------------------------------------------------------------------------------------------------------- |
 | 🌟 **Multi-Platform Support** | Manage conversations across both Gemini and Google AI Studio seamlessly in one unified sidebar.                                  |
 | 👥 **Multi-Account Profiles** | Create separate profiles for work or personal use. Each maintains its own database synced with the corresponding Google account. |
-| **Folders & Colors**          | Drag and drop your chats into nested folders. Assign custom colors to folders and tags.                                          |
+| 🔍 **Chained Search**         | Combine multiple filters — title, tag, and type — to find exactly the conversation you need.                                    |
+| 💎 **Gem Management**         | Browse, filter, create, and chat with your Gems directly from the sidebar. Full Gem lifecycle in one place.                     |
+| 📜 **Smart Scrollbar**        | Visual scrollbar for Gemini conversations — jump to any message instantly in long chats.                                        |
+| 🤖 **Default Model**          | Set a default model for Gemini so every new conversation starts with your preferred choice.                                     |
+| 📂 **Folders & Colors**       | Drag and drop your chats into nested folders. Assign custom colors to folders and tags.                                          |
 | 📝 **Prompt Library**         | Save, manage, and reuse prompts locally. Supports option variables, prompt composition, and system prompt imports.               |
 | 🔍 **Precision Search**       | Full-text search across all conversations. Limit search to the active chat for immediate context.                                |
 | ☁️ **Google Drive Sync**      | Manually backup and sync your settings, prompts, and config data via Google Drive.                                               |
@@ -55,7 +62,7 @@ Here is what Better Sidebar can do for you:
 | ⭐ **Favorites**              | Pin your most used chats or specific prompts to the top.                                                                         |
 | 🔄 **Automatic Sync**         | Your latest conversations are automatically synced behind the scenes when you visit the page.                                    |
 | 📊 **Timeline View**          | See your work organized by "Today", "Yesterday", and "Last Week".                                                                |
-| 🖼️ **Image Downloads**        | Automatically remove watermarks when downloading generated images in Gemini.                                                     |
+| 🖼️ **Image Downloads**        | Automatically remove watermarks when downloading generated images in Gemini (including Pro HD images).                           |
 | 📥 **Conversation Export**    | Export your conversations as Markdown, Plain Text, or JSON.                                                                      |
 | 🌗 **Theme Sync**             | Automatically matches the platform's light/dark mode.                                                                            |
 | 🔒 **Privacy First**          | Everything is stored locally in your browser (SQLite). We don't see your data, ever.                                             |
@@ -80,6 +87,8 @@ We're just getting started. Here is what's on our mind:
 - [x] **Gemini Platform Support** (Done in v2.0.0!)
 - [x] **Multi-Account Support** (Done in v2.1.0!)
 - [x] **Cloud Sync** (Done in v2.2.0!)
+- [x] **Gem Management** (Done in v2.3.0!)
+- [x] **Smart Scrollbar** (Done in v2.3.0!)
 - [ ] **Additional Platform Support**: Maybe bring this to ChatGPT or Claude?
 - [ ] **AI Auto-Tagging**: Using a local LLM to help organize your chats automatically.
 

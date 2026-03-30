@@ -1,6 +1,7 @@
 import { Platform } from '@/shared/types/platform';
 import { navigate } from '@/shared/lib/navigation';
 import { waitForElement } from '@/shared/lib/utils';
+import i18n from '@/locale/i18n';
 
 const SCAN_TIMEOUT_MS = 30000;
 
@@ -33,7 +34,7 @@ export async function scanGems(): Promise<number> {
 
       const id = match[1];
       const nameEl = row.querySelector('.title-container span');
-      const name = nameEl?.textContent?.trim() || 'Untitled Gem';
+      const name = nameEl?.textContent?.trim() || i18n.t('gems.untitledGem');
 
       gems.push({ id, name });
     } catch {

@@ -5,6 +5,7 @@
     "confirm": "Confirm",
     "create": "Create",
     "delete": "Delete",
+    "hide": "Hide",
     "edit": "Edit",
     "save": "Save",
     "close": "Close",
@@ -258,6 +259,7 @@
     "showSidepanel": "Show Sidepanel"
   },
   "tooltip": {
+    "moreOptions": "More options",
     "search": "Search by title",
     "filterByTags": "Filter by Tags",
     "filterAll": "Filter: All",
@@ -293,14 +295,18 @@
     "newFolderName": "New Folder",
     "rename": "Rename",
     "delete": "Delete",
+    "hide": "Hide",
     "removeFromFavorites": "Remove from Favorites",
     "addToFavorites": "Add to Favorites",
     "tags": "Tags",
     "noTagsCreated": "No tags created",
     "deleteItem": "Delete Item",
+    "hideItem": "Hide Item",
     "deleteConfirm": "Are you sure you want to delete \"{{name}}\"?",
+    "hideConfirm": "Are you sure you want to hide \"{{name}}\"?",
     "deleteFolderConfirm": "Are you sure you want to delete the folder \"{{name}}\" and all its contents?",
     "deleteNote": "Note: Deleted items can be restored by importing the chat list.",
+    "hideNote": "Note: Hidden items can be restored by importing the chat list.",
     "deleteFolderNote": "Note: Deleted folders cannot be restored, but conversations can be recovered by importing the chat list.",
     "openInNewTab": "Open in New Tab",
     "moveTo": "Move to...",
@@ -353,11 +359,14 @@
   },
   "batch": {
     "deleteConfirmTitle": "Delete {{count}} Items",
+    "hideConfirmTitle": "Hide {{count}} Items",
     "deleteConfirmMessage": "Are you sure you want to delete the selected items?",
+    "hideConfirmMessage": "Are you sure you want to hide the selected items?",
     "moveTitle": "Move to Folder",
     "addTags": "Add Tags",
     "batchSelection": "Batch Selection",
     "deleteSelected": "Delete Selected",
+    "hideSelected": "Hide Selected",
     "moveSelected": "Move Selected",
     "addTag": "Add Tag",
     "exitBatchMode": "Exit Batch Mode",
@@ -413,7 +422,7 @@
   },
   "search": {
     "title": "Search",
-    "placeholder": "Search",
+    "placeholder": "Full-text Search",
     "wholeWord": "Match Whole Word",
     "matchCase": "Match Case",
     "copyAsText": "Copy as text",
@@ -609,7 +618,9 @@
     "quickResendDesc": "Resend messages without editing",
     "defaultModel": "Default Model:",
     "defaultModelSelect": "Select",
-    "defaultModelNone": "None"
+    "defaultModelNone": "None",
+    "smartScrollbar": "Smart Scrollbar (Experimental)",
+    "smartScrollbarDesc": "Show conversation navigation on the right side"
   },
   "topBarTag": {
     "removeTag": "Remove tag",
@@ -628,6 +639,8 @@
   },
   "gems": {
     "title": "Gems",
+    "untitledGem": "Untitled Gem",
+    "scanFailed": "Scan failed",
     "noGems": "No gems found.",
     "noGemsDescription": "Gems will appear here when synced from Gemini.",
     "newGemChat": "New Gem Chat",
@@ -656,6 +669,14 @@
     "rateUs": "Rate",
     "starOnGithub": "Star ⭐",
     "buyMeACoffee": "Coffee ☕"
+  },
+  "smartScrollbar": {
+    "conversationOutline": "Conversation Outline",
+    "messages": "{{count}} messages",
+    "restoreOutline": "Restore outline",
+    "restoreToCompactView": "Restore to compact view",
+    "collapseToIcon": "Collapse to icon",
+    "expandToFullOutline": "Expand to full outline"
   },
   "firstInstall": {
     "title": "Import Conversation List?",

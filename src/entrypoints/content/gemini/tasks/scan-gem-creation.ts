@@ -1,3 +1,5 @@
+import i18n from '@/locale/i18n';
+
 export class GemCreationScanner {
   private listener: (event: Event) => void;
   private isListening = false;
@@ -14,7 +16,7 @@ export class GemCreationScanner {
           type: 'SAVE_GEM',
           payload: {
             id,
-            name: name || 'Untitled Gem',
+            name: name || i18n.t('gems.untitledGem'),
             external_id: id,
             external_url: `https://gemini.google.com/gem/${id}`,
             platform: 'gemini',

@@ -2,6 +2,7 @@ import {
   parseStreamingResponse,
   extractWrbFrPayloads,
 } from '../lib/response-parser';
+import i18n from '@/locale/i18n';
 
 export function handleCreateGemResponse(response: any, url: string) {
   if (response.status !== 200) return;
@@ -41,7 +42,7 @@ export function handleCreateGemResponse(response: any, url: string) {
             new CustomEvent('GEMINI_GEM_CREATED', {
               detail: {
                 id,
-                name: name || 'Untitled Gem',
+                name: name || i18n.t('gems.untitledGem'),
                 originalUrl: url,
               },
             }),

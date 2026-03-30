@@ -2,6 +2,26 @@ import type { ChangeLogItem } from './types';
 
 export const changelog: ChangeLogItem[] = [
   {
+    version: '2.3.0',
+    date: '2026-03-30',
+    features: [
+      '🔍 **Chained Search**: Filter conversations by combining multiple conditions — title, tag, and type — all at once for laser-precise results.',
+      '📂 **Default Folders**: Configure default folders for sync and import operations, so new conversations land exactly where you want them.',
+      '📜 **Smart Scrollbar** (Gemini): A visual scrollbar that lets you jump directly to any message in long conversations. No more endless scrolling.',
+      '💎 **Gem Management** (Gemini): Full Gem integration — browse, filter, create, and start conversations with your Gems right from the sidebar.',
+      '🤖 **Default Model** (Gemini): Set a default model and every new conversation will automatically use it. No more re-selecting each time.',
+      '✏️ **Quick Resend** (Gemini): Resend a message without making edits — just hit resend directly from the edit view.',
+    ],
+    fixes: [
+      'Fixed watermark removal for Pro account HD images.',
+      'Current conversation now has a clear selected style so you always know which chat is active.',
+      'Folder backgrounds now match their assigned folder color for better visual consistency.',
+      'Redesigned tooltips with a cleaner look and faster response time.',
+      'Improved batch operation UI and UX for a smoother multi-select workflow.',
+      'Various detail-level experience improvements and known bug fixes.',
+    ],
+  },
+  {
     version: '2.2.0',
     date: '2026-03-10',
     features: [

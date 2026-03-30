@@ -2,6 +2,26 @@ import type { ChangeLogItem } from './types';
 
 export const changelog: ChangeLogItem[] = [
   {
+    version: '2.3.0',
+    date: '2026-03-30',
+    features: [
+      '🔍 **Búsqueda encadenada**: Filtra conversaciones combinando múltiples condiciones — título, etiqueta y tipo — para resultados ultra precisos.',
+      '📂 **Carpetas predeterminadas**: Configura carpetas predeterminadas para sincronización e importación, para que las nuevas conversaciones se organicen automáticamente.',
+      '📜 **Barra de desplazamiento inteligente** (Gemini): Una barra visual que te permite saltar directamente a cualquier mensaje en conversaciones largas.',
+      '💎 **Gestión de Gems** (Gemini): Integración completa de Gems — explora, filtra, crea e inicia conversaciones con tus Gems desde la barra lateral.',
+      '🤖 **Modelo predeterminado** (Gemini): Establece un modelo predeterminado y cada nueva conversación lo usará automáticamente.',
+      '✏️ **Reenvío rápido** (Gemini): Reenvía un mensaje sin necesidad de editarlo — simplemente haz clic en reenviar.',
+    ],
+    fixes: [
+      'Corregida la eliminación de marcas de agua para imágenes HD de cuentas Pro.',
+      'La conversación actual ahora tiene un estilo de selección claro para que siempre sepas qué chat está activo.',
+      'Los fondos de las carpetas ahora coinciden con el color asignado para mayor consistencia visual.',
+      'Tooltips rediseñados con un aspecto más limpio y tiempo de respuesta más rápido.',
+      'Mejora de la interfaz y experiencia de las operaciones por lotes.',
+      'Múltiples mejoras de detalle y correcciones de errores conocidos.',
+    ],
+  },
+  {
     version: '2.2.0',
     date: '2026-03-10',
     features: [
