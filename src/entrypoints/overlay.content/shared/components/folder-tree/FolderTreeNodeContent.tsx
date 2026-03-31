@@ -36,6 +36,9 @@ export interface FolderTreeNodeContentProps {
   /** Content rendered after the name (e.g. favorite star) */
   nameAddon?: React.ReactNode;
 
+  /** Content rendered before the name (e.g. favorite star indicator) */
+  namePrefix?: React.ReactNode;
+
   /** Optional external ref for hover detection on the OverflowTooltip */
   hoverRef?: React.RefObject<HTMLElement | null>;
 }
@@ -51,6 +54,7 @@ export const FolderTreeNodeContent = ({
   newName,
   setNewName,
   nameAddon,
+  namePrefix,
   hoverRef,
 }: FolderTreeNodeContentProps) => {
   const isFile = node.data.type === 'file';
@@ -96,7 +100,8 @@ export const FolderTreeNodeContent = ({
         </div>
       )}
 
-      <div className="flex-1 min-w-0 flex items-center gap-1 overflow-hidden justify-between">
+      <div className="flex-1 min-w-0 flex items-center gap-1 overflow-hidden">
+        {namePrefix}
         {node.isEditing ? (
           <RenameForm node={node} newName={newName} setNewName={setNewName} />
         ) : isFile ? (

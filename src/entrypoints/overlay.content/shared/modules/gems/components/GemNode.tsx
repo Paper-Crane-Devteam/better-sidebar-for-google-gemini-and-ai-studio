@@ -7,6 +7,7 @@ import {
   Copy,
   EyeOff,
   ExternalLink,
+  Star,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils/utils';
 import { navigateToConversation, navigateToGem, navigate } from '@/shared/lib/navigation';
@@ -245,7 +246,10 @@ export const GemNode = ({
             )}
 
             {/* Name */}
-            <div className="flex-1 min-w-0 flex items-center gap-1 overflow-hidden justify-between">
+            <div className="flex-1 min-w-0 flex items-center gap-1 overflow-hidden">
+              {isFavorite && (
+                <Star className="h-3 w-3 shrink-0 fill-yellow-400 text-yellow-400" />
+              )}
               <span className="truncate text-sm">
                 {node.data.name}
               </span>
