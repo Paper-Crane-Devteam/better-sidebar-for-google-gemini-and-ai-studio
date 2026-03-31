@@ -1,7 +1,7 @@
 {
   "name": "better-sidebar-for-google-ai-studio",
   "type": "module",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "private": true,
   "description": "A better sidebar for Gemini & AI Studio",
   "author": "Paper Crane Devteam",

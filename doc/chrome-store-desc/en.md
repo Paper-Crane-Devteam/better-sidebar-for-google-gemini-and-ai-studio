@@ -92,3 +92,7 @@ We require access to aistudio.google.com and gemini.google.com solely to inject 
 ---
 
 Disclaimer: This extension is an independent project and is not affiliated with, endorsed by, or sponsored by Google.
+
+🔗 LINKS
+• GitHub: https://github.com/Paper-Crane-Devteam/better-sidebar-for-google-gemini-and-ai-studio
+• Discord: https://discord.gg/uqT72XYh

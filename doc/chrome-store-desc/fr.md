@@ -91,3 +91,7 @@ Nous avons besoin d'un accès à aistudio.google.com et gemini.google.com unique
 ---
 
 Disclaimer: Cette extension est un projet indépendant et n'est pas affiliée, approuvée ou sponsorisée par Google.
+
+🔗 LIENS
+• GitHub: https://github.com/Paper-Crane-Devteam/better-sidebar-for-google-gemini-and-ai-studio
+• Discord: https://discord.gg/uqT72XYh

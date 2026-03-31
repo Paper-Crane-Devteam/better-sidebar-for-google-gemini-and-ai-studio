@@ -84,3 +84,7 @@ Better Sidebar for Gemini & AI Studio 專為開發者和提示詞工程師打造
 ---
 
 免責聲明：本擴充功能為獨立專案，與 Google 公司無隸屬、認可或贊助關係。
+
+🔗 相關連結
+• GitHub: https://github.com/Paper-Crane-Devteam/better-sidebar-for-google-gemini-and-ai-studio
+• Discord: https://discord.gg/uqT72XYh
