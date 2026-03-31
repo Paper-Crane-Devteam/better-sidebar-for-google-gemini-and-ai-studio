@@ -62,8 +62,11 @@ export const DefaultModelFeature = () => {
   useEffect(() => {
     if (defaultModel === 'default') return;
 
-    // If the URL contains a conversation ID (e.g. /app/abc123 or /gem/abc123), skip auto-switch
-    const isExistingConversation = /\/(app|gem)\/[a-zA-Z0-9_-]+/.test(window.location.pathname);
+    // /app/{id} is always an existing conversation
+    // /gem/{gemId}/{conversationId} is an existing gem conversation, but /gem/{gemId} alone is a new chat
+    const isExistingConversation =
+      /\/app\/[a-zA-Z0-9_-]+/.test(window.location.pathname) ||
+      /\/gem\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+/.test(window.location.pathname);
     if (isExistingConversation) return;
     
     const checkAndSwitchModel = async () => {
