@@ -129,7 +129,7 @@ export const useSettingsStore = create<SettingsState>()(
         viewMode: 'tree',
         sortOrder: 'date',
         ignoredFolders: [],
-        enableRightClickRename: false,
+        enableRightClickRename: true,
       },
       shortcuts: {
         favorites: false,

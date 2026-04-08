@@ -34,6 +34,17 @@ export const navigate = (url: string) => {
   window.dispatchEvent(new PopStateEvent('popstate'));
 };
 
+export const navigateToNewChat = () => {
+  const platform = detectPlatform();
+  if (platform === Platform.GEMINI) {
+    if (!clickGeminiNewChat()) {
+      navigate('/app');
+    }
+  } else if (platform === Platform.AI_STUDIO) {
+    navigate('/prompts/new_chat');
+  }
+};
+
 export const navigateToConversation = (targetId: string) => {
   const platform = detectPlatform();
   if (platform === Platform.GEMINI) {

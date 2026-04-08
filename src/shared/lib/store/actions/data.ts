@@ -1,6 +1,31 @@
 import type { AppState, SetState, GetState } from '../types';
 import { useToastStore } from '@/shared/lib/toast';
 import i18n from '@/locale/i18n';
+import { detectPlatform, Platform } from '@/shared/types/platform';
+import { navigateToNewChat } from '@/shared/lib/navigation';
+
+/** Check if the current page is viewing one of the given conversation IDs, and navigate away if so. */
+function redirectIfViewing(ids: string[]) {
+  try {
+    const path = window.location.pathname;
+    const platform = detectPlatform();
+    let currentId: string | null = null;
+
+    if (platform === Platform.GEMINI) {
+      const m = path.match(/\/(?:app|gem\/[^/]+)\/([a-zA-Z0-9_-]+)/);
+      currentId = m?.[1] || null;
+    } else if (platform === Platform.AI_STUDIO) {
+      const m = path.match(/\/prompts\/([a-zA-Z0-9_-]+)/);
+      currentId = m?.[1] || null;
+    }
+
+    if (currentId && ids.includes(currentId)) {
+      navigateToNewChat();
+    }
+  } catch {
+    // non-critical
+  }
+}
 
 export function createDataActions(
   set: SetState,
@@ -114,23 +139,36 @@ export function createDataActions(
               payload: { ...convo, title: newName },
             });
 
-            // Call Gemini API to rename the conversation on the server side
+            // Call platform API to rename the conversation on the server side
             try {
-              window.dispatchEvent(
-                new CustomEvent('GEMINI_API_EXECUTE', {
-                  detail: {
-                    rpcid: 'MUAZcd',
-                    payload: [
-                      null,
-                      [['title']],
-                      [`c_${itemId}`, newName],
-                    ],
-                    callbackEvent: `GEMINI_RENAME_RESULT_${itemId}`,
-                  },
-                }),
-              );
+              const platform = convo.platform || 'aistudio';
+              if (platform === 'gemini') {
+                window.dispatchEvent(
+                  new CustomEvent('GEMINI_API_EXECUTE', {
+                    detail: {
+                      rpcid: 'MUAZcd',
+                      payload: [
+                        null,
+                        [['title']],
+                        [`c_${itemId}`, newName],
+                      ],
+                      callbackEvent: `GEMINI_RENAME_RESULT_${itemId}`,
+                    },
+                  }),
+                );
+              } else if (platform === 'aistudio') {
+                window.dispatchEvent(
+                  new CustomEvent('AISTUDIO_RENAME', {
+                    detail: {
+                      promptId: itemId,
+                      newName,
+                      callbackEvent: `AISTUDIO_RENAME_RESULT_${itemId}`,
+                    },
+                  }),
+                );
+              }
             } catch (apiError) {
-              console.warn('Failed to rename on Gemini API (local rename still applied):', apiError);
+              console.warn('Failed to rename on API (local rename still applied):', apiError);
             }
           }
         }
@@ -197,6 +235,8 @@ export function createDataActions(
             type: 'DELETE_CONVERSATION',
             payload: { id: itemId },
           });
+
+          redirectIfViewing([itemId]);
         }
         await get().fetchData(true);
       } catch (error) {
@@ -306,6 +346,8 @@ export function createDataActions(
           type: 'DELETE_ITEMS',
           payload: { conversationIds, folderIds },
         });
+
+        redirectIfViewing(conversationIds);
         await get().fetchData(true);
       } catch (error) {
         console.error('Failed to delete items:', error);

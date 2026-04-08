@@ -1,7 +1,6 @@
 import React from 'react';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useAppStore } from '@/shared/lib/store';
-import { useSettingsStore } from '@/shared/lib/settings-store';
 import { toast } from '@/shared/lib/toast';
 import {
   fetchMessagesForExport,
@@ -62,7 +61,6 @@ export function useExplorerMenuItems({
 }: UseExplorerMenuItemsParams): MenuEntryDef[] {
   const { t } = useI18n();
   const { tags, conversationTags } = useAppStore();
-  const { enableRightClickRename } = useSettingsStore((s) => s.explorer);
 
   const isFile = node.data.type === 'file';
 
@@ -233,16 +231,14 @@ export function useExplorerMenuItems({
       ],
     });
 
-    // Rename (controlled by setting)
-    if (enableRightClickRename) {
-      items.push({
-        type: 'item',
-        key: 'rename',
-        icon: <Edit2 className="h-4 w-4" />,
-        label: t('node.rename'),
-        onClick: () => node.edit(),
-      });
-    }
+    // Rename
+    items.push({
+      type: 'item',
+      key: 'rename',
+      icon: <Edit2 className="h-4 w-4" />,
+      label: t('node.rename'),
+      onClick: () => node.edit(),
+    });
 
     items.push({ type: 'separator', key: 'sep-file-bottom' });
   }

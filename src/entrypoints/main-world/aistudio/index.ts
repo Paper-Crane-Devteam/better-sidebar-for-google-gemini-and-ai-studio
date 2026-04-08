@@ -75,6 +75,69 @@ export function initAiStudioInterceptors() {
     }
   });
 
+  // AI Studio rename: fetch full prompt data, replace title, then update
+  globalThis.addEventListener('AISTUDIO_RENAME', async (e: Event) => {
+    const { promptId, newName, callbackEvent } = (e as CustomEvent).detail || {};
+    if (!promptId || !callbackEvent) return;
+
+    try {
+      // Step 1: Fetch full prompt data via ResolveDriveResource
+      const resolveRes = await aiStudioRequestBuilder.execute({
+        method: 'ResolveDriveResource',
+        body: [promptId],
+      });
+      if (!resolveRes.ok) {
+        globalThis.dispatchEvent(
+          new CustomEvent(callbackEvent, {
+            detail: { ok: false, status: resolveRes.status, error: 'Failed to fetch prompt data' },
+          }),
+        );
+        return;
+      }
+
+      const rawText = await resolveRes.text();
+      const cleanText = rawText.replace(/^\)\]\}'/, '').trim();
+      const promptData = JSON.parse(cleanText);
+
+      // promptData is the full prompt array, e.g. [["prompts/xxx", ...]]
+      // Get the inner array (could be nested)
+      let root = promptData;
+      if (Array.isArray(root) && root.length === 1 && Array.isArray(root[0])) {
+        root = root[0];
+      }
+
+      // Step 2: Replace title at index [4][0]
+      if (Array.isArray(root) && root.length > 4 && Array.isArray(root[4])) {
+        root[4][0] = newName;
+      } else if (Array.isArray(root) && root.length > 4) {
+        root[4] = [newName];
+      } else {
+        // Extend array if needed
+        while (root.length <= 4) root.push(null);
+        root[4] = [newName];
+      }
+
+      // Step 3: UpdatePrompt with modified data
+      const updateRes = await aiStudioRequestBuilder.execute({
+        method: 'UpdatePrompt',
+        body: [root],
+      });
+      const updateText = await updateRes.text();
+
+      globalThis.dispatchEvent(
+        new CustomEvent(callbackEvent, {
+          detail: { ok: updateRes.ok, status: updateRes.status, body: updateText },
+        }),
+      );
+    } catch (err: any) {
+      globalThis.dispatchEvent(
+        new CustomEvent(callbackEvent, {
+          detail: { ok: false, status: 0, error: err.message },
+        }),
+      );
+    }
+  });
+
   proxy({
     onRequest: (config, handler) => {
       // Learn params from AI Studio API requests

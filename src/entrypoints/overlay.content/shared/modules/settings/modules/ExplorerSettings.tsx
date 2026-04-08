@@ -113,7 +113,7 @@ export const ExplorerSettings = () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
+          {/* <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
                             <label className="text-sm font-medium">{t('explorerSettings.enableRightClickRename')}</label>
                             <p className="text-xs text-muted-foreground">{t('explorerSettings.enableRightClickRenameDescription')}</p>
@@ -122,7 +122,7 @@ export const ExplorerSettings = () => {
                             checked={enableRightClickRename} 
                             onCheckedChange={setExplorerEnableRightClickRename} 
                         />
-                    </div>
+                    </div> */}
         </div>
       </div>
 
