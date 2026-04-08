@@ -313,7 +313,7 @@
     "deleteConfirm": "¿Estás seguro de que deseas eliminar \"{{name}}\"?",
     "hideConfirm": "¿Estás seguro de que deseas ocultar \"{{name}}\"?",
     "deleteFolderConfirm": "¿Estás seguro de que deseas eliminar la carpeta \"{{name}}\" y todo su contenido?",
-    "deleteNote": "Nota: Los elementos eliminados se pueden restaurar importando la lista de chats.",
+    "deleteNote": "Nota: Esto eliminará permanentemente la conversación de Gemini.",
     "hideNote": "Nota: Los elementos ocultos se pueden restaurar importando la lista de chats.",
     "deleteFolderNote": "Nota: Las carpetas eliminadas no se pueden restaurar, pero las conversaciones se pueden recuperar importando la lista de chats.",
     "openInNewTab": "Abrir en Nueva Pestaña",
@@ -380,7 +380,10 @@
     "exitBatchMode": "Salir del Modo de Lotes",
     "selectAll": "Seleccionar Todo",
     "selectedCount": "{{count}} seleccionados",
-    "selectItems": "Seleccionar elementos"
+    "selectItems": "Seleccionar elementos",
+    "deletingProgress": "Eliminando {{current}}/{{total}}...",
+    "deleteSuccess": "{{count}} conversaciones eliminadas",
+    "deletePartial": "Eliminadas {{succeeded}}/{{total}}, {{failed}} fallidas"
   },
   "tags": {
     "noTagsAvailable": "No hay etiquetas disponibles.",

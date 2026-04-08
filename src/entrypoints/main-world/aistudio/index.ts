@@ -7,6 +7,7 @@ import { handleLibraryResponse } from './interceptors/library';
 import { handleUpdatePromptResponse } from './interceptors/update';
 import { handleCreatePromptResponse } from './interceptors/create';
 import { handleDeletePromptResponse } from './interceptors/delete';
+import { aiStudioRequestBuilder } from './lib/request-builder';
 import i18n from '@/locale/i18n';
 
 const showUpdateToast = throttle(
@@ -52,8 +53,41 @@ const showUpdateToast = throttle(
 export function initAiStudioInterceptors() {
   console.log('Better Sidebar: Main World Script (AI Studio) Initialized');
 
+  // Expose request builder for content script via custom events
+  globalThis.addEventListener('AISTUDIO_API_EXECUTE', async (e: Event) => {
+    const { method, body, callbackEvent } = (e as CustomEvent).detail || {};
+    if (!method || !callbackEvent) return;
+
+    try {
+      const res = await aiStudioRequestBuilder.execute({ method, body });
+      const text = await res.text();
+      globalThis.dispatchEvent(
+        new CustomEvent(callbackEvent, {
+          detail: { ok: res.ok, status: res.status, body: text },
+        }),
+      );
+    } catch (err: any) {
+      globalThis.dispatchEvent(
+        new CustomEvent(callbackEvent, {
+          detail: { ok: false, status: 0, error: err.message },
+        }),
+      );
+    }
+  });
+
   proxy({
     onRequest: (config, handler) => {
+      // Learn params from AI Studio API requests
+      if (config.url?.includes('alkalimakersuite-pa.clients6.google.com')) {
+        try {
+          aiStudioRequestBuilder.learn(
+            config.url,
+            (config.headers as Record<string, string>) || {},
+          );
+        } catch {
+          // non-critical
+        }
+      }
       handler.next(config);
     },
     onError: (err, handler) => {

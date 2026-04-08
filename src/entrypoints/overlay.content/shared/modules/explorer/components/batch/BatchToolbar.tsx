@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/shared/components/ui/button';
-import { EyeOff, FolderInput, Tag as TagIcon, CheckSquare, X } from 'lucide-react';
+import { Trash2, FolderInput, Tag as TagIcon, CheckSquare, X } from 'lucide-react';
 import { useAppStore } from '@/shared/lib/store';
 import { modal } from '@/shared/lib/modal';
 import { MoveItemsDialog } from './MoveItemsDialog';
@@ -22,20 +22,20 @@ export const BatchToolbar = ({ onSelectAll }: BatchToolbarProps) => {
     const validIds = selectedIds.filter(id => 
       state.conversations.some(c => c.id === id) || 
       state.folders.some(f => f.id === id)
-  );
+    );
     if (validIds.length === 0) return;
 
     const confirmed = await modal.confirm({
-      title: t('batch.hideConfirmTitle', { count: validIds.length }),
-      content: t('batch.hideConfirmMessage'),
-      confirmText: t('common.hide'),
+      title: t('batch.deleteConfirmTitle', { count: validIds.length }),
+      content: t('batch.deleteConfirmMessage'),
+      confirmText: t('common.delete'),
       cancelText: t('common.cancel'),
     });
 
     if (confirmed) {
-        await deleteItems(validIds);
-        setExplorerBatchSelection([]);
-        setExplorerBatchMode(false);
+      await deleteItems(validIds);
+      setExplorerBatchSelection([]);
+      setExplorerBatchMode(false);
     }
   };
 
@@ -58,58 +58,47 @@ export const BatchToolbar = ({ onSelectAll }: BatchToolbarProps) => {
     });
 
     if (confirmed) {
-        const state = useAppStore.getState();
-        // Flatten logic: Move only files (conversations) found in selection.
-        // Ignore folders in the selection list for the move operation itself.
-        
-        // Find all selected conversations
-        const filesToMove = selectedIds.filter(id => state.conversations.some(c => c.id === id));
-        
-        await useAppStore.getState().moveItems(filesToMove, targetFolderId);
-
-        setExplorerBatchSelection([]);
-        setExplorerBatchMode(false);
+      const state = useAppStore.getState();
+      const filesToMove = selectedIds.filter(id => state.conversations.some(c => c.id === id));
+      await useAppStore.getState().moveItems(filesToMove, targetFolderId);
+      setExplorerBatchSelection([]);
+      setExplorerBatchMode(false);
     }
   };
 
-  // Tagging is only for conversations usually.
   const handleTag = async () => {
-      if (selectedIds.length === 0) return;
+    if (selectedIds.length === 0) return;
 
-      let selectedTagIds: string[] = [];
+    let selectedTagIds: string[] = [];
 
-      const confirmed = await modal.confirm({
-        title: t('batch.addTags'),
-        content: (
-          <AddTagsDialog onSelectionChange={(ids) => (selectedTagIds = ids)} />
-        ),
-        modalClassName: 'max-w-xl',
-        confirmText: t('common.save'),
-        cancelText: t('common.cancel'),
-      });
+    const confirmed = await modal.confirm({
+      title: t('batch.addTags'),
+      content: (
+        <AddTagsDialog onSelectionChange={(ids) => (selectedTagIds = ids)} />
+      ),
+      modalClassName: 'max-w-xl',
+      confirmText: t('common.save'),
+      cancelText: t('common.cancel'),
+    });
 
-      if (confirmed && selectedTagIds.length > 0) {
-          const state = useAppStore.getState();
-          // Filter out folders, only tag conversations
-          const filesToTag = selectedIds.filter(id => state.conversations.some(c => c.id === id));
-          
-          const promises: Promise<void>[] = [];
-          
-          for (const fileId of filesToTag) {
-              for (const tagId of selectedTagIds) {
-                   // Check if already tagged to avoid redundant requests
-                   const alreadyHasTag = state.conversationTags.some(ct => ct.conversation_id === fileId && ct.tag_id === tagId);
-                   if (!alreadyHasTag) {
-                       promises.push(state.addTagToConversation(fileId, tagId));
-                   }
-              }
+    if (confirmed && selectedTagIds.length > 0) {
+      const state = useAppStore.getState();
+      const filesToTag = selectedIds.filter(id => state.conversations.some(c => c.id === id));
+
+      const promises: Promise<void>[] = [];
+      for (const fileId of filesToTag) {
+        for (const tagId of selectedTagIds) {
+          const alreadyHasTag = state.conversationTags.some(ct => ct.conversation_id === fileId && ct.tag_id === tagId);
+          if (!alreadyHasTag) {
+            promises.push(state.addTagToConversation(fileId, tagId));
           }
-          
-          if (promises.length > 0) {
-              await Promise.all(promises);
-          }
-          setExplorerBatchSelection([]);
+        }
       }
+      if (promises.length > 0) {
+        await Promise.all(promises);
+      }
+      setExplorerBatchSelection([]);
+    }
   };
 
   return (
@@ -128,9 +117,9 @@ export const BatchToolbar = ({ onSelectAll }: BatchToolbarProps) => {
 
         <div className="w-[1px] h-4 bg-border mx-0.5" />
 
-        <SimpleTooltip content={t('batch.hideSelected')}>
-          <Button variant="ghost" size="icon" className="h-7 w-7" disabled={selectedIds.length === 0} onClick={handleDelete}>
-            <EyeOff className="h-4 w-4" />
+        <SimpleTooltip content={t('batch.deleteSelected')}>
+          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" disabled={selectedIds.length === 0} onClick={handleDelete}>
+            <Trash2 className="h-4 w-4" />
           </Button>
         </SimpleTooltip>
 
@@ -157,4 +146,3 @@ export const BatchToolbar = ({ onSelectAll }: BatchToolbarProps) => {
     </div>
   );
 };
-

@@ -313,7 +313,7 @@
     "deleteConfirm": "Tem certeza de que deseja excluir \"{{name}}\"?",
     "hideConfirm": "Tem certeza de que deseja ocultar \"{{name}}\"?",
     "deleteFolderConfirm": "Tem certeza de que deseja excluir a pasta \"{{name}}\" e todo o seu conteúdo?",
-    "deleteNote": "Nota: Itens excluídos podem ser restaurados importando a lista de chats.",
+    "deleteNote": "Nota: Isso excluirá permanentemente a conversa do Gemini.",
     "hideNote": "Nota: Itens ocultos podem ser restaurados importando a lista de chats.",
     "deleteFolderNote": "Nota: Pastas excluídas não podem ser restauradas, mas as conversas podem ser recuperadas importando a lista de chats.",
     "openInNewTab": "Abrir em Nova Aba",
@@ -380,7 +380,13 @@
     "exitBatchMode": "Sair do Modo de Lote",
     "selectAll": "Selecionar Tudo",
     "selectedCount": "{{count}} selecionados",
-    "selectItems": "Selecionar itens"
+    "selectItems": "Selecionar itens",
+    "deletingProgress": "Excluindo {{current}}/{{total}}...",
+    "deleteSuccess": "{{count}} conversas excluídas",
+    "deletePartial": "Excluídas {{succeeded}}/{{total}}, {{failed}} falharam",
+    "deletingProgress": "Excluindo {{current}}/{{total}}...",
+    "deleteSuccess": "{{count}} conversas excluídas",
+    "deletePartial": "Excluídas {{succeeded}}/{{total}}, {{failed}} falharam"
   },
   "tags": {
     "noTagsAvailable": "Nenhuma tag disponível.",

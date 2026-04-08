@@ -1,4 +1,6 @@
 import type { AppState, SetState, GetState } from '../types';
+import { useToastStore } from '@/shared/lib/toast';
+import i18n from '@/locale/i18n';
 
 export function createDataActions(
   set: SetState,
@@ -161,6 +163,36 @@ export function createDataActions(
             payload: { id: itemId },
           });
         } else {
+          const convo = get().conversations.find((c) => c.id === itemId);
+          const platform = convo?.platform || 'aistudio';
+
+          // Call platform API to delete the conversation on the server
+          try {
+            if (platform === 'gemini') {
+              window.dispatchEvent(
+                new CustomEvent('GEMINI_API_EXECUTE', {
+                  detail: {
+                    rpcid: 'GzXR5e',
+                    payload: [`c_${itemId}`],
+                    callbackEvent: `GEMINI_DELETE_RESULT_${itemId}`,
+                  },
+                }),
+              );
+            } else if (platform === 'aistudio') {
+              window.dispatchEvent(
+                new CustomEvent('AISTUDIO_API_EXECUTE', {
+                  detail: {
+                    method: 'DeletePrompt',
+                    body: [`prompts/${itemId}`],
+                    callbackEvent: `AISTUDIO_DELETE_RESULT_${itemId}`,
+                  },
+                }),
+              );
+            }
+          } catch (apiError) {
+            console.warn('Failed to delete on API:', apiError);
+          }
+
           await browser.runtime.sendMessage({
             type: 'DELETE_CONVERSATION',
             payload: { id: itemId },
@@ -182,6 +214,94 @@ export function createDataActions(
           state.conversations.some((c) => c.id === id),
         );
         if (folderIds.length === 0 && conversationIds.length === 0) return;
+
+        // Chain API delete calls for conversations
+        if (conversationIds.length > 0) {
+          const total = conversationIds.length;
+          let succeeded = 0;
+          let failed = 0;
+
+          const { addToast, removeToast } = useToastStore.getState();
+          addToast(i18n.t('batch.deletingProgress', { current: 1, total }), 'info', Infinity);
+          const toasts = useToastStore.getState().toasts;
+          const pId = toasts[toasts.length - 1]?.id || '';
+
+          for (let i = 0; i < conversationIds.length; i++) {
+            const cid = conversationIds[i];
+            const convo = state.conversations.find((c) => c.id === cid);
+            const platform = convo?.platform || 'aistudio';
+
+            // Update progress toast
+            useToastStore.setState((s) => ({
+              toasts: s.toasts.map((t) =>
+                t.id === pId
+                  ? { ...t, message: i18n.t('batch.deletingProgress', { current: i + 1, total }) }
+                  : t,
+              ),
+            }));
+
+            try {
+              await new Promise<void>((resolve) => {
+                const callbackEvent = `DELETE_RESULT_${cid}_${Date.now()}`;
+                const TIMEOUT = 10_000;
+
+                const handler = () => {
+                  clearTimeout(timer);
+                  window.removeEventListener(callbackEvent, handler);
+                  succeeded++;
+                  resolve();
+                };
+
+                const timer = setTimeout(() => {
+                  window.removeEventListener(callbackEvent, handler);
+                  failed++;
+                  resolve();
+                }, TIMEOUT);
+
+                window.addEventListener(callbackEvent, handler, { once: true });
+
+                if (platform === 'gemini') {
+                  window.dispatchEvent(
+                    new CustomEvent('GEMINI_API_EXECUTE', {
+                      detail: {
+                        rpcid: 'GzXR5e',
+                        payload: [`c_${cid}`],
+                        callbackEvent,
+                      },
+                    }),
+                  );
+                } else if (platform === 'aistudio') {
+                  window.dispatchEvent(
+                    new CustomEvent('AISTUDIO_API_EXECUTE', {
+                      detail: {
+                        method: 'DeletePrompt',
+                        body: [`prompts/${cid}`],
+                        callbackEvent,
+                      },
+                    }),
+                  );
+                } else {
+                  // Unknown platform, skip API call
+                  clearTimeout(timer);
+                  window.removeEventListener(callbackEvent, handler);
+                  succeeded++;
+                  resolve();
+                }
+              });
+            } catch {
+              failed++;
+            }
+          }
+
+          removeToast(pId);
+          if (failed === 0) {
+            addToast(i18n.t('batch.deleteSuccess', { count: succeeded }), 'success');
+          } else {
+            addToast(i18n.t('batch.deletePartial', { succeeded, total, failed }), 'warning');
+          }
+        }
+
+        // Clean up local DB
         await browser.runtime.sendMessage({
           type: 'DELETE_ITEMS',
           payload: { conversationIds, folderIds },

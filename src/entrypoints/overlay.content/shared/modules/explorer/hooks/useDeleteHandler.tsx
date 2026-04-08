@@ -20,14 +20,14 @@ export const useDeleteHandler = () => {
 
     const confirmMessage = isFolder
       ? t('node.deleteFolderConfirm', { name })
-      : t('node.hideConfirm', { name });
+      : t('node.deleteConfirm', { name });
 
     const noteMessage = isFolder
       ? t('node.deleteFolderNote')
-      : t('node.hideNote');
+      : t('node.deleteNote');
 
     const confirmed = await modal.confirm({
-      title: isFolder ? t('node.deleteItem') : t('node.hideItem'),
+      title: t('node.deleteItem'),
       content: (
         <div className="space-y-2">
           <p>{confirmMessage}</p>
@@ -36,7 +36,7 @@ export const useDeleteHandler = () => {
           </p>
         </div>
       ),
-      confirmText: isFolder ? t('node.delete') : t('node.hide'),
+      confirmText: t('node.delete'),
       cancelText: t('common.cancel'),
     });
 

@@ -313,7 +313,7 @@
     "deleteConfirm": "您確定要刪除 \"{{name}}\" 嗎？",
     "hideConfirm": "您確定要隱藏 \"{{name}}\" 嗎？",
     "deleteFolderConfirm": "您確定要刪除資料夾 \"{{name}}\" 及其包含的所有內容嗎？",
-    "deleteNote": "注意：刪除的項目可以透過匯入聊天清單來還原。",
+    "deleteNote": "注意：此操作將從 Gemini 永久刪除該對話。",
     "hideNote": "注意：隱藏的項目可以透過匯入聊天清單來還原。",
     "deleteFolderNote": "注意：刪除的資料夾無法還原，但對話可以透過匯入聊天清單來還原。",
     "openInNewTab": "在新標籤頁開啟",
@@ -380,7 +380,10 @@
     "exitBatchMode": "離開批次模式",
     "selectAll": "全選",
     "selectedCount": "已選取 {{count}} 項",
-    "selectItems": "選取項目"
+    "selectItems": "選取項目",
+    "deletingProgress": "正在刪除 {{current}}/{{total}}...",
+    "deleteSuccess": "已刪除 {{count}} 則對話",
+    "deletePartial": "已刪除 {{succeeded}}/{{total}}，{{failed}} 則失敗"
   },
   "tags": {
     "noTagsAvailable": "沒有可用的標籤。",

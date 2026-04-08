@@ -313,7 +313,7 @@
     "deleteConfirm": "Are you sure you want to delete \"{{name}}\"?",
     "hideConfirm": "Are you sure you want to hide \"{{name}}\"?",
     "deleteFolderConfirm": "Are you sure you want to delete the folder \"{{name}}\" and all its contents?",
-    "deleteNote": "Note: Deleted items can be restored by importing the chat list.",
+    "deleteNote": "Note: This will permanently delete the conversation from Gemini.",
     "hideNote": "Note: Hidden items can be restored by importing the chat list.",
     "deleteFolderNote": "Note: Deleted folders cannot be restored, but conversations can be recovered by importing the chat list.",
     "openInNewTab": "Open in New Tab",
@@ -380,7 +380,10 @@
     "exitBatchMode": "Exit Batch Mode",
     "selectAll": "Select All",
     "selectedCount": "{{count}} selected",
-    "selectItems": "Select items"
+    "selectItems": "Select items",
+    "deletingProgress": "Deleting {{current}}/{{total}}...",
+    "deleteSuccess": "Deleted {{count}} conversations",
+    "deletePartial": "Deleted {{succeeded}}/{{total}}, {{failed}} failed"
   },
   "tags": {
     "noTagsAvailable": "No tags available.",

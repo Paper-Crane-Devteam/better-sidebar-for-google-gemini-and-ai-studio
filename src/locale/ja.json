@@ -314,7 +314,7 @@
     "hideConfirm": "\"{{name}}\" を非表示にしてもよろしいですか？",
 
     "deleteFolderConfirm": "フォルダ \"{{name}}\" とそのすべての内容を削除してもよろしいですか？",
-    "deleteNote": "注意：削除された項目は、チャットリストをインポートすることで復元できます。",
+    "deleteNote": "注意：この操作により、Gemini から会話が完全に削除されます。",
     "hideNote": "注意：非表示にした項目は、チャットリストをインポートすることで復元できます。",
     "deleteFolderNote": "注意：削除されたフォルダは復元できませんが、会話はチャットリストをインポートすることで復元できます。",
     "openInNewTab": "新しいタブで開く",
@@ -381,7 +381,10 @@
     "exitBatchMode": "一括モードを終了",
     "selectAll": "すべて選択",
     "selectedCount": "{{count}} 件選択中",
-    "selectItems": "項目を選択"
+    "selectItems": "項目を選択",
+    "deletingProgress": "削除中 {{current}}/{{total}}...",
+    "deleteSuccess": "{{count}} 件の会話を削除しました",
+    "deletePartial": "{{succeeded}}/{{total}} 件削除、{{failed}} 件失敗"
   },
   "tags": {
     "noTagsAvailable": "利用可能なタグがありません。",

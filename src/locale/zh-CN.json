@@ -313,7 +313,7 @@
     "deleteConfirm": "您确定要删除 \"{{name}}\" 吗？",
     "hideConfirm": "您确定要隐藏 \"{{name}}\" 吗？",
     "deleteFolderConfirm": "您确定要删除文件夹 \"{{name}}\" 及其包含的所有内容吗？",
-    "deleteNote": "注意：删除的项目可以通过导入聊天列表来恢复。",
+    "deleteNote": "注意：此操作将从 Gemini 永久删除该对话。",
     "hideNote": "注意：隐藏的项目可以通过导入聊天列表来恢复。",
     "deleteFolderNote": "注意：删除的文件夹无法恢复，但对话可以通过导入聊天列表来恢复。",
     "openInNewTab": "在新标签页打开",
@@ -380,7 +380,10 @@
     "exitBatchMode": "退出批量模式",
     "selectAll": "全选",
     "selectedCount": "已选 {{count}} 项",
-    "selectItems": "选择项目"
+    "selectItems": "选择项目",
+    "deletingProgress": "正在删除 {{current}}/{{total}}...",
+    "deleteSuccess": "已删除 {{count}} 个对话",
+    "deletePartial": "已删除 {{succeeded}}/{{total}}，{{failed}} 个失败"
   },
   "tags": {
     "noTagsAvailable": "没有可用的标签。",
