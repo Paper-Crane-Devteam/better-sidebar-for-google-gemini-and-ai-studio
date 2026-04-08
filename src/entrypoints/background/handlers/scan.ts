@@ -2,9 +2,12 @@ import { conversationRepo } from '@/shared/db/operations';
 import { navigate } from '@/shared/lib/navigation';
 import type { ExtensionMessage, ExtensionResponse } from '@/shared/types/messages';
 import type { MessageSender } from '../types';
-import { notifyDataUpdated } from '../notify';
 import { Platform } from '@/shared/types/platform';
 import { resolveSyncFolderId } from './resolve-sync-folder';
+
+// Track which tab initiated the library scan so SCAN_COMPLETE
+// notification is only sent back to that tab (not all tabs).
+let scanOriginTabId: number | null = null;
 
 function getPageLocalStorage(key: string): string | null {
   try {
@@ -46,38 +49,33 @@ export async function handleScan(
           : platform === Platform.CHATGPT
           ? 'https://chatgpt.com/'
           : 'https://aistudio.google.com/library';
-      const matchUrl =
-        platform === Platform.GEMINI
-          ? 'https://gemini.google.com/*'
-          : platform === Platform.CHATGPT
-          ? 'https://chatgpt.com/*'
-          : 'https://aistudio.google.com/*';
 
-      const [existingTab] = await browser.tabs.query({
-        url: matchUrl,
-        currentWindow: true,
-      });
-
-      if (existingTab?.id) {
-        await browser.tabs.update(existingTab.id, { active: true });
+      // Always scan in the tab that initiated the request so that
+      // isScanning UI state and SCAN_COMPLETE stay on the same tab.
+      const originTabId = sender.tab?.id;
+      if (originTabId != null) {
+        scanOriginTabId = originTabId;
         await browser.scripting.executeScript({
-          target: { tabId: existingTab.id },
+          target: { tabId: originTabId },
           func: navigate,
           args: [url],
           world: 'MAIN',
         });
         setTimeout(() => {
           browser.tabs
-            .sendMessage(existingTab.id!, { type: 'START_LIBRARY_SCAN' })
+            .sendMessage(originTabId, { type: 'START_LIBRARY_SCAN' })
             .catch((e) => console.error('Failed to start library scan:', e));
         }, 2000);
         return { success: true };
       }
 
+      // Fallback: no sender tab (e.g. triggered from popup) — open a new tab
+      scanOriginTabId = null;
       const tab = await browser.tabs.create({ url, active: true });
       const listener = (tabId: number, changeInfo: { status?: string }) => {
         if (tabId === tab.id && changeInfo.status === 'complete') {
           browser.tabs.onUpdated.removeListener(listener);
+          scanOriginTabId = tabId;
           setTimeout(() => {
             browser.tabs
               .sendMessage(tabId, { type: 'START_LIBRARY_SCAN' })
@@ -126,7 +124,17 @@ export async function handleScan(
         }
       }
 
-      await notifyDataUpdated('SCAN_COMPLETE', { count: newCount });
+      // Notify only the tab that initiated the scan.
+      // Other same-profile tabs will refresh on visibility change.
+      const originTabId = scanOriginTabId;
+      scanOriginTabId = null;
+      if (originTabId != null) {
+        browser.tabs.sendMessage(originTabId, {
+          type: 'DATA_UPDATED',
+          updateType: 'SCAN_COMPLETE',
+          payload: { count: newCount },
+        }).catch(() => {});
+      }
       return { success: true, data: { count: newCount } };
     }
     default:

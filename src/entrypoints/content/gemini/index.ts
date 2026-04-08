@@ -86,11 +86,9 @@ export async function initGemini() {
       );
       return;
     }
-    // Disabled: no longer scroll the entire conversation list in the background.
-    // The interceptor (apiScanner) already captures items that Gemini loads on its own.
-    // syncConversations().catch((err) => {
-    //   console.error('Better Sidebar: Auto-sync failed', err);
-    // });
+    syncConversations({ scroll: false }).catch((err) => {
+      console.error('Better Sidebar: Auto-sync failed', err);
+    });
   };
 
   if (document.readyState === 'complete') {
@@ -171,16 +169,16 @@ export async function initGemini() {
           });
         return true;
       }
-      // if (message.type === 'START_SYNC_CONVERSATIONS') {
-      //   syncConversations()
-      //     .then((count) => {
-      //       sendResponse({ success: true, data: { count } });
-      //     })
-      //     .catch((err) => {
-      //       sendResponse({ success: false, error: err.message });
-      //     });
-      //   return true;
-      // }
+      if (message.type === 'START_SYNC_CONVERSATIONS') {
+        syncConversations({ scroll: true })
+          .then((count) => {
+            sendResponse({ success: true, data: { count } });
+          })
+          .catch((err) => {
+            sendResponse({ success: false, error: err.message });
+          });
+        return true;
+      }
     },
   );
 }

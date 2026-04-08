@@ -113,8 +113,14 @@ async function processAndSendItems() {
     return payloadItems.length;
 }
 
-export async function syncConversations() {
-  console.log('Starting Gemini conversation sync...');
+export interface SyncConversationsOptions {
+  /** Whether to scroll through the entire list. Defaults to false (first page only). */
+  scroll?: boolean;
+}
+
+export async function syncConversations(options: SyncConversationsOptions = {}) {
+  const { scroll = false } = options;
+  console.log(`Starting Gemini conversation sync (scroll=${scroll})...`);
   
   // Start scanner to capture API responses
   apiScanner.start();
@@ -133,13 +139,16 @@ export async function syncConversations() {
     if (!scroller) {
       console.error('Gemini Sync: Could not find infinite-scroller element');
     } else {
+        // Always sync whatever is already loaded (first page)
+        totalSynced += await processAndSendItems();
+
+        if (!scroll) {
+          console.log('Gemini Sync: scroll=false, synced first page only.');
+        } else {
         console.log('Found infinite-scroller, starting scroll loop...');
         
         let previousScrollHeight = 0;
         let noChangeCount = 0;
-
-        // Initial sync of whatever is already loaded
-        totalSynced += await processAndSendItems();
 
         // Scroll loop
         while (true) {
@@ -203,6 +212,7 @@ export async function syncConversations() {
                 previousScrollHeight = currentScrollHeight;
             }
         }
+        } // end if (scroll)
     }
     
     // Wait a bit more for any final pending requests
