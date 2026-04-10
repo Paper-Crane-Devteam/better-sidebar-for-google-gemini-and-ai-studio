@@ -159,7 +159,7 @@ export async function scanConversations() {
     title: item.title || 'Untitled',
     external_id: item.id,
     external_url: `https://chatgpt.com/c/${item.id}`,
-    updated_at: item.updated_at ?? item.created_at ?? Math.floor(Date.now() / 1000),
+    last_active_at: item.updated_at ?? item.created_at ?? Math.floor(Date.now() / 1000),
     created_at: item.created_at,
     platform: Platform.CHATGPT,
   }));

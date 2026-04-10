@@ -1,24 +1,56 @@
 /**
  * Google OAuth authentication using chrome.identity.launchWebAuthFlow()
- * Manages access tokens for Google Drive API access.
+ * with Authorization Code + PKCE flow for persistent sessions.
+ *
+ * Unlike the implicit grant flow, this obtains a refresh_token that
+ * survives browser restarts indefinitely — no more re-login after a day.
  */
 
 import axios from 'axios';
 
-// TODO: Replace with your actual OAuth Client ID from Google Cloud Console
 const OAUTH_CLIENT_ID = import.meta.env.VITE_OAUTH_CLIENT_ID;
+const OAUTH_CLIENT_SECRET = import.meta.env.VITE_OAUTH_CLIENT_SECRET;
 const OAUTH_SCOPES = ['https://www.googleapis.com/auth/drive.appdata'];
-const TOKEN_STORAGE_KEY = 'gdrive_auth_token';
+const TOKEN_ENDPOINT = 'https://oauth2.googleapis.com/token';
+
+// Storage keys
+const ACCESS_TOKEN_KEY = 'gdrive_auth_token';
 const TOKEN_EXPIRY_KEY = 'gdrive_auth_token_expiry';
+const REFRESH_TOKEN_KEY = 'gdrive_refresh_token';
 
 export interface AuthStatus {
   isAuthenticated: boolean;
   expiresAt?: number;
 }
 
+// ─── PKCE helpers ────────────────────────────────────────────────
+
+function generateCodeVerifier(): string {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return base64UrlEncode(array);
+}
+
+async function generateCodeChallenge(verifier: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(verifier);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return base64UrlEncode(new Uint8Array(digest));
+}
+
+function base64UrlEncode(buffer: Uint8Array): string {
+  let binary = '';
+  for (const byte of buffer) {
+    binary += String.fromCharCode(byte);
+  }
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+// ─── Environment check ───────────────────────────────────────────
+
 /**
- * Check if the current environment supports Google Identity API
- * Returns true if running in background. For Content Script, call the background message for support status instead.
+ * Check if the current environment supports Google Identity API.
+ * Returns true if running in background context.
  */
 export function isGdriveAuthSupported(): boolean {
   return (
@@ -28,122 +60,157 @@ export function isGdriveAuthSupported(): boolean {
   );
 }
 
-/**
- * Get cached token from storage
- */
+// ─── Token storage ───────────────────────────────────────────────
+
 async function getCachedToken(): Promise<string | null> {
-  const result = await browser.storage.local.get([
-    TOKEN_STORAGE_KEY,
-    TOKEN_EXPIRY_KEY,
-  ]);
-  const token = result[TOKEN_STORAGE_KEY] as string | undefined;
+  const result = await browser.storage.local.get([ACCESS_TOKEN_KEY, TOKEN_EXPIRY_KEY]);
+  const token = result[ACCESS_TOKEN_KEY] as string | undefined;
   const expiry = result[TOKEN_EXPIRY_KEY] as number | undefined;
 
   if (!token) return null;
 
-  // Check if token is expired (with 5 min buffer)
+  // Expired (with 5 min buffer) → don't return, but DON'T clear refresh token
   if (expiry && Date.now() > expiry - 5 * 60 * 1000) {
-    await clearStoredToken();
+    await browser.storage.local.remove([ACCESS_TOKEN_KEY, TOKEN_EXPIRY_KEY]);
     return null;
   }
 
   return token;
 }
 
-/**
- * Store token in local storage
- */
-async function storeToken(token: string, expiresIn: number): Promise<void> {
+async function storeTokens(
+  accessToken: string,
+  expiresIn: number,
+  refreshToken?: string,
+): Promise<void> {
   const data: Record<string, any> = {
-    [TOKEN_STORAGE_KEY]: token,
+    [ACCESS_TOKEN_KEY]: accessToken,
     [TOKEN_EXPIRY_KEY]: Date.now() + expiresIn * 1000,
   };
+  if (refreshToken) {
+    data[REFRESH_TOKEN_KEY] = refreshToken;
+  }
   await browser.storage.local.set(data);
 }
 
-/**
- * Clear stored token
- */
-async function clearStoredToken(): Promise<void> {
-  await browser.storage.local.remove([TOKEN_STORAGE_KEY, TOKEN_EXPIRY_KEY]);
+async function getStoredRefreshToken(): Promise<string | null> {
+  const result = await browser.storage.local.get(REFRESH_TOKEN_KEY);
+  return (result[REFRESH_TOKEN_KEY] as string) || null;
 }
 
-/**
- * Build the OAuth URL for launchWebAuthFlow
- */
-function buildAuthUrl(): string {
+async function clearAllTokens(): Promise<void> {
+  await browser.storage.local.remove([ACCESS_TOKEN_KEY, TOKEN_EXPIRY_KEY, REFRESH_TOKEN_KEY]);
+}
+
+// ─── OAuth URL builders ──────────────────────────────────────────
+
+function buildAuthUrl(codeChallenge: string): string {
   const redirectUrl = chrome.identity.getRedirectURL();
   const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
   authUrl.searchParams.set('client_id', OAUTH_CLIENT_ID);
-  authUrl.searchParams.set('response_type', 'token');
+  authUrl.searchParams.set('response_type', 'code');
   authUrl.searchParams.set('redirect_uri', redirectUrl);
   authUrl.searchParams.set('scope', OAUTH_SCOPES.join(' '));
+  authUrl.searchParams.set('access_type', 'offline');
+  authUrl.searchParams.set('prompt', 'consent');
+  authUrl.searchParams.set('code_challenge', codeChallenge);
+  authUrl.searchParams.set('code_challenge_method', 'S256');
   return authUrl.toString();
 }
 
-/**
- * Extract token from OAuth callback URL
- */
-function extractTokenFromUrl(responseUrl: string): { accessToken: string; expiresIn: number } {
+function extractCodeFromUrl(responseUrl: string): string {
   const url = new URL(responseUrl);
-  const hashParams = new URLSearchParams(url.hash.substring(1));
-  const accessToken = hashParams.get('access_token');
-  const expiresIn = parseInt(hashParams.get('expires_in') || '3600', 10);
-
-  if (!accessToken) {
-    throw new Error('Failed to obtain access token from OAuth response');
+  const code = url.searchParams.get('code');
+  if (!code) {
+    throw new Error('Failed to obtain authorization code from OAuth response');
   }
-
-  return { accessToken, expiresIn };
+  return code;
 }
 
+// ─── Token exchange & refresh ────────────────────────────────────
+
+async function exchangeCodeForTokens(
+  code: string,
+  codeVerifier: string,
+): Promise<{ accessToken: string; expiresIn: number; refreshToken?: string }> {
+  const redirectUrl = chrome.identity.getRedirectURL();
+  const response = await axios.post(TOKEN_ENDPOINT, new URLSearchParams({
+    client_id: OAUTH_CLIENT_ID,
+    client_secret: OAUTH_CLIENT_SECRET,
+    code,
+    code_verifier: codeVerifier,
+    grant_type: 'authorization_code',
+    redirect_uri: redirectUrl,
+  }), {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  });
+
+  return {
+    accessToken: response.data.access_token,
+    expiresIn: response.data.expires_in || 3600,
+    refreshToken: response.data.refresh_token,
+  };
+}
+
+async function refreshAccessToken(refreshToken: string): Promise<{
+  accessToken: string;
+  expiresIn: number;
+}> {
+  const response = await axios.post(TOKEN_ENDPOINT, new URLSearchParams({
+    client_id: OAUTH_CLIENT_ID,
+    client_secret: OAUTH_CLIENT_SECRET,
+    refresh_token: refreshToken,
+    grant_type: 'refresh_token',
+  }), {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  });
+
+  return {
+    accessToken: response.data.access_token,
+    expiresIn: response.data.expires_in || 3600,
+  };
+}
+
+// ─── Public API ──────────────────────────────────────────────────
+
 /**
- * Try to silently refresh the token without user interaction.
- * Works if the user has previously granted consent and the session cookie is still valid.
+ * Try to silently refresh the token using stored refresh_token.
+ * No user interaction needed. Returns null if refresh is not possible.
  */
 export async function silentRefresh(): Promise<string | null> {
-  if (!isGdriveAuthSupported()) return null;
+  const refreshToken = await getStoredRefreshToken();
+  if (!refreshToken) return null;
 
   try {
-    const responseUrl = await new Promise<string>((resolve, reject) => {
-      chrome.identity.launchWebAuthFlow(
-        { url: buildAuthUrl(), interactive: false },
-        (callbackUrl) => {
-          if (chrome.runtime.lastError || !callbackUrl) {
-            reject(new Error(chrome.runtime.lastError?.message || 'Silent refresh failed'));
-            return;
-          }
-          resolve(callbackUrl);
-        },
-      );
-    });
-
-    const { accessToken, expiresIn } = extractTokenFromUrl(responseUrl);
-    await storeToken(accessToken, expiresIn);
+    const { accessToken, expiresIn } = await refreshAccessToken(refreshToken);
+    await storeTokens(accessToken, expiresIn);
     return accessToken;
-  } catch {
-    // Silent refresh failed — user needs to re-authorize interactively
+  } catch (err: any) {
+    // If refresh token is revoked/invalid (400/401), clear everything
+    const status = err?.response?.status;
+    if (status === 400 || status === 401) {
+      console.warn('[GoogleAuth] Refresh token invalid, clearing tokens');
+      await clearAllTokens();
+    }
     return null;
   }
 }
 
 /**
- * Launch interactive OAuth2 flow using chrome.identity.launchWebAuthFlow.
- * Does NOT force consent — allows silent re-auth if user already approved.
+ * Launch interactive OAuth2 flow using Authorization Code + PKCE.
+ * Obtains both access_token and refresh_token.
  */
 export async function authenticate(): Promise<string> {
   if (!isGdriveAuthSupported()) {
-    throw new Error(
-      'Google Drive authentication is not supported in this browser',
-    );
+    throw new Error('Google Drive authentication is not supported in this browser');
   }
+
+  const codeVerifier = generateCodeVerifier();
+  const codeChallenge = await generateCodeChallenge(codeVerifier);
 
   const responseUrl = await new Promise<string>((resolve, reject) => {
     chrome.identity.launchWebAuthFlow(
-      {
-        url: buildAuthUrl(),
-        interactive: true,
-      },
+      { url: buildAuthUrl(codeChallenge), interactive: true },
       (callbackUrl) => {
         if (chrome.runtime.lastError) {
           reject(new Error(chrome.runtime.lastError.message));
@@ -158,23 +225,23 @@ export async function authenticate(): Promise<string> {
     );
   });
 
-  const { accessToken, expiresIn } = extractTokenFromUrl(responseUrl);
-  await storeToken(accessToken, expiresIn);
+  const code = extractCodeFromUrl(responseUrl);
+  const { accessToken, expiresIn, refreshToken } = await exchangeCodeForTokens(code, codeVerifier);
+  await storeTokens(accessToken, expiresIn, refreshToken);
   return accessToken;
 }
 
 /**
  * Get a valid access token.
- * Priority: cached → silent refresh → interactive auth.
- * If `noInteractive` is true, will NOT prompt the user (returns error if silent fails).
+ * Priority: cached → refresh_token → interactive auth.
  */
 export async function getAccessToken(noInteractive = false): Promise<string> {
   const cached = await getCachedToken();
   if (cached) return cached;
 
-  // Try silent refresh first
-  const silentToken = await silentRefresh();
-  if (silentToken) return silentToken;
+  // Try refresh token first (works across browser restarts)
+  const refreshed = await silentRefresh();
+  if (refreshed) return refreshed;
 
   if (noInteractive) {
     throw new Error('Token expired and interactive auth is disabled');
@@ -184,35 +251,50 @@ export async function getAccessToken(noInteractive = false): Promise<string> {
 }
 
 /**
- * Revoke the current token and clear storage
+ * Revoke the current token and clear all stored tokens.
  */
 export async function disconnect(): Promise<void> {
-  const token = await getCachedToken();
-  if (token) {
+  // Try revoking the access token first, then refresh token
+  const result = await browser.storage.local.get([ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY]);
+  const tokenToRevoke = (result[ACCESS_TOKEN_KEY] || result[REFRESH_TOKEN_KEY]) as string | undefined;
+
+  if (tokenToRevoke) {
     try {
       await axios.post(
-        `https://oauth2.googleapis.com/revoke?token=${encodeURIComponent(token)}`,
+        `https://oauth2.googleapis.com/revoke?token=${encodeURIComponent(tokenToRevoke)}`,
       );
     } catch {
       // Continue even if revocation fails
     }
   }
-  await clearStoredToken();
+  await clearAllTokens();
 }
 
 /**
- * Get the current authentication status
+ * Get the current authentication status.
+ * Considers the user authenticated if we have a refresh_token OR a valid access_token.
  */
 export async function getAuthStatus(): Promise<AuthStatus> {
   const result = await browser.storage.local.get([
-    TOKEN_STORAGE_KEY,
+    ACCESS_TOKEN_KEY,
     TOKEN_EXPIRY_KEY,
+    REFRESH_TOKEN_KEY,
   ]);
 
-  const token = result[TOKEN_STORAGE_KEY] as string | undefined;
+  const accessToken = result[ACCESS_TOKEN_KEY] as string | undefined;
   const expiry = result[TOKEN_EXPIRY_KEY] as number | undefined;
+  const refreshToken = result[REFRESH_TOKEN_KEY] as string | undefined;
 
-  if (!token || (expiry && Date.now() > expiry - 5 * 60 * 1000)) {
+  // Has refresh token → always considered authenticated (can refresh silently)
+  if (refreshToken) {
+    return {
+      isAuthenticated: true,
+      expiresAt: expiry,
+    };
+  }
+
+  // Fallback: check access token validity
+  if (!accessToken || (expiry && Date.now() > expiry - 5 * 60 * 1000)) {
     return { isAuthenticated: false };
   }
 

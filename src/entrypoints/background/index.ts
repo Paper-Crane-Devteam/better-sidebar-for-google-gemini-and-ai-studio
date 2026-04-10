@@ -8,6 +8,7 @@ import {
   registerAutoSyncAlarm,
   handleAutoSyncAlarm,
   flushPendingSync,
+  onSyncingChange,
 } from '@/shared/lib/gdrive';
 import { usePegasusStore } from '@/shared/lib/pegasus-store';
 import {
@@ -73,6 +74,11 @@ export default defineBackground(() => {
   // Register auto-sync alarm after DB is ready
   dbReady.then(() => {
     registerAutoSyncAlarm();
+
+    // Wire syncing state to pegasus store so UI can show loading indicator
+    onSyncingChange((syncing) => {
+      usePegasusStore.getState().setGdriveSyncing(syncing);
+    });
   });
 
   // Handle alarm events for periodic auto-sync.

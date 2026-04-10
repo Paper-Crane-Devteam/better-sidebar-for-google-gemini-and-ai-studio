@@ -39,7 +39,7 @@ export const conversationTagRepo = {
        FROM conversations c
        INNER JOIN conversation_tags ct ON c.id = ct.conversation_id
        WHERE ct.tag_id = ?
-       ORDER BY c.updated_at DESC`,
+       ORDER BY c.last_active_at DESC`,
       [tagId]
     )) as Conversation[];
   },

@@ -34,7 +34,7 @@ export class PromptCreateScanner {
             title,
             prompt_metadata,
             created_at,
-            updated_at: created_at,
+            last_active_at: created_at,
             external_id: id,
             external_url: getExternalUrl(id),
             folder_id: null,

@@ -77,7 +77,7 @@ export async function initAiStudio() {
           external_id: data.id,
           external_url: `https://aistudio.google.com/prompts/${data.id}`,
           model_name: data.model_name,
-          updated_at: data.updated_at,
+          last_active_at: data.updated_at,
           messages: data.messages,
           platform: Platform.AI_STUDIO,
         },

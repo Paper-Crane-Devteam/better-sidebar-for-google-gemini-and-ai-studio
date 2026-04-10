@@ -29,6 +29,7 @@ const LOCK_KEY = 'gdrive_sync_lock';
 const LOCK_TTL_MS = 2 * 60 * 1000;
 const MAX_RETRIES = 2;
 const RETRY_DELAY_MS = 3_000;
+const PAGE_LOAD_SYNC_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
 
 /** Storage key for the pending debounce sync's target dbName */
 const PENDING_SYNC_DB_KEY = 'gdrive_pending_sync_db';
@@ -236,7 +237,12 @@ export async function handleAutoSyncAlarm(
     if (!auth.isAuthenticated) return;
 
     console.log(`[AutoSync] Debounce alarm fired for db: ${dbName}`);
-    await performMergeSync({ dbName, ensureActiveDb, onSyncComplete });
+    notifySyncingState(true);
+    try {
+      await performMergeSync({ dbName, ensureActiveDb, onSyncComplete });
+    } finally {
+      notifySyncingState(false);
+    }
     return;
   }
 
@@ -248,11 +254,16 @@ export async function handleAutoSyncAlarm(
     }
 
     console.log('[AutoSync] Periodic sync triggered');
-    await performMergeSync({
-      dbName: getDbName(),
-      ensureActiveDb,
-      onSyncComplete,
-    });
+    notifySyncingState(true);
+    try {
+      await performMergeSync({
+        dbName: getDbName(),
+        ensureActiveDb,
+        onSyncComplete,
+      });
+    } finally {
+      notifySyncingState(false);
+    }
   }
 }
 
@@ -261,4 +272,57 @@ export async function handleAutoSyncAlarm(
  */
 export function isAutoSyncing(): boolean {
   return isSyncing;
+}
+
+// --- Syncing state change callback ---
+
+let onSyncingStateChange: ((syncing: boolean) => void) | null = null;
+
+/**
+ * Register a callback to be notified when syncing state changes.
+ * Used by the background to update pegasus store's gdriveSyncing flag.
+ */
+export function onSyncingChange(cb: (syncing: boolean) => void): void {
+  onSyncingStateChange = cb;
+}
+
+function notifySyncingState(syncing: boolean): void {
+  onSyncingStateChange?.(syncing);
+}
+
+// --- Page-load sync ---
+
+/** Storage key for the last page-load sync timestamp */
+const PAGE_LOAD_SYNC_TIME_KEY = 'gdrive_page_load_sync_time';
+
+/**
+ * Trigger a merge sync on page load if enough time has passed since the last sync.
+ * Called after SYNC_CONVERSATIONS completes in the background.
+ * Uses a 5-minute cooldown to avoid redundant syncs.
+ */
+export async function triggerSyncOnPageLoad(
+  dbName: string,
+  ensureActiveDb: () => Promise<void>,
+  onSyncComplete?: () => void,
+): Promise<void> {
+  const auth = await getAuthStatus();
+  if (!auth.isAuthenticated) return;
+
+  const result = await browser.storage.local.get(PAGE_LOAD_SYNC_TIME_KEY);
+  const lastTime = (result[PAGE_LOAD_SYNC_TIME_KEY] as number) || 0;
+
+  if (Date.now() - lastTime < PAGE_LOAD_SYNC_COOLDOWN_MS) {
+    console.log('[AutoSync] Page-load sync skipped (cooldown)');
+    return;
+  }
+
+  await browser.storage.local.set({ [PAGE_LOAD_SYNC_TIME_KEY]: Date.now() });
+
+  console.log('[AutoSync] Page-load sync triggered');
+  notifySyncingState(true);
+  try {
+    await performMergeSync({ dbName, ensureActiveDb, onSyncComplete });
+  } finally {
+    notifySyncingState(false);
+  }
 }

@@ -157,8 +157,8 @@ export const TreeView = forwardRef<ArboristTreeHandle, TreeViewProps>(
 
           if (sortOrder === 'date') {
             if (a.type === 'folder') return a.name.localeCompare(b.name);
-            let dateA = a.data?.updated_at || a.data?.created_at || 0;
-            let dateB = b.data?.updated_at || b.data?.created_at || 0;
+            let dateA = a.data?.last_active_at || a.data?.updated_at || a.data?.created_at || 0;
+            let dateB = b.data?.last_active_at || b.data?.updated_at || b.data?.created_at || 0;
             if (dateA > 0) dateA *= 1000;
             if (dateB > 0) dateB *= 1000;
             return dateB - dateA;

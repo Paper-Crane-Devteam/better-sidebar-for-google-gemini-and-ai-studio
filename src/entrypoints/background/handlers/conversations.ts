@@ -10,7 +10,7 @@ import type {
 import type { MessageSender } from '../types';
 import { notifyDataUpdated } from '../notify';
 import { resolveSyncFolderId } from './resolve-sync-folder';
-import { triggerAutoSync } from './gdrive-sync';
+import { triggerAutoSync, triggerPageLoadSync } from './gdrive-sync';
 
 export async function handleConversations(
   message: ExtensionMessage,
@@ -52,8 +52,8 @@ export async function handleConversations(
     }
     case 'UPDATE_CONVERSATION': {
       const { id, title, updated_at } = message.payload;
-      const updates: { title?: string; updated_at: number } = {
-        updated_at: updated_at ?? Math.floor(Date.now() / 1000),
+      const updates: { title?: string; last_active_at: number } = {
+        last_active_at: updated_at ?? Math.floor(Date.now() / 1000),
       };
       if (title) updates.title = title;
       await conversationRepo.update(id, updates);
@@ -93,7 +93,7 @@ export async function handleConversations(
         folder_id: folderId,
         external_id,
         external_url,
-        updated_at: Math.floor(Date.now() / 1000),
+        last_active_at: Math.floor(Date.now() / 1000),
         created_at,
         prompt_metadata: prompt_metadata
           ? JSON.stringify(prompt_metadata)
@@ -148,6 +148,7 @@ export async function handleConversations(
         await notifyDataUpdated();
       }
       triggerAutoSync();
+      triggerPageLoadSync();
       return { success: true, data: { added: itemsToSync.length } };
     }
     default:

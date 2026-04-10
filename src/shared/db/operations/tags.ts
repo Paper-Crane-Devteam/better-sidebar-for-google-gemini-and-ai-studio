@@ -1,4 +1,5 @@
 import { runQuery, runCommand } from '../index';
+import { updateWithTimestamp } from './helpers';
 import type { Tag } from '../../types/db';
 
 export const tagRepo = {
@@ -7,7 +8,7 @@ export const tagRepo = {
     const id = idResult[0].id;
 
     await runCommand(
-      'INSERT INTO tags (id, name, color, created_at) VALUES (?, ?, ?, unixepoch())',
+      'INSERT INTO tags (id, name, color) VALUES (?, ?, ?)',
       [id, name, color || null]
     );
     return id;
@@ -26,15 +27,7 @@ export const tagRepo = {
     id: string,
     updates: Partial<Pick<Tag, 'name' | 'color'>>
   ): Promise<void> => {
-    const fields = Object.keys(updates);
-    const values = Object.values(updates);
-    if (fields.length === 0) return;
-
-    const setClause = fields.map((field) => `${field} = ?`).join(', ');
-    await runCommand(`UPDATE tags SET ${setClause} WHERE id = ?`, [
-      ...values,
-      id,
-    ]);
+    await updateWithTimestamp('tags', id, updates);
   },
 
   delete: async (id: string): Promise<void> => {

@@ -177,7 +177,7 @@ export const TimelineView = forwardRef<ArboristTreeHandle, TimelineViewProps>(
 
       // Group conversations
       filteredConversations.forEach((c) => {
-        const timestamp = c.updated_at || c.created_at || 0;
+        const timestamp = c.last_active_at || c.updated_at || c.created_at || 0;
         // Normalize seconds to ms if needed (heuristic)
         const ts =
           timestamp > 0 && timestamp < 100000000000
@@ -225,8 +225,8 @@ export const TimelineView = forwardRef<ArboristTreeHandle, TimelineViewProps>(
       // Sort children within groups by date descending
       sortedGroups.forEach((group) => {
         group.children!.sort((a, b) => {
-          let dateA = a.data?.updated_at || a.data?.created_at || 0;
-          let dateB = b.data?.updated_at || b.data?.created_at || 0;
+          let dateA = a.data?.last_active_at || a.data?.updated_at || a.data?.created_at || 0;
+          let dateB = b.data?.last_active_at || b.data?.updated_at || b.data?.created_at || 0;
           if (dateA > 0 && dateA < 100000000000) dateA *= 1000;
           if (dateB > 0 && dateB < 100000000000) dateB *= 1000;
 

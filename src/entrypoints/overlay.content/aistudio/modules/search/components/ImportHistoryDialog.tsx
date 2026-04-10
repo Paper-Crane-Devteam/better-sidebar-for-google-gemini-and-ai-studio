@@ -36,6 +36,15 @@ export const ImportHistoryDialog = ({ isOpen, onClose }: { isOpen: boolean; onCl
     return title.replace(/[^a-zA-Z0-9\u4e00-\u9fa5\s]/g, '_');
   };
 
+  /** Loose normalization: collapse underscores, trim, lowercase — used as fallback */
+  const looseNormalize = (title: string) => {
+    return normalizeTitle(title)
+      .replace(/_+/g, '_')
+      .replace(/^_|_$/g, '')
+      .trim()
+      .toLowerCase();
+  };
+
   const handleImport = async () => {
     if (!file) return;
     setIsProcessing(true);
@@ -57,11 +66,17 @@ export const ImportHistoryDialog = ({ isOpen, onClose }: { isOpen: boolean; onCl
       const conversations = response.data;
 
       const titleMap = new Map<string, string>();
+      const looseTitleMap = new Map<string, string>();
 
       conversations.forEach((c: any) => {
         if (c.title) {
           const norm = normalizeTitle(c.title);
           titleMap.set(norm, c.id);
+          const loose = looseNormalize(c.title);
+          // Only keep first match for loose map to avoid ambiguity
+          if (!looseTitleMap.has(loose)) {
+            looseTitleMap.set(loose, c.id);
+          }
         }
       });
       setLogs((prev) => [
@@ -171,7 +186,10 @@ export const ImportHistoryDialog = ({ isOpen, onClose }: { isOpen: boolean; onCl
 
         const basename = fileName.split('/').pop() || fileName;
         const normalizedBasename = normalizeTitle(basename);
-        const conversationId = titleMap.get(normalizedBasename);
+        // Exact match first, then fallback to loose match for special-char titles
+        const conversationId =
+          titleMap.get(normalizedBasename) ??
+          looseTitleMap.get(looseNormalize(basename));
 
         if (conversationId) {
           try {

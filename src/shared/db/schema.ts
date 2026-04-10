@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS conversations (
   order_index INTEGER DEFAULT 0,
   updated_at INTEGER DEFAULT (unixepoch()),
   created_at INTEGER DEFAULT (unixepoch()),
+  last_active_at INTEGER DEFAULT (unixepoch()), -- business timestamp: last chat activity, rename, etc.
   prompt_metadata TEXT,
   deleted_at INTEGER DEFAULT NULL, -- soft delete: unix timestamp in seconds, NULL = active
   gem_id TEXT,
@@ -72,6 +73,7 @@ CREATE TABLE IF NOT EXISTS favorites (
   target_type TEXT NOT NULL, -- 'conversation' or 'message'
   note TEXT,
   created_at INTEGER DEFAULT (unixepoch()),
+  updated_at INTEGER DEFAULT (unixepoch()),
   UNIQUE(target_id, target_type)
 );
 
@@ -84,13 +86,15 @@ CREATE TABLE IF NOT EXISTS tags (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL UNIQUE,
   color TEXT,
-  created_at INTEGER DEFAULT (unixepoch())
+  created_at INTEGER DEFAULT (unixepoch()),
+  updated_at INTEGER DEFAULT (unixepoch())
 );
 
 CREATE TABLE IF NOT EXISTS conversation_tags (
   conversation_id TEXT NOT NULL,
   tag_id TEXT NOT NULL,
   created_at INTEGER DEFAULT (unixepoch()),
+  updated_at INTEGER DEFAULT (unixepoch()),
   PRIMARY KEY (conversation_id, tag_id),
   FOREIGN KEY(conversation_id) REFERENCES conversations(id) ON DELETE CASCADE,
   FOREIGN KEY(tag_id) REFERENCES tags(id) ON DELETE CASCADE

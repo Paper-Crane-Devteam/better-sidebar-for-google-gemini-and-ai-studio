@@ -22,6 +22,8 @@ export {
   registerAutoSyncAlarm,
   handleAutoSyncAlarm,
   isAutoSyncing,
+  triggerSyncOnPageLoad,
+  onSyncingChange,
 } from './auto-sync';
 export type { SyncPayload } from './sync-data';
 export type { MergeResult } from './sync-merge';

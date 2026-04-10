@@ -145,6 +145,46 @@ export const runMigrations = async (db: any) => {
         'ALTER TABLE gems ADD COLUMN is_deleted INTEGER DEFAULT 0',
       );
     }
+
+    // Migration: Add updated_at to favorites if missing
+    if (!(await hasColumn('favorites', 'updated_at'))) {
+      console.log('Worker: Migrating favorites table - adding updated_at');
+      await db.run(
+        'ALTER TABLE favorites ADD COLUMN updated_at INTEGER DEFAULT (unixepoch())',
+      );
+      // Backfill from created_at
+      await db.run('UPDATE favorites SET updated_at = created_at WHERE updated_at IS NULL');
+    }
+
+    // Migration: Add updated_at to tags if missing
+    if (!(await hasColumn('tags', 'updated_at'))) {
+      console.log('Worker: Migrating tags table - adding updated_at');
+      await db.run(
+        'ALTER TABLE tags ADD COLUMN updated_at INTEGER DEFAULT (unixepoch())',
+      );
+      // Backfill from created_at
+      await db.run('UPDATE tags SET updated_at = created_at WHERE updated_at IS NULL');
+    }
+
+    // Migration: Add updated_at to conversation_tags if missing
+    if (!(await hasColumn('conversation_tags', 'updated_at'))) {
+      console.log('Worker: Migrating conversation_tags table - adding updated_at');
+      await db.run(
+        'ALTER TABLE conversation_tags ADD COLUMN updated_at INTEGER DEFAULT (unixepoch())',
+      );
+      // Backfill from created_at
+      await db.run('UPDATE conversation_tags SET updated_at = created_at WHERE updated_at IS NULL');
+    }
+
+    // Migration: Add last_active_at to conversations if missing
+    if (!(await hasColumn('conversations', 'last_active_at'))) {
+      console.log('Worker: Migrating conversations table - adding last_active_at');
+      await db.run(
+        'ALTER TABLE conversations ADD COLUMN last_active_at INTEGER DEFAULT (unixepoch())',
+      );
+      // Backfill from existing updated_at (which previously held the business timestamp)
+      await db.run('UPDATE conversations SET last_active_at = updated_at WHERE last_active_at IS NULL');
+    }
   } catch (err) {
     console.error('Worker: Migration failed:', err);
   }

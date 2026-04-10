@@ -27,7 +27,7 @@ class AutoSyncHandler {
                     external_id: item.id,
                     external_url: `https://aistudio.google.com/prompts/${item.id}`,
                     created_at: item.created_at ?? Math.floor(Date.now() / 1000),
-                    updated_at: item.created_at ?? Math.floor(Date.now() / 1000),
+                    last_active_at: item.created_at ?? Math.floor(Date.now() / 1000),
                     prompt_metadata: item.prompt_metadata,
                     type: item.type,
                 }));

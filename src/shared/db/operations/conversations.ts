@@ -8,8 +8,8 @@ export const conversationRepo = {
     const platform = c.platform ?? 'aistudio';
     await runCommand(
       `
-      INSERT INTO conversations (id, title, folder_id, external_id, external_url, model_name, type, platform, updated_at, created_at, prompt_metadata, deleted_at, gem_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?)
+      INSERT INTO conversations (id, title, folder_id, external_id, external_url, model_name, type, platform, updated_at, created_at, last_active_at, prompt_metadata, deleted_at, gem_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, unixepoch(), ?, ?, ?, NULL, ?)
       ON CONFLICT(id) DO UPDATE SET
         title = excluded.title,
         folder_id = COALESCE(excluded.folder_id, conversations.folder_id),
@@ -17,8 +17,9 @@ export const conversationRepo = {
         model_name = excluded.model_name,
         type = COALESCE(excluded.type, conversations.type),
         platform = COALESCE(excluded.platform, conversations.platform),
-        updated_at = excluded.updated_at,
+        updated_at = unixepoch(),
         created_at = COALESCE(excluded.created_at, conversations.created_at),
+        last_active_at = COALESCE(excluded.last_active_at, conversations.last_active_at),
         prompt_metadata = COALESCE(excluded.prompt_metadata, conversations.prompt_metadata),
         gem_id = COALESCE(excluded.gem_id, conversations.gem_id),
         deleted_at = NULL
@@ -32,8 +33,8 @@ export const conversationRepo = {
         c.model_name,
         c.type || 'conversation',
         platform,
-        c.updated_at || Math.floor(Date.now() / 1000),
         c.created_at || null,
+        c.last_active_at || Math.floor(Date.now() / 1000),
         c.prompt_metadata ? JSON.stringify(c.prompt_metadata) : null,
         c.gem_id ?? null,
       ]
@@ -52,11 +53,11 @@ export const conversationRepo = {
   getByFolderId: async (folderId: string | null): Promise<Conversation[]> => {
     if (folderId === null) {
       return (await runQuery(
-        'SELECT * FROM conversations WHERE folder_id IS NULL AND deleted_at IS NULL ORDER BY updated_at DESC'
+        'SELECT * FROM conversations WHERE folder_id IS NULL AND deleted_at IS NULL ORDER BY last_active_at DESC'
       )) as Conversation[];
     } else {
       return (await runQuery(
-        'SELECT * FROM conversations WHERE folder_id = ? AND deleted_at IS NULL ORDER BY updated_at DESC',
+        'SELECT * FROM conversations WHERE folder_id = ? AND deleted_at IS NULL ORDER BY last_active_at DESC',
         [folderId]
       )) as Conversation[];
     }
@@ -65,12 +66,12 @@ export const conversationRepo = {
   getAll: async (platform?: string): Promise<Conversation[]> => {
     if (platform) {
       return (await runQuery(
-        'SELECT * FROM conversations WHERE platform = ? AND deleted_at IS NULL ORDER BY updated_at DESC',
+        'SELECT * FROM conversations WHERE platform = ? AND deleted_at IS NULL ORDER BY last_active_at DESC',
         [platform]
       )) as Conversation[];
     }
     return (await runQuery(
-      'SELECT * FROM conversations WHERE deleted_at IS NULL ORDER BY updated_at DESC'
+      'SELECT * FROM conversations WHERE deleted_at IS NULL ORDER BY last_active_at DESC'
     )) as Conversation[];
   },
 
@@ -83,7 +84,7 @@ export const conversationRepo = {
         | 'folder_id'
         | 'external_url'
         | 'model_name'
-        | 'updated_at'
+        | 'last_active_at'
         | 'prompt_metadata'
         | 'platform'
       >
@@ -102,10 +103,10 @@ export const conversationRepo = {
     });
 
     const setClause = fields.map((field) => `${field} = ?`).join(', ');
-    await runCommand(`UPDATE conversations SET ${setClause} WHERE id = ?`, [
-      ...values,
-      id,
-    ]);
+    await runCommand(
+      `UPDATE conversations SET ${setClause}, updated_at = unixepoch() WHERE id = ?`,
+      [...values, id],
+    );
   },
 
   delete: async (id: string): Promise<void> => {
@@ -113,7 +114,7 @@ export const conversationRepo = {
   },
 
   move: async (id: string, folderId: string | null): Promise<void> => {
-    await runCommand('UPDATE conversations SET folder_id = ? WHERE id = ?', [
+    await runCommand('UPDATE conversations SET folder_id = ?, updated_at = unixepoch() WHERE id = ?', [
       folderId,
       id,
     ]);
@@ -126,7 +127,7 @@ export const conversationRepo = {
     if (ids.length === 0) return;
     const placeholders = ids.map(() => '?').join(',');
     await runCommand(
-      `UPDATE conversations SET folder_id = ? WHERE id IN (${placeholders})`,
+      `UPDATE conversations SET folder_id = ?, updated_at = unixepoch() WHERE id IN (${placeholders})`,
       [folderId, ...ids]
     );
   },
@@ -140,8 +141,8 @@ export const conversationRepo = {
       const platform = c.platform ?? 'aistudio';
       return {
         sql: `
-      INSERT INTO conversations (id, title, folder_id, external_id, external_url, model_name, type, platform, updated_at, created_at, prompt_metadata, deleted_at, gem_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?)
+      INSERT INTO conversations (id, title, folder_id, external_id, external_url, model_name, type, platform, updated_at, created_at, last_active_at, prompt_metadata, deleted_at, gem_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, unixepoch(), ?, ?, ?, NULL, ?)
       ON CONFLICT(id) DO UPDATE SET
         title = excluded.title,
         folder_id = COALESCE(excluded.folder_id, conversations.folder_id),
@@ -149,8 +150,9 @@ export const conversationRepo = {
         model_name = excluded.model_name,
         type = COALESCE(excluded.type, conversations.type),
         platform = COALESCE(excluded.platform, conversations.platform),
-        updated_at = excluded.updated_at,
+        updated_at = unixepoch(),
         created_at = COALESCE(excluded.created_at, conversations.created_at),
+        last_active_at = COALESCE(excluded.last_active_at, conversations.last_active_at),
         prompt_metadata = COALESCE(excluded.prompt_metadata, conversations.prompt_metadata),
         gem_id = COALESCE(excluded.gem_id, conversations.gem_id),
         deleted_at = NULL
@@ -164,8 +166,8 @@ export const conversationRepo = {
           c.model_name,
           c.type || 'conversation',
           platform,
-          c.updated_at || Math.floor(Date.now() / 1000),
           c.created_at || null,
+          c.last_active_at || Math.floor(Date.now() / 1000),
           c.prompt_metadata ? JSON.stringify(c.prompt_metadata) : null,
           c.gem_id ?? null,
         ],

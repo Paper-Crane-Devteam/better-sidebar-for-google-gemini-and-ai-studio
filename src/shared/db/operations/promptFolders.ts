@@ -1,4 +1,5 @@
 import { runQuery, runCommand } from '../index';
+import { updateWithTimestamp } from './helpers';
 import type { PromptFolder } from '../../types/db';
 
 export const promptFolderRepo = {
@@ -40,15 +41,7 @@ export const promptFolderRepo = {
     id: string,
     updates: Partial<Pick<PromptFolder, 'name' | 'parent_id' | 'order_index'>>
   ): Promise<void> => {
-    const fields = Object.keys(updates);
-    const values = Object.values(updates);
-    if (fields.length === 0) return;
-
-    const setClause = fields.map((field) => `${field} = ?`).join(', ');
-    await runCommand(
-      `UPDATE prompt_folders SET ${setClause}, updated_at = unixepoch() WHERE id = ?`,
-      [...values, id]
-    );
+    await updateWithTimestamp('prompt_folders', id, updates);
   },
 
   delete: async (id: string): Promise<void> => {

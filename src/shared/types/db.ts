@@ -21,6 +21,7 @@ export interface Conversation {
   order_index: number;
   updated_at: number;
   created_at: number;
+  last_active_at: number; // business timestamp: last chat activity, rename, etc.
   prompt_metadata: any;
   deleted_at: number | null; // Unix timestamp in seconds, NULL = active (not deleted)
   gem_id: string | null;

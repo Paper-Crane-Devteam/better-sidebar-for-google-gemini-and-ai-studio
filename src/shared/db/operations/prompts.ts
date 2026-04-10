@@ -1,4 +1,5 @@
 import { runQuery, runCommand } from '../index';
+import { updateWithTimestamp } from './helpers';
 import type { Prompt } from '../../types/db';
 
 export const promptRepo = {
@@ -80,15 +81,7 @@ export const promptRepo = {
     id: string,
     updates: Partial<Pick<Prompt, 'title' | 'content' | 'type' | 'icon' | 'folder_id' | 'order_index'>>
   ): Promise<void> => {
-    const fields = Object.keys(updates);
-    const values = Object.values(updates);
-    if (fields.length === 0) return;
-
-    const setClause = fields.map((field) => `${field} = ?`).join(', ');
-    await runCommand(
-      `UPDATE prompts SET ${setClause}, updated_at = unixepoch() WHERE id = ?`,
-      [...values, id]
-    );
+    await updateWithTimestamp('prompts', id, updates);
   },
 
   delete: async (id: string): Promise<void> => {

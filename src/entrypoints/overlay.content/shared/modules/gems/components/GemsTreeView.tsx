@@ -104,8 +104,8 @@ export const GemsTreeView = forwardRef<GemsTreeHandle, GemsTreeViewProps>(
           if (isAFav && !isBFav) return -1;
           if (!isAFav && isBFav) return 1;
           if (sortOrder === 'date') {
-            const dateA = a.data?.updated_at || a.data?.created_at || 0;
-            const dateB = b.data?.updated_at || b.data?.created_at || 0;
+            const dateA = a.data?.last_active_at || a.data?.updated_at || a.data?.created_at || 0;
+            const dateB = b.data?.last_active_at || b.data?.updated_at || b.data?.created_at || 0;
             return dateB - dateA;
           }
           return a.name.localeCompare(b.name);

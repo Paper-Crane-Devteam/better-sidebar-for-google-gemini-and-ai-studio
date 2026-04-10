@@ -22,6 +22,7 @@ import {
   performMergeSync,
   scheduleDebouncedSync,
   isAutoSyncing,
+  triggerSyncOnPageLoad,
 } from '@/shared/lib/gdrive';
 import { usePegasusStore } from '@/shared/lib/pegasus-store';
 import i18n from '@/locale/i18n';
@@ -58,6 +59,20 @@ export function triggerAutoSync(): void {
   const { gdriveAutoSync } = usePegasusStore.getState();
   if (!gdriveAutoSync) return;
   scheduleDebouncedSync(getCurrentDbName());
+}
+
+/**
+ * Trigger a merge sync on page load (called after SYNC_CONVERSATIONS).
+ * Respects the gdriveAutoSync setting and uses a 5-minute cooldown.
+ */
+export function triggerPageLoadSync(): void {
+  const { gdriveAutoSync } = usePegasusStore.getState();
+  if (!gdriveAutoSync) return;
+  triggerSyncOnPageLoad(
+    getCurrentDbName(),
+    ensureDbForActiveTab,
+    () => notifyDataUpdated(),
+  );
 }
 
 export async function handleGdriveSync(
@@ -106,6 +121,7 @@ export async function handleGdriveSync(
 
     case 'GDRIVE_SYNC_UP': {
       try {
+        usePegasusStore.getState().setGdriveSyncing(true);
         const token = await getAccessToken();
         const syncFileName = getSyncFileName();
 
@@ -117,11 +133,14 @@ export async function handleGdriveSync(
         return { success: true, data: { lastSyncTime: now } };
       } catch (e: unknown) {
         return { success: false, error: (e as Error).message };
+      } finally {
+        usePegasusStore.getState().setGdriveSyncing(false);
       }
     }
 
     case 'GDRIVE_SYNC_DOWN': {
       try {
+        usePegasusStore.getState().setGdriveSyncing(true);
         const token = await getAccessToken();
         const syncFileName = getSyncFileName();
 
@@ -142,11 +161,14 @@ export async function handleGdriveSync(
         return { success: true, data: { lastSyncTime: now } };
       } catch (e: unknown) {
         return { success: false, error: (e as Error).message };
+      } finally {
+        usePegasusStore.getState().setGdriveSyncing(false);
       }
     }
 
     case 'GDRIVE_MERGE': {
       try {
+        usePegasusStore.getState().setGdriveSyncing(true);
         const result = await performMergeSync({
           dbName: getCurrentDbName(),
           ensureActiveDb: ensureDbForActiveTab,
@@ -166,6 +188,8 @@ export async function handleGdriveSync(
         };
       } catch (e: unknown) {
         return { success: false, error: (e as Error).message };
+      } finally {
+        usePegasusStore.getState().setGdriveSyncing(false);
       }
     }
 
