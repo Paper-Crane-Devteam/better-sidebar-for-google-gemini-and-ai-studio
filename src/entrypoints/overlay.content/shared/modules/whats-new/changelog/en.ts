@@ -2,6 +2,20 @@ import type { ChangeLogItem } from './types';
 
 export const changelog: ChangeLogItem[] = [
   {
+    version: '2.4.0',
+    date: '2026-04-13',
+    features: [
+      '✏️ **True Rename**: Rename conversations directly — changes are synced to Google\'s servers in real time.',
+      '🗑️ **True Delete & Batch Delete**: Delete or batch-delete conversations with real server-side removal. No more ghost chats.',
+      '🔐 **Persistent Login**: Stay logged in across sessions. No more frequent re-authorization. Includes a smart merge option for synced data.',
+      '💎 **Create Gem Conversations** (Gemini): Start a new Gem conversation directly from the Gem tab.',
+    ],
+    fixes: [
+      'Fixed an issue where scanning could trigger across multiple tabs simultaneously.',
+      'Redesigned the three-dot dropdown menu with a cleaner, more polished style.',
+    ],
+  },
+  {
     version: '2.3.0',
     date: '2026-03-30',
     features: [

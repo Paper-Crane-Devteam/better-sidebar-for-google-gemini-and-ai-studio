@@ -2,6 +2,20 @@ import type { ChangeLogItem } from './types';
 
 export const changelog: ChangeLogItem[] = [
   {
+    version: '2.4.0',
+    date: '2026-04-13',
+    features: [
+      '✏️ **真正的重命名**：重命名对话后直接同步到 Google 服务器，不再只是本地修改。',
+      '🗑️ **真正的删除与批量删除**：删除和批量删除对话时同步修改 Google 端数据，彻底告别"幽灵对话"。',
+      '🔐 **登录状态保持**：账号登录状态持久化，无需频繁重新授权登录。新增智能合并选项，同步数据更省心。',
+      '💎 **Gem 对话创建**（Gemini）：在 Gem 标签页中直接创建并发起 Gem 对话。',
+    ],
+    fixes: [
+      '修复了多 Tab 同时触发扫描的问题。',
+      '优化了三个点下拉菜单的样式，更简洁美观。',
+    ],
+  },
+  {
     version: '2.3.0',
     date: '2026-03-30',
     features: [

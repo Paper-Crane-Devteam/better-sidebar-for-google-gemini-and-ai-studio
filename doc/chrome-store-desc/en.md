@@ -5,13 +5,11 @@ Meet BETTER SIDEBAR FOR GEMINI & AI STUDIO — the ultimate workflow booster for
 
 We transform the default AI Studio interface into a powerful, organized knowledge base. Stop scrolling endlessly and start organizing your ideas efficiently.
 
-🔥 WHAT'S NEW (v2.3.0)
-• 🔍 Chained Search: Combine title, tag, and type filters to find any conversation instantly.
-• 💎 Gem Management (Gemini): Browse, filter, create, and chat with Gems right from the sidebar.
-• 📜 Smart Scrollbar (Gemini): Jump to any message in long conversations with a visual scrollbar.
-• 🤖 Default Model (Gemini): Set a default model — every new chat uses it automatically.
-• ✏️ Quick Resend: Resend messages without editing. Just hit resend.
-• 🎨 UI Polish: Active chat indicator, color-matched folders, redesigned tooltips, and smoother batch operations.
+🔥 WHAT'S NEW (v2.4.0)
+• ✏️ True Rename: Rename conversations directly — changes sync to Google's servers in real time.
+• 🗑️ True Delete & Batch Delete: Delete or batch-delete conversations with real server-side removal. No more ghost chats.
+• 🔐 Persistent Login: Stay logged in across sessions. No more frequent re-authorization. Includes a smart merge option.
+• 💎 Create Gem Conversations (Gemini): Start a new Gem conversation directly from the Gem tab.
 
 ---
 
@@ -23,17 +21,26 @@ Manage conversations across both Gemini and Google AI Studio seamlessly in one u
 👥 Multi-Account Profiles
 Create separate profiles for work or personal use. Each maintains its own independent database.
 
-🔍 Chained Search (NEW)
+🔍 Chained Search
 Filter conversations by combining multiple conditions — title, tag, and type — for laser-precise results.
 
-💎 Gem Management (NEW)
+💎 Gem Management
 Full Gem integration — browse, filter, create, and start conversations with your Gems right from the sidebar.
 
-📜 Smart Scrollbar (NEW)
+📜 Smart Scrollbar
 A visual scrollbar for Gemini conversations. Jump directly to any message in long chats — no more endless scrolling.
 
-🤖 Default Model (NEW)
+🤖 Default Model
 Set a default model for Gemini and every new conversation will automatically use it.
+
+✏️ True Rename (NEW)
+Rename conversations directly — changes are synced to Google's servers in real time.
+
+🗑️ True Delete & Batch Delete (NEW)
+Delete or batch-delete conversations with real server-side removal. No more ghost chats.
+
+🔐 Persistent Login (NEW)
+Stay logged in across sessions with smart merge for synced data.
 
 📂 Folders & Colors
 Drag and drop your chats into nested folders. Assign custom colors to folders and tags.

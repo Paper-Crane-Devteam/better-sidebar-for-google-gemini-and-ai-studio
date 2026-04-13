@@ -2,6 +2,20 @@ import type { ChangeLogItem } from './types';
 
 export const changelog: ChangeLogItem[] = [
   {
+    version: '2.4.0',
+    date: '2026-04-13',
+    features: [
+      '✏️ **Renombrado real**: Renombra conversaciones y los cambios se sincronizan con los servidores de Google en tiempo real.',
+      '🗑️ **Eliminación real y por lotes**: Elimina o elimina por lotes conversaciones con eliminación real del lado del servidor. No más chats fantasma.',
+      '🔐 **Sesión persistente**: Mantén tu sesión iniciada entre sesiones. Sin más reautorizaciones frecuentes. Incluye una opción de fusión inteligente para datos sincronizados.',
+      '💎 **Crear conversaciones Gem** (Gemini): Inicia una nueva conversación Gem directamente desde la pestaña Gem.',
+    ],
+    fixes: [
+      'Corregido un problema donde el escaneo podía activarse simultáneamente en múltiples pestañas.',
+      'Rediseñado el menú desplegable de tres puntos con un estilo más limpio y pulido.',
+    ],
+  },
+  {
     version: '2.3.0',
     date: '2026-03-30',
     features: [

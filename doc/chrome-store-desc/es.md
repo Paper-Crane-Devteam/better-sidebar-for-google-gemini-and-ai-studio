@@ -5,13 +5,11 @@ Conoce Better Sidebar for Gemini & AI Studio — el potenciador de flujo de trab
 
 Transformamos la interfaz predeterminada de AI Studio en una base de conocimientos poderosa y organizada. Deja de desplazarte sin fin y comienza a organizar tus ideas de manera eficiente.
 
-🔥 NOVEDADES (v2.3.0)
-• 🔍 Búsqueda encadenada: Combina filtros de título, etiqueta y tipo para encontrar cualquier conversación al instante.
-• 💎 Gestión de Gems (Gemini): Explora, filtra, crea e inicia conversaciones con Gems desde la barra lateral.
-• 📜 Barra de desplazamiento inteligente (Gemini): Salta a cualquier mensaje en conversaciones largas con una barra visual.
-• 🤖 Modelo predeterminado (Gemini): Establece un modelo predeterminado — cada nuevo chat lo usa automáticamente.
-• ✏️ Reenvío rápido: Reenvía mensajes sin editarlos. Solo haz clic en reenviar.
-• 🎨 Mejoras de UI: Indicador de chat activo, carpetas con colores, tooltips rediseñados y operaciones por lotes mejoradas.
+🔥 NOVEDADES (v2.4.0)
+• ✏️ Renombrado real: Renombra conversaciones y los cambios se sincronizan con los servidores de Google en tiempo real.
+• 🗑️ Eliminación real y por lotes: Elimina conversaciones con eliminación real del lado del servidor. No más chats fantasma.
+• 🔐 Sesión persistente: Mantén tu sesión iniciada entre sesiones. Sin más reautorizaciones frecuentes. Incluye una opción de fusión inteligente.
+• 💎 Crear conversaciones Gem (Gemini): Inicia una nueva conversación Gem directamente desde la pestaña Gem.
 
 ---
 
@@ -23,17 +21,26 @@ Gestiona conversaciones tanto en Gemini como en Google AI Studio sin problemas e
 👥 Perfiles Multicuenta
 Crea perfiles separados para uso laboral o personal. Cada uno mantiene su propia base de datos independiente.
 
-🔍 Búsqueda Encadenada (NUEVO)
+🔍 Búsqueda Encadenada
 Filtra conversaciones combinando múltiples condiciones — título, etiqueta y tipo — para resultados ultra precisos.
 
-💎 Gestión de Gems (NUEVO)
+💎 Gestión de Gems
 Integración completa de Gems — explora, filtra, crea e inicia conversaciones con tus Gems desde la barra lateral.
 
-📜 Barra de Desplazamiento Inteligente (NUEVO)
+📜 Barra de Desplazamiento Inteligente
 Una barra visual para conversaciones de Gemini. Salta directamente a cualquier mensaje en chats largos.
 
-🤖 Modelo Predeterminado (NUEVO)
+🤖 Modelo Predeterminado
 Establece un modelo predeterminado para Gemini y cada nueva conversación lo usará automáticamente.
+
+✏️ Renombrado Real (NUEVO)
+Renombra conversaciones y los cambios se sincronizan con los servidores de Google en tiempo real.
+
+🗑️ Eliminación Real y por Lotes (NUEVO)
+Elimina conversaciones con eliminación real del lado del servidor. No más chats fantasma.
+
+🔐 Sesión Persistente (NUEVO)
+Mantén tu sesión iniciada entre sesiones con fusión inteligente de datos sincronizados.
 
 📂 Carpetas y Colores
 Arrastra y suelta tus chats en carpetas anidadas. Asigna colores personalizados a carpetas y etiquetas.
