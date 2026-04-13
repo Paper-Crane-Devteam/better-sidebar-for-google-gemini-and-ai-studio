@@ -29,7 +29,7 @@ const LOCK_KEY = 'gdrive_sync_lock';
 const LOCK_TTL_MS = 2 * 60 * 1000;
 const MAX_RETRIES = 2;
 const RETRY_DELAY_MS = 3_000;
-const PAGE_LOAD_SYNC_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
+const PAGE_LOAD_SYNC_COOLDOWN_MS = 1; // 5 minutes
 
 /** Storage key for the pending debounce sync's target dbName */
 const PENDING_SYNC_DB_KEY = 'gdrive_pending_sync_db';

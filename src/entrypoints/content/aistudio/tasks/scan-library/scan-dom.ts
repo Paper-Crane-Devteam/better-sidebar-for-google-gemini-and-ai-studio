@@ -130,6 +130,7 @@ export async function scanLibraryDom() {
           external_url: href.startsWith('http')
             ? href
             : `https://aistudio.google.com${href}`,
+          updated_at: Math.floor(Date.now() / 1000),
           last_active_at: Math.floor(Date.now() / 1000),
         });
       } catch (e) {

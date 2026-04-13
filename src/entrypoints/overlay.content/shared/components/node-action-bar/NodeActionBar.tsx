@@ -59,7 +59,6 @@ export const NodeActionBar = ({
   }, []);
 
   const scheduleClose = useCallback(() => {
-    console.log("scheduleClosescheduleClosescheduleClosescheduleClose")
     cancelOpen();
     cancelClose();
     closeTimerRef.current = setTimeout(() => {
@@ -92,6 +91,7 @@ export const NodeActionBar = ({
         (forceVisible || isDropdownOpen) && 'visible',
       )}
       style={barStyle}
+      data-tooltip-suppress
       onClick={(e) => e.stopPropagation()}
       onPointerDown={(e) => e.stopPropagation()}
       onContextMenu={(e) => e.stopPropagation()}

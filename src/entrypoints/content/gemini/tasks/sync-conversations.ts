@@ -89,6 +89,7 @@ async function processAndSendItems() {
         title: item.title || i18n.t('common.untitled'),
         external_id: item.id,
         external_url: `https://gemini.google.com/app/${item.id}`,
+        updated_at: item.created_at ?? Math.floor(Date.now() / 1000),
         last_active_at: item.created_at ?? Math.floor(Date.now() / 1000),
         created_at: item.created_at,
         platform: Platform.GEMINI,

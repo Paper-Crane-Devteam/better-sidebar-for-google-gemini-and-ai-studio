@@ -18,7 +18,7 @@ export default defineConfig({
     },
     permissions: [
       // 'sidePanel',
-      'unlimitedStorage',
+      'unlimitedStorage',        
       'storage',
       'alarms',
       // 'tabs', // Removed to speed up review, we have host permissions

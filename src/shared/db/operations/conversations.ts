@@ -6,10 +6,11 @@ export const conversationRepo = {
     c: Partial<Conversation> & Pick<Conversation, 'id'>
   ): Promise<void> => {
     const platform = c.platform ?? 'aistudio';
+    const updatedAt = c.updated_at ?? Math.floor(Date.now() / 1000);
     await runCommand(
       `
       INSERT INTO conversations (id, title, folder_id, external_id, external_url, model_name, type, platform, updated_at, created_at, last_active_at, prompt_metadata, deleted_at, gem_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, unixepoch(), ?, ?, ?, NULL, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?)
       ON CONFLICT(id) DO UPDATE SET
         title = excluded.title,
         folder_id = COALESCE(excluded.folder_id, conversations.folder_id),
@@ -17,7 +18,7 @@ export const conversationRepo = {
         model_name = excluded.model_name,
         type = COALESCE(excluded.type, conversations.type),
         platform = COALESCE(excluded.platform, conversations.platform),
-        updated_at = unixepoch(),
+        updated_at = excluded.updated_at,
         created_at = COALESCE(excluded.created_at, conversations.created_at),
         last_active_at = COALESCE(excluded.last_active_at, conversations.last_active_at),
         prompt_metadata = COALESCE(excluded.prompt_metadata, conversations.prompt_metadata),
@@ -33,6 +34,7 @@ export const conversationRepo = {
         c.model_name,
         c.type || 'conversation',
         platform,
+        updatedAt,
         c.created_at || null,
         c.last_active_at || Math.floor(Date.now() / 1000),
         c.prompt_metadata ? JSON.stringify(c.prompt_metadata) : null,
@@ -139,10 +141,11 @@ export const conversationRepo = {
 
     const operations = conversations.map((c) => {
       const platform = c.platform ?? 'aistudio';
+      const updatedAt = c.updated_at ?? Math.floor(Date.now() / 1000);
       return {
         sql: `
       INSERT INTO conversations (id, title, folder_id, external_id, external_url, model_name, type, platform, updated_at, created_at, last_active_at, prompt_metadata, deleted_at, gem_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, unixepoch(), ?, ?, ?, NULL, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?)
       ON CONFLICT(id) DO UPDATE SET
         title = excluded.title,
         folder_id = COALESCE(excluded.folder_id, conversations.folder_id),
@@ -150,9 +153,15 @@ export const conversationRepo = {
         model_name = excluded.model_name,
         type = COALESCE(excluded.type, conversations.type),
         platform = COALESCE(excluded.platform, conversations.platform),
-        updated_at = unixepoch(),
+        updated_at = CASE
+          WHEN conversations.title IS NOT excluded.title THEN unixepoch()
+          ELSE conversations.updated_at
+        END,
         created_at = COALESCE(excluded.created_at, conversations.created_at),
-        last_active_at = COALESCE(excluded.last_active_at, conversations.last_active_at),
+        last_active_at = CASE
+          WHEN conversations.title IS NOT excluded.title THEN unixepoch()
+          ELSE COALESCE(excluded.last_active_at, conversations.last_active_at)
+        END,
         prompt_metadata = COALESCE(excluded.prompt_metadata, conversations.prompt_metadata),
         gem_id = COALESCE(excluded.gem_id, conversations.gem_id),
         deleted_at = NULL
@@ -166,6 +175,7 @@ export const conversationRepo = {
           c.model_name,
           c.type || 'conversation',
           platform,
+          updatedAt,
           c.created_at || null,
           c.last_active_at || Math.floor(Date.now() / 1000),
           c.prompt_metadata ? JSON.stringify(c.prompt_metadata) : null,

@@ -248,8 +248,8 @@ export const GDriveSyncSection = ({ hideTitle }: { hideTitle?: boolean }) => {
           <>
             <Separator />
 
-            {/* TODO [AUTO-SYNC]: Re-enable when auto-sync is fully tested */}
-            {/* <div className="flex items-center justify-between">
+            {/* Auto-sync toggle */}
+            <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <span className="text-sm font-medium">
                   {t('data.gdriveAutoSyncLabel')}
@@ -264,7 +264,7 @@ export const GDriveSyncSection = ({ hideTitle }: { hideTitle?: boolean }) => {
               />
             </div>
 
-            <Separator /> */}
+            <Separator />
 
             {/* Merge sync button */}
             <Button

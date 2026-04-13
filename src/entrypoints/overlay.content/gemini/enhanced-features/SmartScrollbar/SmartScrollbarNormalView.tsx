@@ -80,8 +80,8 @@ export const SmartScrollbarNormalView: React.FC<Props> = ({
     >
       <div
         className={cn(
-          'flex flex-col py-2.5',
-          dotsOnly ? 'items-center gap-1' : 'gap-0',
+          'flex flex-col',
+          dotsOnly ? 'items-center gap-1 py-2.5' : 'gap-0 py-1',
         )}
       >
         {displayNodes.map((node) => {
@@ -95,7 +95,7 @@ export const SmartScrollbarNormalView: React.FC<Props> = ({
                 'group relative flex items-center justify-center',
                 'transition-all duration-200',
                 node.inDom ? 'cursor-pointer' : 'cursor-default opacity-40',
-                dotsOnly ? 'p-1.5' : 'w-full px-2.5 py-1.5',
+                dotsOnly ? 'p-1.5' : 'w-full px-1.5 py-0',
               )}
             >
               {dotsOnly ? (
@@ -118,7 +118,7 @@ const HoveredItem: React.FC<{
 }> = ({ node, isActive }) => (
   <div
     className={cn(
-      'flex items-center gap-2 w-full rounded-md px-2 py-1',
+      'flex items-center gap-1.5 w-full rounded-md px-2 py-[3px]',
       'transition-all duration-150',
       node.inDom && 'hover:bg-accent/60',
       isActive ? 'bg-primary/10' : '',
@@ -138,7 +138,7 @@ const HoveredItem: React.FC<{
       placement="left"
       offset={24}
       className={cn(
-        'text-sm',
+        'text-[13px] leading-snug',
         'animate-in fade-in slide-in-from-right-2 duration-200',
         isActive
           ? 'text-primary font-semibold'

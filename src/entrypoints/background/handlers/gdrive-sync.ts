@@ -54,27 +54,25 @@ async function saveSyncMeta(direction: 'up' | 'down' | 'merge'): Promise<number>
 /**
  * Trigger a debounced auto-sync after local data changes.
  * Respects the gdriveAutoSync setting from pegasus store.
- * TODO [AUTO-SYNC]: Re-enable when auto-sync is fully tested
  */
 export function triggerAutoSync(): void {
-  // const { gdriveAutoSync } = usePegasusStore.getState();
-  // if (!gdriveAutoSync) return;
-  // scheduleDebouncedSync(getCurrentDbName());
+  const { gdriveAutoSync } = usePegasusStore.getState();
+  if (!gdriveAutoSync) return;
+  scheduleDebouncedSync(getCurrentDbName());
 }
 
 /**
  * Trigger a merge sync on page load (called after SYNC_CONVERSATIONS).
  * Respects the gdriveAutoSync setting and uses a 5-minute cooldown.
- * TODO [AUTO-SYNC]: Re-enable when auto-sync is fully tested
  */
 export function triggerPageLoadSync(): void {
-  // const { gdriveAutoSync } = usePegasusStore.getState();
-  // if (!gdriveAutoSync) return;
-  // triggerSyncOnPageLoad(
-  //   getCurrentDbName(),
-  //   ensureDbForActiveTab,
-  //   () => notifyDataUpdated(),
-  // );
+  const { gdriveAutoSync } = usePegasusStore.getState();
+  if (!gdriveAutoSync) return;
+  triggerSyncOnPageLoad(
+    getCurrentDbName(),
+    ensureDbForActiveTab,
+    () => notifyDataUpdated(),
+  );
 }
 
 export async function handleGdriveSync(

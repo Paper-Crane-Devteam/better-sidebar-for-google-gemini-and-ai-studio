@@ -23,6 +23,7 @@ async function processAndSendItems() {
     external_id: item.id,
     external_url: `https://chatgpt.com/c/${item.id}`,
     last_active_at: item.updated_at ?? item.created_at ?? Math.floor(Date.now() / 1000),
+    updated_at: item.created_at ?? Math.floor(Date.now() / 1000),
     created_at: item.created_at,
     platform: Platform.CHATGPT,
   }));

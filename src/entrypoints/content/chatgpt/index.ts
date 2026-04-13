@@ -100,6 +100,7 @@ export async function initChatGPT() {
             external_id: data.id,
             external_url: `https://chatgpt.com/c/${data.id}`,
             last_active_at: data.created_at ?? Math.floor(Date.now() / 1000),
+            updated_at: data.created_at ?? Math.floor(Date.now() / 1000),
             created_at: data.created_at,
             messages: data.messages,
           },

@@ -171,16 +171,47 @@ export const OverflowTooltip: React.FC<OverflowTooltipProps> = ({
     };
   }, []);
 
-  // When an external hoverRef is provided, attach hover listeners to it
+  // When an external hoverRef is provided, attach hover listeners to it.
+  // We also need to dismiss the tooltip when the pointer moves over the
+  // node-action-bar (or any element marked with data-tooltip-suppress) so
+  // that hovering the action buttons doesn't trigger the underlying tooltip.
   useEffect(() => {
     const el = hoverRef?.current;
     if (!el) return;
 
-    el.addEventListener('mouseenter', handleMouseEnter);
-    el.addEventListener('mouseleave', handleMouseLeave);
+    const onEnter = (e: MouseEvent) => {
+      // If the pointer entered from a tooltip-suppressed child (e.g. action bar),
+      // the relatedTarget will be inside that child — ignore.
+      const related = e.relatedTarget as HTMLElement | null;
+      if (related?.closest?.('[data-tooltip-suppress]')) return;
+      handleMouseEnter();
+    };
+
+    const onLeave = (e: MouseEvent) => {
+      // If the pointer is moving into a tooltip-suppressed child, hide tooltip.
+      const related = e.relatedTarget as HTMLElement | null;
+      if (related?.closest?.('[data-tooltip-suppress]')) {
+        handleMouseLeave();
+        return;
+      }
+      handleMouseLeave();
+    };
+
+    const onMove = (e: MouseEvent) => {
+      // While visible, if the pointer moves over a suppressed region, dismiss.
+      const target = e.target as HTMLElement | null;
+      if (target?.closest?.('[data-tooltip-suppress]')) {
+        handleMouseLeave();
+      }
+    };
+
+    el.addEventListener('mouseenter', onEnter);
+    el.addEventListener('mouseleave', onLeave);
+    el.addEventListener('mousemove', onMove);
     return () => {
-      el.removeEventListener('mouseenter', handleMouseEnter);
-      el.removeEventListener('mouseleave', handleMouseLeave);
+      el.removeEventListener('mouseenter', onEnter);
+      el.removeEventListener('mouseleave', onLeave);
+      el.removeEventListener('mousemove', onMove);
     };
   }, [hoverRef, isOverflowing]); // re-attach when overflow state changes
 
