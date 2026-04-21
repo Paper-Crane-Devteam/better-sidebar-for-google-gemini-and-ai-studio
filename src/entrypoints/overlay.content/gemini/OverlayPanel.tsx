@@ -190,7 +190,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
       data-density={layoutDensity}
     >
       {/* Sidebar Tabs */}
-      <div className="sidebar-nav border-r flex flex-col items-center bg-muted/20 shrink-0">
+      <div className="sidebar-nav flex flex-col items-center shrink-0">
         <SimpleTooltip content={t('tooltip.toggleMenu')}>
           <Button
             variant="ghost"
