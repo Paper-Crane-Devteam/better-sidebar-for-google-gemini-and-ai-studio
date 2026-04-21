@@ -2,6 +2,14 @@ import type { ChangeLogItem } from './types';
 
 export const changelog: ChangeLogItem[] = [
   {
+    version: '2.4.1',
+    date: '2026-04-21',
+    features: [],
+    fixes: [
+      '🚑 **Срочное исправление**: Совместимость с обновлённым AI Studio — расширение теперь распознаёт новую навигационную панель `ms-navbar-v2`, а команда «Переключиться на оригинальную боковую панель» корректно её восстанавливает.',
+    ],
+  },
+  {
     version: '2.4.0',
     date: '2026-04-13',
     features: [

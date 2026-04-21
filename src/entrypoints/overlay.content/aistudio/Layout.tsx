@@ -15,11 +15,12 @@ export async function initAiStudioOverlay(mainStyles: string): Promise<void> {
 
   TooltipHelper.getInstance().initialize(mainStyles);
 
-  // 1. Hide Navbar
+  // 1. Hide Navbar (supports both legacy ms-navbar and the new ms-navbar-v2)
   const style = document.createElement('style');
   style.id = 'better-sidebar-for-google-ai-studio-navbar-hider';
   style.textContent = `
-    ms-navbar {
+    ms-navbar,
+    ms-navbar-v2 {
       display: none !important;
       position: absolute !important;
       left: -9999px !important;
@@ -29,12 +30,14 @@ export async function initAiStudioOverlay(mainStyles: string): Promise<void> {
   document.head.appendChild(style);
 
   try {
-    const navbar = await waitForElement('ms-navbar');
-    (navbar as HTMLElement).style.display = 'none';
-    (navbar as HTMLElement).style.position = 'absolute';
-    (navbar as HTMLElement).style.left = '-9999px';
+    const navbar = await waitForElement('ms-navbar, ms-navbar-v2');
+    if (navbar) {
+      (navbar as HTMLElement).style.display = 'none';
+      (navbar as HTMLElement).style.position = 'absolute';
+      (navbar as HTMLElement).style.left = '-9999px';
+    }
   } catch (e) {
-    console.error('Better Sidebar: Failed to find ms-navbar', e);
+    console.error('Better Sidebar: Failed to find navbar', e);
   }
 
   // 2. Inject SidePanel
@@ -46,7 +49,8 @@ export async function initAiStudioOverlay(mainStyles: string): Promise<void> {
 
   const syncSidebarWithNavbar = async () => {
     try {
-      const navbar = await waitForElement('ms-navbar');
+      const navbar = await waitForElement('ms-navbar, ms-navbar-v2');
+      if (!navbar) return;
       const firstChild = navbar.firstElementChild;
       if (!firstChild) return;
       const updateState = () => {
