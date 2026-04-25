@@ -4,6 +4,7 @@ import { ExtensionMessage } from '@/shared/types/messages';
 import { scanLibrary } from './tasks/scan-library';
 import { autoSyncHandler } from './tasks/scan-library/sync-library';
 import { apiScanner } from './tasks/scan-library/scan-api';
+import { promptCreateScanner } from './tasks/scan-prompt-create';
 import { Platform } from '@/shared/types/platform';
 import { detectAccount } from '../shared/detect-account';
 
@@ -50,6 +51,9 @@ export async function initAiStudio() {
   // Start auto-sync handler to automatically sync conversations as they load
   autoSyncHandler.start();
   apiScanner.start();
+  // Register early so it runs before the overlay's ExplorerTab handler,
+  // ensuring the conversation row exists before a MOVE_CONVERSATION is issued.
+  promptCreateScanner.start();
 
   // Inject Main World Script
   const script = document.createElement('script');

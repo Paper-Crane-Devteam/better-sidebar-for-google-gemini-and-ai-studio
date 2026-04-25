@@ -2,6 +2,14 @@ import type { ChangeLogItem } from './types';
 
 export const changelog: ChangeLogItem[] = [
   {
+    version: '2.4.1',
+    date: '2026-04-21',
+    features: [],
+    fixes: [
+      '🚑 **Hotfix**: Fixed AI Studio redesign — the extension now recognizes the new `ms-navbar-v2` navbar, and "Switch to Original Sidebar" correctly restores it.',
+    ],
+  },
+  {
     version: '2.4.0',
     date: '2026-04-13',
     features: [

@@ -93,7 +93,9 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
     const navbarHider = document.getElementById(
       'better-sidebar-for-google-ai-studio-navbar-hider',
     ) as HTMLStyleElement;
-    const navbar = document.querySelector('ms-navbar') as HTMLElement;
+    const navbars = Array.from(
+      document.querySelectorAll('ms-navbar, ms-navbar-v2'),
+    ) as HTMLElement[];
     const wrapper = document.getElementById(
       'better-sidebar-for-google-ai-studio-sidebar-wrapper',
     );
@@ -101,20 +103,20 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
     if (isUIVisible) {
       // Show Enhanced UI, Hide Original
       if (navbarHider) navbarHider.disabled = false;
-      if (navbar) {
+      navbars.forEach((navbar) => {
         navbar.style.display = 'none';
         navbar.style.position = 'absolute';
         navbar.style.left = '-9999px';
-      }
+      });
       if (wrapper) wrapper.style.display = 'block';
     } else {
       // Hide Enhanced UI, Show Original
       if (navbarHider) navbarHider.disabled = true;
-      if (navbar) {
+      navbars.forEach((navbar) => {
         navbar.style.display = ''; // Reset to default
         navbar.style.position = '';
         navbar.style.left = '';
-      }
+      });
       if (wrapper) wrapper.style.display = 'none';
     }
   }, [isUIVisible]);

@@ -2,6 +2,14 @@ import type { ChangeLogItem } from './types';
 
 export const changelog: ChangeLogItem[] = [
   {
+    version: '2.4.1',
+    date: '2026-04-21',
+    features: [],
+    fixes: [
+      '🚑 **Corrección urgente**: Compatibilidad con el rediseño de AI Studio — la extensión ahora reconoce la nueva barra de navegación `ms-navbar-v2` y "Cambiar a Barra Lateral Original" la restaura correctamente.',
+    ],
+  },
+  {
     version: '2.4.0',
     date: '2026-04-13',
     features: [

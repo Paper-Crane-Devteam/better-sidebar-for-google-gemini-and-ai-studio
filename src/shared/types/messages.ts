@@ -32,9 +32,11 @@ export type ExtensionMessage = (
         prompt_metadata?: any;
         type?: string;
         messages: {
+          id?: string;
           role: 'user' | 'model';
           content: string;
           message_type: 'text' | 'thought';
+          created_at?: number | null;
         }[];
       };
     }
@@ -186,9 +188,11 @@ export type ExtensionMessage = (
       payload: {
         conversationId: string;
         messages: {
+          id?: string;
           role: 'user' | 'model';
           content: string;
           message_type: 'text' | 'thought';
+          created_at?: number | null;
         }[];
       };
     }

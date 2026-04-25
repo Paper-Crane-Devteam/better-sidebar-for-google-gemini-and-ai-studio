@@ -13,6 +13,7 @@ import {
 import { ArboristTreeHandle } from '../types';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useDeleteHandler } from '../hooks/useDeleteHandler';
+import { useExplorerContext } from '../ExplorerContext';
 
 interface TreeViewProps {
   onSelect: (item: any) => void;
@@ -25,6 +26,7 @@ const NodeWrapper = (props: NodeRendererProps<FolderTreeNodeData>) => {
 export const TreeView = forwardRef<ArboristTreeHandle, TreeViewProps>(
   ({ onSelect }, ref) => {
     const { t } = useI18n();
+    const { pendingNewChatFolderId } = useExplorerContext();
     const {
       folders,
       conversations,
@@ -209,11 +211,35 @@ export const TreeView = forwardRef<ArboristTreeHandle, TreeViewProps>(
       }
 
       sortNodes(rootNodes);
+
+      // Inject a virtual loading node into the pending folder
+      if (pendingNewChatFolderId) {
+        const loadingNode: FolderTreeNodeData = {
+          id: '__pending_new_chat__',
+          name: t('common.loading'),
+          type: 'file',
+          data: { isPendingNewChat: true },
+        };
+        const injectLoading = (nodes: FolderTreeNodeData[]): boolean => {
+          for (const node of nodes) {
+            if (node.id === pendingNewChatFolderId && node.type === 'folder') {
+              node.children = node.children || [];
+              node.children.unshift(loadingNode);
+              return true;
+            }
+            if (node.children && injectLoading(node.children)) return true;
+          }
+          return false;
+        };
+        injectLoading(rootNodes);
+      }
+
       return rootNodes;
     }, [
       folders, conversations, sortOrder, favorites,
       tagFilter.selected, conversationTags, typeFilter,
       onlyFavorites, ignoredFolders, searchTerm, t,
+      pendingNewChatFolderId,
     ]);
 
     useImperativeHandle(ref, () => ({

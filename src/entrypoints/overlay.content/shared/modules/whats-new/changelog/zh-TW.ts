@@ -2,6 +2,14 @@ import type { ChangeLogItem } from './types';
 
 export const changelog: ChangeLogItem[] = [
   {
+    version: '2.4.1',
+    date: '2026-04-21',
+    features: [],
+    fixes: [
+      '🚑 **緊急修復**：適配 AI Studio 改版 — 相容新版 `ms-navbar-v2` 導覽列，同時修復「切換到原始側邊欄」無法恢復原生導覽列的問題。',
+    ],
+  },
+  {
     version: '2.4.0',
     date: '2026-04-13',
     features: [

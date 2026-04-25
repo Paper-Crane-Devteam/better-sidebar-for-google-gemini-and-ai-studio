@@ -44,7 +44,6 @@ export const FolderTree = forwardRef<FolderTreeHandle, FolderTreeProps>(
       },
       select: (id: string) => {
         treeRef.current?.select(id);
-        treeRef.current?.scrollTo(id);
       },
       open: (id: string) => {
         treeRef.current?.open(id);

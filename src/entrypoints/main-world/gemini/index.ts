@@ -64,6 +64,14 @@ export function initGeminiInterceptors() {
           // non-critical
         }
       }
+
+      // Notify overlay that a new chat generation has started
+      if (config.url?.includes('StreamGenerate')) {
+        globalThis.dispatchEvent(
+          new CustomEvent('BETTER_SIDEBAR_GENERATE_START'),
+        );
+      }
+
       handler.next(config);
     },
     onError: (err, handler) => {

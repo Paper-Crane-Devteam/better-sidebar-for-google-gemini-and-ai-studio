@@ -97,4 +97,10 @@
       background: rgb(var(--muted-foreground) / 0.4);
     }
   }
+
+  /* Shimmer animation for loading skeleton */
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
 }
