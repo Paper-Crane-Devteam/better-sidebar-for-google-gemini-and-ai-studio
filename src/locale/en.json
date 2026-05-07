@@ -23,7 +23,8 @@
     "tags": "Tags",
     "feedback": "Feedback",
     "settings": "Settings",
-    "gems": "Gems"
+    "gems": "Gems",
+    "notebooks": "Notebooks"
   },
   "sidebar": {
     "newConversation": "New Conversation",
@@ -260,6 +261,7 @@
     "codex": "Codex",
     "myStuff": "My Stuff",
     "gems": "Gems",
+    "notebooks": "Notebooks",
     "originalUI": "Switch to Original Sidebar"
   },
   "overlay": {
@@ -276,6 +278,7 @@
     "filterConversations": "Filter: Conversations",
     "filterImages": "Filter: Images",
     "filterGems": "Filter: Gems",
+    "filterNotebooks": "Filter: Notebooks",
     "filterFavorites": "Filter: Favorites",
     "addToFavorites": "Add to favorites",
     "removeFromFavorites": "Remove from favorites",
@@ -675,6 +678,22 @@
     "viewGems": "View Gems",
     "scanGems": "Import Gems",
     "scanningGems": "Importing..."
+  },
+  "notebooks": {
+    "title": "Notebooks",
+    "untitledNotebook": "Untitled Notebook",
+    "empty": "No notebooks yet. Create one on Gemini.",
+    "noNotebooks": "No notebooks found.",
+    "openNotebook": "Open Notebook",
+    "openInNewTab": "Open in New Tab",
+    "hideNotebook": "Hide Notebook",
+    "hideNotebookConfirm": "Hide \"{{name}}\" from the sidebar? You can rescan to bring it back.",
+    "deleteNotebook": "Delete Notebook",
+    "deleteNotebookConfirm": "Are you sure you want to delete \"{{name}}\"? This will permanently delete the Notebook from Gemini.",
+    "newNotebook": "New Notebook",
+    "viewNotebooks": "View Notebooks",
+    "scanNotebooks": "Refresh Notebooks",
+    "scanningNotebooks": "Loading..."
   },
   "whatsNew": {
     "title": "What's New in v{{version}}",

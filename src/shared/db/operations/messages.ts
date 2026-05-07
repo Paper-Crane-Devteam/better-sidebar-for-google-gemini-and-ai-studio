@@ -21,10 +21,10 @@ export const messageRepo = {
 
   bulkInsert: async (
     conversationId: string,
-    messages: Omit<
+    messages: (Omit<
       Message,
       'id' | 'timestamp' | 'conversation_id' | 'order_index'
-    >[],
+    > & { id?: string; created_at?: number | null })[],
   ): Promise<void> => {
     if (messages.length === 0) return;
 
@@ -35,16 +35,27 @@ export const messageRepo = {
     );
     let currentOrder = (result[0]?.max_order ?? -1) + 1;
 
-    const operations = messages.map((msg) => ({
-      sql: 'INSERT INTO messages (id, conversation_id, role, content, message_type, timestamp, order_index) VALUES (hex(randomblob(16)), ?, ?, ?, ?, unixepoch(), ?)',
-      bind: [
-        conversationId,
-        msg.role,
-        msg.content,
-        msg.message_type || 'text',
-        currentOrder++,
-      ],
-    }));
+    // Honor caller-provided ids (e.g. Gemini r_xxx / rc_xxx from the interceptor)
+    // so downstream features like SmartScrollbar can match DB rows to DOM
+    // elements without generating duplicate entries. Fall back to a random
+    // hex id when the caller doesn't supply one.
+    const operations = messages.map((msg) => {
+      const hasId = typeof msg.id === 'string' && msg.id.length > 0;
+      const hasTs = msg.created_at != null;
+      return {
+        sql: `INSERT INTO messages (id, conversation_id, role, content, message_type, timestamp, order_index)
+              VALUES (${hasId ? '?' : 'hex(randomblob(16))'}, ?, ?, ?, ?, ${hasTs ? '?' : 'unixepoch()'}, ?)`,
+        bind: [
+          ...(hasId ? [msg.id] : []),
+          conversationId,
+          msg.role,
+          msg.content,
+          msg.message_type || 'text',
+          ...(hasTs ? [msg.created_at] : []),
+          currentOrder++,
+        ],
+      };
+    });
 
     await runBatch(operations);
   },

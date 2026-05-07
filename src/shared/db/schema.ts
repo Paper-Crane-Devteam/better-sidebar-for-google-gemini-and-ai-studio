@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS conversations (
   prompt_metadata TEXT,
   deleted_at INTEGER DEFAULT NULL, -- soft delete: unix timestamp in seconds, NULL = active
   gem_id TEXT,
+  notebook_id TEXT,
   FOREIGN KEY(folder_id) REFERENCES folders(id) ON DELETE CASCADE
 );
 
@@ -137,4 +138,20 @@ CREATE TABLE IF NOT EXISTS gems (
 );
 
 CREATE INDEX IF NOT EXISTS idx_gems_platform ON gems(platform);
+
+CREATE TABLE IF NOT EXISTS notebooks (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  external_id TEXT UNIQUE,
+  external_url TEXT,
+  icon_url TEXT,
+  description TEXT,
+  platform TEXT DEFAULT 'gemini',
+  order_index INTEGER DEFAULT 0,
+  is_deleted INTEGER DEFAULT 0,
+  created_at INTEGER DEFAULT (unixepoch()),
+  updated_at INTEGER DEFAULT (unixepoch())
+);
+
+CREATE INDEX IF NOT EXISTS idx_notebooks_platform ON notebooks(platform);
 `;

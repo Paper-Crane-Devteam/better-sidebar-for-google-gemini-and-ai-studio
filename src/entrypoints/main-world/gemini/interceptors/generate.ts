@@ -3,10 +3,12 @@ import {
   extractWrbFrPayloads,
 } from '../lib/response-parser';
 import { parseBatchExecuteRequest } from '../lib/request-parser';
+import { detectGeminiContext } from '@/shared/lib/gemini-context';
 
 export function handleGenerateResponse(response: any, url: string) {
   if (response.status === 200) {
     let prompt: string | null = null;
+    let requestNotebookId: string | null = null;
     // Parse Request
     try {
       const requestBody = response.config?.body;
@@ -28,6 +30,13 @@ export function handleGenerateResponse(response: any, url: string) {
             if (typeof promptCandidate === 'string') {
               prompt = promptCandidate;
             }
+
+            // Detect notebook from request payload.
+            // innerJson[21] = "notebooks/<uuid>" when chatting inside a notebook.
+            const nbField = innerJson?.[21];
+            if (typeof nbField === 'string' && nbField.startsWith('notebooks/')) {
+              requestNotebookId = nbField.slice('notebooks/'.length);
+            }
           }
         } catch (e) {
           // ignore
@@ -35,6 +44,9 @@ export function handleGenerateResponse(response: any, url: string) {
 
         if (prompt) {
           console.log('Better Sidebar (Gemini): Parsed User Prompt:', prompt);
+        }
+        if (requestNotebookId) {
+          console.log('Better Sidebar (Gemini): Detected notebook from request:', requestNotebookId);
         }
       }
     } catch (e) {
@@ -176,9 +188,12 @@ export function handleGenerateResponse(response: any, url: string) {
                 });
 
                 if (title) {
-                  // Detect if this is a gem conversation from the current URL
-                  const gemUrlMatch = /\/gem\/([^/]+?)(?:\/|$)/.exec(globalThis.location?.pathname || '');
-                  const gemId = gemUrlMatch ? gemUrlMatch[1] : undefined;
+                  // Detect the parent context (plain chat / gem / notebook)
+                  // Priority: URL gem → request notebook id → conversation
+                  const ctx = detectGeminiContext(
+                    globalThis.location?.pathname || '',
+                    requestNotebookId,
+                  );
 
                   globalThis.dispatchEvent(
                     new CustomEvent('BETTER_SIDEBAR_PROMPT_CREATE', {
@@ -187,8 +202,9 @@ export function handleGenerateResponse(response: any, url: string) {
                         title,
                         messages,
                         created_at: timestamp,
-                        type: 'gem',
-                        gem_id: gemId,
+                        type: ctx.type,
+                        gem_id: ctx.gemId ?? undefined,
+                        notebook_id: ctx.notebookId ?? undefined,
                       },
                     }),
                   );

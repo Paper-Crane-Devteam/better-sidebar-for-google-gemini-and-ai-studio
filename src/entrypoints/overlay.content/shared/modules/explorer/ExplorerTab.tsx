@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useAppStore } from '@/shared/lib/store';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { Button } from '../../components/ui/button';
@@ -67,6 +67,13 @@ export const ExplorerTab = ({
   const lastProcessedConversationIdRef = useRef<string | null>(null);
   const lastConversationIdsRef = useRef<Set<string>>(new Set());
 
+  // Track which folder a new chat is being created in (for loading state)
+  const [pendingNewChatFolderId, setPendingNewChatFolderId] = useState<string | null>(null);
+  // Track whether the user clicked "new chat" from a folder (waiting for generate)
+  const pendingFolderRef = useRef<string | null>(null);
+  // Skip scrollTo when auto-selecting a newly created conversation
+  const skipScrollForIdRef = useRef<string | null>(null);
+
   // Clear stale selection
   useEffect(() => {
     if (folders.length === 0 && conversations.length === 0) {
@@ -90,12 +97,55 @@ export const ExplorerTab = ({
     }
   }, [folders, conversations, selectedNode]);
 
+  // Wrap onNewChat to record the target folder and expand it
+  const handleNewChatFromFolder = useCallback(() => {
+    if (selectedNode && selectedNode.data.type === 'folder' && !selectedNode.data.data?.isTimeGroup) {
+      pendingFolderRef.current = selectedNode.data.id;
+      // Expand the folder so the loading entry is visible
+      treeRef.current?.open(selectedNode.data.id);
+    } else {
+      pendingFolderRef.current = null;
+    }
+    onNewChat();
+  }, [selectedNode, onNewChat]);
+
+  // Called from folder node action bar with explicit folderId
+  const handleNewChatInFolder = useCallback((folderId: string) => {
+    pendingFolderRef.current = folderId;
+    treeRef.current?.open(folderId);
+    onNewChat();
+  }, [onNewChat]);
+
+  // Listen for generate request start → show loading entry in the pending folder
+  useEffect(() => {
+    const handleGenerateStart = () => {
+      if (pendingFolderRef.current) {
+        setPendingNewChatFolderId(pendingFolderRef.current);
+        pendingFolderRef.current = null;
+      }
+    };
+    globalThis.addEventListener('BETTER_SIDEBAR_GENERATE_START', handleGenerateStart);
+    return () => globalThis.removeEventListener('BETTER_SIDEBAR_GENERATE_START', handleGenerateStart);
+  }, []);
+
+  // Safety timeout: clear loading state after 30s in case the event never fires
+  useEffect(() => {
+    if (!pendingNewChatFolderId) return;
+    const timer = setTimeout(() => setPendingNewChatFolderId(null), 30000);
+    return () => clearTimeout(timer);
+  }, [pendingNewChatFolderId]);
+
   // Handle New Chat Creation — assign to selected folder if one is active.
   // The actual DB save is handled by PromptCreateScanner in the content script,
   // so this only needs to move the conversation when a folder is selected.
   useEffect(() => {
     const handleCreate = async (event: any) => {
       const { id } = event.detail;
+
+      // Clear loading state — the real conversation will appear after fetchData
+      setPendingNewChatFolderId(null);
+      // The folder is already in view; don't scroll the tree when auto-selecting this id
+      skipScrollForIdRef.current = id;
 
       let targetFolderId: string | null = null;
       if (selectedNode) {
@@ -139,6 +189,9 @@ export const ExplorerTab = ({
   // Handle URL changes to auto-select prompt
   useEffect(() => {
     if (currentConversationId) {
+      // If user navigated to an existing conversation, discard any pending new-chat intent
+      pendingFolderRef.current = null;
+
       // Prevent redundant selection which might steal focus
       if (selectedNodeRef.current?.data?.id === currentConversationId) return;
 
@@ -159,9 +212,18 @@ export const ExplorerTab = ({
           (c) => c.id === currentConversationId,
         );
         if (exists) {
-          treeRef.current?.select(currentConversationId);
+          // Skip select entirely when the conversation was just created in a folder —
+          // react-arborist's select() always scrolls internally and there's no way to opt out.
+          if (skipScrollForIdRef.current !== currentConversationId) {
+            treeRef.current?.select(currentConversationId);
+          }
         }
         lastProcessedConversationIdRef.current = currentConversationId;
+      }
+
+      // Once the conversation is selected and stable, clear the skip flag
+      if (skipScrollForIdRef.current && skipScrollForIdRef.current !== currentConversationId) {
+        skipScrollForIdRef.current = null;
       }
 
       // Update the conversation IDs set
@@ -226,7 +288,7 @@ export const ExplorerTab = ({
   };
 
   return (
-    <ExplorerContext.Provider value={{ onNewChat }}>
+    <ExplorerContext.Provider value={{ onNewChat: handleNewChatFromFolder, onNewChatInFolder: handleNewChatInFolder, pendingNewChatFolderId }}>
     <div className="flex flex-col h-full w-full relative">
       {isScanning && (
         <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background/50 backdrop-blur-[1px] gap-2">
@@ -241,7 +303,7 @@ export const ExplorerTab = ({
         onNewFolder={handleNewFolder}
         onCollapseAll={handleCollapseAll}
         onSelectAll={handleSelectAll}
-        onNewChat={onNewChat}
+        onNewChat={handleNewChatFromFolder}
         newChatDropdownItems={newChatDropdownItems}
         filter={filter}
         filterTypes={filterTypes}

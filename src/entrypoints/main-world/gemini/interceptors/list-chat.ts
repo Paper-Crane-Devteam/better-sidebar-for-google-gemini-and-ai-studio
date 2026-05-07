@@ -1,5 +1,6 @@
 import { parseStreamingResponse, extractWrbFrPayloads } from '../lib/response-parser';
 import { parseBatchExecuteRequest } from '../lib/request-parser';
+import { classifyChatParentId } from '@/shared/lib/gemini-context';
 
 export function handleListChatResponse(response: any, url: string) {
   if (response.status === 200) {
@@ -58,13 +59,23 @@ export function handleListChatResponse(response: any, url: string) {
                              }
                              
                              if (id) {
-                                const gemId = chatItem?.[7] || null;
+                                // chatItem[7] holds the parent id when this chat
+                                // belongs to a gem OR a notebook. Notebook ids
+                                // are transmitted as `notebooks/<uuid>`.
+                                const { gemId, notebookId } = classifyChatParentId(
+                                    chatItem?.[7],
+                                );
+                                let type: string;
+                                if (notebookId) type = 'notebook';
+                                else if (gemId) type = 'gem';
+                                else type = 'conversation';
                                 items.push({
                                     id: id.replace(/^c_/, ''),
                                     title,
                                     created_at: createdAtSeconds,
-                                    type: gemId ? 'gem' : 'conversation',
+                                    type,
                                     gem_id: gemId,
+                                    notebook_id: notebookId,
                                 });
                              }
                          } catch (itemErr) {

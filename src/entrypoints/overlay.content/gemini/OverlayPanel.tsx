@@ -19,6 +19,7 @@ import {
   Menu,
   Library,
   Gem,
+  NotebookText,
   SquarePen,
 } from 'lucide-react';
 import { SqlExecutor } from '../shared/components/menu/SqlExecutor';
@@ -29,6 +30,7 @@ import { FavoritesTab } from '../shared/modules/favorites/FavoritesTab';
 import { TagsTab } from '../shared/modules/tags/TagsTab';
 import { FeedbackTab } from '../shared/modules/feedback/FeedbackTab';
 import { GemsTab } from '../shared/modules/gems/GemsTab';
+import { NotebooksTab } from '../shared/modules/notebooks/NotebooksTab';
 import { SettingsModal } from '../shared/modules/settings/SettingsModal';
 import { WhatsNewDialog } from '../shared/modules/whats-new/WhatsNewDialog';
 import { FirstInstallPrompt } from '../shared/modules/whats-new/FirstInstallPrompt';
@@ -156,7 +158,8 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
       | 'settings'
       | 'search'
       | 'prompts'
-      | 'gems',
+      | 'gems'
+      | 'notebooks',
   ) => {
     if (tab === 'settings') {
       setIsSettingsOpen(true);
@@ -310,20 +313,20 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
             </Button>
           </SimpleTooltip>
 
-          {((shortcuts?.myStuff ?? true) || (shortcuts?.gems ?? true)) && (
+          {((shortcuts?.myStuff ?? true) || (shortcuts?.gems ?? true) || (shortcuts?.notebooks ?? true)) && (
             <Separator className="w-8 my-1" />
           )}
 
-          {(shortcuts?.myStuff ?? true) && (
-            <SimpleTooltip content={t('shortcuts.myStuff')}>
+          {(shortcuts?.notebooks ?? true) && (
+            <SimpleTooltip content={t('tabs.notebooks')}>
               <Button
-                variant="ghost"
+                variant={activeTab === 'notebooks' ? 'secondary' : 'ghost'}
                 size="icon"
-                onClick={() => navigate('https://gemini.google.com/mystuff')}
+                onClick={() => handleTabChange('notebooks')}
                 className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-                data-tour-id="tour-mystuff"
+                data-tour-id="tour-notebooks"
               >
-                <Library className="sidebar-icon" />
+                <NotebookText className="sidebar-icon" />
               </Button>
             </SimpleTooltip>
           )}
@@ -338,6 +341,20 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
                 data-tour-id="tour-gems"
               >
                 <Gem className="sidebar-icon" />
+              </Button>
+            </SimpleTooltip>
+          )}
+
+          {(shortcuts?.myStuff ?? true) && (
+            <SimpleTooltip content={t('shortcuts.myStuff')}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate('https://gemini.google.com/mystuff')}
+                className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+                data-tour-id="tour-mystuff"
+              >
+                <Library className="sidebar-icon" />
               </Button>
             </SimpleTooltip>
           )}
@@ -427,6 +444,8 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
           <TagsTab menuActions={moduleConfig.general.menuActions} />
         ) : activeTab === 'gems' ? (
           <GemsTab menuActions={moduleConfig.general.menuActions} />
+        ) : activeTab === 'notebooks' ? (
+          <NotebooksTab menuActions={moduleConfig.general.menuActions} />
         ) : activeTab === 'feedback' ? (
           <FeedbackTab />
         ) : (

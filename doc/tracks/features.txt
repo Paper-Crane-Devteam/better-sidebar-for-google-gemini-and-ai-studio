@@ -9,7 +9,7 @@
 10. claude support
 -11. nano banana watermark removal
 -12. add tag drop down beside title
-13. gemini gem mangement 
+-13. gemini gem mangement 
 -14. zen mode
 15. demo video
 -16. landing page
@@ -23,4 +23,8 @@
 25. customize tab icon and order
 26. scroll to top and bottom button
 27. keyboard shortcuts
-28. real deletion of chats
+-28. real deletion of chats
+29. debounce sync with gdrive and keep session
+30. notebook integration
+-31. pending create indication
+32. export includes thinking process

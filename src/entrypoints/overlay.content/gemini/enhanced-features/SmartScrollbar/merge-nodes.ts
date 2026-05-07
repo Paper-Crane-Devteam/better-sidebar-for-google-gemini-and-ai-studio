@@ -21,14 +21,31 @@ export function mergeNodes(
   for (const n of incoming) {
     const existing = byId.get(n.id);
     if (!existing) {
-      // Try to find a node with different id but same orderIndex+content
-      // (DB hex id vs interceptor Gemini id for the same message).
+      // Try to find a node with a different id but the same logical message.
+      // Two cases to reconcile:
+      //  (a) DB hex id vs interceptor Gemini id — match by orderIndex+content
+      //      when both sides carry an orderIndex.
+      //  (b) Interceptor node (no orderIndex) arriving alongside a DB node
+      //      with the same role+content — match on role+trimmed content.
       let mergeTarget: ConversationNode | undefined;
+      const trimmed = n.content.trim();
       if (n.orderIndex != null) {
         for (const e of byId.values()) {
           if (
             e.orderIndex === n.orderIndex &&
-            e.content.trim() === n.content.trim()
+            e.content.trim() === trimmed
+          ) {
+            mergeTarget = e;
+            break;
+          }
+        }
+      }
+      if (!mergeTarget) {
+        for (const e of byId.values()) {
+          if (
+            e.role === n.role &&
+            e.content.trim() === trimmed &&
+            (looksLikeGeminiId(e.id) !== looksLikeGeminiId(n.id))
           ) {
             mergeTarget = e;
             break;

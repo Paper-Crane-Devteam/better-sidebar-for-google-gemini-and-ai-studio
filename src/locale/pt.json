@@ -23,7 +23,8 @@
     "tags": "Tags",
     "feedback": "Feedback",
     "settings": "Configurações",
-    "gems": "Gems"
+    "gems": "Gems",
+    "notebooks": "Notebooks"
   },
   "sidebar": {
     "newConversation": "Nova Conversa",
@@ -276,6 +277,7 @@
     "filterConversations": "Filtro: Conversas",
     "filterImages": "Filtro: Imagens",
     "filterGems": "Filtro: Gems",
+    "filterNotebooks": "Filtro: Notebooks",
     "filterFavorites": "Filtro: Favoritos",
     "addToFavorites": "Adicionar aos favoritos",
     "removeFromFavorites": "Remover dos favoritos",
@@ -679,6 +681,22 @@
     "viewGems": "Ver Gems",
     "scanGems": "Importar Gems",
     "scanningGems": "Importando..."
+  },
+  "notebooks": {
+    "title": "Notebooks",
+    "untitledNotebook": "Notebook sem título",
+    "empty": "Nenhum notebook ainda. Crie um no Gemini.",
+    "noNotebooks": "Nenhum notebook encontrado.",
+    "openNotebook": "Abrir Notebook",
+    "openInNewTab": "Abrir em nova aba",
+    "hideNotebook": "Ocultar Notebook",
+    "hideNotebookConfirm": "Ocultar \"{{name}}\" da barra lateral? Você pode reescanear para recuperá-lo.",
+    "deleteNotebook": "Excluir Notebook",
+    "deleteNotebookConfirm": "Tem certeza de que deseja excluir \"{{name}}\"? Isso excluirá permanentemente o Notebook do Gemini.",
+    "newNotebook": "Novo Notebook",
+    "viewNotebooks": "Ver Notebooks",
+    "scanNotebooks": "Atualizar Notebooks",
+    "scanningNotebooks": "Carregando..."
   },
   "whatsNew": {
     "title": "Novidades na v{{version}}",

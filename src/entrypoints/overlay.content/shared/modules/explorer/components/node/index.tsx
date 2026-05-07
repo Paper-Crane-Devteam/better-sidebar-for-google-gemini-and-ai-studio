@@ -31,7 +31,7 @@ import { useExplorerMenuItems } from './useExplorerMenuItems';
 
 export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
   const { t } = useI18n();
-  const { onNewChat } = useExplorerContext();
+  const { onNewChat, onNewChatInFolder } = useExplorerContext();
   const {
     conversationTags,
     addTagToConversation,
@@ -119,6 +119,24 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
   useEffect(() => {
     setNewName(node.data.name);
   }, [node.data.name, node.isEditing]);
+
+  // Render loading skeleton for pending new chat (after all hooks)
+  if (node.data.data?.isPendingNewChat) {
+    return (
+      <div style={style} className="h-[calc(100%-2px)] w-[calc(100%-4px)] mx-auto mt-[1px]">
+        <div className="flex items-center h-full px-1 pr-2">
+          <div
+            className="ml-5 flex-1 h-3 rounded-full"
+            style={{
+              background: 'linear-gradient(90deg, rgb(var(--muted-foreground) / 0.1) 25%, rgb(var(--muted-foreground) / 0.05) 50%, rgb(var(--muted-foreground) / 0.1) 75%)',
+              backgroundSize: '200% 100%',
+              animation: 'shimmer 1.5s ease-in-out infinite',
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
 
   const handleToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -372,14 +390,14 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
               <NodeActionBar
                 actions={[
                   // New chat button for folders
-                  ...(!isFile && !isTimeGroup && onNewChat ? [{
+                  ...(!isFile && !isTimeGroup && onNewChatInFolder ? [{
                     icon: <MessageSquarePlus className="h-3.5 w-3.5" />,
                     tooltip: t('tooltip.newChat'),
                     onClick: (e: React.MouseEvent) => {
                       e.stopPropagation();
                       e.preventDefault();
                       node.select();
-                      onNewChat();
+                      onNewChatInFolder(node.data.id);
                     },
                   }] : []),
                 ]}

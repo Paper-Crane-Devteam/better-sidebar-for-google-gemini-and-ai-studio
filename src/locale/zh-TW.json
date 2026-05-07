@@ -23,7 +23,8 @@
     "tags": "標籤",
     "feedback": "意見回饋",
     "settings": "設定",
-    "gems": "Gems"
+    "gems": "Gems",
+    "notebooks": "筆記本"
   },
   "sidebar": {
     "newConversation": "新增對話",
@@ -276,6 +277,7 @@
     "filterConversations": "篩選：對話",
     "filterImages": "篩選：圖片",
     "filterGems": "篩選：Gem",
+    "filterNotebooks": "篩選：筆記本",
     "filterFavorites": "篩選：收藏",
     "addToFavorites": "新增至收藏",
     "removeFromFavorites": "從收藏中移除",
@@ -676,6 +678,22 @@
     "viewGems": "檢視 Gems",
     "scanGems": "匯入 Gems",
     "scanningGems": "匯入中..."
+  },
+  "notebooks": {
+    "title": "筆記本",
+    "untitledNotebook": "無標題筆記本",
+    "empty": "尚無筆記本。請在 Gemini 中建立。",
+    "noNotebooks": "找不到筆記本。",
+    "openNotebook": "開啟筆記本",
+    "openInNewTab": "在新分頁中開啟",
+    "hideNotebook": "隱藏筆記本",
+    "hideNotebookConfirm": "從側邊欄隱藏 \"{{name}}\"？您可以重新掃描以恢復。",
+    "deleteNotebook": "刪除筆記本",
+    "deleteNotebookConfirm": "確定要刪除 \"{{name}}\" 嗎？這將從 Gemini 中永久刪除該筆記本。",
+    "newNotebook": "新增筆記本",
+    "viewNotebooks": "檢視筆記本",
+    "scanNotebooks": "重新整理筆記本",
+    "scanningNotebooks": "載入中..."
   },
   "whatsNew": {
     "title": "v{{version}} 更新內容",

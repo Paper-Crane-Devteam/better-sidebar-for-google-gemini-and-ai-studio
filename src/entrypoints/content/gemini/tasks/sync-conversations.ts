@@ -95,6 +95,7 @@ async function processAndSendItems() {
         platform: Platform.GEMINI,
         type: item.type || 'conversation',
         gem_id: item.gem_id || null,
+        notebook_id: item.notebook_id || null,
     }));
 
     if (payloadItems.length > 0) {

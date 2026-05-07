@@ -26,7 +26,7 @@ interface SettingsState {
   layoutDensity: 'compact' | 'relaxed';
   newChatBehavior: 'current-tab' | 'new-tab';
   autoScanLibrary: boolean;
-  overlayPosition: 'bottom-left' | 'bottom-right';
+  overlayPosition: { x: number; y: number };
   lastSelectedGemId: string | null;
   explorer: {
     viewMode: 'tree' | 'timeline';
@@ -44,6 +44,7 @@ interface SettingsState {
     codex: boolean;
     myStuff: boolean;
     gems: boolean;
+    notebooks: boolean;
     originalUI: boolean;
   };
   enhancedFeatures: {
@@ -55,7 +56,7 @@ interface SettingsState {
   setLayoutDensity: (density: 'compact' | 'relaxed') => void;
   setNewChatBehavior: (behavior: 'current-tab' | 'new-tab') => void;
   setAutoScanLibrary: (enabled: boolean) => void;
-  setOverlayPosition: (position: 'bottom-left' | 'bottom-right') => void;
+  setOverlayPosition: (position: { x: number; y: number }) => void;
   setExplorerViewMode: (mode: 'tree' | 'timeline') => void;
   setExplorerSortOrder: (order: 'alpha' | 'date') => void;
   setExplorerIgnoredFolders: (folders: string[]) => void;
@@ -123,7 +124,7 @@ export const useSettingsStore = create<SettingsState>()(
       layoutDensity: 'relaxed',
       newChatBehavior: 'current-tab',
       autoScanLibrary: false,
-      overlayPosition: 'bottom-left',
+      overlayPosition: { x: 16, y: 16 },
       lastSelectedGemId: null,
       explorer: {
         viewMode: 'tree',
@@ -141,6 +142,7 @@ export const useSettingsStore = create<SettingsState>()(
         codex: true,
         myStuff: true,
         gems: true,
+        notebooks: true,
         originalUI: true,
       },
       enhancedFeatures: {
@@ -204,7 +206,7 @@ export const useSettingsStore = create<SettingsState>()(
     {
       name: getStorageName(),
       storage: createJSONStorage(() => storage),
-      version: 1,
+      version: 2,
       migrate: (persistedState: any, version: number) => {
         if (version === 0) {
           const oldEnhanced = persistedState.enhancedFeatures || {};
@@ -222,6 +224,16 @@ export const useSettingsStore = create<SettingsState>()(
           };
           delete persistedState.enableResizableSidebar;
           delete persistedState.customSidebarWidth;
+        }
+        if (version < 2) {
+          // Migrate old string position to {x, y} coordinates (bottom-left offset from bottom-left corner)
+          const old = persistedState.overlayPosition;
+          if (typeof old === 'string') {
+            persistedState.overlayPosition =
+              old === 'bottom-right'
+                ? { x: window.innerWidth - 60, y: 16 }
+                : { x: 16, y: 16 };
+          }
         }
         return persistedState;
       },

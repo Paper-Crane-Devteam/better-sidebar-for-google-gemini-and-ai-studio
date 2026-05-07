@@ -5,15 +5,25 @@
 export const runMigrations = async (db: any) => {
   console.log('Worker: Checking for migrations...');
 
+  // Helper to check if a column exists in a table
+  const hasColumn = async (
+    table: string,
+    column: string,
+  ): Promise<boolean> => {
+    const columns = await db.run(`PRAGMA table_info(${table})`);
+    return columns.some((col: any) => col.name === column);
+  };
+
+  // Individual migration wrapper — keeps one failure from cascading into the rest.
+  const step = async (name: string, fn: () => Promise<void>) => {
+    try {
+      await fn();
+    } catch (err) {
+      console.error(`Worker: Migration "${name}" failed:`, err);
+    }
+  };
+
   try {
-    // Helper to check if a column exists in a table
-    const hasColumn = async (
-      table: string,
-      column: string,
-    ): Promise<boolean> => {
-      const columns = await db.run(`PRAGMA table_info(${table})`);
-      return columns.some((col: any) => col.name === column);
-    };
 
     // Migration: Add order_index to messages if missing
     if (!(await hasColumn('messages', 'order_index'))) {
@@ -145,6 +155,45 @@ export const runMigrations = async (db: any) => {
         'ALTER TABLE gems ADD COLUMN is_deleted INTEGER DEFAULT 0',
       );
     }
+
+    // Migration: Add notebook_id to conversations if missing
+    await step('add notebook_id to conversations', async () => {
+      if (!(await hasColumn('conversations', 'notebook_id'))) {
+        console.log('Worker: Migrating conversations table - adding notebook_id');
+        await db.run('ALTER TABLE conversations ADD COLUMN notebook_id TEXT');
+      }
+      await db.run(
+        'CREATE INDEX IF NOT EXISTS idx_conversations_notebook_id ON conversations(notebook_id)',
+      );
+    });
+
+    // Migration: Create notebooks table if missing
+    await step('create notebooks table', async () => {
+      const notebooksTableExists = await db.run(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='notebooks'",
+      );
+      if (notebooksTableExists.length === 0) {
+        console.log('Worker: Creating notebooks table');
+        await db.run(`
+          CREATE TABLE IF NOT EXISTS notebooks (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            external_id TEXT UNIQUE,
+            external_url TEXT,
+            icon_url TEXT,
+            description TEXT,
+            platform TEXT DEFAULT 'gemini',
+            order_index INTEGER DEFAULT 0,
+            is_deleted INTEGER DEFAULT 0,
+            created_at INTEGER DEFAULT (unixepoch()),
+            updated_at INTEGER DEFAULT (unixepoch())
+          )
+        `);
+        await db.run(
+          'CREATE INDEX IF NOT EXISTS idx_notebooks_platform ON notebooks(platform)',
+        );
+      }
+    });
 
     // Migration: Add updated_at to favorites if missing
     if (!(await hasColumn('favorites', 'updated_at'))) {

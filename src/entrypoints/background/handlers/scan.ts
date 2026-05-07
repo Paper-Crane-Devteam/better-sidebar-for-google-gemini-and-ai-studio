@@ -101,6 +101,21 @@ export async function handleScan(
         return { success: false, error: (e as Error).message };
       }
     }
+    case 'START_NOTEBOOK_SCAN': {
+      const tabId = sender.tab?.id;
+      if (tabId == null) {
+        return { success: false, error: 'No active tab' };
+      }
+      try {
+        const response = await browser.tabs.sendMessage(tabId, {
+          type: 'START_NOTEBOOK_SCAN',
+        });
+        return response ?? { success: true };
+      } catch (e) {
+        console.error('Failed to start notebook scan:', e);
+        return { success: false, error: (e as Error).message };
+      }
+    }
     case 'SAVE_SCANNED_ITEMS': {
       const items = message.payload.items || [];
       const platform = message.platform || items[0]?.platform || 'aistudio';

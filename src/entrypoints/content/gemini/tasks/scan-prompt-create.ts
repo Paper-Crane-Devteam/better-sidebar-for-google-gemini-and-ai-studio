@@ -16,8 +16,16 @@ export class PromptCreateScanner {
 
   constructor() {
     this.listener = async (event: Event) => {
-      const { id, title, prompt_metadata, created_at, type, messages, gem_id } =
-        (event as CustomEvent).detail;
+      const {
+        id,
+        title,
+        prompt_metadata,
+        created_at,
+        type,
+        messages,
+        gem_id,
+        notebook_id,
+      } = (event as CustomEvent).detail;
 
       if (!id) return;
 
@@ -42,6 +50,7 @@ export class PromptCreateScanner {
             type,
             messages,
             gem_id: gem_id || undefined,
+            notebook_id: notebook_id || undefined,
             platform: 'gemini',
           },
         });

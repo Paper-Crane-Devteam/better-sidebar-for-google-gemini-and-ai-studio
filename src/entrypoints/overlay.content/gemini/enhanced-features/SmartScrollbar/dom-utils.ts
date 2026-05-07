@@ -1,6 +1,7 @@
 /**
  * Gemini native message IDs typically start with "r_" or "rc_" prefixes.
- * DB bulkInsert IDs are 32-char uppercase hex strings or UUID v4.
+ * Non-native IDs are 32-char uppercase hex (fallback from bulkInsert when
+ * the caller doesn't provide an id) or UUID v4 strings.
  */
 export function looksLikeGeminiId(id: string): boolean {
   return (

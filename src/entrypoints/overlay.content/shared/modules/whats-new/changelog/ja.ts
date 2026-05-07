@@ -2,6 +2,14 @@ import type { ChangeLogItem } from './types';
 
 export const changelog: ChangeLogItem[] = [
   {
+    version: '2.4.1',
+    date: '2026-04-21',
+    features: [],
+    fixes: [
+      '🚑 **緊急修正**：AI Studio のリデザインに対応 — 新しい `ms-navbar-v2` ナビゲーションバーを認識し、「元のサイドバーに切り替え」でネイティブのナビゲーションバーが正しく復元されるようになりました。',
+    ],
+  },
+  {
     version: '2.4.0',
     date: '2026-04-13',
     features: [

@@ -5,6 +5,7 @@ import {
   Prompt,
   PromptFolder,
   Gem,
+  Notebook,
 } from '../../types/db';
 import type { Platform } from '../../types/platform';
 
@@ -22,12 +23,14 @@ export interface Conversation {
   folder_id: string | null;
   updated_at: number;
   created_at?: number;
+  last_active_at?: number;
   prompt_metadata?: any;
   external_url?: string;
   external_id?: string;
-  type?: 'conversation' | 'text-to-image' | 'gem';
+  type?: 'conversation' | 'text-to-image' | 'gem' | 'notebook';
   platform?: string;
   gem_id?: string | null;
+  notebook_id?: string | null;
 }
 
 export interface UIState {
@@ -43,7 +46,8 @@ export interface UIState {
       | 'settings'
       | 'search'
       | 'prompts'
-      | 'gems';
+      | 'gems'
+      | 'notebooks';
     isSettingsOpen: boolean;
     isScanning: boolean;
     showSqlInterface: boolean;
@@ -84,7 +88,7 @@ export interface UIState {
   explorer: {
     search: { isOpen: boolean; query: string };
     tags: { isOpen: boolean; selected: string[] };
-    typeFilter: 'all' | 'conversation' | 'text-to-image' | 'gem';
+    typeFilter: 'all' | 'conversation' | 'text-to-image' | 'gem' | 'notebook';
     onlyFavorites: boolean;
     sortOrder: 'alpha' | 'date';
     viewMode: 'tree' | 'timeline';
@@ -93,9 +97,15 @@ export interface UIState {
   favorites: {
     search: { isOpen: boolean; query: string };
     tags: { isOpen: boolean; selected: string[] };
-    typeFilter: 'all' | 'conversation' | 'text-to-image' | 'gem';
+    typeFilter: 'all' | 'conversation' | 'text-to-image' | 'gem' | 'notebook';
   };
   gems: {
+    search: { isOpen: boolean; query: string };
+    tags: { isOpen: boolean; selected: string[] };
+    onlyFavorites: boolean;
+    sortOrder: 'alpha' | 'date';
+  };
+  notebooks: {
     search: { isOpen: boolean; query: string };
     tags: { isOpen: boolean; selected: string[] };
     onlyFavorites: boolean;
@@ -112,6 +122,7 @@ export interface AppState {
   tags: Tag[];
   conversationTags: ConversationTag[];
   gems: Gem[];
+  notebooks: Notebook[];
   isLoading: boolean;
   ui: UIState;
 
@@ -173,14 +184,15 @@ export interface AppState {
       | 'settings'
       | 'search'
       | 'prompts'
-      | 'gems',
+      | 'gems'
+      | 'notebooks',
   ) => void;
   setIsScanning: (isScanning: boolean) => void;
   setShowSqlInterface: (show: boolean) => void;
   setExplorerSearch: (isOpen: boolean, query?: string) => void;
   setExplorerTags: (isOpen: boolean, selected?: string[]) => void;
   setExplorerTypeFilter: (
-    filter: 'all' | 'conversation' | 'text-to-image' | 'gem',
+    filter: 'all' | 'conversation' | 'text-to-image' | 'gem' | 'notebook',
   ) => void;
   setExplorerOnlyFavorites: (onlyFavorites: boolean) => void;
   setExplorerSortOrder: (order: 'alpha' | 'date') => void;
@@ -192,7 +204,7 @@ export interface AppState {
   setFavoritesSearch: (isOpen: boolean, query?: string) => void;
   setFavoritesTags: (isOpen: boolean, selected?: string[]) => void;
   setFavoritesTypeFilter: (
-    filter: 'all' | 'conversation' | 'text-to-image' | 'gem',
+    filter: 'all' | 'conversation' | 'text-to-image' | 'gem' | 'notebook',
   ) => void;
 
   setSearchQuery: (query: string) => void;
@@ -244,6 +256,13 @@ export interface AppState {
   setGemsTags: (isOpen: boolean, selected?: string[]) => void;
   setGemsOnlyFavorites: (onlyFavorites: boolean) => void;
   setGemsSortOrder: (order: 'alpha' | 'date') => void;
+
+  // Notebooks
+  setNotebooks: (notebooks: Notebook[]) => void;
+  setNotebooksSearch: (isOpen: boolean, query?: string) => void;
+  setNotebooksTags: (isOpen: boolean, selected?: string[]) => void;
+  setNotebooksOnlyFavorites: (onlyFavorites: boolean) => void;
+  setNotebooksSortOrder: (order: 'alpha' | 'date') => void;
 }
 
 export type SetState = (
