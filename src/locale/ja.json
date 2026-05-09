@@ -23,7 +23,8 @@
     "tags": "タグ",
     "feedback": "フィードバック",
     "settings": "設定",
-    "gems": "Gems"
+    "gems": "Gems",
+    "notebooks": "ノートブック"
   },
   "sidebar": {
     "newConversation": "新しい会話",
@@ -276,6 +277,7 @@
     "filterConversations": "フィルタ：会話",
     "filterImages": "フィルタ：画像",
     "filterGems": "フィルタ：Gem",
+    "filterNotebooks": "フィルタ：ノートブック",
     "filterFavorites": "フィルタ：お気に入り",
     "addToFavorites": "お気に入りに追加",
     "removeFromFavorites": "お気に入りから削除",
@@ -677,6 +679,22 @@
     "viewGems": "Gems を表示",
     "scanGems": "Gems をインポート",
     "scanningGems": "インポート中..."
+  },
+  "notebooks": {
+    "title": "ノートブック",
+    "untitledNotebook": "無題のノートブック",
+    "empty": "ノートブックはまだありません。Geminiで作成してください。",
+    "noNotebooks": "ノートブックが見つかりません。",
+    "openNotebook": "ノートブックを開く",
+    "openInNewTab": "新しいタブで開く",
+    "hideNotebook": "ノートブックを非表示",
+    "hideNotebookConfirm": "\"{{name}}\" をサイドバーから非表示にしますか？再スキャンで復元できます。",
+    "deleteNotebook": "ノートブックを削除",
+    "deleteNotebookConfirm": "\"{{name}}\" を削除してもよろしいですか？この操作により、Geminiからノートブックが完全に削除されます。",
+    "newNotebook": "新しいノートブック",
+    "viewNotebooks": "ノートブックを表示",
+    "scanNotebooks": "ノートブックを更新",
+    "scanningNotebooks": "読み込み中..."
   },
   "whatsNew": {
     "title": "v{{version}} の新機能",

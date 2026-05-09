@@ -23,7 +23,8 @@
     "tags": "Теги",
     "feedback": "Обратная связь",
     "settings": "Настройки",
-    "gems": "Gems"
+    "gems": "Gems",
+    "notebooks": "Блокноты"
   },
   "sidebar": {
     "newConversation": "Новый диалог",
@@ -276,6 +277,7 @@
     "filterConversations": "Фильтр: Диалоги",
     "filterImages": "Фильтр: Изображения",
     "filterGems": "Фильтр: Gem",
+    "filterNotebooks": "Фильтр: Блокноты",
     "filterFavorites": "Фильтр: Избранное",
     "addToFavorites": "Добавить в избранное",
     "removeFromFavorites": "Удалить из избранного",
@@ -676,6 +678,22 @@
     "viewGems": "Просмотр Gems",
     "scanGems": "Импортировать Gems",
     "scanningGems": "Импорт..."
+  },
+  "notebooks": {
+    "title": "Блокноты",
+    "untitledNotebook": "Блокнот без названия",
+    "empty": "Блокнотов пока нет. Создайте один в Gemini.",
+    "noNotebooks": "Блокноты не найдены.",
+    "openNotebook": "Открыть блокнот",
+    "openInNewTab": "Открыть в новой вкладке",
+    "hideNotebook": "Скрыть блокнот",
+    "hideNotebookConfirm": "Скрыть \"{{name}}\" из боковой панели? Вы можете повторно сканировать, чтобы вернуть его.",
+    "deleteNotebook": "Удалить блокнот",
+    "deleteNotebookConfirm": "Вы уверены, что хотите удалить \"{{name}}\"? Это навсегда удалит блокнот из Gemini.",
+    "newNotebook": "Новый блокнот",
+    "viewNotebooks": "Просмотр блокнотов",
+    "scanNotebooks": "Обновить блокноты",
+    "scanningNotebooks": "Загрузка..."
   },
   "whatsNew": {
     "title": "Что нового в v{{version}}",

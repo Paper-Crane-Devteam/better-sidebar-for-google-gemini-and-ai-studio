@@ -9,6 +9,7 @@ import { chatContentScanner } from './tasks/scan-chat-content';
 import { gemCreationScanner } from './tasks/scan-gem-creation';
 import { promptCreateScanner } from './tasks/scan-prompt-create';
 import { scanGems } from './tasks/scan-gems';
+import { notebookListScanner, scanNotebooks } from './tasks/scan-notebooks';
 
 import { syncConversations } from './tasks/sync-conversations';
 // import { initImageProcessor } from './tasks/process-images';
@@ -62,6 +63,7 @@ export async function initGemini() {
   chatContentScanner.start();
   gemCreationScanner.start();
   promptCreateScanner.start();
+  notebookListScanner.start();
 
   // Start image watermark processor (MutationObserver on img tags)
   // initImageProcessor().catch((e) => {
@@ -129,6 +131,46 @@ export async function initGemini() {
     }
   });
 
+  window.addEventListener('GEMINI_NOTEBOOK_DELETE', async (event: any) => {
+    const { id } = event.detail;
+    console.log(
+      'Better Sidebar: Content Script received GEMINI_NOTEBOOK_DELETE',
+      id,
+    );
+    try {
+      await browser.runtime.sendMessage({
+        type: 'DELETE_NOTEBOOK',
+        payload: { id },
+      });
+    } catch (e) {
+      console.error('Better Sidebar: Failed to handle GEMINI_NOTEBOOK_DELETE', e);
+    }
+  });
+
+  window.addEventListener('GEMINI_NOTEBOOK_CREATED', async (event: any) => {
+    const { id, name } = event.detail;
+    if (!id) return;
+    console.log(
+      'Better Sidebar: Content Script received GEMINI_NOTEBOOK_CREATED',
+      id,
+      name,
+    );
+    try {
+      await browser.runtime.sendMessage({
+        type: 'SAVE_NOTEBOOK',
+        payload: {
+          id,
+          name: name || 'Untitled Notebook',
+          external_id: id,
+          external_url: `https://gemini.google.com/notebook/notebooks%2F${id}`,
+          platform: 'gemini',
+        },
+      });
+    } catch (e) {
+      console.error('Better Sidebar: Failed to handle GEMINI_NOTEBOOK_CREATED', e);
+    }
+  });
+
   window.addEventListener('GEMINI_CHAT_RENAME', async (event: any) => {
     const { id, newName } = event.detail;
     console.log(
@@ -161,6 +203,16 @@ export async function initGemini() {
       }
       if (message.type === 'START_GEM_SCAN') {
         scanGems()
+          .then((count) => {
+            sendResponse({ success: true, data: { count } });
+          })
+          .catch((err) => {
+            sendResponse({ success: false, error: err.message });
+          });
+        return true;
+      }
+      if (message.type === 'START_NOTEBOOK_SCAN') {
+        scanNotebooks()
           .then((count) => {
             sendResponse({ success: true, data: { count } });
           })

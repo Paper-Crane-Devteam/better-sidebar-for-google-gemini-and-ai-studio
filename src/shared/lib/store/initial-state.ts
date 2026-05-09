@@ -33,6 +33,12 @@ export const initialUIState: UIState = {
     onlyFavorites: false,
     sortOrder: 'alpha',
   },
+  notebooks: {
+    search: { isOpen: false, query: '' },
+    tags: { isOpen: false, selected: [] },
+    onlyFavorites: false,
+    sortOrder: 'alpha',
+  },
   prompts: {
     search: { isOpen: false, query: '' },
     typeFilter: 'all',

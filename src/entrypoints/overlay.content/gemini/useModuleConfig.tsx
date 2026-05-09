@@ -225,7 +225,7 @@ export const useModuleConfig = (): ModuleConfig => {
           onClick: toggleTempChat,
         },
       ],
-      filterTypes: ['all', 'conversation', 'gem'] as const,
+      filterTypes: ['all', 'conversation', 'gem', 'notebook'] as const,
       visibleFilters: ['search', 'tags', 'type', 'favorites'],
       extraHeaderButtons: <GemSplitButton />,
     },

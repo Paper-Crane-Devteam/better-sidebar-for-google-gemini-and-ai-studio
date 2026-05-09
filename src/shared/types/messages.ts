@@ -31,6 +31,8 @@ export type ExtensionMessage = (
         created_at?: number;
         prompt_metadata?: any;
         type?: string;
+        gem_id?: string | null;
+        notebook_id?: string | null;
         messages: {
           id?: string;
           role: 'user' | 'model';
@@ -70,11 +72,13 @@ export type ExtensionMessage = (
         type?: string;
         platform?: string;
         gem_id?: string | null;
+        notebook_id?: string | null;
       };
     }
   | { type: 'SCAN_LIBRARY' }
   | { type: 'START_LIBRARY_SCAN' }
   | { type: 'START_GEM_SCAN' }
+  | { type: 'START_NOTEBOOK_SCAN' }
   | { type: 'START_SYNC_CONVERSATIONS' }
   | { type: 'SYNC_CONVERSATIONS'; payload: { items: any[] } }
   | { type: 'GET_PAGE_LOCAL_STORAGE'; payload: { key: string } }
@@ -94,6 +98,7 @@ export type ExtensionMessage = (
           type?: string;
           folder_id?: string | null;
           gem_id?: string | null;
+          notebook_id?: string | null;
         }[];
       };
     }
@@ -356,6 +361,44 @@ export type ExtensionMessage = (
       };
     }
   | { type: 'GET_GEM_CONVERSATIONS'; payload: { gemId: string } }
+  // Notebooks
+  | { type: 'GET_NOTEBOOKS' }
+  | {
+      type: 'SAVE_NOTEBOOK';
+      payload: {
+        id: string;
+        name: string;
+        external_id?: string;
+        external_url?: string;
+        icon_url?: string;
+        description?: string;
+        platform?: string;
+      };
+    }
+  | {
+      type: 'SAVE_NOTEBOOKS';
+      payload: {
+        notebooks: {
+          id: string;
+          name: string;
+          external_id?: string;
+          external_url?: string;
+          icon_url?: string;
+          description?: string;
+          platform?: string;
+        }[];
+      };
+    }
+  | { type: 'DELETE_NOTEBOOK'; payload: { id: string } }
+  | { type: 'HIDE_NOTEBOOK'; payload: { id: string } }
+  | {
+      type: 'UPDATE_NOTEBOOK';
+      payload: {
+        id: string;
+        updates: Partial<{ name: string; description: string; icon_url: string }>;
+      };
+    }
+  | { type: 'GET_NOTEBOOK_CONVERSATIONS'; payload: { notebookId: string } }
   // Google Drive sync
   | { type: 'GDRIVE_AUTH' }
   | { type: 'GDRIVE_DISCONNECT' }

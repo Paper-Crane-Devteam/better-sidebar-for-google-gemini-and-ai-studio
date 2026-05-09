@@ -26,5 +26,5 @@
 -28. real deletion of chats
 29. debounce sync with gdrive and keep session
 30. notebook integration
-31. pending create indication
+-31. pending create indication
 32. export includes thinking process

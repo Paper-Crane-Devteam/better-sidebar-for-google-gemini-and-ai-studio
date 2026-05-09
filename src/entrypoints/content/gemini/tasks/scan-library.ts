@@ -127,6 +127,7 @@ export async function scanLibrary() {
     platform: Platform.GEMINI,
     type: item.type || 'conversation',
     gem_id: item.gem_id || null,
+    notebook_id: item.notebook_id || null,
   }));
 
   console.log(`Sending ${payloadItems.length} scanned items to background...`);

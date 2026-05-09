@@ -10,3 +10,4 @@ export * from './raw';
 export * from './prompts';
 export * from './promptFolders';
 export * from './gems';
+export * from './notebooks';

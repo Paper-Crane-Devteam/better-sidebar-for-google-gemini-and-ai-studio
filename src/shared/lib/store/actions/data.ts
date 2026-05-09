@@ -64,6 +64,7 @@ export function createDataActions(
           promptFoldersResponse,
           promptsResponse,
           gemsResponse,
+          notebooksResponse,
         ] = await Promise.all([
           browser.runtime.sendMessage({ type: 'GET_FOLDERS' }),
           browser.runtime.sendMessage({ type: 'GET_CONVERSATIONS' }),
@@ -73,6 +74,7 @@ export function createDataActions(
           browser.runtime.sendMessage({ type: 'GET_PROMPT_FOLDERS' }),
           browser.runtime.sendMessage({ type: 'GET_PROMPTS' }),
           browser.runtime.sendMessage({ type: 'GET_GEMS' }),
+          browser.runtime.sendMessage({ type: 'GET_NOTEBOOKS' }),
         ]);
         if (foldersResponse.success) set({ folders: foldersResponse.data });
         if (conversationsResponse.success)
@@ -86,6 +88,8 @@ export function createDataActions(
           set({ promptFolders: promptFoldersResponse.data });
         if (promptsResponse.success) set({ prompts: promptsResponse.data });
         if (gemsResponse.success) set({ gems: gemsResponse.data });
+        if (notebooksResponse.success)
+          set({ notebooks: notebooksResponse.data });
       } catch (error) {
         console.error('Failed to fetch data:', error);
       } finally {

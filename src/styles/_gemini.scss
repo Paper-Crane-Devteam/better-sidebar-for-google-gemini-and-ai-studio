@@ -138,6 +138,24 @@
 }
 
 @layer components {
+  /* Sidebar Gradient - Gemini Specific (premium feel) */
+  .theme-gemini .sidebar-nav,
+  :host(.theme-gemini) .sidebar-nav {
+    background: linear-gradient(
+      to right,
+      color-mix(in srgb, rgb(var(--foreground)) 8%, rgb(var(--background))) 0%,
+      color-mix(in srgb, rgb(var(--foreground)) 4%, rgb(var(--background))) 50%,
+      rgb(var(--background)) 100%
+    );
+    border-right: 1px solid color-mix(in srgb, rgb(var(--foreground)) 6%, transparent);
+  }
+
+  /* Active sidebar icon - Gemini Specific */
+  .theme-gemini .sidebar-nav .sidebar-btn.bg-secondary .sidebar-icon,
+  :host(.theme-gemini) .sidebar-nav .sidebar-btn.bg-secondary .sidebar-icon {
+    color: rgb(var(--primary));
+  }
+
   /* Node Selection Styles - Gemini Specific */
   .theme-gemini .node-item-selected,
   :host(.theme-gemini) .node-item-selected {

@@ -29,6 +29,19 @@ export const navigateToGem = (gemIdOrUrl: string) => {
   navigate(gemUrl);
 };
 
+/**
+ * Navigate to a Notebook page. Same pattern as navigateToGem —
+ * click "New chat" first, then pushState to the notebook URL.
+ * Accepts either a notebook UUID or a full notebook URL.
+ */
+export const navigateToNotebook = (notebookIdOrUrl: string) => {
+  const nbUrl = notebookIdOrUrl.startsWith('http')
+    ? notebookIdOrUrl
+    : `https://gemini.google.com/notebook/notebooks%2F${notebookIdOrUrl}`;
+  clickGeminiNewChat();
+  navigate(nbUrl);
+};
+
 export const navigate = (url: string) => {
   window.history.pushState({}, '', url);
   window.dispatchEvent(new PopStateEvent('popstate'));

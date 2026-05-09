@@ -23,7 +23,8 @@
     "tags": "标签",
     "feedback": "反馈",
     "settings": "设置",
-    "gems": "Gems"
+    "gems": "Gems",
+    "notebooks": "笔记本"
   },
   "sidebar": {
     "newConversation": "新建对话",
@@ -276,6 +277,7 @@
     "filterConversations": "筛选：对话",
     "filterImages": "筛选：图片",
     "filterGems": "筛选：Gem",
+    "filterNotebooks": "筛选：笔记本",
     "filterFavorites": "筛选：收藏",
     "addToFavorites": "添加到收藏",
     "removeFromFavorites": "从收藏中移除",
@@ -675,6 +677,22 @@
     "viewGems": "查看 Gems",
     "scanGems": "导入 Gems",
     "scanningGems": "导入中..."
+  },
+  "notebooks": {
+    "title": "笔记本",
+    "untitledNotebook": "无标题笔记本",
+    "empty": "暂无笔记本。请在 Gemini 中创建。",
+    "noNotebooks": "未找到笔记本。",
+    "openNotebook": "打开笔记本",
+    "openInNewTab": "在新标签页中打开",
+    "hideNotebook": "隐藏笔记本",
+    "hideNotebookConfirm": "从侧边栏隐藏 \"{{name}}\"？您可以重新扫描以恢复。",
+    "deleteNotebook": "删除笔记本",
+    "deleteNotebookConfirm": "确定要删除 \"{{name}}\" 吗？这将从 Gemini 中永久删除该笔记本。",
+    "newNotebook": "新建笔记本",
+    "viewNotebooks": "查看笔记本",
+    "scanNotebooks": "刷新笔记本",
+    "scanningNotebooks": "加载中..."
   },
   "whatsNew": {
     "title": "v{{version}} 更新内容",

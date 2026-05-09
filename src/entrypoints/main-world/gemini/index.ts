@@ -3,9 +3,11 @@ import { handleGenerateResponse } from './interceptors/generate';
 import { handleChatContentResponse } from './interceptors/chat-content';
 import { handleListChatResponse } from './interceptors/list-chat';
 import { handleDeleteResponse } from './interceptors/delete';
-import { handleCreateGemResponse } from './interceptors/create-gem';
+import { handleCNgdBeResponse } from './interceptors/create-gem';
 import { handleRenameResponse } from './interceptors/rename';
 import { handleDeleteGemResponse } from './interceptors/delete-gem';
+import { handleDeleteNotebookResponse } from './interceptors/delete-notebook';
+import { handleCreateNotebookResponse } from './interceptors/create-notebook';
 import { handleDownloadResponse } from './interceptors/download';
 import { geminiRequestBuilder } from './lib/request-builder';
 
@@ -92,11 +94,15 @@ export function initGeminiInterceptors() {
           } else if (url.includes('rpcids=GzXR5e')) {
             handleDeleteResponse(response, url);
           } else if (url.includes('rpcids=CNgdBe')) {
-            handleCreateGemResponse(response, url);
+            handleCNgdBeResponse(response, url);
           } else if (url.includes('rpcids=MUAZcd')) {
             handleRenameResponse(response, url);
           } else if (url.includes('rpcids=UXcSJb')) {
             handleDeleteGemResponse(response, url);
+          } else if (url.includes('rpcids=Nwkn9')) {
+            handleDeleteNotebookResponse(response, url);
+          } else if (url.includes('rpcids=oMH3Zd')) {
+            handleCreateNotebookResponse(response, url);
           }
         }
       } catch (e) {

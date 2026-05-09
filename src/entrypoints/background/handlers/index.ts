@@ -10,3 +10,4 @@ export { handleMisc } from './misc';
 export { handleProfile } from './profile';
 export { handleGdriveSync } from './gdrive-sync';
 export { handleGems } from './gems';
+export { handleNotebooks } from './notebooks';

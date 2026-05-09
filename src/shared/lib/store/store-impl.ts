@@ -12,6 +12,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   tags: [],
   conversationTags: [],
   gems: [],
+  notebooks: [],
   isLoading: false,
   ui: initialUIState,
 
