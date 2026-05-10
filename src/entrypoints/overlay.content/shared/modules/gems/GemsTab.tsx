@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAppStore } from '@/shared/lib/store';
 import { GemsHeader } from './components/GemsHeader';
 import { GemsTreeView, GemsTreeHandle } from './components/GemsTreeView';
@@ -23,6 +23,22 @@ export const GemsTab = ({ menuActions }: GemsTabProps) => {
   const filter = useStoreFilter('gems');
   const treeRef = useRef<GemsTreeHandle>(null);
   const [isScanningGems, setIsScanningGems] = useState(false);
+
+  // Listen for new gem conversations created via BETTER_SIDEBAR_PROMPT_CREATE
+  // so the UI refreshes immediately (same pattern as ExplorerTab)
+  useEffect(() => {
+    const handleCreate = (event: any) => {
+      const { gem_id } = event.detail || {};
+      if (!gem_id) return;
+      fetchData(true);
+    };
+    globalThis.addEventListener('BETTER_SIDEBAR_PROMPT_CREATE', handleCreate);
+    return () =>
+      globalThis.removeEventListener(
+        'BETTER_SIDEBAR_PROMPT_CREATE',
+        handleCreate,
+      );
+  }, [fetchData]);
 
   const handleCollapseAll = () => {
     treeRef.current?.collapseAll();

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAppStore } from '@/shared/lib/store';
 import { NotebooksHeader } from './components/NotebooksHeader';
 import {
@@ -26,6 +26,35 @@ export const NotebooksTab = ({ menuActions }: NotebooksTabProps) => {
   const filter = useStoreFilter('notebooks');
   const treeRef = useRef<NotebooksTreeHandle>(null);
   const [isScanning, setIsScanning] = useState(false);
+
+  // Listen for new notebook conversations created via BETTER_SIDEBAR_PROMPT_CREATE
+  // so the UI refreshes immediately (same pattern as ExplorerTab)
+  useEffect(() => {
+    const handleCreate = (event: any) => {
+      const { notebook_id } = event.detail || {};
+      if (!notebook_id) return;
+      fetchData(true);
+    };
+    globalThis.addEventListener('BETTER_SIDEBAR_PROMPT_CREATE', handleCreate);
+    return () =>
+      globalThis.removeEventListener(
+        'BETTER_SIDEBAR_PROMPT_CREATE',
+        handleCreate,
+      );
+  }, [fetchData]);
+
+  // Listen for GEMINI_NOTEBOOK_CREATED (notebook entity creation)
+  useEffect(() => {
+    const handleNotebookCreated = () => {
+      fetchData(true);
+    };
+    window.addEventListener('GEMINI_NOTEBOOK_CREATED', handleNotebookCreated);
+    return () =>
+      window.removeEventListener(
+        'GEMINI_NOTEBOOK_CREATED',
+        handleNotebookCreated,
+      );
+  }, [fetchData]);
 
   const handleCollapseAll = () => {
     treeRef.current?.collapseAll();

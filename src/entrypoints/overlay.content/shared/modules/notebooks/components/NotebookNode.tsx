@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
   NotebookText,
   ChevronRight,
   ChevronDown,
   ExternalLink,
   Star,
-  EyeOff,
   Trash2,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils/utils';
@@ -29,6 +28,7 @@ import { NodeActionBar } from '@/entrypoints/overlay.content/shared/components/n
 import { useExplorerMenuItems } from '../../explorer/components/node/useExplorerMenuItems';
 import { renderMenuItems } from '@/entrypoints/overlay.content/shared/components/node-action-bar';
 import type { MenuEntryDef } from '@/entrypoints/overlay.content/shared/components/node-action-bar';
+import { FolderTreeNodeContent } from '../../../components/folder-tree';
 
 export const NotebookNode = ({
   node,
@@ -49,6 +49,16 @@ export const NotebookNode = ({
   const currentConversationId = useCurrentConversationId();
   const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [newName, setNewName] = useState(node.data.name);
+  const nodeRowRef = useRef<HTMLDivElement>(null);
+
+  const combinedRef = useCallback(
+    (el: HTMLDivElement | null) => {
+      (nodeRowRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+      if (dragHandle) dragHandle(el);
+    },
+    [dragHandle],
+  );
 
   const isNotebook = node.data.data?.isNotebook;
   const isFile = node.data.type === 'file';
@@ -89,22 +99,6 @@ export const NotebookNode = ({
 
   const handleOpenNotebook = () => {
     navigateToNotebook(node.data.id);
-  };
-
-  const handleHideNotebook = async () => {
-    const confirmed = await modal.confirm({
-      title: t('notebooks.hideNotebook'),
-      content: t('notebooks.hideNotebookConfirm', { name: node.data.name }),
-      confirmText: t('common.hide'),
-      cancelText: t('common.cancel'),
-    });
-    if (confirmed) {
-      await browser.runtime.sendMessage({
-        type: 'HIDE_NOTEBOOK',
-        payload: { id: node.data.id },
-      });
-      fetchData(true);
-    }
   };
 
   const handleDeleteNotebook = async () => {
@@ -194,13 +188,6 @@ export const NotebookNode = ({
         { type: 'separator' as const, key: 'sep-manage' },
         {
           type: 'item' as const,
-          key: 'hide-notebook',
-          icon: <EyeOff className="h-4 w-4" />,
-          label: t('notebooks.hideNotebook'),
-          onClick: () => void handleHideNotebook(),
-        },
-        {
-          type: 'item' as const,
           key: 'delete-notebook',
           icon: <Trash2 className="h-4 w-4" />,
           label: t('notebooks.deleteNotebook'),
@@ -252,37 +239,37 @@ export const NotebookNode = ({
           className="outline-none h-[calc(100%-2px)] w-[calc(100%-4px)] mx-auto mt-[1px]"
         >
           <div
-            ref={dragHandle}
+            ref={combinedRef}
             role="button"
             tabIndex={0}
             className={nodeClasses}
             onClick={handleClick}
             onKeyDown={handleKeyDown}
           >
-            {isNotebook && (
-              <span
-                className="flex items-center justify-center w-4 h-4 shrink-0 cursor-pointer"
-                onClick={handleToggle}
-              >
-                {toggleIcon}
-              </span>
-            )}
-
-            {isNotebook && (
-              <span className="flex items-center justify-center shrink-0">
-                <NotebookText className="w-4 h-4" />
-              </span>
-            )}
-
-            <div className="flex-1 min-w-0 flex items-center gap-1 overflow-hidden">
-              {isFavorite && (
-                <Star className="h-3 w-3 shrink-0 fill-yellow-400 text-yellow-400" />
-              )}
-              <span className="truncate text-sm">{node.data.name}</span>
-            </div>
+            {/* Use shared FolderTreeNodeContent for both notebook headers and file children */}
+            <FolderTreeNodeContent
+              node={node}
+              folderIcon={isNotebook ? <NotebookText className="w-4 h-4" /> : null}
+              fileIcon={null}
+              toggleIcon={toggleIcon}
+              handleToggle={handleToggle}
+              newName={newName}
+              setNewName={setNewName}
+              hoverRef={nodeRowRef}
+            />
 
             {hasHoverActions && (
               <NodeActionBar
+                actions={isFile && isFavorite ? [{
+                  icon: <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />,
+                  tooltip: t('tooltip.removeFromFavorites'),
+                  onClick: (e: React.MouseEvent) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    toggleFavorite(node.data.id, 'conversation', isFavorite);
+                  },
+                  className: 'text-yellow-400 hover:text-yellow-500',
+                }] : []}
                 menuItems={activeMenuItems}
                 forceVisible={isMenuActive}
                 onDropdownOpenChange={setIsDropdownOpen}

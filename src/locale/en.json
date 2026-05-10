@@ -90,7 +90,7 @@
   },
   "modal": {
     "resetDatabase": "Reset Database",
-    "resetDatabaseConfirm": "Are you sure you want to reset the database? This will delete all data.",
+    "resetDatabaseConfirm": "Are you sure you want to reset the database? This will delete all local data. Remote backup (if any) will not be affected. To clear remote data, use \"Backup to Drive\" after reset.",
     "reset": "Reset",
     "deleteDatabaseConfirm": "Are you sure you want to delete all stored data? This cannot be undone.",
     "defaultConfirm": "Confirm",
@@ -194,7 +194,7 @@
     "importConversationDataDescription": "Import conversation history from a ZIP exported from Google AI Studio",
     "storageManagement": "Storage Management",
     "resetDatabase": "Reset Database",
-    "resetDatabaseDescription": "Delete all stored data (folders, tags, cache). This cannot be undone.",
+    "resetDatabaseDescription": "Delete all local data (folders, tags, cache). Remote backup will not be affected. To clear remote data, use \"Backup to Drive\" after reset.",
     "resetData": "Reset Data",
     "backupRestore": "Backup & Restore",
     "exportData": "Export Data",
@@ -434,7 +434,7 @@
   },
   "dataManagement": {
     "resetDatabase": "Reset Database",
-    "resetDatabaseConfirm": "Are you sure you want to delete all stored data? This cannot be undone."
+    "resetDatabaseConfirm": "This will only reset local data. Remote backup (if any) will not be affected. To clear remote data, use \"Backup to Drive\" after reset."
   },
   "search": {
     "title": "Search",
@@ -686,8 +686,6 @@
     "noNotebooks": "No notebooks found.",
     "openNotebook": "Open Notebook",
     "openInNewTab": "Open in New Tab",
-    "hideNotebook": "Hide Notebook",
-    "hideNotebookConfirm": "Hide \"{{name}}\" from the sidebar? You can rescan to bring it back.",
     "deleteNotebook": "Delete Notebook",
     "deleteNotebookConfirm": "Are you sure you want to delete \"{{name}}\"? This will permanently delete the Notebook from Gemini.",
     "newNotebook": "New Notebook",

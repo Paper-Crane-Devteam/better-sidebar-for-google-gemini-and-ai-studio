@@ -1,4 +1,5 @@
 import { notebookRepo } from '@/shared/db/operations';
+import { runCommand } from '@/shared/db';
 import type {
   ExtensionMessage,
   ExtensionResponse,
@@ -32,12 +33,12 @@ export async function handleNotebooks(
       return { success: true };
     }
     case 'DELETE_NOTEBOOK': {
+      // Soft-delete all conversations under this notebook first
+      await runCommand(
+        'UPDATE conversations SET deleted_at = unixepoch() WHERE notebook_id = ? AND deleted_at IS NULL',
+        [message.payload.id],
+      );
       await notebookRepo.delete(message.payload.id);
-      await notifyDataUpdated();
-      return { success: true };
-    }
-    case 'HIDE_NOTEBOOK': {
-      await notebookRepo.softDelete(message.payload.id);
       await notifyDataUpdated();
       return { success: true };
     }

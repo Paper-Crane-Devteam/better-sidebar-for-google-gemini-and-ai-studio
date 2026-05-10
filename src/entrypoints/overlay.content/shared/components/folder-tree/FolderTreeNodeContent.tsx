@@ -115,12 +115,16 @@ export const FolderTreeNodeContent = ({
             {node.data.name}
           </OverflowTooltip>
         ) : (
-          <span
-            className="truncate text-sm select-none"
+          <OverflowTooltip
+            content={node.data.name}
+            placement="right"
+            offset={16}
+            className="text-sm select-none"
             style={folderColor ? { color: folderColor } : undefined}
+            hoverRef={hoverRef}
           >
             {node.data.name}
-          </span>
+          </OverflowTooltip>
         )}
         {nameAddon}
       </div>

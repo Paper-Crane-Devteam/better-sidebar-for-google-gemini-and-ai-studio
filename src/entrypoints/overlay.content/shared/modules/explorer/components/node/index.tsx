@@ -8,6 +8,7 @@ import {
   FolderOpen,
   Calendar,
   Image,
+  Star,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils/utils';
 import { navigateToConversation } from '@/shared/lib/navigation';
@@ -389,6 +390,17 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
             {hasHoverActions && !node.isEditing && (
               <NodeActionBar
                 actions={[
+                  // Unfavorite button for favorited conversations
+                  ...(isFile && isFavorite ? [{
+                    icon: <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />,
+                    tooltip: t('tooltip.removeFromFavorites'),
+                    onClick: (e: React.MouseEvent) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      toggleFavorite(node.data.id, 'conversation', isFavorite);
+                    },
+                    className: 'text-yellow-400 hover:text-yellow-500',
+                  }] : []),
                   // New chat button for folders
                   ...(!isFile && !isTimeGroup && onNewChatInFolder ? [{
                     icon: <MessageSquarePlus className="h-3.5 w-3.5" />,

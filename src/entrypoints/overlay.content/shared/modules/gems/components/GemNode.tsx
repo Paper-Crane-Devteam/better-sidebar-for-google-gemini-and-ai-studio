@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
   Gem,
   ChevronRight,
@@ -28,6 +28,7 @@ import { NodeActionBar } from '@/entrypoints/overlay.content/shared/components/n
 import { useExplorerMenuItems } from '../../explorer/components/node/useExplorerMenuItems';
 import { renderMenuItems } from '@/entrypoints/overlay.content/shared/components/node-action-bar';
 import type { MenuEntryDef } from '@/entrypoints/overlay.content/shared/components/node-action-bar';
+import { FolderTreeNodeContent } from '../../../components/folder-tree';
 
 export const GemNode = ({
   node,
@@ -48,6 +49,16 @@ export const GemNode = ({
   const currentConversationId = useCurrentConversationId();
   const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [newName, setNewName] = useState(node.data.name);
+  const nodeRowRef = useRef<HTMLDivElement>(null);
+
+  const combinedRef = useCallback(
+    (el: HTMLDivElement | null) => {
+      (nodeRowRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+      if (dragHandle) dragHandle(el);
+    },
+    [dragHandle],
+  );
 
   const isGem = node.data.data?.isGem;
   const isFile = node.data.type === 'file';
@@ -249,43 +260,38 @@ export const GemNode = ({
           className="outline-none h-[calc(100%-2px)] w-[calc(100%-4px)] mx-auto mt-[1px]"
         >
           <div
-            ref={dragHandle}
+            ref={combinedRef}
             role="button"
             tabIndex={0}
             className={nodeClasses}
             onClick={handleClick}
             onKeyDown={handleKeyDown}
           >
-            {/* Toggle arrow for gems */}
-            {isGem && (
-              <span
-                className="flex items-center justify-center w-4 h-4 shrink-0 cursor-pointer"
-                onClick={handleToggle}
-              >
-                {toggleIcon}
-              </span>
-            )}
-
-            {/* Icon */}
-            {isGem && (
-              <span className="flex items-center justify-center shrink-0">
-                <Gem className="w-4 h-4" />
-              </span>
-            )}
-
-            {/* Name */}
-            <div className="flex-1 min-w-0 flex items-center gap-1 overflow-hidden">
-              {isFavorite && (
-                <Star className="h-3 w-3 shrink-0 fill-yellow-400 text-yellow-400" />
-              )}
-              <span className="truncate text-sm">
-                {node.data.name}
-              </span>
-            </div>
+            {/* Use shared FolderTreeNodeContent for both gem headers and file children */}
+            <FolderTreeNodeContent
+              node={node}
+              folderIcon={isGem ? <Gem className="w-4 h-4" /> : null}
+              fileIcon={null}
+              toggleIcon={toggleIcon}
+              handleToggle={handleToggle}
+              newName={newName}
+              setNewName={setNewName}
+              hoverRef={nodeRowRef}
+            />
 
             {/* Action bar with three-dot menu */}
             {hasHoverActions && (
               <NodeActionBar
+                actions={isFile && isFavorite ? [{
+                  icon: <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />,
+                  tooltip: t('tooltip.removeFromFavorites'),
+                  onClick: (e: React.MouseEvent) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    toggleFavorite(node.data.id, 'conversation', isFavorite);
+                  },
+                  className: 'text-yellow-400 hover:text-yellow-500',
+                }] : []}
                 menuItems={activeMenuItems}
                 forceVisible={isMenuActive}
                 onDropdownOpenChange={setIsDropdownOpen}
