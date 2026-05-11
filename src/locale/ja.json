@@ -90,7 +90,7 @@
   },
   "modal": {
     "resetDatabase": "データベースをリセット",
-    "resetDatabaseConfirm": "データベースをリセットしてもよろしいですか？これによりすべてのデータが削除されます。",
+    "resetDatabaseConfirm": "データベースをリセットしてもよろしいですか？ローカルデータのみが削除されます。リモートバックアップ（ある場合）は影響を受けません。リモートデータを消去するには、リセット後に「ドライブにバックアップ」を実行してください。",
     "reset": "リセット",
     "deleteDatabaseConfirm": "保存されているすべてのデータを削除してもよろしいですか？この操作は元に戻せません。",
     "defaultConfirm": "確認",
@@ -194,7 +194,7 @@
     "importConversationDataDescription": "Google AI Studio からエクスポートした ZIP で会話履歴をインポート",
     "storageManagement": "ストレージ管理",
     "resetDatabase": "データベースをリセット",
-    "resetDatabaseDescription": "保存されているすべてのデータ（フォルダ、タグ、キャッシュ）を削除。この操作は元に戻せません。",
+    "resetDatabaseDescription": "ローカルデータ（フォルダ、タグ、キャッシュ）をすべて削除します。リモートバックアップは影響を受けません。リモートデータを消去するには、リセット後に「Backup to Drive」を使用してください。",
     "resetData": "データをリセット",
     "backupRestore": "バックアップと復元",
     "exportData": "データをエクスポート",
@@ -506,7 +506,7 @@
   },
   "dataManagement": {
     "resetDatabase": "データベースをリセット",
-    "resetDatabaseConfirm": "保存されているすべてのデータを削除してもよろしいですか？この操作は元に戻せません。"
+    "resetDatabaseConfirm": "ローカルデータのみが削除されます。リモートバックアップ（ある場合）は影響を受けません。リモートデータを消去するには、リセット後に「ドライブにバックアップ」を実行してください。"
   },
   "rating": {
     "title": "この拡張機能は気に入りましたか？",
@@ -687,8 +687,6 @@
     "noNotebooks": "ノートブックが見つかりません。",
     "openNotebook": "ノートブックを開く",
     "openInNewTab": "新しいタブで開く",
-    "hideNotebook": "ノートブックを非表示",
-    "hideNotebookConfirm": "\"{{name}}\" をサイドバーから非表示にしますか？再スキャンで復元できます。",
     "deleteNotebook": "ノートブックを削除",
     "deleteNotebookConfirm": "\"{{name}}\" を削除してもよろしいですか？この操作により、Geminiからノートブックが完全に削除されます。",
     "newNotebook": "新しいノートブック",

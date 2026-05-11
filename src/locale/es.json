@@ -90,7 +90,7 @@
   },
   "modal": {
     "resetDatabase": "Restablecer Base de Datos",
-    "resetDatabaseConfirm": "¿Estás seguro de que deseas restablecer la base de datos? Esto eliminará todos los datos.",
+    "resetDatabaseConfirm": "¿Estás seguro de que deseas restablecer la base de datos? Solo se eliminarán los datos locales. La copia de seguridad remota (si existe) no se verá afectada. Para borrar los datos remotos, usa \"Backup to Drive\" después del restablecimiento.",
     "reset": "Restablecer",
     "deleteDatabaseConfirm": "¿Estás seguro de que deseas eliminar todos los datos almacenados? Esto no se puede deshacer.",
     "defaultConfirm": "Confirmar",
@@ -194,7 +194,7 @@
     "importConversationDataDescription": "Importar historial de conversaciones desde un ZIP exportado de Google AI Studio",
     "storageManagement": "Gestión de Almacenamiento",
     "resetDatabase": "Restablecer Base de Datos",
-    "resetDatabaseDescription": "Eliminar todos los datos almacenados (carpetas, etiquetas, caché). Esto no se puede deshacer.",
+    "resetDatabaseDescription": "Eliminar todos los datos locales (carpetas, etiquetas, caché). La copia de seguridad remota no se verá afectada. Para borrar los datos remotos, usa \"Backup to Drive\" después del restablecimiento.",
     "resetData": "Restablecer Datos",
     "backupRestore": "Respaldo y Restauración",
     "exportData": "Exportar Datos",
@@ -505,7 +505,7 @@
   },
   "dataManagement": {
     "resetDatabase": "Restablecer Base de Datos",
-    "resetDatabaseConfirm": "¿Estás seguro de que deseas eliminar todos los datos almacenados? Esto no se puede deshacer."
+    "resetDatabaseConfirm": "Solo se eliminarán los datos locales. La copia de seguridad remota (si existe) no se verá afectada. Para borrar los datos remotos, usa \"Backup to Drive\" después del restablecimiento."
   },
   "rating": {
     "title": "¿Te gusta esta extensión?",
@@ -686,8 +686,6 @@
     "noNotebooks": "No se encontraron notebooks.",
     "openNotebook": "Abrir Notebook",
     "openInNewTab": "Abrir en nueva pestaña",
-    "hideNotebook": "Ocultar Notebook",
-    "hideNotebookConfirm": "¿Ocultar \"{{name}}\" de la barra lateral? Puedes volver a escanearlo para recuperarlo.",
     "deleteNotebook": "Eliminar Notebook",
     "deleteNotebookConfirm": "¿Estás seguro de que deseas eliminar \"{{name}}\"? Esto eliminará permanentemente el Notebook de Gemini.",
     "newNotebook": "Nuevo Notebook",

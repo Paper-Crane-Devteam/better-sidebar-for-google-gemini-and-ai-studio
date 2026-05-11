@@ -90,7 +90,7 @@
   },
   "modal": {
     "resetDatabase": "重設資料庫",
-    "resetDatabaseConfirm": "您確定要重設資料庫嗎？這將刪除所有資料。",
+    "resetDatabaseConfirm": "確定要重設資料庫嗎？此操作僅重設本地資料，遠端備份（如有）不會受影響。如需清空遠端資料，請在重設後使用「備份到雲端」。",
     "reset": "重設",
     "deleteDatabaseConfirm": "您確定要刪除所有儲存的資料嗎？此操作無法復原。",
     "defaultConfirm": "確認",
@@ -194,7 +194,7 @@
     "importConversationDataDescription": "從 Google AI Studio 匯出的 ZIP 匯入對話歷史",
     "storageManagement": "儲存管理",
     "resetDatabase": "重設資料庫",
-    "resetDatabaseDescription": "刪除所有儲存的資料（資料夾、標籤、快取）。此操作無法復原。",
+    "resetDatabaseDescription": "刪除所有本地資料（資料夾、標籤、快取）。遠端備份不會受影響，如需清空遠端資料請在重設後使用「備份到雲端」。",
     "resetData": "重設資料",
     "backupRestore": "備份與還原",
     "exportData": "匯出資料",
@@ -505,7 +505,7 @@
   },
   "dataManagement": {
     "resetDatabase": "重設資料庫",
-    "resetDatabaseConfirm": "您確定要刪除所有儲存的資料嗎？此操作無法復原。"
+    "resetDatabaseConfirm": "此操作僅重設本地資料，遠端備份（如有）不會受影響。如需清空遠端資料，請在重設後使用「備份到雲端」。"
   },
   "onboarding": {
     "welcome": "歡迎使用 Better Sidebar",
@@ -686,8 +686,6 @@
     "noNotebooks": "找不到筆記本。",
     "openNotebook": "開啟筆記本",
     "openInNewTab": "在新分頁中開啟",
-    "hideNotebook": "隱藏筆記本",
-    "hideNotebookConfirm": "從側邊欄隱藏 \"{{name}}\"？您可以重新掃描以恢復。",
     "deleteNotebook": "刪除筆記本",
     "deleteNotebookConfirm": "確定要刪除 \"{{name}}\" 嗎？這將從 Gemini 中永久刪除該筆記本。",
     "newNotebook": "新增筆記本",

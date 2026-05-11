@@ -14,7 +14,7 @@
  * - Silent token refresh (no user interaction during auto-sync)
  */
 
-import { getAccessToken, getAuthStatus } from './google-auth';
+import { getAccessToken, getAuthStatus, silentRefresh } from './google-auth';
 import { findFile, uploadFile, downloadFile } from './gdrive-api';
 import { exportSyncData } from './sync-data';
 import { mergeSyncData } from './sync-merge';
@@ -29,7 +29,7 @@ const LOCK_KEY = 'gdrive_sync_lock';
 const LOCK_TTL_MS = 2 * 60 * 1000;
 const MAX_RETRIES = 2;
 const RETRY_DELAY_MS = 3_000;
-const PAGE_LOAD_SYNC_COOLDOWN_MS = 1; // 5 minutes
+const PAGE_LOAD_SYNC_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
 
 /** Storage key for the pending debounce sync's target dbName */
 const PENDING_SYNC_DB_KEY = 'gdrive_pending_sync_db';
@@ -61,7 +61,7 @@ async function releaseLock(): Promise<void> {
 function isRetryable(err: any): boolean {
   if (!err?.response) return true;
   const status = err.response?.status;
-  return status === 429 || status >= 500;
+  return status === 401 || status === 429 || status >= 500;
 }
 
 // --- Helpers ---
@@ -138,6 +138,11 @@ export async function performMergeSync(
     return { success: true };
   } catch (err: any) {
     if (retries > 0 && isRetryable(err)) {
+      // On 401, try to refresh the token before retrying
+      if (err?.response?.status === 401) {
+        console.warn('[AutoSync] Got 401, attempting token refresh...');
+        await silentRefresh();
+      }
       console.warn(`[AutoSync] Retrying... (${retries} left)`, err.message);
       isSyncing = false;
       await releaseLock();

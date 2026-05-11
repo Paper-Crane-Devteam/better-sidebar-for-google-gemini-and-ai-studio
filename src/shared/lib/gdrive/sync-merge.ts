@@ -79,7 +79,17 @@ export async function mergeSyncData(
         const localRow = localMap.get(remoteRow.id);
 
         if (!localRow) {
-          // Remote-only → insert
+          // Remote-only: check if it was locally deleted
+          if (lastSyncTime > 0) {
+            const remoteTime = remoteRow.updated_at || remoteRow.created_at || 0;
+            if (remoteTime < lastSyncTime) {
+              // Record existed at last sync but local doesn't have it now
+              // → was deleted locally → skip
+              totalSkipped++;
+              continue;
+            }
+          }
+          // Truly new from remote → insert
           const columns = Object.keys(remoteRow);
           const placeholders = columns.map(() => '?').join(', ');
           const values = columns.map((col) => remoteRow[col]);

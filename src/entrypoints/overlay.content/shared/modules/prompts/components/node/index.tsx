@@ -5,6 +5,7 @@ import {
   ChevronRight,
   ChevronDown,
   Eye,
+  Star,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils/utils';
 import { useAppStore } from '@/shared/lib/store';
@@ -218,6 +219,18 @@ export const Node = ({
   const isMenuActive = isContextMenuOpen || isDropdownOpen;
 
   const quickActions: ActionButtonDef[] = [];
+  if (isFile && isFavorite) {
+    quickActions.push({
+      icon: <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />,
+      tooltip: t('tooltip.removeFromFavorites'),
+      onClick: (e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+        toggleFavorite(node.data.id, 'prompt', isFavorite);
+      },
+      className: 'text-yellow-400 hover:text-yellow-500',
+    });
+  }
   if (isFile && onPreview) {
     quickActions.push({
       icon: <Eye className="h-3.5 w-3.5" />,

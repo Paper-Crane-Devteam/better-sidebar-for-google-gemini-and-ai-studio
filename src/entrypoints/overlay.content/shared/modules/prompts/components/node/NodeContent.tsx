@@ -1,5 +1,4 @@
 import React from 'react';
-import { Star } from 'lucide-react';
 import { NodeProps } from './types';
 import { FolderTreeNodeContent } from '../../../../components/folder-tree';
 import { PromptIconDisplay } from '../../lib/prompt-icons';
@@ -65,7 +64,7 @@ export const NodeContent = ({
       }
       newName={newName}
       setNewName={setNewName}
-      namePrefix={isFavorite ? <Star className="h-3 w-3 shrink-0 fill-yellow-400 text-yellow-400" /> : undefined}
+      namePrefix={undefined}
     />
   );
 };

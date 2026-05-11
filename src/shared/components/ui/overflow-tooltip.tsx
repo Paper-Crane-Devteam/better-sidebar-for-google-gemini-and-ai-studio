@@ -16,6 +16,8 @@ export interface OverflowTooltipProps {
   offset?: number;
   /** Additional class name for the trigger wrapper */
   className?: string;
+  /** Additional inline style for the trigger wrapper */
+  style?: React.CSSProperties;
   /** Additional class name for the tooltip content */
   tooltipClassName?: string;
   /** Delay in ms before showing the tooltip */
@@ -38,6 +40,7 @@ export const OverflowTooltip: React.FC<OverflowTooltipProps> = ({
   placement = 'right',
   offset = 8,
   className,
+  style,
   tooltipClassName,
   showDelay = 300,
   hoverRef,
@@ -222,6 +225,7 @@ export const OverflowTooltip: React.FC<OverflowTooltipProps> = ({
       <div
         ref={triggerRef}
         className={cn('truncate', className)}
+        style={style}
         onMouseEnter={hoverRef ? undefined : handleMouseEnter}
         onMouseLeave={hoverRef ? undefined : handleMouseLeave}
       >

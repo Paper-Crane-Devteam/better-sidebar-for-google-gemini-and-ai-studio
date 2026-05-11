@@ -2,6 +2,7 @@ import { rawSql, dbAdmin } from '@/shared/db/operations';
 import type { ExtensionMessage, ExtensionResponse } from '@/shared/types/messages';
 import type { MessageSender } from '../types';
 import { notifyDataUpdated } from '../notify';
+import { getCurrentDbName } from '../tab-profile-map';
 
 const CHUNK_SIZE = 8 * 1024 * 1024; // 8MB
 
@@ -22,6 +23,13 @@ export async function handleDbAdmin(
       try {
         await dbAdmin.resetDatabase();
         await notifyDataUpdated();
+
+        // Clear sync timestamps so next merge treats everything as first-ever sync
+        const dbName = getCurrentDbName();
+        const syncMetaKey = `gdrive_last_sync_time__${dbName}`;
+        const syncDirKey = `gdrive_last_sync_dir__${dbName}`;
+        await browser.storage.local.remove([syncMetaKey, syncDirKey]);
+
         return { success: true };
       } catch (e: unknown) {
         return { success: false, error: (e as Error).message };

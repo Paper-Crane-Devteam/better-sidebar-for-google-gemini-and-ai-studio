@@ -63,10 +63,6 @@ export const notebookRepo = {
     await runCommand('DELETE FROM notebooks WHERE id = ?', [id]);
   },
 
-  softDelete: async (id: string): Promise<void> => {
-    await updateWithTimestamp('notebooks', id, { is_deleted: 1 });
-  },
-
   bulkSave: async (
     notebooks: (Partial<Notebook> & Pick<Notebook, 'id' | 'name'>)[],
   ): Promise<void> => {

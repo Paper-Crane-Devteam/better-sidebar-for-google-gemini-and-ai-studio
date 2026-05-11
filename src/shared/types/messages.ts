@@ -390,7 +390,6 @@ export type ExtensionMessage = (
       };
     }
   | { type: 'DELETE_NOTEBOOK'; payload: { id: string } }
-  | { type: 'HIDE_NOTEBOOK'; payload: { id: string } }
   | {
       type: 'UPDATE_NOTEBOOK';
       payload: {

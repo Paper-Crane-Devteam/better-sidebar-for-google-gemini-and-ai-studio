@@ -90,7 +90,7 @@
   },
   "modal": {
     "resetDatabase": "重置数据库",
-    "resetDatabaseConfirm": "您确定要重置数据库吗？这将删除所有数据。",
+    "resetDatabaseConfirm": "确定要重置数据库吗？此操作仅重置本地数据，远端备份（如有）不会受影响。如需清空远端数据，请在重置后使用「备份到云端」。",
     "reset": "重置",
     "deleteDatabaseConfirm": "您确定要删除所有存储的数据吗？此操作无法撤销。",
     "defaultConfirm": "确认",
@@ -194,7 +194,7 @@
     "importConversationDataDescription": "从 Google AI Studio 导出的 ZIP 导入对话历史",
     "storageManagement": "存储管理",
     "resetDatabase": "重置数据库",
-    "resetDatabaseDescription": "删除所有存储的数据（文件夹、标签、缓存）。此操作无法撤销。",
+    "resetDatabaseDescription": "删除所有本地数据（文件夹、标签、缓存）。远端备份不会受影响，如需清空远端数据请在重置后使用「备份到云端」。",
     "resetData": "重置数据",
     "backupRestore": "备份与恢复",
     "exportData": "导出数据",
@@ -433,7 +433,7 @@
   },
   "dataManagement": {
     "resetDatabase": "重置数据库",
-    "resetDatabaseConfirm": "您确定要删除所有存储的数据吗？此操作无法撤销。"
+    "resetDatabaseConfirm": "此操作仅重置本地数据，远端备份（如有）不会受影响。如需清空远端数据，请在重置后使用「备份到云端」。"
   },
   "search": {
     "title": "搜索",
@@ -685,8 +685,6 @@
     "noNotebooks": "未找到笔记本。",
     "openNotebook": "打开笔记本",
     "openInNewTab": "在新标签页中打开",
-    "hideNotebook": "隐藏笔记本",
-    "hideNotebookConfirm": "从侧边栏隐藏 \"{{name}}\"？您可以重新扫描以恢复。",
     "deleteNotebook": "删除笔记本",
     "deleteNotebookConfirm": "确定要删除 \"{{name}}\" 吗？这将从 Gemini 中永久删除该笔记本。",
     "newNotebook": "新建笔记本",

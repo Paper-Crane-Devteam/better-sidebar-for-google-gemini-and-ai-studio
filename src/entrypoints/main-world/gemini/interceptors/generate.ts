@@ -32,8 +32,8 @@ export function handleGenerateResponse(response: any, url: string) {
             }
 
             // Detect notebook from request payload.
-            // innerJson[21] = "notebooks/<uuid>" when chatting inside a notebook.
-            const nbField = innerJson?.[21];
+            // innerJson[19] = "notebooks/<uuid>" when chatting inside a notebook.
+            const nbField = innerJson?.[19];
             if (typeof nbField === 'string' && nbField.startsWith('notebooks/')) {
               requestNotebookId = nbField.slice('notebooks/'.length);
             }

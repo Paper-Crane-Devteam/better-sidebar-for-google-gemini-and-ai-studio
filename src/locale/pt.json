@@ -90,7 +90,7 @@
   },
   "modal": {
     "resetDatabase": "Redefinir Banco de Dados",
-    "resetDatabaseConfirm": "Tem certeza de que deseja redefinir o banco de dados? Isso excluirá todos os dados.",
+    "resetDatabaseConfirm": "Tem certeza de que deseja redefinir o banco de dados? Apenas os dados locais serão excluídos. O backup remoto (se houver) não será afetado. Para limpar os dados remotos, use \"Backup to Drive\" após a redefinição.",
     "reset": "Redefinir",
     "deleteDatabaseConfirm": "Tem certeza de que deseja excluir todos os dados armazenados? Isso não pode ser desfeito.",
     "defaultConfirm": "Confirmar",
@@ -194,7 +194,7 @@
     "importConversationDataDescription": "Importar histórico de conversas de um ZIP exportado do Google AI Studio",
     "storageManagement": "Gerenciamento de Armazenamento",
     "resetDatabase": "Redefinir Banco de Dados",
-    "resetDatabaseDescription": "Excluir todos os dados armazenados (pastas, tags, cache). Isso não pode ser desfeito.",
+    "resetDatabaseDescription": "Excluir todos os dados locais (pastas, tags, cache). O backup remoto não será afetado. Para limpar os dados remotos, use \"Backup to Drive\" após a redefinição.",
     "resetData": "Redefinir Dados",
     "backupRestore": "Backup e Restauração",
     "exportData": "Exportar Dados",
@@ -508,7 +508,7 @@
   },
   "dataManagement": {
     "resetDatabase": "Redefinir Banco de Dados",
-    "resetDatabaseConfirm": "Tem certeza de que deseja excluir todos os dados armazenados? Isso não pode ser desfeito."
+    "resetDatabaseConfirm": "Apenas os dados locais serão excluídos. O backup remoto (se houver) não será afetado. Para limpar os dados remotos, use \"Backup to Drive\" após a redefinição."
   },
   "rating": {
     "title": "Você está gostando desta extensão?",
@@ -689,8 +689,6 @@
     "noNotebooks": "Nenhum notebook encontrado.",
     "openNotebook": "Abrir Notebook",
     "openInNewTab": "Abrir em nova aba",
-    "hideNotebook": "Ocultar Notebook",
-    "hideNotebookConfirm": "Ocultar \"{{name}}\" da barra lateral? Você pode reescanear para recuperá-lo.",
     "deleteNotebook": "Excluir Notebook",
     "deleteNotebookConfirm": "Tem certeza de que deseja excluir \"{{name}}\"? Isso excluirá permanentemente o Notebook do Gemini.",
     "newNotebook": "Novo Notebook",
