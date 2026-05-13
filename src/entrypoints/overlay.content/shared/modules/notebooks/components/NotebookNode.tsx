@@ -133,7 +133,7 @@ export const NotebookNode = ({
       // Navigate to new app blank page if currently viewing this notebook
       try {
         const path = decodeURIComponent(window.location.pathname);
-        if (path.includes(`/notebook/notebooks/${node.data.id}`)) {
+        if (path.includes(`/notebook/${node.data.id}`) || path.includes(`/notebook/notebooks/${node.data.id}`)) {
           navigateToNewChat();
         }
       } catch {
