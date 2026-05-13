@@ -18,9 +18,6 @@ export const GeminiUIControl = () => {
     sidebarWidth,
     chatWidth,
     inputWidth,
-    containerWidth,
-    measuredChatWidth,
-    measuredInputWidth,
     hideBrand,
     hideDisclaimer,
     hideUpgrade,
@@ -42,12 +39,6 @@ export const GeminiUIControl = () => {
     quickResend,
     setQuickResend,
   } = useGeminiUI();
-
-  // Helper to calculate percentage based on DOM measurements
-  const getMeasuredPercent = (measured: number) => {
-    if (!containerWidth || !measured) return null;
-    return Math.round((measured / containerWidth) * 100);
-  };
 
   return (
     <div className="fixed top-16 right-4 z-[39]">
@@ -126,9 +117,7 @@ export const GeminiUIControl = () => {
                     </Label>
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-mono font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-                        {chatWidth < 0
-                          ? `${getMeasuredPercent(measuredChatWidth) ?? '-'}%`
-                          : `${chatWidth}%`}
+                        {`${chatWidth}%`}
                       </span>
                     </div>
                   </div>
@@ -137,11 +126,7 @@ export const GeminiUIControl = () => {
                     min={40}
                     max={100}
                     step={1}
-                    value={
-                      chatWidth < 0
-                        ? (getMeasuredPercent(measuredChatWidth) ?? 50)
-                        : chatWidth
-                    }
+                    value={chatWidth}
                     onChange={(e) => setChatWidth(Number(e.target.value))}
                     className="ui-slider"
                   />
@@ -155,9 +140,7 @@ export const GeminiUIControl = () => {
                     </Label>
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-mono font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-                        {inputWidth < 0
-                          ? `${getMeasuredPercent(measuredInputWidth) ?? '-'}%`
-                          : `${inputWidth}%`}
+                        {`${inputWidth}%`}
                       </span>
                     </div>
                   </div>
@@ -166,11 +149,7 @@ export const GeminiUIControl = () => {
                     min={40}
                     max={100}
                     step={1}
-                    value={
-                      inputWidth < 0
-                        ? (getMeasuredPercent(measuredInputWidth) ?? 50)
-                        : inputWidth
-                    }
+                    value={inputWidth}
                     onChange={(e) => setInputWidth(Number(e.target.value))}
                     className="ui-slider"
                   />

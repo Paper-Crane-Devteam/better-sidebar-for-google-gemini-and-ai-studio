@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { usePegasusStore } from '@/shared/lib/pegasus-store';
-import { debounce, throttle } from 'lodash';
+import { debounce } from 'lodash';
 import { useAppStore } from '@/shared/lib/store';
 import { waitForElement } from '@/shared/lib/utils';
 
@@ -33,9 +33,7 @@ export const useGeminiUI = () => {
   const [localSidebarWidth, setLocalSidebarWidth] = useState(storeSidebarWidth);
   const [localChatWidth, setLocalChatWidth] = useState(storeChatWidth);
   const [localInputWidth, setLocalInputWidth] = useState(storeInputWidth);
-  const [containerWidth, setContainerWidth] = useState(0);
-  const [measuredChatWidth, setMeasuredChatWidth] = useState(0);
-  const [measuredInputWidth, setMeasuredInputWidth] = useState(0);
+
 
   // Check for upgrade option
   useEffect(() => {
@@ -51,36 +49,50 @@ export const useGeminiUI = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Measure elements on window resize
+  // On first use (store value is -1), measure current DOM percentage and persist it
   useEffect(() => {
-    const updateMeasurements = throttle(() => {
-      const chatHistory = document.getElementById('chat-history');
-      if (chatHistory) {
-        setContainerWidth(chatHistory.getBoundingClientRect().width);
+    if (storeChatWidth >= 0 && storeInputWidth >= 0) return;
 
+    const measure = () => {
+      const chatHistory = document.getElementById('chat-history');
+      if (!chatHistory) return;
+
+      const containerW = chatHistory.getBoundingClientRect().width;
+      if (!containerW) return;
+
+      if (storeChatWidth < 0) {
         const chatContent = chatHistory.querySelector(
           '.conversation-container',
         );
-        if (chatContent)
-          setMeasuredChatWidth(chatContent.getBoundingClientRect().width);
+        if (chatContent) {
+          const percent = Math.round(
+            (chatContent.getBoundingClientRect().width / containerW) * 100,
+          );
+          setGeminiFeature('chatWidth', percent);
+          setLocalChatWidth(percent);
+        }
+      }
 
-        const inputField = chatHistory.querySelector(
+      if (storeInputWidth < 0) {
+        // Input field may not be inside #chat-history, search from document
+        const inputField = document.querySelector(
           'input-container > fieldset',
         );
-        if (inputField)
-          setMeasuredInputWidth(inputField.getBoundingClientRect().width);
+        if (inputField) {
+          const percent = Math.round(
+            (inputField.getBoundingClientRect().width / containerW) * 100,
+          );
+          setGeminiFeature('inputWidth', percent);
+          setLocalInputWidth(percent);
+        }
       }
-    }, 100);
-
-    updateMeasurements();
-
-    window.addEventListener('resize', updateMeasurements);
-
-    return () => {
-      window.removeEventListener('resize', updateMeasurements);
-      updateMeasurements.cancel();
     };
-  }, []);
+
+    // Try immediately, then retry after a short delay for slow-rendering pages
+    measure();
+    const timer = setTimeout(measure, 1500);
+    return () => clearTimeout(timer);
+  }, [storeChatWidth, storeInputWidth, setGeminiFeature]);
 
   // Sync local state when store changes (e.g., from another instance or initial load)
   useEffect(() => {
@@ -138,10 +150,10 @@ export const useGeminiUI = () => {
       bard-sidenav { 
         --bard-sidenav-open-width: ${storeSidebarWidth}px !important; 
       }
+    `;
 
-      ${
-        storeChatWidth > 0
-          ? `
+    if (storeChatWidth > 0) {
+      css += `
       /* Chat Content Control */
       #chat-history .conversation-container {
         max-width: ${storeChatWidth}% !important;
@@ -151,22 +163,21 @@ export const useGeminiUI = () => {
       }
       #chat-history .conversation-container user-query {
         max-width: none !important;
-      }`
-          : ''
       }
-      ${
-        storeInputWidth > 0
-          ? `
+      `;
+    }
+
+    if (storeInputWidth > 0) {
+      css += `
       /* Input Box Control */
       input-container > fieldset {
         max-width: ${storeInputWidth}% !important;
         width: 100% !important;
         margin-left: auto !important;
         margin-right: auto !important;
-      }`
-          : ''
       }
-    `;
+      `;
+    }
 
     if (zenMode) {
       css += `
@@ -236,9 +247,6 @@ export const useGeminiUI = () => {
     sidebarWidth: localSidebarWidth,
     chatWidth: localChatWidth,
     inputWidth: localInputWidth,
-    containerWidth,
-    measuredChatWidth,
-    measuredInputWidth,
     hideBrand,
     hideDisclaimer,
     hideUpgrade,
