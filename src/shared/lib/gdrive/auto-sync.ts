@@ -24,7 +24,7 @@ import { mergeSyncData } from './sync-merge';
 const PERIODIC_ALARM = 'gdrive-auto-sync';
 const DEBOUNCE_ALARM = 'gdrive-debounce-sync';
 const SYNC_INTERVAL_MINUTES = 25;
-const DEBOUNCE_MINUTES = 0.5; // 30 seconds as fractional minutes
+const DEBOUNCE_MINUTES = 0.25; // 15 seconds as fractional minutes
 const LOCK_KEY = 'gdrive_sync_lock';
 const LOCK_TTL_MS = 2 * 60 * 1000;
 const MAX_RETRIES = 2;

@@ -11,6 +11,7 @@ import { cn } from '@/shared/lib/utils/utils';
 import {
   navigateToConversation,
   navigateToNotebook,
+  navigateToNewChat,
 } from '@/shared/lib/navigation';
 import { useAppStore } from '@/shared/lib/store';
 import { useI18n } from '@/shared/hooks/useI18n';
@@ -128,6 +129,17 @@ export const NotebookNode = ({
         type: 'DELETE_NOTEBOOK',
         payload: { id: node.data.id },
       });
+
+      // Navigate to new app blank page if currently viewing this notebook
+      try {
+        const path = decodeURIComponent(window.location.pathname);
+        if (path.includes(`/notebook/notebooks/${node.data.id}`)) {
+          navigateToNewChat();
+        }
+      } catch {
+        // non-critical
+      }
+
       fetchData(true);
     }
   };

@@ -7,6 +7,7 @@ import { handleCNgdBeResponse } from './interceptors/create-gem';
 import { handleRenameResponse } from './interceptors/rename';
 import { handleDeleteGemResponse } from './interceptors/delete-gem';
 import { handleDeleteNotebookResponse } from './interceptors/delete-notebook';
+import { handleRenameNotebookResponse } from './interceptors/rename-notebook';
 import { handleCreateNotebookResponse } from './interceptors/create-notebook';
 import { handleDownloadResponse } from './interceptors/download';
 import { geminiRequestBuilder } from './lib/request-builder';
@@ -101,6 +102,8 @@ export function initGeminiInterceptors() {
             handleDeleteGemResponse(response, url);
           } else if (url.includes('rpcids=Nwkn9')) {
             handleDeleteNotebookResponse(response, url);
+          } else if (url.includes('rpcids=kHv0Vd')) {
+            handleRenameNotebookResponse(response, url);
           } else if (url.includes('rpcids=oMH3Zd')) {
             handleCreateNotebookResponse(response, url);
           }

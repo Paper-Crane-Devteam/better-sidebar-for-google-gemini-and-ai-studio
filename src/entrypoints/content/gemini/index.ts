@@ -147,6 +147,23 @@ export async function initGemini() {
     }
   });
 
+  window.addEventListener('GEMINI_NOTEBOOK_RENAME', async (event: any) => {
+    const { id, newName } = event.detail;
+    console.log(
+      'Better Sidebar: Content Script received GEMINI_NOTEBOOK_RENAME',
+      id,
+      newName,
+    );
+    try {
+      await browser.runtime.sendMessage({
+        type: 'UPDATE_NOTEBOOK',
+        payload: { id, updates: { name: newName } },
+      });
+    } catch (e) {
+      console.error('Better Sidebar: Failed to handle GEMINI_NOTEBOOK_RENAME', e);
+    }
+  });
+
   window.addEventListener('GEMINI_NOTEBOOK_CREATED', async (event: any) => {
     const { id, name } = event.detail;
     if (!id) return;
