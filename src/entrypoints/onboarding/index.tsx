@@ -31,9 +31,11 @@ const Onboarding = () => {
       PLATFORM_CONFIG.aistudio.urlPattern + '/app/prompts/new_chat';
   };
 
-  // Filter out unknown platforms
+  // Filter out unknown platforms and temporarily hidden platforms (ChatGPT, Claude)
   const platformsToShow = Object.values(PLATFORM_CONFIG).filter(
-    (config) => config.id !== 'unknown',
+    (config) => config.id !== 'unknown'
+      && config.id !== 'chatgpt'   // temporarily hidden
+      && config.id !== 'claude',   // temporarily hidden
   );
 
   return (

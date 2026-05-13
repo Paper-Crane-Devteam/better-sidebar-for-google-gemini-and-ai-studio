@@ -250,6 +250,7 @@ export const GeneralSettings = () => {
               </div>
             </>
           )}
+          {/* ChatGPT shortcuts - temporarily hidden
           {platform === Platform.CHATGPT && (
             <>
               <div className="flex items-center justify-between">
@@ -287,6 +288,7 @@ export const GeneralSettings = () => {
               </div>
             </>
           )}
+          */}
           {platform === Platform.GEMINI && (
             <>
               <div className="flex items-center justify-between">

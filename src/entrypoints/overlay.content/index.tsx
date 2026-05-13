@@ -44,11 +44,11 @@ export default defineContentScript({
         await initGeminiOverlay(mainStyles);
         break;
       }
-      case Platform.CHATGPT: {
-        const { initChatGPTOverlay } = await import('./chatgpt/Layout');
-        await initChatGPTOverlay(mainStyles);
-        break;
-      }
+      // case Platform.CHATGPT: {
+      //   const { initChatGPTOverlay } = await import('./chatgpt/Layout');
+      //   await initChatGPTOverlay(mainStyles);
+      //   break;
+      // }
       default:
         console.warn(
           `Better Sidebar: Unknown platform (${platform}), overlay not loaded`,

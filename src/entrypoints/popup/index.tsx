@@ -63,8 +63,8 @@ const Options = () => {
   const platformsToConfigure = [
     Platform.AI_STUDIO,
     Platform.GEMINI,
-    Platform.CHATGPT,
-    Platform.CLAUDE,
+    // Platform.CHATGPT,
+    // Platform.CLAUDE,
   ];
 
   return (

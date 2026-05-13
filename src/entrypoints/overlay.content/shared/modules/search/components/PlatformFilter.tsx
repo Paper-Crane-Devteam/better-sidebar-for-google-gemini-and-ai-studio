@@ -49,7 +49,7 @@ export const PlatformFilter = () => {
   const platforms = [
     {...PLATFORM_CONFIG[Platform.GEMINI]},
     {...PLATFORM_CONFIG[Platform.AI_STUDIO]},
-    {...PLATFORM_CONFIG[Platform.CHATGPT]},
+    // {...PLATFORM_CONFIG[Platform.CHATGPT]},
     // {...PLATFORM_CONFIG[Platform.CLAUDE]},
   ];
 
