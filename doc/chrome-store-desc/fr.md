@@ -5,11 +5,10 @@ Découvrez Better Sidebar for Gemini & AI Studio — le booster de flux de trava
 
 Nous transformons l'interface par défaut d'AI Studio en une base de connaissances puissante et organisée. Arrêtez de faire défiler sans fin et commencez à organiser vos idées efficacement.
 
-🔥 NOUVEAUTÉS (v2.4.0)
-• ✏️ Renommage réel : Renommez vos conversations — les modifications sont synchronisées avec les serveurs Google en temps réel.
-• 🗑️ Suppression réelle et par lots : Supprimez ou supprimez par lots des conversations avec une suppression réelle côté serveur. Fini les chats fantômes.
-• 🔐 Session persistante : Restez connecté entre les sessions. Plus de réautorisations fréquentes. Inclut une option de fusion intelligente.
-• 💎 Créer des conversations Gem (Gemini) : Démarrez une nouvelle conversation Gem directement depuis l'onglet Gem.
+🔥 NOUVEAUTÉS (v2.5.0)
+• 📓 Intégration Notebook (Gemini) : Support complet des Notebooks — parcourez, organisez et gérez vos Gemini Notebooks directement depuis la barre latérale.
+• ☁️ Synchronisation automatique Google Drive : Vos paramètres et votre bibliothèque de prompts se synchronisent désormais automatiquement avec Google Drive. Plus de sauvegardes manuelles.
+• ✨ Améliorations UX : Ajout d'états de chargement lors de la création de conversations, ainsi que diverses améliorations d'interaction pour une expérience plus fluide.
 
 ---
 
@@ -33,13 +32,13 @@ Une barre visuelle pour les conversations Gemini. Accédez directement à n'impo
 🤖 Modèle par Défaut
 Définissez un modèle par défaut pour Gemini et chaque nouvelle conversation l'utilisera automatiquement.
 
-✏️ Renommage Réel (NOUVEAU)
+✏️ Renommage Réel
 Renommez vos conversations — les modifications sont synchronisées avec les serveurs Google en temps réel.
 
-🗑️ Suppression Réelle et par Lots (NOUVEAU)
+🗑️ Suppression Réelle et par Lots
 Supprimez des conversations avec une suppression réelle côté serveur. Fini les chats fantômes.
 
-🔐 Session Persistante (NOUVEAU)
+🔐 Session Persistante
 Restez connecté entre les sessions avec fusion intelligente des données synchronisées.
 
 📂 Dossiers et Couleurs
@@ -48,8 +47,11 @@ Créez des dossiers imbriqués et attribuez des couleurs personnalisées à vos 
 📝 Bibliothèque de Prompts
 Construisez votre bibliothèque de prompts réutilisables. Supporte les variables d'options et l'importation.
 
-☁️ Synchronisation Google Drive
-Sauvegardez et synchronisez vos données de configuration via Google Drive.
+📓 Intégration Notebook (NOUVEAU)
+Support complet des Notebooks pour Gemini — parcourez, organisez et gérez vos Notebooks directement depuis la barre latérale.
+
+☁️ Synchronisation Automatique Google Drive
+Vos paramètres et votre bibliothèque de prompts se synchronisent automatiquement avec Google Drive en arrière-plan. Toujours sauvegardé.
 
 🔍 Recherche de Précision
 Effectuez des recherches en texte intégral dans tout votre historique. Limitez la recherche à la conversation active.

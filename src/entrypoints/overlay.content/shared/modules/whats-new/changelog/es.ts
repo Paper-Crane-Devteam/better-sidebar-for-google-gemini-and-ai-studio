@@ -2,6 +2,19 @@ import type { ChangeLogItem } from './types';
 
 export const changelog: ChangeLogItem[] = [
   {
+    version: '2.5.0',
+    date: '2026-05-14',
+    features: [
+      '📓 **Integración de Notebook** (Gemini): Soporte completo de Notebook — navega, organiza y gestiona tus Gemini Notebooks directamente desde la barra lateral.',
+      '☁️ **Sincronización automática con Google Drive**: Tus configuraciones y biblioteca de prompts ahora se sincronizan automáticamente con Google Drive en segundo plano. No más copias de seguridad manuales.',
+      '✨ **Mejoras de UX**: Se añadieron estados de carga al crear nuevas conversaciones, además de varias mejoras de interacción para una experiencia más fluida.',
+    ],
+    fixes: [
+      'Corregido el problema de entradas duplicadas en la barra de desplazamiento inteligente.',
+      'Corregido un problema donde la creación de conversaciones dentro de carpetas en AI Studio no funcionaba.',
+    ],
+  },
+  {
     version: '2.4.1',
     date: '2026-04-21',
     features: [],

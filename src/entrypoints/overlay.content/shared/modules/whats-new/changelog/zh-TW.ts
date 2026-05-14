@@ -2,6 +2,19 @@ import type { ChangeLogItem } from './types';
 
 export const changelog: ChangeLogItem[] = [
   {
+    version: '2.5.0',
+    date: '2026-05-14',
+    features: [
+      '📓 **Notebook 整合**（Gemini）：完整的 Notebook 支援 — 在側邊欄中瀏覽、整理和管理您的 Gemini Notebook。',
+      '☁️ **Google Drive 自動同步**：設定和 Prompt 庫現在會自動在背景同步到 Google Drive，無需再手動備份。',
+      '✨ **體驗優化**：新增建立對話時的 Loading 狀態，以及多項互動細節打磨，整體體驗更流暢。',
+    ],
+    fixes: [
+      '修復了智慧捲軸出現重複條目的問題。',
+      '修復了 AI Studio 在資料夾內建立對話失效的問題。',
+    ],
+  },
+  {
     version: '2.4.1',
     date: '2026-04-21',
     features: [],

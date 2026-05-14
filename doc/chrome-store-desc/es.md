@@ -5,11 +5,10 @@ Conoce Better Sidebar for Gemini & AI Studio — el potenciador de flujo de trab
 
 Transformamos la interfaz predeterminada de AI Studio en una base de conocimientos poderosa y organizada. Deja de desplazarte sin fin y comienza a organizar tus ideas de manera eficiente.
 
-🔥 NOVEDADES (v2.4.0)
-• ✏️ Renombrado real: Renombra conversaciones y los cambios se sincronizan con los servidores de Google en tiempo real.
-• 🗑️ Eliminación real y por lotes: Elimina conversaciones con eliminación real del lado del servidor. No más chats fantasma.
-• 🔐 Sesión persistente: Mantén tu sesión iniciada entre sesiones. Sin más reautorizaciones frecuentes. Incluye una opción de fusión inteligente.
-• 💎 Crear conversaciones Gem (Gemini): Inicia una nueva conversación Gem directamente desde la pestaña Gem.
+🔥 NOVEDADES (v2.5.0)
+• 📓 Integración de Notebook (Gemini): Soporte completo de Notebook — navega, organiza y gestiona tus Gemini Notebooks directamente desde la barra lateral.
+• ☁️ Sincronización automática con Google Drive: Tus configuraciones y biblioteca de prompts ahora se sincronizan automáticamente con Google Drive. No más copias de seguridad manuales.
+• ✨ Mejoras de UX: Se añadieron estados de carga al crear conversaciones, además de varias mejoras de interacción para una experiencia más fluida.
 
 ---
 
@@ -33,13 +32,13 @@ Una barra visual para conversaciones de Gemini. Salta directamente a cualquier m
 🤖 Modelo Predeterminado
 Establece un modelo predeterminado para Gemini y cada nueva conversación lo usará automáticamente.
 
-✏️ Renombrado Real (NUEVO)
+✏️ Renombrado Real
 Renombra conversaciones y los cambios se sincronizan con los servidores de Google en tiempo real.
 
-🗑️ Eliminación Real y por Lotes (NUEVO)
+🗑️ Eliminación Real y por Lotes
 Elimina conversaciones con eliminación real del lado del servidor. No más chats fantasma.
 
-🔐 Sesión Persistente (NUEVO)
+🔐 Sesión Persistente
 Mantén tu sesión iniciada entre sesiones con fusión inteligente de datos sincronizados.
 
 📂 Carpetas y Colores
@@ -48,8 +47,11 @@ Arrastra y suelta tus chats en carpetas anidadas. Asigna colores personalizados 
 📝 Biblioteca de Prompts
 Construye tu biblioteca personal de prompts reutilizables. Soporta variables de opción, composición de prompts y sistemas.
 
-☁️ Sincronización con Google Drive
-Haz una copia de seguridad y sincroniza manualmente tu configuración y datos mediante Google Drive.
+📓 Integración de Notebook (NUEVO)
+Soporte completo de Notebook para Gemini — navega, organiza y gestiona tus Notebooks directamente desde la barra lateral.
+
+☁️ Sincronización Automática con Google Drive
+Tus configuraciones y biblioteca de prompts se sincronizan automáticamente con Google Drive en segundo plano. Siempre con respaldo.
 
 🔍 Búsqueda de Precisión
 Realiza búsquedas de texto completo en cada mensaje de tu historial. Limita la búsqueda al chat activo.

@@ -2,6 +2,19 @@ import type { ChangeLogItem } from './types';
 
 export const changelog: ChangeLogItem[] = [
   {
+    version: '2.5.0',
+    date: '2026-05-14',
+    features: [
+      '📓 **Notebook 統合**（Gemini）：完全な Notebook サポート — サイドバーから Gemini Notebook の閲覧、整理、管理が可能に。',
+      '☁️ **Google Drive 自動同期**：設定やプロンプトライブラリがバックグラウンドで自動的に Google Drive に同期されるようになりました。手動バックアップは不要です。',
+      '✨ **UX 改善**：新しい会話作成時のローディング状態を追加し、各種インタラクションを改善。よりスムーズな体験を実現しました。',
+    ],
+    fixes: [
+      'スマートスクロールバーに重複エントリが表示される問題を修正しました。',
+      'AI Studio でフォルダ内に会話を作成できない問題を修正しました。',
+    ],
+  },
+  {
     version: '2.4.1',
     date: '2026-04-21',
     features: [],

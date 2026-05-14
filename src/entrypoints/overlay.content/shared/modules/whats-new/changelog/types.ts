@@ -1,4 +1,4 @@
-export const CURRENT_VERSION = '2.4.1';
+export const CURRENT_VERSION = '2.5.0';
 
 export interface ChangeLogItem {
   version: string;

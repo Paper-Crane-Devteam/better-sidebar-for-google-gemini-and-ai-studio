@@ -5,11 +5,10 @@ Meet BETTER SIDEBAR FOR GEMINI & AI STUDIO — the ultimate workflow booster for
 
 We transform the default AI Studio interface into a powerful, organized knowledge base. Stop scrolling endlessly and start organizing your ideas efficiently.
 
-🔥 WHAT'S NEW (v2.4.0)
-• ✏️ True Rename: Rename conversations directly — changes sync to Google's servers in real time.
-• 🗑️ True Delete & Batch Delete: Delete or batch-delete conversations with real server-side removal. No more ghost chats.
-• 🔐 Persistent Login: Stay logged in across sessions. No more frequent re-authorization. Includes a smart merge option.
-• 💎 Create Gem Conversations (Gemini): Start a new Gem conversation directly from the Gem tab.
+🔥 WHAT'S NEW (v2.5.0)
+• 📓 Notebook Integration (Gemini): Full notebook support — browse, organize, and manage your Gemini notebooks right from the sidebar.
+• ☁️ Auto Google Drive Sync: Your settings and prompt library now sync to Google Drive automatically. No more manual backups.
+• ✨ UX Improvements: Added loading states when creating conversations, plus various interaction polish for a smoother experience.
 
 ---
 
@@ -33,13 +32,13 @@ A visual scrollbar for Gemini conversations. Jump directly to any message in lon
 🤖 Default Model
 Set a default model for Gemini and every new conversation will automatically use it.
 
-✏️ True Rename (NEW)
+✏️ True Rename
 Rename conversations directly — changes are synced to Google's servers in real time.
 
-🗑️ True Delete & Batch Delete (NEW)
+🗑️ True Delete & Batch Delete
 Delete or batch-delete conversations with real server-side removal. No more ghost chats.
 
-🔐 Persistent Login (NEW)
+🔐 Persistent Login
 Stay logged in across sessions with smart merge for synced data.
 
 📂 Folders & Colors
@@ -51,8 +50,11 @@ Build your personal library of reusable prompts. Supports option variables, prom
 🔍 Precision Search
 Perform full-text searches across every message in your history. Limit search to the active chat for immediate context.
 
-☁️ Google Drive Sync
-Manually backup and sync your settings, prompts, and config data via Google Drive.
+📓 Notebook Integration (NEW)
+Full notebook support for Gemini — browse, organize, and manage your notebooks right from the sidebar.
+
+☁️ Google Drive Auto Sync
+Automatically sync your settings, prompts, and config data to Google Drive in the background. Always backed up.
 
 🎨 UI Customization
 Advanced layout controls for Gemini, including width adjustments and Focus Mode.

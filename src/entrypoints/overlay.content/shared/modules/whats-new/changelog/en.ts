@@ -2,6 +2,19 @@ import type { ChangeLogItem } from './types';
 
 export const changelog: ChangeLogItem[] = [
   {
+    version: '2.5.0',
+    date: '2026-05-14',
+    features: [
+      '📓 **Notebook Integration** (Gemini): Full notebook support — browse, organize, and manage your Gemini notebooks right from the sidebar.',
+      '☁️ **Auto Google Drive Sync**: Your settings and prompt library now sync to Google Drive automatically in the background. No more manual backups.',
+      '✨ **UX Improvements**: Added loading states when creating new conversations, plus various interaction polish for a smoother experience.',
+    ],
+    fixes: [
+      'Fixed duplicate entries appearing in the Smart Scrollbar.',
+      'Fixed an issue where creating conversations inside folders in AI Studio was not working.',
+    ],
+  },
+  {
     version: '2.4.1',
     date: '2026-04-21',
     features: [],
