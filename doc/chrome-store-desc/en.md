@@ -104,4 +104,4 @@ Disclaimer: This extension is an independent project and is not affiliated with,
 
 🔗 LINKS
 • GitHub: https://github.com/Paper-Crane-Devteam/better-sidebar-for-google-gemini-and-ai-studio
-• Discord: https://discord.gg/uqT72XYh
+• Discord: https://discord.gg/FRzesxaGAx

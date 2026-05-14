@@ -6,7 +6,7 @@
 [![Firefox Add-ons](https://img.shields.io/badge/Firefox_Add--ons-Available-orange?style=for-the-badge&logo=firefox)](https://addons.mozilla.org/en-US/firefox/addon/better-sidebar-for-ai-studio)
 [![Edge Add-ons](https://img.shields.io/badge/Edge_Add--ons-Coming_Soon-gray?style=for-the-badge&logo=microsoft-edge)](https://microsoftedge.microsoft.com/addons/)
 [![Privacy Policy](https://img.shields.io/badge/Privacy-Policy-green?style=for-the-badge)](./PRIVACY.md)
-[![Discord](https://img.shields.io/badge/Discord-Join_Us-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/uqT72XYh)
+[![Discord](https://img.shields.io/badge/Discord-Join_Us-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/FRzesxaGAx)
 [![License](https://img.shields.io/badge/License-Open_Source-orange?style=for-the-badge)](./LICENSE)
 
 Hi there! Welcome to the home of **Better Sidebar for Gemini & AI Studio**.
@@ -135,7 +135,7 @@ This project is now open source! If you're a developer and want to help make it 
 
 ### Community
 
-Join our [Discord server](https://discord.gg/uqT72XYh) to chat with other users, get help, or share feedback.
+Join our [Discord server](https://discord.gg/FRzesxaGAx) to chat with other users, get help, or share feedback.
 
 ### Reporting Bugs
 

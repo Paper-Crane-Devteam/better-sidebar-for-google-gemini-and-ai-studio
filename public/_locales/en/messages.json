@@ -1,10 +1,10 @@
 {
   "extensionName": {
-    "message": "Better Sidebar for Gemini & AI Studio",
+    "message": "Better Sidebar for Gemini & AI Studio: Folders, Prompts & Search",
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "Better sidebar with folders, tags, favorites, prompt library, deep search, conversation export, and library scanning.",
+    "message": "Better Gemini & AI Studio: Folders, tags, prompt library, full-text search, chat export, UI tweaks, smart scrollbar & more.",
     "description": "The description of the extension"
   }
 }

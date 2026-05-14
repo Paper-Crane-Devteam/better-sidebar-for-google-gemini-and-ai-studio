@@ -1,10 +1,10 @@
 {
   "extensionName": {
-    "message": "Gemini & AI Studio 增强侧边栏",
+    "message": "Gemini & AI Studio 增强侧边栏：文件夹、提示词与搜索",
     "description": "插件名称"
   },
   "extensionDescription": {
-    "message": "更好的侧边栏：文件夹、标签、收藏、提示词库、深度搜索、对话导出与库扫描。",
+    "message": "更好的 Gemini & AI Studio：文件夹、标签、提示词库、全文搜索、对话导出、UI 优化、智能滚动条等。",
     "description": "插件描述"
   }
 }
