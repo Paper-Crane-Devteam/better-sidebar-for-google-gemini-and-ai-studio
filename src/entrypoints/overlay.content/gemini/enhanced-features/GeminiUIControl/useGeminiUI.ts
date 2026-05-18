@@ -278,5 +278,7 @@ export const useGeminiUI = () => {
       setPegasusGeminiFeature('removeWatermark', v),
     quickResend: geminiSettings.quickResend,
     setQuickResend: (v: boolean) => setGeminiFeature('quickResend', v),
+    autoHideInput: geminiSettings.autoHideInput,
+    setAutoHideInput: (v: boolean) => setGeminiFeature('autoHideInput', v),
   };
 };

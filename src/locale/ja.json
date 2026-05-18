@@ -637,7 +637,9 @@
     "defaultModelSelect": "選択",
     "defaultModelNone": "なし",
     "smartScrollbar": "スマートスクロールバー（実験的）",
-    "smartScrollbarDesc": "右側に会話ナビゲーションを表示"
+    "smartScrollbarDesc": "右側に会話ナビゲーションを表示",
+    "autoHideInput": "入力欄の自動非表示",
+    "autoHideInputDesc": "下部エリアにホバーするまで入力欄を非表示にする"
   },
   "topBarTag": {
     "removeTag": "タグを削除",
@@ -720,5 +722,12 @@
     "hint": "この操作はメニューからいつでも実行できます。",
     "importAll": "今すぐインポート",
     "skip": "あとで"
+  },
+  "themeSettings": {
+    "title": "テーマ",
+    "customThemes": "カスタムテーマ",
+    "customThemesDescription": "Gemini インターフェースにカスタムビジュアルテーマを適用します。これらのテーマはデフォルトの配色を上書きします。",
+    "default": "デフォルト",
+    "defaultDescription": "ライト/ダークモード対応のオリジナル Gemini テーマ"
   }
 }

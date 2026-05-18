@@ -6,6 +6,7 @@ import {
   syncAiStudioTheme,
   syncChatGPTTheme,
 } from './utils/utils';
+import type { ThemePresetId } from '@/themes/types';
 
 interface GeminiEnhancedFeatures {
   defaultModel: 'default' | 'fast' | 'thinking' | 'pro';
@@ -19,10 +20,13 @@ interface GeminiEnhancedFeatures {
   zenMode: boolean;
   showSmartScrollbar: boolean;
   quickResend: boolean;
+  autoHideInput: boolean;
 }
 
 interface SettingsState {
   theme: 'light' | 'dark' | 'system';
+  /** Custom theme preset ID, or null for default Gemini theme */
+  customTheme: ThemePresetId | null;
   layoutDensity: 'compact' | 'relaxed';
   newChatBehavior: 'current-tab' | 'new-tab';
   autoScanLibrary: boolean;
@@ -53,6 +57,7 @@ interface SettingsState {
 
   // Actions
   setTheme: (theme: 'light' | 'dark' | 'system') => void;
+  setCustomTheme: (themeId: ThemePresetId | null) => void;
   setLayoutDensity: (density: 'compact' | 'relaxed') => void;
   setNewChatBehavior: (behavior: 'current-tab' | 'new-tab') => void;
   setAutoScanLibrary: (enabled: boolean) => void;
@@ -121,6 +126,7 @@ export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
       theme: 'system',
+      customTheme: null,
       layoutDensity: 'relaxed',
       newChatBehavior: 'current-tab',
       autoScanLibrary: false,
@@ -158,6 +164,7 @@ export const useSettingsStore = create<SettingsState>()(
           zenMode: false,
           showSmartScrollbar: true,
           quickResend: false,
+          autoHideInput: false,
         },
       },
 
@@ -175,6 +182,11 @@ export const useSettingsStore = create<SettingsState>()(
         // if(platform === Platform.CLAUDE) {
         //   syncClaudeTheme(theme)
         // }
+      },
+      setCustomTheme: (themeId) => {
+        set({ customTheme: themeId });
+        // Theme engine apply/remove is handled by the content script
+        // that subscribes to this store change
       },
       setLayoutDensity: (layoutDensity) => set({ layoutDensity }),
       setNewChatBehavior: (newChatBehavior) => set({ newChatBehavior }),

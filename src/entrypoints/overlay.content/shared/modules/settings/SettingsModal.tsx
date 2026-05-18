@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Button } from '../../components/ui/button';
-import { X, Settings, Heart, Info, LayoutTemplate, Database, SlidersHorizontal } from 'lucide-react';
+import { X, Settings, Heart, Info, LayoutTemplate, Database, SlidersHorizontal, Palette } from 'lucide-react';
 import { GeneralSettings } from './modules/GeneralSettings';
+import { ThemeSettings } from './modules/ThemeSettings';
 import { ExplorerSettings } from './modules/ExplorerSettings';
 import { DataSettings } from './modules/DataSettings';
 import { AboutSettings } from './modules/AboutSettings';
@@ -15,7 +16,7 @@ interface SettingsModalProps {
     onOpenChange: (open: boolean) => void;
 }
 
-type Section = 'general' | 'explorer' | 'data' | 'platform' | 'sponsor' | 'about';
+type Section = 'general' | 'theme' | 'explorer' | 'data' | 'platform' | 'sponsor' | 'about';
 
 const NavButton = ({ 
     id, 
@@ -53,6 +54,8 @@ export const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
         switch (activeSection) {
             case 'general':
                 return <GeneralSettings />;
+            case 'theme':
+                return <ThemeSettings />;
             case 'explorer':
                 return <ExplorerSettings />;
             case 'platform':
@@ -88,6 +91,7 @@ export const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
                     </div>
                     
                     <NavButton id="general" label={t('settings.general')} icon={Settings} activeSection={activeSection} setActiveSection={setActiveSection} />
+                    <NavButton id="theme" label={t('themeSettings.title')} icon={Palette} activeSection={activeSection} setActiveSection={setActiveSection} />
                     <NavButton id="explorer" label={t('settings.library')} icon={LayoutTemplate} activeSection={activeSection} setActiveSection={setActiveSection} />
                     {hasPlatformSettings && (
                         <NavButton id="platform" label={t('geminiUI.title')} icon={SlidersHorizontal} activeSection={activeSection} setActiveSection={setActiveSection} />

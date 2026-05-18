@@ -35,6 +35,7 @@ export const GeminiPlatformSettings = () => {
     zenMode,
     showSmartScrollbar,
     quickResend,
+    autoHideInput,
   } = geminiSettings;
 
   // Local state for immediate slider feedback
@@ -318,6 +319,24 @@ export const GeminiPlatformSettings = () => {
               checked={showSmartScrollbar}
               onCheckedChange={(c) =>
                 setGeminiFeature('showSmartScrollbar', c)
+              }
+            />
+          </div>
+
+          {/* Auto-hide Input */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label className="text-sm font-medium">
+                {t('geminiUI.autoHideInput')}
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                {t('geminiUI.autoHideInputDesc')}
+              </p>
+            </div>
+            <Switch
+              checked={autoHideInput}
+              onCheckedChange={(c) =>
+                setGeminiFeature('autoHideInput', c)
               }
             />
           </div>

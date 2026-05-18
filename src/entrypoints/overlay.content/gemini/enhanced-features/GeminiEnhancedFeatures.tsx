@@ -5,6 +5,7 @@ import { TopBarTagFeature } from './TopBarTagFeature';
 import { ZenModeFeature } from './ZenModeFeature';
 import { SmartScrollbarFeature } from './SmartScrollbar/SmartScrollbarFeature';
 import { QuickResendFeature } from './QuickResendFeature';
+import { AutoHideInputFeature } from './AutoHideInputFeature';
 
 /**
  * Container for all Gemini enhanced features.
@@ -20,6 +21,7 @@ export const GeminiEnhancedFeatures = () => {
       <ZenModeFeature />
       <SmartScrollbarFeature />
       <QuickResendFeature />
+      <AutoHideInputFeature />
     </>
   );
 };

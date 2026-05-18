@@ -636,7 +636,9 @@
     "defaultModelSelect": "選擇",
     "defaultModelNone": "無",
     "smartScrollbar": "智慧捲軸（實驗性）",
-    "smartScrollbarDesc": "在右側顯示對話導覽"
+    "smartScrollbarDesc": "在右側顯示對話導覽",
+    "autoHideInput": "自動隱藏輸入框",
+    "autoHideInputDesc": "滑鼠懸停在底部區域時才顯示輸入框"
   },
   "topBarTag": {
     "removeTag": "移除標籤",
@@ -719,5 +721,12 @@
     "hint": "你也可以之後隨時在選單中手動匯入。",
     "importAll": "立即匯入",
     "skip": "以後再說"
+  },
+  "themeSettings": {
+    "title": "主題",
+    "customThemes": "自訂主題",
+    "customThemesDescription": "為 Gemini 介面套用自訂視覺主題。這些主題會覆蓋預設配色方案。",
+    "default": "預設",
+    "defaultDescription": "原版 Gemini 主題，支援淺色/深色模式切換"
   }
 }

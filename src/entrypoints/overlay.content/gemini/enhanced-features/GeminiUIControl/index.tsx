@@ -38,6 +38,8 @@ export const GeminiUIControl = () => {
     setShowSmartScrollbar,
     quickResend,
     setQuickResend,
+    autoHideInput,
+    setAutoHideInput,
   } = useGeminiUI();
 
   return (
@@ -330,6 +332,25 @@ export const GeminiUIControl = () => {
                   <Switch
                     checked={showSmartScrollbar}
                     onCheckedChange={(c) => setShowSmartScrollbar(c)}
+                  />
+                </div>
+
+                {/* Auto-hide Input */}
+                <div className="flex items-center justify-between group">
+                  <div className="space-y-0.5">
+                    <Label
+                      className="text-xs font-semibold cursor-pointer"
+                      onClick={() => setAutoHideInput(!autoHideInput)}
+                    >
+                      {t('geminiUI.autoHideInput')}
+                    </Label>
+                    <p className="text-[10px] text-muted-foreground">
+                      {t('geminiUI.autoHideInputDesc')}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={autoHideInput}
+                    onCheckedChange={(c) => setAutoHideInput(c)}
                   />
                 </div>
               </div>

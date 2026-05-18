@@ -635,7 +635,9 @@
     "defaultModelSelect": "选择",
     "defaultModelNone": "无",
     "smartScrollbar": "智能滚动条（实验性）",
-    "smartScrollbarDesc": "在右侧显示对话导航"
+    "smartScrollbarDesc": "在右侧显示对话导航",
+    "autoHideInput": "自动隐藏输入框",
+    "autoHideInputDesc": "隐藏输入框，鼠标悬停底部时自动显示"
   },
   "topBarTag": {
     "removeTag": "移除标签",
@@ -718,5 +720,12 @@
     "hint": "你也可以之后随时在菜单中手动导入。",
     "importAll": "立即导入",
     "skip": "以后再说"
+  },
+  "themeSettings": {
+    "title": "主题",
+    "customThemes": "自定义主题",
+    "customThemesDescription": "为 Gemini 界面应用自定义视觉主题，覆盖默认配色方案。",
+    "default": "默认",
+    "defaultDescription": "原版 Gemini 主题，支持浅色/深色模式切换"
   }
 }

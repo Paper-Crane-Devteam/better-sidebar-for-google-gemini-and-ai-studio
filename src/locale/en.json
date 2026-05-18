@@ -636,7 +636,9 @@
     "defaultModelSelect": "Select",
     "defaultModelNone": "None",
     "smartScrollbar": "Smart Scrollbar (Experimental)",
-    "smartScrollbarDesc": "Show conversation navigation on the right side"
+    "smartScrollbarDesc": "Show conversation navigation on the right side",
+    "autoHideInput": "Auto-hide Input",
+    "autoHideInputDesc": "Hide input box until you hover the bottom area"
   },
   "topBarTag": {
     "removeTag": "Remove tag",
@@ -719,5 +721,12 @@
     "hint": "You can always do this later from the menu.",
     "importAll": "Import Now",
     "skip": "Maybe Later"
+  },
+  "themeSettings": {
+    "title": "Theme",
+    "customThemes": "Custom Themes",
+    "customThemesDescription": "Apply a custom visual theme to the Gemini interface. These themes override the default color scheme.",
+    "default": "Default",
+    "defaultDescription": "Original Gemini theme with light/dark mode support"
   }
 }

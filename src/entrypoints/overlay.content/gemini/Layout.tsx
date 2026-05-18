@@ -16,6 +16,7 @@ import {
 } from '@/shared/lib/utils';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { useAppStore } from '@/shared/lib/store';
+import { initGeminiThemeSync } from '@/themes/platforms/gemini';
 
 export async function initGeminiOverlay(mainStyles: string): Promise<void> {
   console.log('Better Sidebar: Overlay (Gemini) Initialized');
@@ -102,6 +103,9 @@ export async function initGeminiOverlay(mainStyles: string): Promise<void> {
 
   // Mount Enhanced Features independently from OverlayPanel
   mountEnhancedFeatures(mainStyles);
+
+  // Initialize custom theme sync (applies CSS variables to body)
+  initGeminiThemeSync();
 }
 
 // ─── Desktop Layout ─────────────────────────────────────────────────────────

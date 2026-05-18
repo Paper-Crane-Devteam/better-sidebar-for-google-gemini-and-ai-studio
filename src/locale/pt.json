@@ -387,9 +387,6 @@
     "selectItems": "Selecionar itens",
     "deletingProgress": "Excluindo {{current}}/{{total}}...",
     "deleteSuccess": "{{count}} conversas excluídas",
-    "deletePartial": "Excluídas {{succeeded}}/{{total}}, {{failed}} falharam",
-    "deletingProgress": "Excluindo {{current}}/{{total}}...",
-    "deleteSuccess": "{{count}} conversas excluídas",
     "deletePartial": "Excluídas {{succeeded}}/{{total}}, {{failed}} falharam"
   },
   "tags": {
@@ -639,7 +636,9 @@
     "defaultModelSelect": "Selecionar",
     "defaultModelNone": "Nenhum",
     "smartScrollbar": "Barra de rolagem inteligente (Experimental)",
-    "smartScrollbarDesc": "Mostrar navegação da conversa no lado direito"
+    "smartScrollbarDesc": "Mostrar navegação da conversa no lado direito",
+    "autoHideInput": "Ocultar entrada automaticamente",
+    "autoHideInputDesc": "Ocultar a caixa de entrada até passar o cursor na área inferior"
   },
   "topBarTag": {
     "removeTag": "Remover tag",
@@ -722,5 +721,12 @@
     "hint": "Você também pode fazer isso depois pelo menu.",
     "importAll": "Importar agora",
     "skip": "Talvez depois"
+  },
+  "themeSettings": {
+    "title": "Tema",
+    "customThemes": "Temas personalizados",
+    "customThemesDescription": "Aplique um tema visual personalizado à interface do Gemini. Esses temas substituem o esquema de cores padrão.",
+    "default": "Padrão",
+    "defaultDescription": "Tema original do Gemini com suporte a modo claro/escuro"
   }
 }
