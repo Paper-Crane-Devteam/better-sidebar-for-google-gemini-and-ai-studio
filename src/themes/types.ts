@@ -32,6 +32,18 @@ export interface ThemePresetMeta {
 export interface ThemePreset extends ThemePresetMeta {
   /** CSS variables to inject on body (overrides Gemini's :root .light-theme / .dark-theme) */
   variables: ThemeVariable[];
+  /**
+   * CSS variables to inject into the sidebar Shadow DOM root container.
+   * These override the sidebar's own design tokens (--background, --foreground, --primary, etc.)
+   * defined in _gemini.scss. Values should be RGB triplets like "245 240 232" for color vars.
+   */
+  sidebarVariables?: ThemeVariable[];
+  /**
+   * Direct inline styles to apply on the sidebar Shadow DOM root container.
+   * Use for properties like backdrop-filter that aren't CSS variables.
+   * Keys are CSS property names (camelCase or kebab-case).
+   */
+  sidebarStyles?: Record<string, string>;
 }
 
 /** Registry of all available theme presets */

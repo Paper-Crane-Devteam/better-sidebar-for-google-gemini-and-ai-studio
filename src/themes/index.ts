@@ -8,7 +8,8 @@
  */
 
 export type { ThemePreset, ThemePresetId, ThemePresetMeta, ThemeVariable, ThemeRegistry } from './types';
-export { applyTheme, removeTheme, getCurrentThemeId } from './engine';
+export { applyTheme, removeTheme, getCurrentThemeId, applySidebarTheme, clearSidebarTheme } from './engine';
+export { bindShadowRootToTheme } from './platforms/gemini';
 
 import type { ThemePresetId, ThemeRegistry } from './types';
 import { grimoire } from './presets/grimoire';

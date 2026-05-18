@@ -256,4 +256,31 @@ body.bs-theme--retro-terminal rich-textarea::after {
     { property: '--bard-color-processing-animation-color-1', value: '#0a2a0a' },
     { property: '--bard-color-processing-animation-color-2', value: '#003300' },
   ],
+  sidebarVariables: [
+    // Pure black terminal
+    { property: '--background', value: '8 8 8' },            // #080808
+    { property: '--foreground', value: '0 255 65' },          // #00ff41
+    { property: '--card', value: '15 15 15' },                // #0f0f0f
+    { property: '--card-foreground', value: '0 255 65' },
+    { property: '--popover', value: '15 15 15' },
+    { property: '--popover-foreground', value: '0 255 65' },
+    { property: '--primary', value: '0 255 65' },             // #00ff41
+    { property: '--primary-foreground', value: '0 0 0' },
+    { property: '--secondary', value: '20 40 20' },           // dark green
+    { property: '--secondary-foreground', value: '0 255 65' },
+    { property: '--muted', value: '20 40 20' },
+    { property: '--muted-foreground', value: '0 128 32' },    // #008020
+    { property: '--accent', value: '10 42 10' },              // #0a2a0a
+    { property: '--accent-foreground', value: '0 255 65' },
+    { property: '--destructive', value: '255 0 51' },         // #ff0033
+    { property: '--destructive-foreground', value: '0 0 0' },
+    { property: '--border', value: '26 58 26' },              // #1a3a1a
+    { property: '--input', value: '26 58 26' },
+    { property: '--ring', value: '0 255 65' },
+    { property: '--sidebar-icon-color', value: '0 204 51' },  // #00cc33
+    { property: '--font-sans', value: '"Fira Code", "JetBrains Mono", "Cascadia Code", "Consolas", monospace' },
+    { property: '--gem-sys-color--primary-container', value: '#0a2a0a' },
+    { property: '--gem-sys-color--on-primary-container', value: '#00ff41' },
+    { property: '--radius', value: '0px' },
+  ],
 };

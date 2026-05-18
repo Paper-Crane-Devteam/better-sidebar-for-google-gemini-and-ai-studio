@@ -16,7 +16,7 @@ import {
 } from '@/shared/lib/utils';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { useAppStore } from '@/shared/lib/store';
-import { initGeminiThemeSync } from '@/themes/platforms/gemini';
+import { initGeminiThemeSync, bindShadowRootToTheme } from '@/themes/platforms/gemini';
 
 export async function initGeminiOverlay(mainStyles: string): Promise<void> {
   console.log('Better Sidebar: Overlay (Gemini) Initialized');
@@ -298,6 +298,9 @@ async function mountDesktopLayout(
           });
 
           shadow.appendChild(rootContainer);
+
+          // Bind custom theme to sidebar Shadow DOM
+          bindShadowRootToTheme(rootContainer);
 
           const root = ReactDOM.createRoot(rootContainer);
           root.render(

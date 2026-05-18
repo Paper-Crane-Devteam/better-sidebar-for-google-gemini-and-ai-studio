@@ -18,24 +18,17 @@ export const cupertinoGlass: ThemePreset = {
   descriptionZh: '磨砂玻璃质感，系统原生字体，极简黑白灰，纯粹生产力',
   fonts: ['Inter:wght@300;400;500;600'],
   extraCss: `
-/* Frosted glass effect on sidebar and containers */
-body.bs-theme--cupertino-glass bard-sidenav .sidenav-with-history-container,
-body.bs-theme--cupertino-glass .conversation-container {
-  backdrop-filter: blur(20px) saturate(1.8) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(1.8) !important;
-  background-color: rgba(255, 255, 255, 0.72) !important;
-}
-
 /* Remove rounded corners for a more native feel */
 body.bs-theme--cupertino-glass mat-card,
 body.bs-theme--cupertino-glass .mdc-card {
   border-radius: 12px !important;
 }
 
-/* Subtle vibrancy on hover states */
-body.bs-theme--cupertino-glass .mat-mdc-list-item:hover {
-  backdrop-filter: blur(10px) !important;
-  background-color: rgba(0, 0, 0, 0.04) !important;
+/* Frosted glass on Gemini native dropdowns/menus (they float above content) */
+body.bs-theme--cupertino-glass .cdk-overlay-pane .mat-mdc-menu-panel,
+body.bs-theme--cupertino-glass .cdk-overlay-pane .mdc-menu-surface {
+  backdrop-filter: blur(20px) saturate(1.8) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(1.8) !important;
 }
 
 /* System font stack */
@@ -210,5 +203,41 @@ body.bs-theme--cupertino-glass *:not(.material-symbols-outlined):not(.material-s
       property: '--mat-button-filled-label-text-font',
       value: '-apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", sans-serif',
     },
+  ],
+  sidebarVariables: [
+    // Pure frosted glass tones
+    { property: '--background', value: '246 246 246' },       // #f6f6f6
+    { property: '--foreground', value: '29 29 31' },          // #1d1d1f
+    { property: '--card', value: '255 255 255' },
+    { property: '--card-foreground', value: '29 29 31' },
+    { property: '--popover', value: '255 255 255' },
+    { property: '--popover-foreground', value: '29 29 31' },
+    { property: '--primary', value: '0 122 255' },            // #007aff
+    { property: '--primary-foreground', value: '255 255 255' },
+    { property: '--secondary', value: '229 229 234' },        // #e5e5ea
+    { property: '--secondary-foreground', value: '29 29 31' },
+    { property: '--muted', value: '229 229 234' },
+    { property: '--muted-foreground', value: '142 142 147' }, // #8e8e93
+    { property: '--accent', value: '227 242 255' },           // #e3f2ff
+    { property: '--accent-foreground', value: '0 58 122' },
+    { property: '--destructive', value: '255 59 48' },        // #ff3b30
+    { property: '--destructive-foreground', value: '255 255 255' },
+    { property: '--border', value: '209 209 214' },           // #d1d1d6
+    { property: '--input', value: '199 199 204' },            // #c7c7cc
+    { property: '--ring', value: '0 122 255' },
+    { property: '--sidebar-icon-color', value: '72 72 74' },  // #48484a
+    { property: '--font-sans', value: '-apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", "Helvetica Neue", sans-serif' },
+    { property: '--gem-sys-color--primary-container', value: '#e3f2ff' },
+    { property: '--gem-sys-color--on-primary-container', value: '#003a7a' },
+    { property: '--radius', value: '12px' },
+    // Frosted glass for dropdowns/popovers
+    { property: '--popover-blur', value: 'blur(20px) saturate(1.8)' },
+    { property: '--popover-bg', value: 'rgba(255, 255, 255, 0.72)' },
+    // Frosted glass for modal panels (settings, dialogs)
+    // Only the overlay/mask has blur — panel is just semi-transparent to let the blur show through
+    { property: '--panel-blur', value: 'none' },
+    { property: '--panel-bg', value: 'rgba(255, 255, 255, 0.55)' },
+    { property: '--overlay-bg', value: 'rgba(255, 255, 255, 0.15)' },
+    { property: '--overlay-blur', value: 'blur(16px) saturate(1.5)' },
   ],
 };

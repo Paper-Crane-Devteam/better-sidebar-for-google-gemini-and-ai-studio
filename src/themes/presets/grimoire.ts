@@ -204,4 +204,30 @@ body.bs-theme--grimoire h3 {
       value: '"Merriweather", Georgia, serif',
     },
   ],
+  sidebarVariables: [
+    // Parchment tones for sidebar
+    { property: '--background', value: '235 229 218' },       // #ebe5da
+    { property: '--foreground', value: '59 47 32' },          // #3b2f20
+    { property: '--card', value: '245 240 232' },             // #f5f0e8
+    { property: '--card-foreground', value: '59 47 32' },
+    { property: '--popover', value: '245 240 232' },
+    { property: '--popover-foreground', value: '59 47 32' },
+    { property: '--primary', value: '139 32 32' },            // #8b2020
+    { property: '--primary-foreground', value: '255 248 240' },
+    { property: '--secondary', value: '232 224 212' },        // #e8e0d4
+    { property: '--secondary-foreground', value: '59 47 32' },
+    { property: '--muted', value: '232 224 212' },
+    { property: '--muted-foreground', value: '139 115 85' },  // #8b7355
+    { property: '--accent', value: '245 230 184' },           // #f5e6b8
+    { property: '--accent-foreground', value: '92 68 0' },
+    { property: '--destructive', value: '139 26 26' },
+    { property: '--destructive-foreground', value: '255 248 240' },
+    { property: '--border', value: '212 196 168' },           // #d4c4a8
+    { property: '--input', value: '224 212 192' },            // #e0d4c0
+    { property: '--ring', value: '139 32 32' },
+    { property: '--sidebar-icon-color', value: '92 74 56' },  // #5c4a38
+    { property: '--font-sans', value: '"Merriweather", Georgia, "Times New Roman", serif' },
+    { property: '--gem-sys-color--primary-container', value: '#f5d5c8' },
+    { property: '--gem-sys-color--on-primary-container', value: '#5c1010' },
+  ],
 };

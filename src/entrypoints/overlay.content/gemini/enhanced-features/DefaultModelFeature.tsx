@@ -5,6 +5,7 @@ import { useSettingsStore } from '@/shared/lib/settings-store';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { waitForElement, applyShadowStyles } from '@/shared/lib/utils';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { bindShadowRootToTheme } from '@/themes';
 import mainStyles from '@/index.scss?inline';
 
 const MODEL_MAPPING: Record<string, string> = {
@@ -212,6 +213,7 @@ export const DefaultModelFeature = () => {
           shadowBody.addEventListener('touchstart', stopProp);
           
           shadow.appendChild(shadowBody);
+          bindShadowRootToTheme(shadowBody);
           setPortalTarget(shadowBody);
         }
       } else {

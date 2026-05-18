@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { GeminiEnhancedFeatures } from './GeminiEnhancedFeatures';
 import { ShadowRootProvider } from '@/shared/components/ShadowRootContext';
 import { applyShadowStyles } from '@/shared/lib/utils';
+import { bindShadowRootToTheme } from '@/themes';
 
 /**
  * Independent mounting of Gemini enhanced features (like Default Model selector)
@@ -47,6 +48,9 @@ export function mountEnhancedFeatures(mainStyles: string) {
     });
 
     enhancedShadow.appendChild(enhancedRoot);
+
+    // Bind custom theme to this Shadow DOM container
+    bindShadowRootToTheme(enhancedRoot);
 
     const enhancedReactRoot = ReactDOM.createRoot(enhancedRoot);
     enhancedReactRoot.render(

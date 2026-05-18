@@ -36,10 +36,33 @@
     line-height: 20px;
     width: 100%;
     height: 100%;
+
+    /* Theme-driven frosted glass for floating layers (dropdowns, popovers, tooltips).
+       --popover-blur: set to e.g. "blur(20px) saturate(1.8)" to enable backdrop-filter.
+       --popover-bg: override popover background to semi-transparent when blur is active.
+       --panel-blur: backdrop-filter for modal panels (settings, dialogs).
+       --panel-bg: background for modal panels (semi-transparent when blur is active).
+       --overlay-bg: background for modal overlay/mask layer.
+       --overlay-blur: backdrop-filter for the overlay/mask layer. */
+    --popover-blur: none;
+    --popover-bg: rgb(var(--popover));
+    --panel-blur: none;
+    --panel-bg: rgb(var(--background));
+    --overlay-bg: rgb(var(--background) / 0.8);
+    --overlay-blur: blur(4px);
   }
 }
 
 @layer components {
+  /* Frosted glass for floating layers — driven by --popover-blur variable.
+     Only themes that explicitly set --popover-blur will get the effect.
+     backdrop-filter: none (default) does NOT create a containing block. */
+  [data-custom-theme] [data-radix-menu-content] {
+    backdrop-filter: var(--popover-blur);
+    -webkit-backdrop-filter: var(--popover-blur);
+    background-color: var(--popover-bg);
+  }
+
   /* Node Selection Styles */
   .node-item-selected {
     @apply bg-accent;
