@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
 import { Button } from '../../components/ui/button';
-import { X, Settings, Heart, Info, LayoutTemplate, Database } from 'lucide-react';
+import { X, Settings, Heart, Info, LayoutTemplate, Database, SlidersHorizontal } from 'lucide-react';
 import { GeneralSettings } from './modules/GeneralSettings';
 import { ExplorerSettings } from './modules/ExplorerSettings';
 import { DataSettings } from './modules/DataSettings';
 import { AboutSettings } from './modules/AboutSettings';
 import { SponsorSettings } from './modules/SponsorSettings';
+import { PlatformSettings } from './modules/PlatformSettings';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { detectPlatform, Platform } from '@/shared/types/platform';
 
 interface SettingsModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
 }
 
-type Section = 'general' | 'explorer' | 'data' | 'sponsor' | 'about';
+type Section = 'general' | 'explorer' | 'data' | 'platform' | 'sponsor' | 'about';
 
 const NavButton = ({ 
     id, 
@@ -44,12 +46,17 @@ export const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
 
     if (!open) return null;
 
+    const platform = detectPlatform();
+    const hasPlatformSettings = platform === Platform.GEMINI;
+
     const renderContent = () => {
         switch (activeSection) {
             case 'general':
                 return <GeneralSettings />;
             case 'explorer':
                 return <ExplorerSettings />;
+            case 'platform':
+                return <PlatformSettings />;
             case 'data':
                 return <DataSettings />;
             case 'sponsor':
@@ -82,6 +89,9 @@ export const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
                     
                     <NavButton id="general" label={t('settings.general')} icon={Settings} activeSection={activeSection} setActiveSection={setActiveSection} />
                     <NavButton id="explorer" label={t('settings.library')} icon={LayoutTemplate} activeSection={activeSection} setActiveSection={setActiveSection} />
+                    {hasPlatformSettings && (
+                        <NavButton id="platform" label={t('geminiUI.title')} icon={SlidersHorizontal} activeSection={activeSection} setActiveSection={setActiveSection} />
+                    )}
                     <NavButton id="data" label={t('settings.dataStorage')} icon={Database} activeSection={activeSection} setActiveSection={setActiveSection} />
                     
                     <div className="h-px bg-border my-2 mx-2" />
