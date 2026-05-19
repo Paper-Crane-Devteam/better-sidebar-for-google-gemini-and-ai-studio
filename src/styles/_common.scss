@@ -61,6 +61,9 @@
     backdrop-filter: var(--popover-blur);
     -webkit-backdrop-filter: var(--popover-blur);
     background-color: var(--popover-bg);
+    border-radius: var(--popover-radius, var(--radius));
+    box-shadow: var(--popover-shadow, 0 4px 12px rgba(0,0,0,0.08));
+    border: var(--popover-border, 1px solid rgb(var(--border)));
   }
 
   /* Node Selection Styles */

@@ -113,8 +113,10 @@ export function applySidebarTheme(
   container: HTMLElement,
   preset: ThemePreset | null,
 ): void {
+  // Always clear previous theme first to prevent property leaking between themes
+  clearSidebarTheme(container);
+
   if (!preset || (!preset.sidebarVariables?.length && !preset.sidebarStyles)) {
-    clearSidebarTheme(container);
     return;
   }
 
@@ -131,11 +133,6 @@ export function applySidebarTheme(
   if (preset.sidebarStyles) {
     for (const [prop, value] of Object.entries(preset.sidebarStyles)) {
       container.style.setProperty(prop, value);
-    }
-  } else {
-    // Clear any previously set style props
-    for (const prop of SIDEBAR_STYLE_PROPS) {
-      container.style.removeProperty(prop);
     }
   }
 }

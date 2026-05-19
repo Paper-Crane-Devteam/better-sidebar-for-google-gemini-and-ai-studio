@@ -71,8 +71,10 @@ export class TooltipHelper {
   setCustomThemeVariables(variables: ThemeVariable[] | null) {
     if (!this.wrapper) return;
 
+    // Always clear previous theme first to prevent property leaking between themes
+    clearSidebarTheme(this.wrapper);
+
     if (!variables || variables.length === 0) {
-      clearSidebarTheme(this.wrapper);
       return;
     }
 

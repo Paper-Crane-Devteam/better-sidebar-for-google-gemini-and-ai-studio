@@ -26,10 +26,19 @@ body.bs-theme--cupertino-glass .mdc-card {
 
 /* Frosted glass on Gemini native dropdowns/menus (they float above content) */
 body.bs-theme--cupertino-glass .cdk-overlay-pane .mat-mdc-menu-panel,
-body.bs-theme--cupertino-glass .cdk-overlay-pane .mdc-menu-surface {
-  backdrop-filter: blur(20px) saturate(1.8) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(1.8) !important;
+body.bs-theme--cupertino-glass .cdk-overlay-pane mat-card {
+  backdrop-filter: blur(10px) saturate(1.8) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(1.8) !important;
+  border-radius: 10px !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.08) !important;
 }
+
+body.bs-theme--cupertino-glass .cdk-global-overlay-wrapper{
+  backdrop-filter: blur(10px) saturate(1.8) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(1.8) !important;
+}
+
 
 /* System font stack */
 body.bs-theme--cupertino-glass {
@@ -151,7 +160,7 @@ body.bs-theme--cupertino-glass *:not(.material-symbols-outlined):not(.material-s
     { property: '--mat-button-tonal-label-text-color', value: '#1c1c1e' },
 
     // ─── Menu ───────────────────────────────────────────────────────
-    { property: '--mat-menu-container-color', value: 'rgba(246,246,246,0.85)' },
+    { property: '--mat-menu-container-color', value: 'rgba(246,246,246,0.55)' },
     { property: '--mat-menu-item-label-text-color', value: '#1d1d1f' },
     { property: '--mat-menu-item-icon-color', value: '#48484a' },
     { property: '--mat-menu-divider-color', value: '#e5e5ea' },
@@ -230,14 +239,17 @@ body.bs-theme--cupertino-glass *:not(.material-symbols-outlined):not(.material-s
     { property: '--gem-sys-color--primary-container', value: '#e3f2ff' },
     { property: '--gem-sys-color--on-primary-container', value: '#003a7a' },
     { property: '--radius', value: '12px' },
-    // Frosted glass for dropdowns/popovers
-    { property: '--popover-blur', value: 'blur(20px) saturate(1.8)' },
-    { property: '--popover-bg', value: 'rgba(255, 255, 255, 0.72)' },
+    // Frosted glass for dropdowns/popovers (macOS-native feel)
+    { property: '--popover-blur', value: 'blur(10px) saturate(1.8)' },
+    { property: '--popover-bg', value: 'rgba(255, 255, 255, 0.55)' },
+    { property: '--popover-radius', value: '10px' },
+    { property: '--popover-shadow', value: '0 24px 48px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.08)' },
+    { property: '--popover-border', value: '0.5px solid rgba(255,255,255,0.6)' },
     // Frosted glass for modal panels (settings, dialogs)
     // Only the overlay/mask has blur — panel is just semi-transparent to let the blur show through
     { property: '--panel-blur', value: 'none' },
     { property: '--panel-bg', value: 'rgba(255, 255, 255, 0.55)' },
     { property: '--overlay-bg', value: 'rgba(255, 255, 255, 0.15)' },
-    { property: '--overlay-blur', value: 'blur(16px) saturate(1.5)' },
+    { property: '--overlay-blur', value: 'blur(10px) saturate(1.5)' },
   ],
 };
