@@ -62,16 +62,14 @@ body.bs-theme--retro-terminal .mat-mdc-button-base {
   text-shadow: 0 0 4px rgba(0, 255, 65, 0.3);
 }
 
-/* Blinking cursor effect on active input */
-body.bs-theme--retro-terminal .ql-editor::after,
-body.bs-theme--retro-terminal rich-textarea::after {
-  content: '▌';
-  animation: blink 1s step-end infinite;
-  color: #00ff41;
-}
-
-@keyframes blink {
-  50% { opacity: 0; }
+/* Terminal-style caret color on inputs and contenteditable */
+body.bs-theme--retro-terminal input,
+body.bs-theme--retro-terminal textarea,
+body.bs-theme--retro-terminal [contenteditable="true"],
+body.bs-theme--retro-terminal .ql-editor,
+body.bs-theme--retro-terminal rich-textarea {
+  caret-color: #00ff41;
+  caret-shape: block;
 }
 `,
   variables: [

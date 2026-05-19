@@ -9,7 +9,7 @@ import {
 import type { ThemePresetId } from '@/themes/types';
 
 interface GeminiEnhancedFeatures {
-  defaultModel: 'default' | 'fast' | 'thinking' | 'pro';
+  defaultModel: 'default' | 'flash-lite' | 'flash' | 'pro';
   sidebarWidth: number;
   chatWidth: number;
   inputWidth: number;

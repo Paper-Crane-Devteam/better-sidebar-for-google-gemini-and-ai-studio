@@ -10,6 +10,7 @@
 export type { ThemePreset, ThemePresetId, ThemePresetMeta, ThemeVariable, ThemeRegistry } from './types';
 export { applyTheme, removeTheme, getCurrentThemeId, applySidebarTheme, clearSidebarTheme } from './engine';
 export { bindShadowRootToTheme } from './platforms/gemini';
+export { initAiStudioThemeSync, bindAiStudioShadowRootToTheme } from './platforms/aistudio';
 
 import type { ThemePresetId, ThemeRegistry } from './types';
 import { grimoire } from './presets/grimoire';
@@ -25,7 +26,7 @@ export const themeRegistry: ThemeRegistry = {
 
 /** Ordered list of theme preset IDs for UI rendering */
 export const themePresetIds: ThemePresetId[] = [
-  'grimoire',
   'cupertino-glass',
+  'grimoire',
   'retro-terminal',
 ];

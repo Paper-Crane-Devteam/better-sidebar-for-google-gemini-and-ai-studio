@@ -199,7 +199,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
             variant="ghost"
             size="icon"
             onClick={handleMainMenuClick}
-            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+            className="sidebar-btn transition-all"
           >
             <Menu className="sidebar-icon" />
           </Button>
@@ -218,7 +218,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               variant="ghost"
               size="icon"
               onClick={() => moduleConfig.explorer.onNewChat()}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              className="sidebar-btn transition-all"
             >
               <SquarePen className="sidebar-icon" />
             </Button>
@@ -230,7 +230,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsFeatureEnabled(false)}
-                className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+                className="sidebar-btn transition-all"
               >
                 <LogOut className="sidebar-icon" />
               </Button>
@@ -241,7 +241,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               variant={isSettingsOpen ? 'secondary' : 'ghost'}
               size="icon"
               onClick={() => handleTabChange('settings')}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              className="sidebar-btn transition-all"
             >
               <Settings className="sidebar-icon" />
             </Button>
@@ -260,7 +260,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               variant={activeTab === 'files' ? 'secondary' : 'ghost'}
               size="icon"
               onClick={() => handleTabChange('files')}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              className="sidebar-btn transition-all"
               data-tour-id="tour-files"
             >
               <Files className="sidebar-icon" />
@@ -271,7 +271,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               variant={activeTab === 'search' ? 'secondary' : 'ghost'}
               size="icon"
               onClick={() => handleTabChange('search')}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              className="sidebar-btn transition-all"
               data-tour-id="tour-search"
             >
               <Search className="sidebar-icon" />
@@ -282,7 +282,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               variant={activeTab === 'prompts' ? 'secondary' : 'ghost'}
               size="icon"
               onClick={() => handleTabChange('prompts')}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              className="sidebar-btn transition-all"
               data-tour-id="tour-prompts"
             >
               <Sparkles className="sidebar-icon" />
@@ -294,7 +294,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
                 variant={activeTab === 'favorites' ? 'secondary' : 'ghost'}
                 size="icon"
                 onClick={() => handleTabChange('favorites')}
-                className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+                className="sidebar-btn transition-all"
                 data-tour-id="tour-favorites"
               >
                 <Star className="sidebar-icon" />
@@ -306,7 +306,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               variant={activeTab === 'tags' ? 'secondary' : 'ghost'}
               size="icon"
               onClick={() => handleTabChange('tags')}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              className="sidebar-btn transition-all"
               data-tour-id="tour-tags"
             >
               <Tag className="sidebar-icon" />
@@ -323,7 +323,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
                 variant={activeTab === 'notebooks' ? 'secondary' : 'ghost'}
                 size="icon"
                 onClick={() => handleTabChange('notebooks')}
-                className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+                className="sidebar-btn transition-all"
                 data-tour-id="tour-notebooks"
               >
                 <NotebookText className="sidebar-icon" />
@@ -337,7 +337,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
                 variant={activeTab === 'gems' ? 'secondary' : 'ghost'}
                 size="icon"
                 onClick={() => handleTabChange('gems')}
-                className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+                className="sidebar-btn transition-all"
                 data-tour-id="tour-gems"
               >
                 <Gem className="sidebar-icon" />
@@ -351,7 +351,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('https://gemini.google.com/mystuff')}
-                className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+                className="sidebar-btn transition-all"
                 data-tour-id="tour-mystuff"
               >
                 <Library className="sidebar-icon" />
@@ -367,7 +367,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsFeatureEnabled(false)}
-                className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+                className="sidebar-btn transition-all"
                 data-tour-id="tour-original-ui"
               >
                 <LogOut className="sidebar-icon" />
@@ -380,7 +380,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               variant={activeTab === 'feedback' ? 'secondary' : 'ghost'}
               size="icon"
               onClick={() => handleTabChange('feedback')}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              className="sidebar-btn transition-all"
               data-tour-id="tour-feedback"
             >
               <MessageSquare className="sidebar-icon" />
@@ -391,7 +391,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               variant={isSettingsOpen ? 'secondary' : 'ghost'}
               size="icon"
               onClick={() => handleTabChange('settings')}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              className="sidebar-btn transition-all"
               data-tour-id="tour-settings"
             >
               <Settings className="sidebar-icon" />

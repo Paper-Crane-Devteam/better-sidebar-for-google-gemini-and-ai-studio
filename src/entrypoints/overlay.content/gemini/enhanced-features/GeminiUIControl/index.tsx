@@ -48,7 +48,7 @@ export const GeminiUIControl = () => {
         <DropdownMenuTrigger asChild>
           <button
             className={cn(
-              'flex h-9 w-9 items-center justify-center rounded-xl border border-border/50 bg-background/60 backdrop-blur-md transition-all hover:bg-accent',
+              'flex h-9 w-9 items-center justify-center rounded-lg border border-border/50 bg-background/60 backdrop-blur-md transition-all hover:bg-accent',
               isOpen && 'bg-accent shadow-sm ring-2 ring-ring/20',
             )}
           >
@@ -62,7 +62,7 @@ export const GeminiUIControl = () => {
         <DropdownMenuContent
           align="end"
           sideOffset={8}
-          className="z-[39] w-[340px] max-h-[85vh] flex flex-col rounded-2xl border border-border bg-popover p-0 shadow-2xl animate-in fade-in zoom-in-95 duration-200 overflow-hidden"
+          className="z-[39] w-[340px] max-h-[85vh] flex flex-col rounded-lg border border-border bg-popover p-0 shadow-2xl animate-in fade-in zoom-in-95 duration-200 overflow-hidden"
         >
           {/* Header */}
           <div className="flex items-center gap-2.5 p-5 pb-4 border-b border-border/40 bg-popover/50 backdrop-blur-sm z-10">

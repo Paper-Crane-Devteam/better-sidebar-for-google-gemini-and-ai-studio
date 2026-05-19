@@ -9,6 +9,7 @@ import { ShadowRootProvider } from '@/shared/components/ShadowRootContext';
 import { TooltipHelper } from '@/shared/lib/tooltip-helper';
 import { applyShadowStyles, querySelectorDeep, waitForElement } from '@/shared/lib/utils';
 import { useSettingsStore } from '@/shared/lib/settings-store';
+import { initAiStudioThemeSync, bindAiStudioShadowRootToTheme } from '@/themes/platforms/aistudio';
 
 export async function initAiStudioOverlay(mainStyles: string): Promise<void> {
   console.log('Better Sidebar: Overlay (AI Studio) Initialized');
@@ -132,6 +133,12 @@ export async function initAiStudioOverlay(mainStyles: string): Promise<void> {
   });
 
   shadow.appendChild(rootContainer);
+
+  // Bind custom theme to sidebar Shadow DOM
+  bindAiStudioShadowRootToTheme(rootContainer);
+
+  // Initialize custom theme sync (applies CSS variables to body for native AI Studio UI)
+  initAiStudioThemeSync();
 
   const root = ReactDOM.createRoot(rootContainer);
   root.render(

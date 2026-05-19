@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '../../../components/ui/button';
 import { Separator } from '../../../components/ui/separator';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
-import { Moon, Sun, Monitor, Check, Palette } from 'lucide-react';
+import { Moon, Sun, Monitor, Check } from 'lucide-react';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { useTheme } from '../hooks/useTheme';
 import { useI18n } from '@/shared/hooks/useI18n';
@@ -44,13 +44,55 @@ export const ThemeSettings = () => {
   const { theme, setTheme } = useTheme();
   const { customTheme, setCustomTheme } = useSettingsStore();
 
+  const isDefaultTheme = customTheme === null;
+
   return (
     <div className="space-y-6">
-      {/* Light/Dark/System Toggle */}
+      {/* Section Header */}
       <div className="space-y-2">
-        <h3 className="text-lg font-medium">{t('settings.theme')}</h3>
+        <h3 className="text-lg font-medium">{t('themeSettings.title')}</h3>
+        <p className="text-xs text-muted-foreground">
+          {t('themeSettings.customThemesDescription')}
+        </p>
         <Separator />
-        <div className="grid gap-4 py-4">
+      </div>
+
+      {/* All themes in a unified grid */}
+      <div className="grid grid-cols-2 gap-3">
+        {/* Default Theme Card */}
+        <ThemeCard
+          name={t('themeSettings.default')}
+          description={t('themeSettings.defaultDescription')}
+          colors={{
+            bg: '#ffffff',
+            fg: '#1f1f1f',
+            accent: '#0b57d0',
+            secondary: '#c2e7ff',
+          }}
+          isActive={isDefaultTheme}
+          onClick={() => setCustomTheme(null)}
+        />
+
+        {/* Custom presets */}
+        {themePresetIds.map((id) => {
+          const preset = themeRegistry[id];
+          const colors = themePreviewColors[id];
+          return (
+            <ThemeCard
+              key={id}
+              name={preset.nameZh}
+              description={preset.descriptionZh}
+              colors={colors}
+              isActive={customTheme === id}
+              onClick={() => setCustomTheme(id)}
+            />
+          );
+        })}
+      </div>
+
+      {/* Light/Dark/System Toggle — only shown when default theme is active */}
+      {isDefaultTheme && (
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <span className="text-sm font-medium">
@@ -94,49 +136,7 @@ export const ThemeSettings = () => {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Custom Theme Presets */}
-      <div className="space-y-2">
-        <h3 className="text-lg font-medium">
-          {t('themeSettings.customThemes')}
-        </h3>
-        <p className="text-xs text-muted-foreground">
-          {t('themeSettings.customThemesDescription')}
-        </p>
-        <Separator />
-        <div className="grid grid-cols-2 gap-3 py-4">
-          {/* Default (no custom theme) */}
-          <ThemeCard
-            name={t('themeSettings.default')}
-            description={t('themeSettings.defaultDescription')}
-            colors={{
-              bg: '#ffffff',
-              fg: '#1f1f1f',
-              accent: '#0b57d0',
-              secondary: '#c2e7ff',
-            }}
-            isActive={customTheme === null}
-            onClick={() => setCustomTheme(null)}
-          />
-
-          {/* Custom presets */}
-          {themePresetIds.map((id) => {
-            const preset = themeRegistry[id];
-            const colors = themePreviewColors[id];
-            return (
-              <ThemeCard
-                key={id}
-                name={preset.nameZh}
-                description={preset.descriptionZh}
-                colors={colors}
-                isActive={customTheme === id}
-                onClick={() => setCustomTheme(id)}
-              />
-            );
-          })}
-        </div>
-      </div>
+      )}
     </div>
   );
 };

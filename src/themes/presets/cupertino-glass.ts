@@ -30,7 +30,7 @@ body.bs-theme--cupertino-glass .cdk-overlay-pane mat-card {
   backdrop-filter: blur(10px) saturate(1.8) !important;
   -webkit-backdrop-filter: blur(10px) saturate(1.8) !important;
   border-radius: 10px !important;
-  border: 0.5px solid rgba(255, 255, 255, 0.6) !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.35) !important;
   box-shadow: 0 24px 48px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.08) !important;
 }
 
@@ -244,7 +244,7 @@ body.bs-theme--cupertino-glass *:not(.material-symbols-outlined):not(.material-s
     { property: '--popover-bg', value: 'rgba(255, 255, 255, 0.55)' },
     { property: '--popover-radius', value: '10px' },
     { property: '--popover-shadow', value: '0 24px 48px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.08)' },
-    { property: '--popover-border', value: '0.5px solid rgba(255,255,255,0.6)' },
+    { property: '--popover-border', value: '0.5px solid rgba(255,255,255,0.35)' },
     // Frosted glass for modal panels (settings, dialogs)
     // Only the overlay/mask has blur — panel is just semi-transparent to let the blur show through
     { property: '--panel-blur', value: 'none' },
