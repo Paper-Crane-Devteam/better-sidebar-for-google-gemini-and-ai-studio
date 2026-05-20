@@ -167,8 +167,8 @@ export const GeminiUIControl = () => {
               </div>
 
               <div className="space-y-4">
-                {/* Gemini Brand */}
-                <div className="flex items-center justify-between group">
+                {/* [DEPRECATED] Gemini Brand - element no longer exists in new Gemini UI */}
+                {/* <div className="flex items-center justify-between group">
                   <div className="space-y-0.5">
                     <Label
                       className="text-xs font-semibold cursor-pointer"
@@ -184,7 +184,7 @@ export const GeminiUIControl = () => {
                     checked={!hideBrand}
                     onCheckedChange={(c) => setHideBrand(!c)}
                   />
-                </div>
+                </div> */}
 
                 {/* AI Disclaimer */}
                 <div className="flex items-center justify-between group">
@@ -276,8 +276,8 @@ export const GeminiUIControl = () => {
                   />
                 </div>
 
-                {/* Top Bar Conversation Tag */}
-                <div className="flex items-center justify-between group">
+                {/* [DEPRECATED] Top Bar Conversation Tag - removed due to Gemini UI redesign */}
+                {/* <div className="flex items-center justify-between group">
                   <div className="space-y-0.5">
                     <Label
                       className="text-xs font-semibold cursor-pointer"
@@ -293,10 +293,10 @@ export const GeminiUIControl = () => {
                     checked={showTopBarTag}
                     onCheckedChange={(c) => setShowTopBarTag(c)}
                   />
-                </div>
+                </div> */}
 
-                {/* Remove AI Sparkle Image Watermark */}
-                <div className="flex items-center justify-between group">
+                {/* [DEPRECATED] Remove AI Sparkle Image Watermark - Gemini no longer adds watermarks to downloads */}
+                {/* <div className="flex items-center justify-between group">
                   <div className="space-y-0.5">
                     <Label
                       className="text-xs font-semibold cursor-pointer"
@@ -312,7 +312,7 @@ export const GeminiUIControl = () => {
                     checked={removeWatermark}
                     onCheckedChange={(c) => setRemoveWatermark(c)}
                   />
-                </div>
+                </div> */}
 
                 {/* Smart Scrollbar */}
                 <div className="flex items-center justify-between group">

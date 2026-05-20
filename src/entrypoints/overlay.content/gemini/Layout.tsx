@@ -116,57 +116,38 @@ export async function initGeminiOverlay(mainStyles: string): Promise<void> {
 
     const wrapperId = 'better-sidebar-for-google-ai-studio-sidebar-wrapper';
 
-    // Store references to elements we need to toggle
-    const elements = {
-      wrapper: null as HTMLElement | null,
-      sideNavMenuBtn: null as HTMLElement | null,
-      // bardModeSwitcher: null as HTMLElement | null,
-      searchNavBtn: null as HTMLElement | null,
-      // topBarActions: null as HTMLElement | null,
+    /** Move an element offscreen (hidden) or restore it */
+    const setOffscreen = (el: HTMLElement | null, hidden: boolean) => {
+      if (!el) return;
+      if (hidden) {
+        el.style.position = 'absolute';
+        el.style.top = '-9999px';
+        el.style.left = '-9999px';
+      } else {
+        el.style.position = '';
+        el.style.top = '';
+        el.style.left = '';
+      }
     };
 
+    // Elements to hide offscreen when panel is open
+    const hiddenElements: HTMLElement[] = [];
+
     // Start looking for external elements
-    waitForElement('side-nav-menu-button').then((el) => {
-      elements.sideNavMenuBtn = el as HTMLElement;
-      // Apply current state
-      const enabled = useAppStore.getState().ui.overlay.isOpen;
-      if (enabled) {
-        (el as HTMLElement).style.position = 'absolute';
-        (el as HTMLElement).style.top = '-9999px';
-        (el as HTMLElement).style.left = '-9999px';
-      }
-    });
+    const trackElement = (selector: string) => {
+      waitForElement(selector).then((el) => {
+        hiddenElements.push(el as HTMLElement);
+        const enabled = useAppStore.getState().ui.overlay.isOpen;
+        setOffscreen(el as HTMLElement, enabled);
+      });
+    };
 
-    // waitForElement('bard-mode-switcher').then((el) => {
-    //   elements.bardModeSwitcher = el as HTMLElement;
-    //   const enabled = useAppStore.getState().ui.overlay.isOpen;
-    //   if (enabled) {
-    //     const density = useSettingsStore.getState().layoutDensity;
-    //     const width = density === 'compact' ? '281px' : '296px';
-    //     (el as HTMLElement).style.setProperty(
-    //       '--bard-sidenav-open-closed-width-diff',
-    //       width,
-    //     );
-    //   }
-    // });
-
-    waitForElement('search-nav-button').then((el) => {
-      elements.searchNavBtn = el as HTMLElement;
-      const enabled = useAppStore.getState().ui.overlay.isOpen;
-      if (enabled) {
-        (el as HTMLElement).style.display = 'none';
-      }
-    });
-
-    // waitForElement('top-bar-actions').then((el) => {
-    //   elements.topBarActions = el as HTMLElement;
-    //   const enabled = useAppStore.getState().ui.overlay.isOpen;
-    //   if (enabled) {
-    //     (el as HTMLElement).style.left = '361px';
-    //   }
-    // });
+    trackElement('side-nav-menu-button');
+    trackElement('side-nav-sparkle-button');
 
     // Function to update visibility/state based on enabled status
+    let wrapperEl: HTMLElement | null = null;
+
     const updateState = (enabled: boolean) => {
       // 0. Update Sidebar Widths
       const density = useSettingsStore.getState().layoutDensity;
@@ -174,7 +155,7 @@ export async function initGeminiOverlay(mainStyles: string): Promise<void> {
 
       // 1. Manage Wrapper
       if (enabled) {
-        if (!elements.wrapper) {
+        if (!wrapperEl) {
           // Create wrapper if doesn't exist
           const wrapper = document.createElement('div');
           wrapper.id = wrapperId;
@@ -189,7 +170,7 @@ export async function initGeminiOverlay(mainStyles: string): Promise<void> {
           }
 
           container.appendChild(wrapper);
-          elements.wrapper = wrapper;
+          wrapperEl = wrapper;
 
           const shadow = wrapper.attachShadow({ mode: 'open' });
           applyShadowStyles(shadow, mainStyles);
@@ -240,64 +221,24 @@ export async function initGeminiOverlay(mainStyles: string): Promise<void> {
             </ShadowRootProvider>,
           );
         } else {
-          elements.wrapper.style.display = 'block';
+          wrapperEl.style.display = 'block';
         }
       } else {
-        if (elements.wrapper) {
-          elements.wrapper.style.display = 'none';
+        if (wrapperEl) {
+          wrapperEl.style.display = 'none';
         }
       }
 
       // 2. Hide/Show Original Elements (children of container)
       Array.from(container.children).forEach((child) => {
         if (child.id !== wrapperId) {
-          const el = child as HTMLElement;
-          if (enabled) {
-            el.style.position = 'absolute';
-            el.style.top = '-9999px';
-            el.style.left = '-9999px';
-          } else {
-            el.style.position = '';
-            el.style.top = '';
-            el.style.left = '';
-          }
+          setOffscreen(child as HTMLElement, enabled);
         }
       });
 
-      // 3. Update External Elements
-      if (elements.sideNavMenuBtn) {
-        if (enabled) {
-          elements.sideNavMenuBtn.style.position = 'absolute';
-          elements.sideNavMenuBtn.style.top = '-9999px';
-          elements.sideNavMenuBtn.style.left = '-9999px';
-        } else {
-          elements.sideNavMenuBtn.style.position = '';
-          elements.sideNavMenuBtn.style.top = '';
-          elements.sideNavMenuBtn.style.left = '';
-        }
-      }
+      // 3. Update External Elements (offscreen-hidden)
+      hiddenElements.forEach((el) => setOffscreen(el, enabled));
 
-      // if (elements.bardModeSwitcher) {
-      //   if (!enabled) {
-      //     elements.bardModeSwitcher.style.removeProperty(
-      //       '--bard-sidenav-open-closed-width-diff',
-      //     );
-      //   }
-      // }
-
-      if (elements.searchNavBtn) {
-        if (enabled) {
-          elements.searchNavBtn.style.display = 'none';
-        } else {
-          elements.searchNavBtn.style.display = '';
-        }
-      }
-
-      // if (elements.topBarActions) {
-      //   if (!enabled) {
-      //     elements.topBarActions.style.left = '';
-      //   }
-      // }
     };
 
     // Initial state check

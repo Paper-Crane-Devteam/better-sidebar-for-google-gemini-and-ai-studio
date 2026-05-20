@@ -5,8 +5,9 @@ import { detectPlatform, Platform } from '@/shared/types/platform';
  * Returns true if the button was found and clicked.
  */
 const clickGeminiNewChat = (): boolean => {
+  // New UI: first gem-nav-list-item inside bard-sidenav .overflow-container
   const newChatBtn = document.querySelector(
-    'side-navigation-content mat-action-list side-nav-action-button a[aria-label="New chat"]',
+    'bard-sidenav .overflow-container gem-nav-list-item a',
   ) as HTMLElement;
   if (newChatBtn) {
     newChatBtn.click();
@@ -61,16 +62,14 @@ export const navigateToNewChat = () => {
 export const navigateToConversation = (targetId: string) => {
   const platform = detectPlatform();
   if (platform === Platform.GEMINI) {
-    const links = document.querySelectorAll('a[data-test-id="conversation"]');
+    const links = document.querySelectorAll('[data-test-id="conversation"] > a');
     const targetHref = `/app/${targetId}`;
     
     for (const link of Array.from(links)) {
-      if (link.classList.contains('conversation')) {
-        const href = link.getAttribute('href');
-        if (href && href.includes(targetHref)) {
-          (link as HTMLElement).click();
-          return;
-        }
+      const href = link.getAttribute('href');
+      if (href && href.includes(targetHref)) {
+        (link as HTMLElement).click();
+        return;
       }
     }
     

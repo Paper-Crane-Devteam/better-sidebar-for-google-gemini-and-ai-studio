@@ -1,7 +1,8 @@
-import { WatermarkEngine } from '@/shared/lib/utils/watermark-remover';
-import { usePegasusStore } from '@/shared/lib/pegasus-store';
+// [DEPRECATED] Watermark removal - Gemini no longer adds watermarks to downloads
+// import { WatermarkEngine } from '@/shared/lib/utils/watermark-remover';
+// import { usePegasusStore } from '@/shared/lib/pegasus-store';
 
-let watermarkEngineInstance: WatermarkEngine | null = null;
+// let watermarkEngineInstance: WatermarkEngine | null = null;
 
 export async function handleDownloadResponse(
   url: string,
@@ -10,26 +11,28 @@ export async function handleDownloadResponse(
   const upscaledUrl = url.replace(/=s\d+/, '=s0');
   console.log('Better Sidebar (Gemini): Intercepted image download', url, '->', upscaledUrl);
 
-  const shouldRemoveWatermark = usePegasusStore.getState().enhancedFeatures.gemini.removeWatermark;
+  // [DEPRECATED] Watermark removal disabled - Gemini no longer adds watermarks
+  // const shouldRemoveWatermark = usePegasusStore.getState().enhancedFeatures.gemini.removeWatermark;
 
   try {
     const res = await originalFetch(upscaledUrl);
     const blob = await res.blob();
 
-    let finalBlob = blob;
+    const finalBlob = blob;
 
-    if (shouldRemoveWatermark) {
-      try {
-        if (!watermarkEngineInstance) {
-          watermarkEngineInstance = await WatermarkEngine.create();
-        }
-        const blobUrl = URL.createObjectURL(blob);
-        finalBlob = await watermarkEngineInstance.process(blobUrl);
-        URL.revokeObjectURL(blobUrl);
-      } catch (e) {
-        console.error('Better Sidebar (Gemini): Watermark removal failed, using original', e);
-      }
-    }
+    // [DEPRECATED] Watermark removal logic - Gemini no longer adds watermarks
+    // if (shouldRemoveWatermark) {
+    //   try {
+    //     if (!watermarkEngineInstance) {
+    //       watermarkEngineInstance = await WatermarkEngine.create();
+    //     }
+    //     const blobUrl = URL.createObjectURL(blob);
+    //     finalBlob = await watermarkEngineInstance.process(blobUrl);
+    //     URL.revokeObjectURL(blobUrl);
+    //   } catch (e) {
+    //     console.error('Better Sidebar (Gemini): Watermark removal failed, using original', e);
+    //   }
+    // }
 
     // Return the processed blob as the fetch response so the browser's
     // native download handler receives the modified image instead of

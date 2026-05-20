@@ -169,13 +169,29 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
   };
 
   const handleMainMenuClick = () => {
+    // Desktop: separate Open/Close sidebar buttons
+    const closeBtn = document.querySelector(
+      'button[aria-label="Close sidebar"]',
+    ) as HTMLElement;
+    if (closeBtn) {
+      closeBtn.click();
+      return;
+    }
+    const openBtn = document.querySelector(
+      'button[aria-label="Open sidebar"]',
+    ) as HTMLElement;
+    if (openBtn) {
+      openBtn.click();
+      return;
+    }
+    // Mobile fallback
     const menuBtn = document.querySelector(
-      '.mdc-icon-button[aria-label="Main menu"]',
+      'button[aria-label="Main menu"]',
     ) as HTMLElement;
     if (menuBtn) {
       menuBtn.click();
     } else {
-      console.warn('Main menu button not found');
+      console.warn('Sidebar toggle button not found');
     }
   };
 
