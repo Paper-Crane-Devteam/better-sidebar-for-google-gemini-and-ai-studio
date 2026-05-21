@@ -84,12 +84,12 @@ export async function scanLibraryDom() {
   // 1. Wait for the library table/wrapper
   console.log('Waiting for library table...');
   const scrollContainer = await waitForElement<HTMLElement>(
-    '.lib-table-wrapper',
+    '.page-content-wrapper',
     5000
   );
 
   if (!scrollContainer) {
-    console.error('Could not find .lib-table-wrapper after waiting.');
+    console.error('Could not find ms-library-table .lib-view after waiting.');
     return [];
   }
 
@@ -97,7 +97,7 @@ export async function scanLibraryDom() {
   await waitForElement('.library-table, table', 5000);
 
   // Wait for loading spinner to disappear
-  await waitForElementToDisappear('mat-spinner', 10000);
+  await waitForElementToDisappear('ms-gradient-spinner', 10000);
   const scannedIds = new Set<string>();
   const items: any[] = [];
 
@@ -110,7 +110,7 @@ export async function scanLibraryDom() {
     for (const row of Array.from(rows)) {
       try {
         const nameLink = row.querySelector(
-          'td.cdk-column-name a.name-btn'
+          'td.cdk-column-name a.name-link'
         ) as HTMLAnchorElement;
         if (!nameLink) continue;
 

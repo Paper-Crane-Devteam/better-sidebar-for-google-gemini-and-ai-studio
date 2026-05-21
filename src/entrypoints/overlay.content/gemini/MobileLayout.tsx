@@ -53,6 +53,9 @@ export async function mountMobileLayout(
       'pointerdown',
       'pointerup',
       'contextmenu',
+      'keydown',
+      'keyup',
+      'keypress',
     ]) {
       wrapper.addEventListener(evt, stopPropagation);
     }

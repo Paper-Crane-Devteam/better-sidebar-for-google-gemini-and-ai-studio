@@ -84,50 +84,54 @@ const useTemporaryChatToggle = () => {
   }, []);
 
   const toggle = () => {
-    const isOnNewChat = window.location.pathname === '/app';
-
-    const clickTempChatBtn = () => {
+    const clickTempChatBtn = (): boolean => {
       const container = document.querySelector(
         'div[data-test-id="temp-chat-button-container"]',
       );
       const btn = container?.querySelector('button') as HTMLButtonElement;
       if (btn) {
         btn.click();
-      } else {
-        console.warn('Temporary chat button not found');
+        return true;
       }
+      return false;
     };
 
-    if (isOnNewChat) {
-      clickTempChatBtn();
+    // Try clicking directly first — works if already on /app
+    if (clickTempChatBtn()) return;
+
+    // Navigate to new chat first, then wait for the temp chat button to appear
+    const newChatBtn = document.querySelector(
+      'bard-sidenav .overflow-container gem-nav-list-item',
+    ) as HTMLElement;
+    if (newChatBtn) {
+      newChatBtn.click();
     } else {
-      // Navigate to new chat first, then toggle after the page settles
-      const newChatBtn = document.querySelector(
-        'bard-sidenav .overflow-container gem-nav-list-item',
-      ) as HTMLElement;
-      if (newChatBtn) {
-        newChatBtn.click();
-      } else {
-        navigate('/app');
-      }
-      // Wait for the new chat page to render the temporary chat button
-      const waitAndClick = (retries = 10) => {
-        setTimeout(() => {
-          const container = document.querySelector(
-            'div[data-test-id="temp-chat-button-container"]',
-          );
-          const btn = container?.querySelector('button') as HTMLButtonElement;
-          if (btn) {
-            btn.click();
-          } else if (retries > 0) {
-            waitAndClick(retries - 1);
-          } else {
-            console.warn('Temporary chat button not found after navigation');
-          }
-        }, 300);
-      };
-      waitAndClick();
+      navigate('/app');
     }
+
+    // Use MutationObserver to detect the temp chat button as soon as it renders
+    const waitForTempChatBtn = () => {
+      // Check immediately in case it's already there after navigation
+      if (clickTempChatBtn()) return;
+
+      const obs = new MutationObserver(() => {
+        if (clickTempChatBtn()) {
+          obs.disconnect();
+          clearTimeout(timeout);
+        }
+      });
+      obs.observe(document.body, { childList: true, subtree: true });
+
+      // Fallback timeout to avoid observing forever
+      const timeout = setTimeout(() => {
+        obs.disconnect();
+        if (!clickTempChatBtn()) {
+          console.warn('Temporary chat button not found after navigation');
+        }
+      }, 5000);
+    };
+
+    waitForTempChatBtn();
   };
 
   return { isTempChat, toggle };

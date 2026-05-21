@@ -258,6 +258,9 @@ async function mountDesktopLayout(
             'pointerdown',
             'pointerup',
             'contextmenu',
+            'keydown',
+            'keyup',
+            'keypress',
           ]) {
             wrapper.addEventListener(evt, stopPropagation);
           }

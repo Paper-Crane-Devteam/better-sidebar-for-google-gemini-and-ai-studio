@@ -112,6 +112,22 @@ export async function initAiStudioOverlay(mainStyles: string): Promise<void> {
     updateSidebarWidth(state.layoutDensity);
   });
 
+  // Prevent keyboard/mouse events from bubbling to AI Studio's native listeners
+  const stopPropagation = (e: Event) => e.stopPropagation();
+  for (const evt of [
+    'click',
+    'mousedown',
+    'mouseup',
+    'pointerdown',
+    'pointerup',
+    'contextmenu',
+    'keydown',
+    'keyup',
+    'keypress',
+  ]) {
+    wrapper.addEventListener(evt, stopPropagation);
+  }
+
   const shadow = wrapper.attachShadow({ mode: 'open' });
   applyShadowStyles(shadow, mainStyles);
 
