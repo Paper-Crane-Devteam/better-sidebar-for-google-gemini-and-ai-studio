@@ -1,4 +1,4 @@
-import { navigate, navigateToGem } from '@/shared/lib/navigation';
+import { navigate, navigateToGem, navigateToNewChat } from '@/shared/lib/navigation';
 import { handleSearchNavigation } from '../shared/utils';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSettingsStore } from '@/shared/lib/settings-store';
@@ -53,7 +53,8 @@ const useTemporaryChatToggle = () => {
     };
 
     const checkAndObserve = () => {
-      const btn = document.querySelector('button[aria-label="Temporary chat"]');
+      const container = document.querySelector('div[data-test-id="temp-chat-button-container"]');
+      const btn = container?.querySelector('button') || null;
       if (btn) {
         if (btn !== currentBtn) {
           currentBtn = btn;
@@ -86,9 +87,10 @@ const useTemporaryChatToggle = () => {
     const isOnNewChat = window.location.pathname === '/app';
 
     const clickTempChatBtn = () => {
-      const btn = document.querySelector(
-        'button[aria-label="Temporary chat"]',
-      ) as HTMLButtonElement;
+      const container = document.querySelector(
+        'div[data-test-id="temp-chat-button-container"]',
+      );
+      const btn = container?.querySelector('button') as HTMLButtonElement;
       if (btn) {
         btn.click();
       } else {
@@ -101,7 +103,7 @@ const useTemporaryChatToggle = () => {
     } else {
       // Navigate to new chat first, then toggle after the page settles
       const newChatBtn = document.querySelector(
-        'side-navigation-content mat-action-list side-nav-action-button a[aria-label="New chat"]',
+        'bard-sidenav .overflow-container gem-nav-list-item',
       ) as HTMLElement;
       if (newChatBtn) {
         newChatBtn.click();
@@ -111,9 +113,10 @@ const useTemporaryChatToggle = () => {
       // Wait for the new chat page to render the temporary chat button
       const waitAndClick = (retries = 10) => {
         setTimeout(() => {
-          const btn = document.querySelector(
-            'button[aria-label="Temporary chat"]',
-          ) as HTMLButtonElement;
+          const container = document.querySelector(
+            'div[data-test-id="temp-chat-button-container"]',
+          );
+          const btn = container?.querySelector('button') as HTMLButtonElement;
           if (btn) {
             btn.click();
           } else if (retries > 0) {
@@ -204,18 +207,10 @@ export const useModuleConfig = (): ModuleConfig => {
     },
     explorer: {
       onNewChat: () => {
-        const url = 'https://gemini.google.com/app';
         if (newChatBehavior === 'new-tab') {
-          window.open(url, '_blank');
+          window.open('https://gemini.google.com/app', '_blank');
         } else {
-          const newChatBtn = document.querySelector(
-            'side-navigation-content mat-action-list side-nav-action-button a[aria-label="New chat"]',
-          ) as HTMLElement;
-          if (newChatBtn) {
-            newChatBtn.click();
-          } else {
-            window.location.href = url;
-          }
+          navigateToNewChat();
         }
       },
       newChatDropdownItems: [

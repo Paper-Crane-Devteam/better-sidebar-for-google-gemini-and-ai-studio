@@ -3,7 +3,6 @@
  * Monitors chat-app for "mobile" class to switch between desktop and mobile layouts.
  */
 
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { OverlayPanel } from './OverlayPanel';
 import { mountMobileLayout } from './MobileLayout';
@@ -205,40 +204,46 @@ async function mountDesktopLayout(
 
     const wrapperId = 'better-sidebar-for-google-ai-studio-sidebar-wrapper';
 
-    // Store references to elements we need to toggle
-    const elements = {
-      wrapper: null as HTMLElement | null,
-      sideNavMenuBtn: null as HTMLElement | null,
-      searchNavBtn: null as HTMLElement | null,
+    /** Move an element offscreen (hidden) or restore it */
+    const setOffscreen = (el: HTMLElement | null, hidden: boolean) => {
+      if (!el) return;
+      if (hidden) {
+        el.style.position = 'absolute';
+        el.style.top = '-9999px';
+        el.style.left = '-9999px';
+      } else {
+        el.style.position = '';
+        el.style.top = '';
+        el.style.left = '';
+      }
     };
 
-    // Start looking for external elements
-    waitForElement('side-nav-menu-button').then((el) => {
-      elements.sideNavMenuBtn = el as HTMLElement;
-      const enabled = useAppStore.getState().ui.overlay.isOpen;
-      if (enabled) {
-        (el as HTMLElement).style.position = 'absolute';
-        (el as HTMLElement).style.top = '-9999px';
-        (el as HTMLElement).style.left = '-9999px';
-      }
-    });
+    // Elements to hide offscreen when panel is open
+    const hiddenElements: HTMLElement[] = [];
 
-    waitForElement('search-nav-button').then((el) => {
-      elements.searchNavBtn = el as HTMLElement;
-      const enabled = useAppStore.getState().ui.overlay.isOpen;
-      if (enabled) {
-        (el as HTMLElement).style.display = 'none';
-      }
-    });
+    // Start looking for external elements
+    const trackElement = (selector: string) => {
+      waitForElement(selector).then((el) => {
+        hiddenElements.push(el as HTMLElement);
+        const enabled = useAppStore.getState().ui.overlay.isOpen;
+        setOffscreen(el as HTMLElement, enabled);
+      });
+    };
+
+    trackElement('side-nav-menu-button');
+    trackElement('side-nav-sparkle-button');
 
     // Function to update visibility/state based on enabled status
+    let wrapperEl: HTMLElement | null = null;
+
     const updateState = (enabled: boolean) => {
       const density = useSettingsStore.getState().layoutDensity;
       updateSidebarWidths(density, enabled);
 
       // Manage Wrapper
       if (enabled) {
-        if (!elements.wrapper) {
+        if (!wrapperEl) {
+          // Create wrapper if doesn't exist
           const wrapper = document.createElement('div');
           wrapper.id = wrapperId;
           wrapper.style.height = '100%';
@@ -258,7 +263,7 @@ async function mountDesktopLayout(
           }
 
           container.appendChild(wrapper);
-          elements.wrapper = wrapper;
+          wrapperEl = wrapper;
 
           const shadow = wrapper.attachShadow({ mode: 'open' });
           applyShadowStyles(shadow, mainStyles);
@@ -311,50 +316,23 @@ async function mountDesktopLayout(
             </ShadowRootProvider>,
           );
         } else {
-          elements.wrapper.style.display = 'block';
+          wrapperEl.style.display = 'block';
         }
       } else {
-        if (elements.wrapper) {
-          elements.wrapper.style.display = 'none';
+        if (wrapperEl) {
+          wrapperEl.style.display = 'none';
         }
       }
 
       // Hide/Show Original Elements (children of container)
       Array.from(container.children).forEach((child) => {
         if (child.id !== wrapperId) {
-          const el = child as HTMLElement;
-          if (enabled) {
-            el.style.position = 'absolute';
-            el.style.top = '-9999px';
-            el.style.left = '-9999px';
-          } else {
-            el.style.position = '';
-            el.style.top = '';
-            el.style.left = '';
-          }
+          setOffscreen(child as HTMLElement, enabled);
         }
       });
 
-      // Update External Elements
-      if (elements.sideNavMenuBtn) {
-        if (enabled) {
-          elements.sideNavMenuBtn.style.position = 'absolute';
-          elements.sideNavMenuBtn.style.top = '-9999px';
-          elements.sideNavMenuBtn.style.left = '-9999px';
-        } else {
-          elements.sideNavMenuBtn.style.position = '';
-          elements.sideNavMenuBtn.style.top = '';
-          elements.sideNavMenuBtn.style.left = '';
-        }
-      }
-
-      if (elements.searchNavBtn) {
-        if (enabled) {
-          elements.searchNavBtn.style.display = 'none';
-        } else {
-          elements.searchNavBtn.style.display = '';
-        }
-      }
+      // Update External Elements (offscreen-hidden)
+      hiddenElements.forEach((el) => setOffscreen(el, enabled));
     };
 
     // Initial state check
@@ -404,19 +382,12 @@ async function mountDesktopLayout(
         });
 
         // Restore external elements
-        if (elements.sideNavMenuBtn) {
-          elements.sideNavMenuBtn.style.position = '';
-          elements.sideNavMenuBtn.style.top = '';
-          elements.sideNavMenuBtn.style.left = '';
-        }
-        if (elements.searchNavBtn) {
-          elements.searchNavBtn.style.display = '';
-        }
+        hiddenElements.forEach((el) => setOffscreen(el, false));
 
         // Remove our wrapper
-        if (elements.wrapper) {
-          elements.wrapper.remove();
-          elements.wrapper = null;
+        if (wrapperEl) {
+          wrapperEl.remove();
+          wrapperEl = null;
         }
       },
     };
