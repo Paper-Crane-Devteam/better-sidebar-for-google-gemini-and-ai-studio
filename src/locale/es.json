@@ -329,6 +329,10 @@
     "duplicate": "Duplicar",
     "changeColor": "Cambiar Color"
   },
+  "pendingEntry": {
+    "placeholder": "Título (opcional)",
+    "waitingForChat": "Esperando chat..."
+  },
   "folderSettings": {
     "title": "Configuración de Carpeta",
     "name": "Nombre",
@@ -727,7 +731,7 @@
     "customThemes": "Temas personalizados",
     "customThemesDescription": "Aplica un tema visual personalizado a la interfaz de Gemini. Estos temas anulan el esquema de colores predeterminado.",
     "default": "Predeterminado",
-    "defaultDescription": "Tema Gemini v2 con soporte para modo claro/oscuro",
+    "defaultDescription": "Tema predeterminado con soporte para modo claro/oscuro",
     "classicDescription": "Aspecto clásico de Gemini con superficies azuladas"
   }
 }

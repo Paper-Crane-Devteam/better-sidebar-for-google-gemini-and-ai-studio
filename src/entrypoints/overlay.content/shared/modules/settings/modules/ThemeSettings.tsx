@@ -6,6 +6,7 @@ import { Moon, Sun, Monitor, Check } from 'lucide-react';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { useTheme } from '../hooks/useTheme';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { detectPlatform, Platform } from '@/shared/types/platform';
 import {
   themeRegistry,
   themePresetIds,
@@ -44,6 +45,8 @@ export const ThemeSettings = () => {
   const { theme, setTheme } = useTheme();
   const { customTheme, setCustomTheme, geminiStyle, setGeminiStyle } = useSettingsStore();
 
+  const platform = detectPlatform();
+  const isGemini = platform === Platform.GEMINI;
   const isDefaultTheme = customTheme === null && geminiStyle === 'default';
   const isClassicTheme = customTheme === null && geminiStyle === 'classic';
 
@@ -74,19 +77,21 @@ export const ThemeSettings = () => {
           onClick={() => { setCustomTheme(null); setGeminiStyle('default'); }}
         />
 
-        {/* Gemini Classic Card */}
-        <ThemeCard
-          name="Gemini Classic"
-          description={t('themeSettings.classicDescription')}
-          colors={{
-            bg: '#e9eef6',
-            fg: '#1f1f1f',
-            accent: '#0b57d0',
-            secondary: '#dde3ea',
-          }}
-          isActive={isClassicTheme}
-          onClick={() => { setCustomTheme(null); setGeminiStyle('classic'); }}
-        />
+        {/* Gemini Classic Card — only on Gemini platform */}
+        {isGemini && (
+          <ThemeCard
+            name="Gemini Classic"
+            description={t('themeSettings.classicDescription')}
+            colors={{
+              bg: '#e9eef6',
+              fg: '#1f1f1f',
+              accent: '#0b57d0',
+              secondary: '#dde3ea',
+            }}
+            isActive={isClassicTheme}
+            onClick={() => { setCustomTheme(null); setGeminiStyle('classic'); }}
+          />
+        )}
 
         {/* Custom presets */}
         {themePresetIds.map((id) => {

@@ -330,6 +330,10 @@
     "duplicate": "複製",
     "changeColor": "色を変更"
   },
+  "pendingEntry": {
+    "placeholder": "タイトル（任意）",
+    "waitingForChat": "チャットを待機中..."
+  },
   "folderSettings": {
     "title": "フォルダー設定",
     "name": "名前",
@@ -728,7 +732,7 @@
     "customThemes": "カスタムテーマ",
     "customThemesDescription": "Gemini インターフェースにカスタムビジュアルテーマを適用します。これらのテーマはデフォルトの配色を上書きします。",
     "default": "デフォルト",
-    "defaultDescription": "Gemini v2 テーマ、ライト/ダークモード対応",
+    "defaultDescription": "デフォルトテーマ、ライト/ダークモード対応",
     "classicDescription": "クラシック Gemini、クールブルーのサーフェス"
   }
 }

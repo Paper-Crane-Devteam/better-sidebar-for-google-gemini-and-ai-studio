@@ -329,6 +329,10 @@
     "duplicate": "Duplicar",
     "changeColor": "Alterar Cor"
   },
+  "pendingEntry": {
+    "placeholder": "Título (opcional)",
+    "waitingForChat": "Aguardando chat..."
+  },
   "folderSettings": {
     "title": "Configurações da Pasta",
     "name": "Nome",
@@ -727,7 +731,7 @@
     "customThemes": "Temas personalizados",
     "customThemesDescription": "Aplique um tema visual personalizado à interface do Gemini. Esses temas substituem o esquema de cores padrão.",
     "default": "Padrão",
-    "defaultDescription": "Tema Gemini v2 com suporte a modo claro/escuro",
+    "defaultDescription": "Tema padrão com suporte a modo claro/escuro",
     "classicDescription": "Visual clássico do Gemini com superfícies em tons azulados"
   }
 }

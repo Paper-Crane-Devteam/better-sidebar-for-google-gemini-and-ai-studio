@@ -1,5 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
-import { useAppStore } from '@/shared/lib/store';
+import { useState, useCallback, useRef } from 'react';
 
 export type PendingNewChatPhase =
   | 'editing'       // User is typing a title (input focused)
@@ -17,6 +16,13 @@ export interface PendingNewChatEntry {
   phase: PendingNewChatPhase;
 }
 
+export interface FinalizeResult {
+  /** Whether a rename is needed */
+  needsRename: boolean;
+  /** The user-defined title to rename to */
+  userTitle: string;
+}
+
 export interface UsePendingNewChatReturn {
   /** The current pending entry (singleton, null if none) */
   pendingEntry: PendingNewChatEntry | null;
@@ -32,8 +38,8 @@ export interface UsePendingNewChatReturn {
   removePendingEntry: () => void;
   /** Called when the create API is intercepted — locks the entry */
   markIntercepted: (conversationId: string) => void;
-  /** Called when the conversation is fully created — clears the entry and renames if needed */
-  finalize: (conversationId: string, apiTitle: string) => void;
+  /** Called when the conversation is fully created — clears the entry and returns rename info */
+  finalize: (apiTitle: string) => FinalizeResult;
 }
 
 const PENDING_NODE_ID = '__pending_new_chat_entry__';
@@ -45,8 +51,6 @@ export const usePendingNewChat = (): UsePendingNewChatReturn => {
 
   // Track the conversation ID once intercepted, so finalize can match
   const interceptedConversationIdRef = useRef<string | null>(null);
-
-  const { renameItem, fetchData } = useAppStore();
 
   const createPendingEntry = useCallback((folderId: string | null) => {
     interceptedConversationIdRef.current = null;
@@ -92,24 +96,26 @@ export const usePendingNewChat = (): UsePendingNewChatReturn => {
     });
   }, []);
 
-  const finalize = useCallback(async (conversationId: string, apiTitle: string) => {
+  /**
+   * Finalize the pending entry: clears it and returns whether a rename is needed.
+   * The caller is responsible for actually calling renameItem.
+   * This avoids closure/reference issues with store actions inside useCallback.
+   */
+  const finalize = useCallback((apiTitle: string): FinalizeResult => {
     const entry = pendingEntryRef.current;
-    if (!entry) return;
+    if (!entry) return { needsRename: false, userTitle: '' };
 
-    // If user defined a custom title, rename the conversation
-    const userTitle = entry.title.trim();
-    if (userTitle && userTitle !== apiTitle) {
-      try {
-        await renameItem(conversationId, userTitle, 'file');
-      } catch (e) {
-        console.error('Better Sidebar: Failed to rename new conversation', e);
-      }
-    }
-
-    // Clear the pending entry
+    // Clear the pending entry immediately (removes the virtual node from tree)
     interceptedConversationIdRef.current = null;
     setPendingEntry(null);
-  }, [renameItem]);
+
+    // Check if user defined a custom title that differs from the API title
+    const userTitle = entry.title.trim();
+    if (userTitle && userTitle !== apiTitle) {
+      return { needsRename: true, userTitle };
+    }
+    return { needsRename: false, userTitle: '' };
+  }, []);
 
   return {
     pendingEntry,

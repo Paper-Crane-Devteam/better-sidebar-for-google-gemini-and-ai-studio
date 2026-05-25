@@ -329,6 +329,10 @@
     "duplicate": "複製",
     "changeColor": "更改顏色"
   },
+  "pendingEntry": {
+    "placeholder": "標題（選填）",
+    "waitingForChat": "等待對話..."
+  },
   "folderSettings": {
     "title": "資料夾設定",
     "name": "名稱",
@@ -727,7 +731,7 @@
     "customThemes": "自訂主題",
     "customThemesDescription": "為 Gemini 介面套用自訂視覺主題。這些主題會覆蓋預設配色方案。",
     "default": "預設",
-    "defaultDescription": "Gemini v2 主題，支援淺色/深色模式切換",
+    "defaultDescription": "預設主題，支援淺色/深色模式切換",
     "classicDescription": "經典 Gemini 外觀，冷藍色調面板"
   }
 }

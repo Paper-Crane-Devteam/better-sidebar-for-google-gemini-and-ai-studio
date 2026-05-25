@@ -329,6 +329,10 @@
     "duplicate": "复制",
     "changeColor": "更改颜色"
   },
+  "pendingEntry": {
+    "placeholder": "标题（选填）",
+    "waitingForChat": "等待对话..."
+  },
   "folderSettings": {
     "title": "文件夹设置",
     "name": "名称",
@@ -726,7 +730,7 @@
     "customThemes": "自定义主题",
     "customThemesDescription": "为 Gemini 界面应用自定义视觉主题，覆盖默认配色方案。",
     "default": "默认",
-    "defaultDescription": "Gemini v2 主题，支持浅色/深色模式切换",
+    "defaultDescription": "默认主题，支持浅色/深色模式切换",
     "classicDescription": "经典 Gemini 外观，冷蓝色调面板"
   }
 }

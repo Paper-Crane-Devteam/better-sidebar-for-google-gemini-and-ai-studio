@@ -15,6 +15,7 @@
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { themeRegistry, applySidebarTheme } from '@/themes';
 import { TooltipHelper } from '@/shared/lib/tooltip-helper';
+import { syncAiStudioTheme } from '@/shared/lib/utils/utils';
 import type { ThemePreset, ThemeVariable } from '../types';
 
 const AISTUDIO_THEME_STYLE_ID = 'better-sidebar-aistudio-custom-theme';
@@ -273,6 +274,8 @@ export function initAiStudioThemeSync(): () => void {
     applyAiStudioTheme(themeRegistry[initialThemeId]);
     const preset = themeRegistry[initialThemeId];
     TooltipHelper.getInstance().setCustomThemeVariables(preset.sidebarVariables ?? null);
+    // Force page to the theme's preferred mode
+    syncAiStudioTheme(preset.preferredMode);
   }
 
   // Subscribe to changes
@@ -282,9 +285,13 @@ export function initAiStudioThemeSync(): () => void {
         applyAiStudioTheme(themeRegistry[state.customTheme]);
         const preset = themeRegistry[state.customTheme];
         TooltipHelper.getInstance().setCustomThemeVariables(preset.sidebarVariables ?? null);
+        // Force page to the theme's preferred mode
+        syncAiStudioTheme(preset.preferredMode);
       } else {
         removeAiStudioTheme();
         TooltipHelper.getInstance().setCustomThemeVariables(null);
+        // Restore user's chosen theme setting
+        syncAiStudioTheme(state.theme);
       }
     }
   });

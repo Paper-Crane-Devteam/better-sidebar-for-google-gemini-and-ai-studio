@@ -26,7 +26,7 @@ const NodeWrapper = (props: NodeRendererProps<FolderTreeNodeData>) => {
 export const TreeView = forwardRef<ArboristTreeHandle, TreeViewProps>(
   ({ onSelect }, ref) => {
     const { t } = useI18n();
-    const { pendingNewChatFolderId } = useExplorerContext();
+    const { pendingNewChatFolderId, pendingEntry } = useExplorerContext();
     const {
       folders,
       conversations,
@@ -212,8 +212,9 @@ export const TreeView = forwardRef<ArboristTreeHandle, TreeViewProps>(
 
       sortNodes(rootNodes);
 
-      // Inject a virtual loading node into the pending folder
-      if (pendingNewChatFolderId) {
+      // Inject a virtual loading node into the pending folder (legacy shimmer)
+      // Only show legacy shimmer when there's NO pending entry (they are mutually exclusive)
+      if (pendingNewChatFolderId && !pendingEntry) {
         const loadingNode: FolderTreeNodeData = {
           id: '__pending_new_chat__',
           name: t('common.loading'),
@@ -234,12 +235,38 @@ export const TreeView = forwardRef<ArboristTreeHandle, TreeViewProps>(
         injectLoading(rootNodes);
       }
 
+      // Inject the new pending entry node (singleton temporary entry)
+      if (pendingEntry) {
+        const pendingNode: FolderTreeNodeData = {
+          id: pendingEntry.nodeId,
+          name: pendingEntry.title || '',
+          type: 'file',
+          data: { isPendingEntry: true, pendingPhase: pendingEntry.phase, pendingTitle: pendingEntry.title },
+        };
+        if (pendingEntry.folderId) {
+          const injectPending = (nodes: FolderTreeNodeData[]): boolean => {
+            for (const node of nodes) {
+              if (node.id === pendingEntry.folderId && node.type === 'folder') {
+                node.children = node.children || [];
+                node.children.unshift(pendingNode);
+                return true;
+              }
+              if (node.children && injectPending(node.children)) return true;
+            }
+            return false;
+          };
+          injectPending(rootNodes);
+        } else {
+          rootNodes.unshift(pendingNode);
+        }
+      }
+
       return rootNodes;
     }, [
       folders, conversations, sortOrder, favorites,
       tagFilter.selected, conversationTags, typeFilter,
       onlyFavorites, ignoredFolders, searchTerm, t,
-      pendingNewChatFolderId,
+      pendingNewChatFolderId, pendingEntry,
     ]);
 
     useImperativeHandle(ref, () => ({

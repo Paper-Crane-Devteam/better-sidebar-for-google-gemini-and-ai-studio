@@ -330,6 +330,10 @@
     "duplicate": "Duplicate",
     "changeColor": "Change Color"
   },
+  "pendingEntry": {
+    "placeholder": "Title (optional)",
+    "waitingForChat": "Waiting for chat..."
+  },
   "folderSettings": {
     "title": "Folder Settings",
     "name": "Name",
@@ -727,7 +731,7 @@
     "customThemes": "Custom Themes",
     "customThemesDescription": "Apply a custom visual theme to the Gemini interface. These themes override the default color scheme.",
     "default": "Default",
-    "defaultDescription": "Gemini v2 theme with light/dark mode support",
+    "defaultDescription": "Default theme with light/dark mode support",
     "classicDescription": "Classic Gemini look with cool blue-tinted surfaces"
   }
 }
