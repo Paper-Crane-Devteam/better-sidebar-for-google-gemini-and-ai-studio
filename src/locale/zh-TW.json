@@ -86,7 +86,8 @@
     "spanish": "Español",
     "russian": "Русский",
     "resizableSidebar": "可拖曳側邊欄",
-    "resizableSidebarDescription": "允許透過拖曳改變側邊欄寬度"
+    "resizableSidebarDescription": "允許透過拖曳改變側邊欄寬度",
+    "uiControls": "介面控制"
   },
   "modal": {
     "resetDatabase": "重設資料庫",
@@ -613,7 +614,7 @@
     "newProfile": "新增設定檔"
   },
   "geminiUI": {
-    "title": "Gemini 介面控制",
+    "title": "介面控制",
     "subtitle": "調整版面、可見性與功能",
     "layoutDimensions": "版面尺寸",
     "sidebarWidth": "側邊欄寬度",
@@ -643,6 +644,17 @@
     "smartScrollbarDesc": "在右側顯示對話導覽",
     "autoHideInput": "自動隱藏輸入框",
     "autoHideInputDesc": "滑鼠懸停在底部區域時才顯示輸入框"
+  },
+  "aistudioUI": {
+    "title": "介面控制",
+    "subtitle": "調整版面和功能",
+    "layoutDimensions": "版面尺寸",
+    "sidebarWidth": "側邊欄寬度",
+    "additionalFeatures": "額外功能",
+    "autoHideInput": "自動隱藏輸入框",
+    "autoHideInputDesc": "滑鼠懸停在底部區域時才顯示輸入框",
+    "autoHideRunSettings": "自動隱藏執行設定",
+    "autoHideRunSettingsDesc": "滑鼠懸停在該區域時才顯示執行設定面板"
   },
   "topBarTag": {
     "removeTag": "移除標籤",

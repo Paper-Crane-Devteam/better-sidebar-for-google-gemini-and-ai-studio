@@ -86,7 +86,8 @@
     "spanish": "Español",
     "russian": "Русский",
     "resizableSidebar": "Resizable Sidebar",
-    "resizableSidebarDescription": "Allow modifying sidebar width by dragging"
+    "resizableSidebarDescription": "Allow modifying sidebar width by dragging",
+    "uiControls": "UI Controls"
   },
   "modal": {
     "resetDatabase": "Reset Database",
@@ -613,7 +614,7 @@
     "newProfile": "New Profile"
   },
   "geminiUI": {
-    "title": "Gemini UI Controls",
+    "title": "UI Controls",
     "subtitle": "Adjust layout, visibility and features",
     "layoutDimensions": "Layout Dimensions",
     "sidebarWidth": "Sidebar Width",
@@ -643,6 +644,17 @@
     "smartScrollbarDesc": "Show conversation navigation on the right side",
     "autoHideInput": "Auto-hide Input",
     "autoHideInputDesc": "Hide input box until you hover the bottom area"
+  },
+  "aistudioUI": {
+    "title": "UI Controls",
+    "subtitle": "Adjust layout and features",
+    "layoutDimensions": "Layout Dimensions",
+    "sidebarWidth": "Sidebar Width",
+    "additionalFeatures": "Additional Features",
+    "autoHideInput": "Auto-hide Input",
+    "autoHideInputDesc": "Hide input box until you hover the bottom area",
+    "autoHideRunSettings": "Auto-hide Run Settings",
+    "autoHideRunSettingsDesc": "Hide run settings panel until you hover the area"
   },
   "topBarTag": {
     "removeTag": "Remove tag",

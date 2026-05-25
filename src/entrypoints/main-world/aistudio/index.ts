@@ -10,6 +10,38 @@ import { handleDeletePromptResponse } from './interceptors/delete';
 import { aiStudioRequestBuilder } from './lib/request-builder';
 import i18n from '@/locale/i18n';
 
+/**
+ * Patch Element.prototype.animate to skip Angular slideInOut animations
+ * inside ms-right-side-panel when auto-hide run settings is active.
+ */
+let killRunSettingsAnimation = false;
+
+function patchElementAnimate() {
+  const originalAnimate = Element.prototype.animate;
+  Element.prototype.animate = function (
+    this: Element,
+    keyframes: Keyframe[] | PropertyIndexedKeyframes | null,
+    options?: number | KeyframeAnimationOptions,
+  ) {
+    if (killRunSettingsAnimation && this.closest('ms-right-side-panel')) {
+      // Force duration to 0 to skip the animation
+      if (typeof options === 'number') {
+        options = 0;
+      } else if (options && typeof options === 'object') {
+        options = { ...options, duration: 0 };
+      }
+    }
+    return originalAnimate.call(this, keyframes, options);
+  };
+}
+
+patchElementAnimate();
+
+// Listen for toggle from content script
+globalThis.addEventListener('BETTER_SIDEBAR_KILL_RUN_SETTINGS_ANIM', (e: Event) => {
+  killRunSettingsAnimation = !!(e as CustomEvent).detail?.enabled;
+});
+
 const showUpdateToast = throttle(
   () => {
     const message = i18n.t('toast.interfaceUpdated');

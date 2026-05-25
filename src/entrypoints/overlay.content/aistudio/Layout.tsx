@@ -5,6 +5,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { OverlayPanel } from './OverlayPanel';
+import { AIStudioEnhancedFeatures } from './enhanced-features/AIStudioEnhancedFeatures';
 import { ShadowRootProvider } from '@/shared/components/ShadowRootContext';
 import { TooltipHelper } from '@/shared/lib/tooltip-helper';
 import { applyShadowStyles, querySelectorDeep, waitForElement } from '@/shared/lib/utils';
@@ -164,4 +165,27 @@ export async function initAiStudioOverlay(mainStyles: string): Promise<void> {
       </div>
     </ShadowRootProvider>
   );
+
+  // Mount enhanced features independently (CSS-based features that work on the native page)
+  mountAIStudioEnhancedFeatures();
+}
+
+/**
+ * Mount AI Studio enhanced features (auto-hide input, etc.)
+ * These inject CSS into the main document and don't need a shadow DOM.
+ */
+function mountAIStudioEnhancedFeatures() {
+  try {
+    const enhancedWrapper = document.createElement('div');
+    enhancedWrapper.id = 'better-sidebar-aistudio-enhanced-features';
+    enhancedWrapper.style.display = 'none';
+    document.body.appendChild(enhancedWrapper);
+
+    const enhancedRoot = ReactDOM.createRoot(enhancedWrapper);
+    enhancedRoot.render(<AIStudioEnhancedFeatures />);
+
+    console.log('Better Sidebar: AI Studio enhanced features mounted');
+  } catch (e) {
+    console.error('Better Sidebar: AI Studio enhanced features initialization failed', e);
+  }
 }

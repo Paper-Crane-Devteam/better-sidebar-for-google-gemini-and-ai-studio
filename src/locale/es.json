@@ -86,7 +86,8 @@
     "spanish": "Español",
     "russian": "Русский",
     "resizableSidebar": "Barra lateral redimensionable",
-    "resizableSidebarDescription": "Permitir modificar el ancho de la barra lateral arrastrando"
+    "resizableSidebarDescription": "Permitir modificar el ancho de la barra lateral arrastrando",
+    "uiControls": "Controles de Interfaz"
   },
   "modal": {
     "resetDatabase": "Restablecer Base de Datos",
@@ -613,7 +614,7 @@
     "newProfile": "Nuevo Perfil"
   },
   "geminiUI": {
-    "title": "Controles de Interfaz Gemini",
+    "title": "Controles de Interfaz",
     "subtitle": "Ajustar diseño, visibilidad y funciones",
     "layoutDimensions": "Dimensiones del Diseño",
     "sidebarWidth": "Ancho de la Barra Lateral",
@@ -643,6 +644,17 @@
     "smartScrollbarDesc": "Mostrar navegación de conversación en el lado derecho",
     "autoHideInput": "Ocultar entrada automáticamente",
     "autoHideInputDesc": "Ocultar el cuadro de entrada hasta que pases el cursor por la zona inferior"
+  },
+  "aistudioUI": {
+    "title": "Controles de Interfaz",
+    "subtitle": "Ajustar diseño y funciones",
+    "layoutDimensions": "Dimensiones del Diseño",
+    "sidebarWidth": "Ancho de la Barra Lateral",
+    "additionalFeatures": "Funciones Adicionales",
+    "autoHideInput": "Ocultar Entrada Automáticamente",
+    "autoHideInputDesc": "Ocultar el cuadro de entrada hasta que pases el cursor por la zona inferior",
+    "autoHideRunSettings": "Ocultar Configuración de Ejecución Automáticamente",
+    "autoHideRunSettingsDesc": "Ocultar el panel de configuración de ejecución hasta que pases el cursor por la zona"
   },
   "topBarTag": {
     "removeTag": "Eliminar etiqueta",

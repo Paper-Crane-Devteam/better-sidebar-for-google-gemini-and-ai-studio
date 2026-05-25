@@ -86,7 +86,8 @@
     "spanish": "Español",
     "russian": "Русский",
     "resizableSidebar": "Изменяемая ширина боковой панели",
-    "resizableSidebarDescription": "Разрешить изменение ширины боковой панели перетаскиванием"
+    "resizableSidebarDescription": "Разрешить изменение ширины боковой панели перетаскиванием",
+    "uiControls": "Управление интерфейсом"
   },
   "modal": {
     "resetDatabase": "Сбросить базу данных",
@@ -613,7 +614,7 @@
     "newProfile": "Новый профиль"
   },
   "geminiUI": {
-    "title": "Управление интерфейсом Gemini",
+    "title": "Управление интерфейсом",
     "subtitle": "Настройка макета, видимости и функций",
     "layoutDimensions": "Размеры макета",
     "sidebarWidth": "Ширина боковой панели",
@@ -643,6 +644,17 @@
     "smartScrollbarDesc": "Показывать навигацию по беседе справа",
     "autoHideInput": "Автоскрытие ввода",
     "autoHideInputDesc": "Скрывать поле ввода, пока курсор не наведён на нижнюю область"
+  },
+  "aistudioUI": {
+    "title": "Управление интерфейсом",
+    "subtitle": "Настройка макета и функций",
+    "layoutDimensions": "Размеры макета",
+    "sidebarWidth": "Ширина боковой панели",
+    "additionalFeatures": "Дополнительные функции",
+    "autoHideInput": "Автоскрытие ввода",
+    "autoHideInputDesc": "Скрывать поле ввода, пока курсор не наведён на нижнюю область",
+    "autoHideRunSettings": "Автоскрытие настроек запуска",
+    "autoHideRunSettingsDesc": "Скрывать панель настроек запуска, пока курсор не наведён на область"
   },
   "topBarTag": {
     "removeTag": "Удалить тег",

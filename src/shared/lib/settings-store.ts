@@ -23,6 +23,12 @@ interface GeminiEnhancedFeatures {
   autoHideInput: boolean;
 }
 
+interface AIStudioEnhancedFeatures {
+  sidebarWidth: number;
+  autoHideInput: boolean;
+  autoHideRunSettings: boolean;
+}
+
 interface SettingsState {
   theme: 'light' | 'dark' | 'system';
   /** Custom theme preset ID, or null for default Gemini theme */
@@ -55,6 +61,7 @@ interface SettingsState {
   };
   enhancedFeatures: {
     gemini: GeminiEnhancedFeatures;
+    aistudio: AIStudioEnhancedFeatures;
   };
 
   // Actions
@@ -76,6 +83,10 @@ interface SettingsState {
   setGeminiFeature: <K extends keyof GeminiEnhancedFeatures>(
     key: K,
     value: GeminiEnhancedFeatures[K],
+  ) => void;
+  setAIStudioFeature: <K extends keyof AIStudioEnhancedFeatures>(
+    key: K,
+    value: AIStudioEnhancedFeatures[K],
   ) => void;
   setLastSelectedGemId: (id: string | null) => void;
 }
@@ -170,6 +181,11 @@ export const useSettingsStore = create<SettingsState>()(
           quickResend: false,
           autoHideInput: false,
         },
+        aistudio: {
+          sidebarWidth: 320,
+          autoHideInput: false,
+          autoHideRunSettings: false,
+        },
       },
 
       setTheme: (theme) => {
@@ -220,12 +236,26 @@ export const useSettingsStore = create<SettingsState>()(
             gemini: { ...state.enhancedFeatures.gemini, [key]: value },
           },
         })),
+      setAIStudioFeature: (key, value) =>
+        set((state) => ({
+          enhancedFeatures: {
+            ...state.enhancedFeatures,
+            aistudio: {
+              ...(state.enhancedFeatures.aistudio ?? {
+                sidebarWidth: 320,
+                autoHideInput: false,
+                autoHideRunSettings: false,
+              }),
+              [key]: value,
+            },
+          },
+        })),
       setLastSelectedGemId: (id) => set({ lastSelectedGemId: id }),
     }),
     {
       name: getStorageName(),
       storage: createJSONStorage(() => storage),
-      version: 2,
+      version: 3,
       migrate: (persistedState: any, version: number) => {
         if (version === 0) {
           const oldEnhanced = persistedState.enhancedFeatures || {};
@@ -252,6 +282,19 @@ export const useSettingsStore = create<SettingsState>()(
               old === 'bottom-right'
                 ? { x: window.innerWidth - 60, y: 16 }
                 : { x: 16, y: 16 };
+          }
+        }
+        if (version < 3) {
+          // Add aistudio enhanced features defaults
+          if (!persistedState.enhancedFeatures) {
+            persistedState.enhancedFeatures = {};
+          }
+          if (!persistedState.enhancedFeatures.aistudio) {
+            persistedState.enhancedFeatures.aistudio = {
+              sidebarWidth: 320,
+              autoHideInput: false,
+              autoHideRunSettings: false,
+            };
           }
         }
         return persistedState;

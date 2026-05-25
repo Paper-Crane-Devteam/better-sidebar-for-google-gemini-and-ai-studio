@@ -48,7 +48,7 @@ export const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
     if (!open) return null;
 
     const platform = detectPlatform();
-    const hasPlatformSettings = platform === Platform.GEMINI;
+    const hasPlatformSettings = platform === Platform.GEMINI || platform === Platform.AI_STUDIO;
 
     const renderContent = () => {
         switch (activeSection) {
@@ -94,7 +94,7 @@ export const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
                     <NavButton id="theme" label={t('themeSettings.title')} icon={Palette} activeSection={activeSection} setActiveSection={setActiveSection} />
                     <NavButton id="explorer" label={t('settings.library')} icon={LayoutTemplate} activeSection={activeSection} setActiveSection={setActiveSection} />
                     {hasPlatformSettings && (
-                        <NavButton id="platform" label={t('geminiUI.title')} icon={SlidersHorizontal} activeSection={activeSection} setActiveSection={setActiveSection} />
+                        <NavButton id="platform" label={t('settings.uiControls')} icon={SlidersHorizontal} activeSection={activeSection} setActiveSection={setActiveSection} />
                     )}
                     <NavButton id="data" label={t('settings.dataStorage')} icon={Database} activeSection={activeSection} setActiveSection={setActiveSection} />
                     

@@ -86,7 +86,8 @@
     "spanish": "Español",
     "russian": "Русский",
     "resizableSidebar": "サイドバーのリサイズ",
-    "resizableSidebarDescription": "ドラッグでサイドバーの幅を変更できるようにする"
+    "resizableSidebarDescription": "ドラッグでサイドバーの幅を変更できるようにする",
+    "uiControls": "UI コントロール"
   },
   "modal": {
     "resetDatabase": "データベースをリセット",
@@ -614,7 +615,7 @@
     "newProfile": "新しいプロファイル"
   },
   "geminiUI": {
-    "title": "Gemini UI コントロール",
+    "title": "UI コントロール",
     "subtitle": "レイアウト、表示、機能を調整",
     "layoutDimensions": "レイアウトサイズ",
     "sidebarWidth": "サイドバーの幅",
@@ -644,6 +645,17 @@
     "smartScrollbarDesc": "右側に会話ナビゲーションを表示",
     "autoHideInput": "入力欄の自動非表示",
     "autoHideInputDesc": "下部エリアにホバーするまで入力欄を非表示にする"
+  },
+  "aistudioUI": {
+    "title": "UI コントロール",
+    "subtitle": "レイアウトと機能を調整",
+    "layoutDimensions": "レイアウトサイズ",
+    "sidebarWidth": "サイドバーの幅",
+    "additionalFeatures": "追加機能",
+    "autoHideInput": "入力欄の自動非表示",
+    "autoHideInputDesc": "下部エリアにホバーするまで入力欄を非表示にする",
+    "autoHideRunSettings": "実行設定の自動非表示",
+    "autoHideRunSettingsDesc": "エリアにホバーするまで実行設定パネルを非表示にする"
   },
   "topBarTag": {
     "removeTag": "タグを削除",

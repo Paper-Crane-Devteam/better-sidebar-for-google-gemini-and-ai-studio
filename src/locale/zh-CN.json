@@ -86,7 +86,8 @@
     "spanish": "Español",
     "russian": "Русский",
     "resizableSidebar": "可拖拽侧边栏",
-    "resizableSidebarDescription": "允许通过拖拽改变侧边栏宽度"
+    "resizableSidebarDescription": "允许通过拖拽改变侧边栏宽度",
+    "uiControls": "界面控制"
   },
   "modal": {
     "resetDatabase": "重置数据库",
@@ -612,7 +613,7 @@
     "newProfile": "新建 Profile"
   },
   "geminiUI": {
-    "title": "Gemini 界面控制",
+    "title": "界面控制",
     "subtitle": "调整布局、可见性和功能",
     "layoutDimensions": "布局尺寸",
     "sidebarWidth": "侧边栏宽度",
@@ -642,6 +643,17 @@
     "smartScrollbarDesc": "在右侧显示对话导航",
     "autoHideInput": "自动隐藏输入框",
     "autoHideInputDesc": "隐藏输入框，鼠标悬停底部时自动显示"
+  },
+  "aistudioUI": {
+    "title": "界面控制",
+    "subtitle": "调整布局和功能",
+    "layoutDimensions": "布局尺寸",
+    "sidebarWidth": "侧边栏宽度",
+    "additionalFeatures": "额外功能",
+    "autoHideInput": "自动隐藏输入框",
+    "autoHideInputDesc": "隐藏输入框，鼠标悬停底部时自动显示",
+    "autoHideRunSettings": "自动隐藏运行设置",
+    "autoHideRunSettingsDesc": "隐藏运行设置面板，鼠标悬停时自动显示"
   },
   "topBarTag": {
     "removeTag": "移除标签",

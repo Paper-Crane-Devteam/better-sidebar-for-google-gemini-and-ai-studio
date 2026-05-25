@@ -86,7 +86,8 @@
     "spanish": "Español",
     "russian": "Русский",
     "resizableSidebar": "Barra lateral redimensionável",
-    "resizableSidebarDescription": "Permitir modificar a largura da barra lateral arrastando"
+    "resizableSidebarDescription": "Permitir modificar a largura da barra lateral arrastando",
+    "uiControls": "Controles de Interface"
   },
   "modal": {
     "resetDatabase": "Redefinir Banco de Dados",
@@ -613,7 +614,7 @@
     "newProfile": "Novo Perfil"
   },
   "geminiUI": {
-    "title": "Controles de Interface Gemini",
+    "title": "Controles de Interface",
     "subtitle": "Ajustar layout, visibilidade e recursos",
     "layoutDimensions": "Dimensões do Layout",
     "sidebarWidth": "Largura da Barra Lateral",
@@ -643,6 +644,17 @@
     "smartScrollbarDesc": "Mostrar navegação da conversa no lado direito",
     "autoHideInput": "Ocultar entrada automaticamente",
     "autoHideInputDesc": "Ocultar a caixa de entrada até passar o cursor na área inferior"
+  },
+  "aistudioUI": {
+    "title": "Controles de Interface",
+    "subtitle": "Ajustar layout e recursos",
+    "layoutDimensions": "Dimensões do Layout",
+    "sidebarWidth": "Largura da Barra Lateral",
+    "additionalFeatures": "Recursos Adicionais",
+    "autoHideInput": "Ocultar entrada automaticamente",
+    "autoHideInputDesc": "Ocultar a caixa de entrada até passar o cursor na área inferior",
+    "autoHideRunSettings": "Ocultar configurações de execução automaticamente",
+    "autoHideRunSettingsDesc": "Ocultar o painel de configurações de execução até passar o cursor na área"
   },
   "topBarTag": {
     "removeTag": "Remover tag",
