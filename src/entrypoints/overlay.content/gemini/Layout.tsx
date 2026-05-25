@@ -275,6 +275,24 @@ async function mountDesktopLayout(
           rootContainer.classList.add('shadow-body', 'theme-gemini');
           rootContainer.style.height = '100%';
 
+          // Gemini style sync (default v2 vs classic)
+          const syncGeminiStyle = () => {
+            const style = useSettingsStore.getState().geminiStyle;
+            if (style === 'classic') {
+              rootContainer.classList.remove('theme-gemini');
+              rootContainer.classList.add('theme-gemini-classic');
+            } else {
+              rootContainer.classList.remove('theme-gemini-classic');
+              rootContainer.classList.add('theme-gemini');
+            }
+          };
+          syncGeminiStyle();
+          useSettingsStore.subscribe((state, prevState) => {
+            if (state.geminiStyle !== prevState.geminiStyle) {
+              syncGeminiStyle();
+            }
+          });
+
           // Theme sync
           const syncTheme = () => {
             const themeValue = localStorage.getItem('Bard-Color-Theme');

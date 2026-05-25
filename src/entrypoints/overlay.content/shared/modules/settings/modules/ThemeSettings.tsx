@@ -42,9 +42,10 @@ const themePreviewColors: Record<
 export const ThemeSettings = () => {
   const { t } = useI18n();
   const { theme, setTheme } = useTheme();
-  const { customTheme, setCustomTheme } = useSettingsStore();
+  const { customTheme, setCustomTheme, geminiStyle, setGeminiStyle } = useSettingsStore();
 
-  const isDefaultTheme = customTheme === null;
+  const isDefaultTheme = customTheme === null && geminiStyle === 'default';
+  const isClassicTheme = customTheme === null && geminiStyle === 'classic';
 
   return (
     <div className="space-y-6">
@@ -59,18 +60,32 @@ export const ThemeSettings = () => {
 
       {/* All themes in a unified grid */}
       <div className="grid grid-cols-2 gap-3">
-        {/* Default Theme Card */}
+        {/* Default Theme Card (v2) */}
         <ThemeCard
           name={t('themeSettings.default')}
           description={t('themeSettings.defaultDescription')}
           colors={{
-            bg: '#ffffff',
+            bg: '#faf9f9',
             fg: '#1f1f1f',
             accent: '#0b57d0',
-            secondary: '#c2e7ff',
+            secondary: '#f0f4f9',
           }}
           isActive={isDefaultTheme}
-          onClick={() => setCustomTheme(null)}
+          onClick={() => { setCustomTheme(null); setGeminiStyle('default'); }}
+        />
+
+        {/* Gemini Classic Card */}
+        <ThemeCard
+          name="Gemini Classic"
+          description={t('themeSettings.classicDescription')}
+          colors={{
+            bg: '#e9eef6',
+            fg: '#1f1f1f',
+            accent: '#0b57d0',
+            secondary: '#dde3ea',
+          }}
+          isActive={isClassicTheme}
+          onClick={() => { setCustomTheme(null); setGeminiStyle('classic'); }}
         />
 
         {/* Custom presets */}
@@ -84,14 +99,14 @@ export const ThemeSettings = () => {
               description={preset.descriptionZh}
               colors={colors}
               isActive={customTheme === id}
-              onClick={() => setCustomTheme(id)}
+              onClick={() => { setCustomTheme(id); setGeminiStyle('default'); }}
             />
           );
         })}
       </div>
 
-      {/* Light/Dark/System Toggle — only shown when default theme is active */}
-      {isDefaultTheme && (
+      {/* Light/Dark/System Toggle — only shown when no custom preset is active */}
+      {(isDefaultTheme || isClassicTheme) && (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">

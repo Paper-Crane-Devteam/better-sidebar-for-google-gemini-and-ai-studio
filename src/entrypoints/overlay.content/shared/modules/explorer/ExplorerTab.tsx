@@ -20,6 +20,7 @@ import {
 import type { ExplorerTypeFilter } from '../../types/filter';
 import type { SplitDropdownItem } from '@/shared/components/ui/split-icon-button';
 import { ExplorerContext } from './ExplorerContext';
+import { usePendingNewChat } from './hooks/usePendingNewChat';
 
 interface ExplorerTabProps {
   onNewChat: () => void;

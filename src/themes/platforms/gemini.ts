@@ -4,6 +4,7 @@
  * Subscribes to the settings store and applies/removes custom themes
  * on the Gemini page by injecting CSS variables onto document.body.
  * Also syncs theme to the tooltip container.
+ * Forces the page to the theme's preferred light/dark mode.
  *
  * Call `initGeminiThemeSync()` once from the content script.
  */
@@ -11,6 +12,7 @@
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { themeRegistry, applyTheme, removeTheme, applySidebarTheme } from '@/themes';
 import { TooltipHelper } from '@/shared/lib/tooltip-helper';
+import { syncGeminiTheme } from '@/shared/lib/utils/utils';
 
 /**
  * Initialize theme sync for Gemini.
@@ -22,9 +24,10 @@ export function initGeminiThemeSync(): () => void {
   const initialThemeId = useSettingsStore.getState().customTheme;
   if (initialThemeId && themeRegistry[initialThemeId]) {
     applyTheme(themeRegistry[initialThemeId]);
-    // Sync tooltip
     const preset = themeRegistry[initialThemeId];
     TooltipHelper.getInstance().setCustomThemeVariables(preset.sidebarVariables ?? null);
+    // Force page to the theme's preferred mode
+    syncGeminiTheme(preset.preferredMode);
   }
 
   // Subscribe to changes
@@ -34,9 +37,13 @@ export function initGeminiThemeSync(): () => void {
         applyTheme(themeRegistry[state.customTheme]);
         const preset = themeRegistry[state.customTheme];
         TooltipHelper.getInstance().setCustomThemeVariables(preset.sidebarVariables ?? null);
+        // Force page to the theme's preferred mode
+        syncGeminiTheme(preset.preferredMode);
       } else {
         removeTheme();
         TooltipHelper.getInstance().setCustomThemeVariables(null);
+        // Restore user's chosen theme setting
+        syncGeminiTheme(state.theme);
       }
     }
   });

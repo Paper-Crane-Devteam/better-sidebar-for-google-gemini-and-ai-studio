@@ -727,6 +727,7 @@
     "customThemes": "自訂主題",
     "customThemesDescription": "為 Gemini 介面套用自訂視覺主題。這些主題會覆蓋預設配色方案。",
     "default": "預設",
-    "defaultDescription": "原版 Gemini 主題，支援淺色/深色模式切換"
+    "defaultDescription": "Gemini v2 主題，支援淺色/深色模式切換",
+    "classicDescription": "經典 Gemini 外觀，冷藍色調面板"
   }
 }

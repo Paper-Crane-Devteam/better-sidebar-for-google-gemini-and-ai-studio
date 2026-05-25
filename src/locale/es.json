@@ -727,6 +727,7 @@
     "customThemes": "Temas personalizados",
     "customThemesDescription": "Aplica un tema visual personalizado a la interfaz de Gemini. Estos temas anulan el esquema de colores predeterminado.",
     "default": "Predeterminado",
-    "defaultDescription": "Tema original de Gemini con soporte para modo claro/oscuro"
+    "defaultDescription": "Tema Gemini v2 con soporte para modo claro/oscuro",
+    "classicDescription": "Aspecto clásico de Gemini con superficies azuladas"
   }
 }

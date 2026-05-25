@@ -728,6 +728,7 @@
     "customThemes": "カスタムテーマ",
     "customThemesDescription": "Gemini インターフェースにカスタムビジュアルテーマを適用します。これらのテーマはデフォルトの配色を上書きします。",
     "default": "デフォルト",
-    "defaultDescription": "ライト/ダークモード対応のオリジナル Gemini テーマ"
+    "defaultDescription": "Gemini v2 テーマ、ライト/ダークモード対応",
+    "classicDescription": "クラシック Gemini、クールブルーのサーフェス"
   }
 }

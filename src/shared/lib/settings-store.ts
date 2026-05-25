@@ -27,6 +27,8 @@ interface SettingsState {
   theme: 'light' | 'dark' | 'system';
   /** Custom theme preset ID, or null for default Gemini theme */
   customTheme: ThemePresetId | null;
+  /** Gemini sidebar base style: 'default' (v2) or 'classic' (pre-v2 blue-tinted) */
+  geminiStyle: 'default' | 'classic';
   layoutDensity: 'compact' | 'relaxed';
   newChatBehavior: 'current-tab' | 'new-tab';
   autoScanLibrary: boolean;
@@ -58,6 +60,7 @@ interface SettingsState {
   // Actions
   setTheme: (theme: 'light' | 'dark' | 'system') => void;
   setCustomTheme: (themeId: ThemePresetId | null) => void;
+  setGeminiStyle: (style: 'default' | 'classic') => void;
   setLayoutDensity: (density: 'compact' | 'relaxed') => void;
   setNewChatBehavior: (behavior: 'current-tab' | 'new-tab') => void;
   setAutoScanLibrary: (enabled: boolean) => void;
@@ -127,6 +130,7 @@ export const useSettingsStore = create<SettingsState>()(
     (set) => ({
       theme: 'system',
       customTheme: null,
+      geminiStyle: 'default',
       layoutDensity: 'relaxed',
       newChatBehavior: 'current-tab',
       autoScanLibrary: false,
@@ -187,6 +191,9 @@ export const useSettingsStore = create<SettingsState>()(
         set({ customTheme: themeId });
         // Theme engine apply/remove is handled by the content script
         // that subscribes to this store change
+      },
+      setGeminiStyle: (style) => {
+        set({ geminiStyle: style });
       },
       setLayoutDensity: (layoutDensity) => set({ layoutDensity }),
       setNewChatBehavior: (newChatBehavior) => set({ newChatBehavior }),

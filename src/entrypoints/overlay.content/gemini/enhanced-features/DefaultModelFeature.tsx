@@ -200,7 +200,8 @@ export const DefaultModelFeature = () => {
           applyShadowStyles(shadow, mainStyles);
           
           const shadowBody = document.createElement('div');
-          shadowBody.classList.add('shadow-body', 'theme-gemini');
+          shadowBody.classList.add('shadow-body');
+          shadowBody.classList.add(useSettingsStore.getState().geminiStyle === 'classic' ? 'theme-gemini-classic' : 'theme-gemini');
           if (document.body.classList.contains('dark-theme') || document.body.getAttribute('data-theme') === 'dark') {
             shadowBody.classList.add('dark');
           }

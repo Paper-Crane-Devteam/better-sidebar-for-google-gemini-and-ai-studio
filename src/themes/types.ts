@@ -22,6 +22,12 @@ export interface ThemePresetMeta {
   description: string;
   descriptionZh: string;
   author?: string;
+  /**
+   * The preferred Gemini page color mode for this theme.
+   * When a custom theme is applied, the page will be forced to this mode
+   * so that native CSS variables (not overridden by the theme) stay consistent.
+   */
+  preferredMode: 'light' | 'dark';
   /** Google Fonts to load (if any) */
   fonts?: string[];
   /** Extra CSS rules beyond variables (e.g. backdrop-filter, noise texture) */

@@ -1,9 +1,8 @@
 @layer base {
-  /* Gemini Theme (v2 - 2025 Redesign) */
-  .theme-gemini,
-  :host(.theme-gemini) {
+  /* Gemini Classic Theme (pre-v2, cool blue-tinted surfaces) */
+  .theme-gemini-classic,
+  :host(.theme-gemini-classic) {
     /* Light Theme */
-    /* Sidebar Defaults (Gemini Compact) */
     --sidebar-width: 3.5rem;
     --sidebar-button-size: 2.5rem;
     --sidebar-icon-size: 1.25rem;
@@ -11,7 +10,7 @@
     --sidebar-padding-y: 0.5rem;
     --sidebar-icon-color: 68 71 70;
 
-    --background: 250 249 249; /* #faf9f9 - remy-surface */
+    --background: 233 238 246; /* #e9eef6 */
     --foreground: 31 31 31; /* #1f1f1f */
 
     --card: 255 255 255; /* #ffffff */
@@ -23,20 +22,20 @@
     --primary: 11 87 208; /* #0b57d0 */
     --primary-foreground: 255 255 255;
 
-    --secondary: 240 244 249; /* #f0f4f9 - surface-container */
+    --secondary: 221 227 234; /* #dde3ea */
     --secondary-foreground: 31 31 31;
 
-    --muted: 240 244 249;
+    --muted: 221 227 234;
     --muted-foreground: 68 71 70; /* #444746 */
 
-    --accent: 233 238 246; /* #e9eef6 - surface-container-high */
+    --accent: 221 227 234;
     --accent-foreground: 31 31 31;
 
     --destructive: 179 38 30; /* #b3261e */
     --destructive-foreground: 255 255 255;
 
-    --border: 225 227 225; /* #e1e3e1 - outline-low */
-    --input: 196 199 197; /* #c4c7c5 - outline-variant */
+    --border: 226 226 226; /* #e2e2e2 */
+    --input: 220 220 220; /* #dcdcdc */
     --ring: 11 87 208;
 
     --radius: 16px;
@@ -50,28 +49,28 @@
       'Google Sans Flex', 'Google Sans', 'Helvetica Neue', sans-serif;
   }
 
-  .theme-gemini.dark,
-  :host(.theme-gemini.dark) {
+  .theme-gemini-classic.dark,
+  :host(.theme-gemini-classic.dark) {
     /* Dark Theme */
-    --background: 3 3 3; /* #030303 - remy-surface */
+    --background: 30 31 32; /* #1e1f20 */
     --foreground: 227 227 227; /* #e3e3e3 */
 
-    --card: 34 35 39; /* #222327 - custom-primary-container */
+    --card: 40 42 44; /* #282a2c */
     --card-foreground: 227 227 227;
 
-    --popover: 34 35 39;
+    --popover: 40 42 44;
     --popover-foreground: 227 227 227;
 
     --primary: 168 199 250; /* #a8c7fa */
     --primary-foreground: 4 30 73; /* #041e49 */
 
-    --secondary: 55 57 59; /* #37393b - neutral-90 */
+    --secondary: 59 68 86; /* #3b4456 */
     --secondary-foreground: 227 227 227;
 
-    --muted: 55 57 59;
+    --muted: 59 68 86;
     --muted-foreground: 196 199 197; /* #c4c7c5 */
 
-    --accent: 59 68 86; /* #3b4456 */
+    --accent: 59 68 86;
     --accent-foreground: 227 227 227;
 
     --destructive: 236 146 142; /* #ec928e */
@@ -79,8 +78,8 @@
 
     --sidebar-icon-color: 196 199 197; /* #c4c7c5 */
 
-    --border: 55 57 59; /* #37393b - neutral-90 */
-    --input: 122 122 122; /* #7a7a7a - icon-separator */
+    --border: 60 64 67; /* #3c4043 */
+    --input: 142 145 143; /* #8e918f */
     --ring: 168 199 250;
 
     /* Custom Gemini Colors */
@@ -88,9 +87,9 @@
     --gem-sys-color--on-primary-container: #d3e3fd;
   }
 
-  /* Relaxed Mode - Theme Specific Overrides */
-  .theme-gemini [data-density='relaxed'],
-  :host(.theme-gemini) [data-density='relaxed'] {
+  /* Relaxed Mode */
+  .theme-gemini-classic [data-density='relaxed'],
+  :host(.theme-gemini-classic) [data-density='relaxed'] {
     --sidebar-width: 4rem;
     --sidebar-button-size: 2.5rem;
     --sidebar-gap: 0.75rem;
@@ -98,24 +97,23 @@
   }
 }
 
-/* Gemini Scrollbar */
+/* Gemini Classic Scrollbar */
 @media (pointer: fine) {
-  /* Target scrollbars on the theme container itself AND its descendants */
-  .theme-gemini::-webkit-scrollbar,
-  .theme-gemini ::-webkit-scrollbar,
-  .theme-gemini::-webkit-scrollbar-corner,
-  .theme-gemini ::-webkit-scrollbar-corner {
+  .theme-gemini-classic::-webkit-scrollbar,
+  .theme-gemini-classic ::-webkit-scrollbar,
+  .theme-gemini-classic::-webkit-scrollbar-corner,
+  .theme-gemini-classic ::-webkit-scrollbar-corner {
     background: transparent;
     height: 12px;
     width: 12px;
   }
-  .theme-gemini::-webkit-scrollbar-button,
-  .theme-gemini ::-webkit-scrollbar-button {
+  .theme-gemini-classic::-webkit-scrollbar-button,
+  .theme-gemini-classic ::-webkit-scrollbar-button {
     height: 0;
     width: 0;
   }
-  .theme-gemini::-webkit-scrollbar-thumb,
-  .theme-gemini ::-webkit-scrollbar-thumb {
+  .theme-gemini-classic::-webkit-scrollbar-thumb,
+  .theme-gemini-classic ::-webkit-scrollbar-thumb {
     background-color: transparent;
     background-clip: content-box;
     border: 4px solid transparent;
@@ -124,23 +122,21 @@
     min-width: 48px;
   }
 
-  /* Show scrollbar when hovering the container */
-  .theme-gemini:hover::-webkit-scrollbar-thumb,
-  .theme-gemini:hover ::-webkit-scrollbar-thumb {
+  .theme-gemini-classic:hover::-webkit-scrollbar-thumb,
+  .theme-gemini-classic:hover ::-webkit-scrollbar-thumb {
     background-color: rgb(var(--muted-foreground) / 0.2);
   }
 
-  /* Darker on thumb hover */
-  .theme-gemini::-webkit-scrollbar-thumb:hover,
-  .theme-gemini ::-webkit-scrollbar-thumb:hover {
+  .theme-gemini-classic::-webkit-scrollbar-thumb:hover,
+  .theme-gemini-classic ::-webkit-scrollbar-thumb:hover {
     background-color: rgb(var(--muted-foreground) / 0.5);
   }
 }
 
 @layer components {
-  /* Sidebar Gradient - Gemini Specific (premium feel) */
-  .theme-gemini .sidebar-nav,
-  :host(.theme-gemini) .sidebar-nav {
+  /* Sidebar Gradient - Classic */
+  .theme-gemini-classic .sidebar-nav,
+  :host(.theme-gemini-classic) .sidebar-nav {
     background: linear-gradient(
       to right,
       color-mix(in srgb, rgb(var(--foreground)) 8%, rgb(var(--background))) 0%,
@@ -150,45 +146,45 @@
     border-right: 1px solid color-mix(in srgb, rgb(var(--foreground)) 6%, transparent);
   }
 
-  /* Active sidebar icon - Gemini Specific */
-  .theme-gemini .sidebar-nav .sidebar-btn.bg-secondary .sidebar-icon,
-  :host(.theme-gemini) .sidebar-nav .sidebar-btn.bg-secondary .sidebar-icon {
+  /* Active sidebar icon - Classic */
+  .theme-gemini-classic .sidebar-nav .sidebar-btn.bg-secondary .sidebar-icon,
+  :host(.theme-gemini-classic) .sidebar-nav .sidebar-btn.bg-secondary .sidebar-icon {
     color: rgb(var(--primary));
   }
 
-  /* Node Selection Styles - Gemini Specific */
-  .theme-gemini .node-item-selected,
-  :host(.theme-gemini) .node-item-selected {
+  /* Node Selection Styles - Classic */
+  .theme-gemini-classic .node-item-selected,
+  :host(.theme-gemini-classic) .node-item-selected {
     background-color: var(--gem-sys-color--primary-container);
     color: var(--gem-sys-color--on-primary-container);
     font-weight: 500;
   }
 
-  /* Current Conversation Indicator - Gemini Specific */
-  .theme-gemini .node-item-current,
-  :host(.theme-gemini) .node-item-current {
+  /* Current Conversation Indicator - Classic */
+  .theme-gemini-classic .node-item-current,
+  :host(.theme-gemini-classic) .node-item-current {
     background-color: color-mix(in srgb, var(--gem-sys-color--primary-container) 60%, transparent);
   }
 
-  /* Node action bar - Gemini Specific */
-  .theme-gemini .node-item-selected .node-action-bar,
-  :host(.theme-gemini) .node-item-selected .node-action-bar {
+  /* Node action bar - Classic */
+  .theme-gemini-classic .node-item-selected .node-action-bar,
+  :host(.theme-gemini-classic) .node-item-selected .node-action-bar {
     background-color: var(--gem-sys-color--primary-container);
   }
-  .theme-gemini .node-item-current .node-action-bar,
-  :host(.theme-gemini) .node-item-current .node-action-bar {
+  .theme-gemini-classic .node-item-current .node-action-bar,
+  :host(.theme-gemini-classic) .node-item-current .node-action-bar {
     background-color: color-mix(in srgb, var(--gem-sys-color--primary-container) 60%, rgb(var(--background)));
   }
-  .theme-gemini .group:hover:not(.node-item-selected):not(.node-item-current) > .node-action-bar,
-  :host(.theme-gemini) .group:hover:not(.node-item-selected):not(.node-item-current) > .node-action-bar,
-  .theme-gemini .group.node-menu-active:not(.node-item-selected):not(.node-item-current) > .node-action-bar,
-  :host(.theme-gemini) .group.node-menu-active:not(.node-item-selected):not(.node-item-current) > .node-action-bar {
+  .theme-gemini-classic .group:hover:not(.node-item-selected):not(.node-item-current) > .node-action-bar,
+  :host(.theme-gemini-classic) .group:hover:not(.node-item-selected):not(.node-item-current) > .node-action-bar,
+  .theme-gemini-classic .group.node-menu-active:not(.node-item-selected):not(.node-item-current) > .node-action-bar,
+  :host(.theme-gemini-classic) .group.node-menu-active:not(.node-item-selected):not(.node-item-current) > .node-action-bar {
     background-color: color-mix(in srgb, rgb(var(--accent)) 50%, rgb(var(--background)));
   }
 
   /* Custom Slider Styles */
-  .theme-gemini .ui-slider,
-  :host(.theme-gemini) .ui-slider {
+  .theme-gemini-classic .ui-slider,
+  :host(.theme-gemini-classic) .ui-slider {
     -webkit-appearance: none;
     appearance: none;
     width: 100%;

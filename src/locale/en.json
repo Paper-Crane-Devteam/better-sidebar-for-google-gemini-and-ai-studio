@@ -727,6 +727,7 @@
     "customThemes": "Custom Themes",
     "customThemesDescription": "Apply a custom visual theme to the Gemini interface. These themes override the default color scheme.",
     "default": "Default",
-    "defaultDescription": "Original Gemini theme with light/dark mode support"
+    "defaultDescription": "Gemini v2 theme with light/dark mode support",
+    "classicDescription": "Classic Gemini look with cool blue-tinted surfaces"
   }
 }

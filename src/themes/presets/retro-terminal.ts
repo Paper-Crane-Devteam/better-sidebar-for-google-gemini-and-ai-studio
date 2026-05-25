@@ -16,6 +16,7 @@ export const retroTerminal: ThemePreset = {
   description:
     'CRT terminal aesthetic with neon green text and monospace typography',
   descriptionZh: '纯黑底色，荧光绿文字，等宽字体，硬核极客命令控制台',
+  preferredMode: 'dark',
   fonts: ['Fira+Code:wght@300;400;500;600', 'JetBrains+Mono:wght@300;400;500;600'],
   extraCss: `
 /* Remove all rounded corners */

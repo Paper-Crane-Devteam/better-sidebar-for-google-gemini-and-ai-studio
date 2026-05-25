@@ -16,6 +16,7 @@ export const cupertinoGlass: ThemePreset = {
   description:
     'Frosted glass aesthetic with system fonts and minimal color palette',
   descriptionZh: '磨砂玻璃质感，系统原生字体，极简黑白灰，纯粹生产力',
+  preferredMode: 'light',
   fonts: ['Inter:wght@300;400;500;600'],
   extraCss: `
 /* Remove rounded corners for a more native feel */
