@@ -22,6 +22,8 @@ export interface ThemePresetMeta {
   description: string;
   descriptionZh: string;
   author?: string;
+  /** Whether this theme requires a Support Pack to use permanently */
+  isPremium?: boolean;
   /**
    * The preferred Gemini page color mode for this theme.
    * When a custom theme is applied, the page will be forced to this mode

@@ -744,6 +744,30 @@
     "customThemesDescription": "Aplica un tema visual personalizado a la interfaz de Gemini. Estos temas anulan el esquema de colores predeterminado.",
     "default": "Predeterminado",
     "defaultDescription": "Tema predeterminado con soporte para modo claro/oscuro",
-    "classicDescription": "Aspecto clásico de Gemini con superficies azuladas"
+    "classicDescription": "Aspecto clásico de Gemini con superficies azuladas",
+    "previewBannerText": "Modo vista previa — el tema volverá al predeterminado en 5 minutos. Compra para conservarlo.",
+    "buyNow": "Comprar"
+  },
+  "supportPack": {
+    "title": "Pack de Soporte",
+    "heroTitle": "Desbloquea Temas Premium",
+    "heroDescription": "Temas hermosos y artesanales que transforman tu espacio de trabajo con IA. Una compra, acceso permanente en hasta 3 dispositivos.",
+    "feature1": "Todos los temas premium desbloqueados permanentemente",
+    "feature2": "Futuros temas incluidos sin costo adicional",
+    "feature3": "Activa en hasta 3 dispositivos",
+    "feature4": "Apoya el desarrollo independiente de código abierto",
+    "buyButton": "Obtener Pack de Soporte",
+    "afdian": "爱发电",
+    "alreadyPurchased": "¿Ya lo compraste?",
+    "enterToken": "Introduce tu token de activación de Gumroad o 爱发电 a continuación.",
+    "activate": "Activar",
+    "invalidToken": "Formato no válido. Se espera BS-SP-XXXXXXXX o clave de licencia de Gumroad.",
+    "networkError": "Error de red. Comprueba tu conexión e inténtalo de nuevo.",
+    "maxDevices": "Límite de dispositivos alcanzado (3 dispositivos). Desactiva otro dispositivo primero.",
+    "activationFailed": "Activación fallida. Comprueba tu token e inténtalo de nuevo.",
+    "activationSuccess": "¡Activado! Todos los temas premium están desbloqueados.",
+    "activatedTitle": "Pack de Soporte Activo",
+    "activatedDescription": "Todos los temas premium están desbloqueados. ¡Gracias por apoyar Better Sidebar!",
+    "deactivate": "Desactivar"
   }
 }

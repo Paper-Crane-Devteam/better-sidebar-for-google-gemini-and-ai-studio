@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Button } from '../../components/ui/button';
-import { X, Settings, Heart, Info, LayoutTemplate, Database, SlidersHorizontal, Palette } from 'lucide-react';
+import { X, Settings, Heart, Info, LayoutTemplate, Database, SlidersHorizontal, Palette, Sparkles } from 'lucide-react';
 import { GeneralSettings } from './modules/GeneralSettings';
 import { ThemeSettings } from './modules/ThemeSettings';
 import { ExplorerSettings } from './modules/ExplorerSettings';
 import { DataSettings } from './modules/DataSettings';
 import { AboutSettings } from './modules/AboutSettings';
 import { SponsorSettings } from './modules/SponsorSettings';
+import { SupportPackSettings } from './modules/SupportPackSettings';
 import { PlatformSettings } from './modules/PlatformSettings';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { detectPlatform, Platform } from '@/shared/types/platform';
@@ -16,7 +17,7 @@ interface SettingsModalProps {
     onOpenChange: (open: boolean) => void;
 }
 
-type Section = 'general' | 'theme' | 'explorer' | 'data' | 'platform' | 'sponsor' | 'about';
+type Section = 'general' | 'theme' | 'explorer' | 'data' | 'platform' | 'supportpack' | 'sponsor' | 'about';
 
 const NavButton = ({ 
     id, 
@@ -62,6 +63,8 @@ export const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
                 return <PlatformSettings />;
             case 'data':
                 return <DataSettings />;
+            case 'supportpack':
+                return <SupportPackSettings />;
             case 'sponsor':
                 return <SponsorSettings />;
             case 'about':
@@ -100,6 +103,7 @@ export const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
                     
                     <div className="h-px bg-border my-2 mx-2" />
                     
+                    <NavButton id="supportpack" label={t('supportPack.title')} icon={Sparkles} activeSection={activeSection} setActiveSection={setActiveSection} />
                     <NavButton id="sponsor" label={t('settings.sponsor')} icon={Heart} activeSection={activeSection} setActiveSection={setActiveSection} />
                     
                     <div className="flex-1" />

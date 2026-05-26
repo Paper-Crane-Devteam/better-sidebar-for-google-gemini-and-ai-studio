@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { Button } from '../../../components/ui/button';
 import { Separator } from '../../../components/ui/separator';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
-import { Moon, Sun, Monitor, Check } from 'lucide-react';
+import { Moon, Sun, Monitor, Check, Sparkles, Eye, ShoppingCart } from 'lucide-react';
 import { useSettingsStore } from '@/shared/lib/settings-store';
+import { useLicenseStore, isLicenseValid } from '@/shared/lib/license-store';
+import { openPurchasePage } from '@/shared/lib/license-links';
 import { useTheme } from '../hooks/useTheme';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { detectPlatform, Platform } from '@/shared/types/platform';
@@ -12,6 +14,9 @@ import {
   themePresetIds,
   type ThemePresetId,
 } from '@/themes';
+
+/** Preview duration: 5 minutes */
+const PREVIEW_DURATION_MS = 5 * 60 * 1000;
 
 /**
  * Theme card preview colors for each preset
@@ -44,11 +49,78 @@ export const ThemeSettings = () => {
   const { t } = useI18n();
   const { theme, setTheme } = useTheme();
   const { customTheme, setCustomTheme, geminiStyle, setGeminiStyle } = useSettingsStore();
+  const licenseState = useLicenseStore();
+  const hasLicense = isLicenseValid(licenseState);
 
   const platform = detectPlatform();
   const isGemini = platform === Platform.GEMINI;
   const isDefaultTheme = customTheme === null && geminiStyle === 'default';
   const isClassicTheme = customTheme === null && geminiStyle === 'classic';
+
+  // Preview timer — resets to default after 5 min for unlicensed premium themes
+  const previewTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { isPreviewActive, previewThemeId, startPreview, endPreview } = licenseState;
+
+  const clearPreviewTimer = useCallback(() => {
+    if (previewTimerRef.current) {
+      clearTimeout(previewTimerRef.current);
+      previewTimerRef.current = null;
+    }
+  }, []);
+
+  const handlePreviewExpired = useCallback(() => {
+    clearPreviewTimer();
+    endPreview();
+    // Reset to default theme via the store (triggers the platform subscriber)
+    setCustomTheme(null);
+    setGeminiStyle('default');
+  }, [clearPreviewTimer, endPreview, setCustomTheme, setGeminiStyle]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => clearPreviewTimer();
+  }, [clearPreviewTimer]);
+
+  const handleThemeClick = (themeId: ThemePresetId) => {
+    const preset = themeRegistry[themeId];
+
+    if (preset.isPremium && !hasLicense) {
+      // Apply theme normally via store (triggers platform subscriber)
+      setCustomTheme(themeId);
+      setGeminiStyle('default');
+      // Start preview tracking
+      startPreview(themeId);
+      // Set auto-revert timer
+      clearPreviewTimer();
+      previewTimerRef.current = setTimeout(handlePreviewExpired, PREVIEW_DURATION_MS);
+    } else {
+      // Normal apply — clear any active preview
+      if (isPreviewActive) {
+        clearPreviewTimer();
+        endPreview();
+      }
+      setCustomTheme(themeId);
+      setGeminiStyle('default');
+    }
+  };
+
+  const handleDefaultClick = () => {
+    if (isPreviewActive) {
+      clearPreviewTimer();
+      endPreview();
+    }
+    setCustomTheme(null);
+    setGeminiStyle('default');
+  };
+
+  const handleClassicClick = () => {
+    if (isPreviewActive) {
+      clearPreviewTimer();
+      endPreview();
+    }
+    setCustomTheme(null);
+    setGeminiStyle('classic');
+  };
 
   return (
     <div className="space-y-6">
@@ -60,6 +132,11 @@ export const ThemeSettings = () => {
         </p>
         <Separator />
       </div>
+
+      {/* Preview Banner */}
+      {isPreviewActive && (
+        <PreviewBanner t={t} />
+      )}
 
       {/* All themes in a unified grid */}
       <div className="grid grid-cols-2 gap-3">
@@ -74,7 +151,7 @@ export const ThemeSettings = () => {
             secondary: '#f0f4f9',
           }}
           isActive={isDefaultTheme}
-          onClick={() => { setCustomTheme(null); setGeminiStyle('default'); }}
+          onClick={handleDefaultClick}
         />
 
         {/* Gemini Classic Card — only on Gemini platform */}
@@ -89,7 +166,7 @@ export const ThemeSettings = () => {
               secondary: '#dde3ea',
             }}
             isActive={isClassicTheme}
-            onClick={() => { setCustomTheme(null); setGeminiStyle('classic'); }}
+            onClick={handleClassicClick}
           />
         )}
 
@@ -97,6 +174,7 @@ export const ThemeSettings = () => {
         {themePresetIds.map((id) => {
           const preset = themeRegistry[id];
           const colors = themePreviewColors[id];
+          const isPreviewing = isPreviewActive && previewThemeId === id;
           return (
             <ThemeCard
               key={id}
@@ -104,7 +182,10 @@ export const ThemeSettings = () => {
               description={preset.descriptionZh}
               colors={colors}
               isActive={customTheme === id}
-              onClick={() => { setCustomTheme(id); setGeminiStyle('default'); }}
+              isPremium={preset.isPremium}
+              hasLicense={hasLicense}
+              isPreviewing={isPreviewing}
+              onClick={() => handleThemeClick(id)}
             />
           );
         })}
@@ -161,18 +242,47 @@ export const ThemeSettings = () => {
   );
 };
 
+/** Preview banner — tells user the theme will revert in 5 min, with a purchase CTA */
+function PreviewBanner({ t }: { t: (key: string) => string }) {
+  return (
+    <div className="flex items-center justify-between gap-2 rounded-lg border border-amber-500/50 bg-amber-500/10 px-4 py-2.5">
+      <div className="flex items-center gap-2 min-w-0">
+        <Eye className="h-4 w-4 text-amber-600 shrink-0" />
+        <span className="text-xs text-amber-800 dark:text-amber-300 truncate">
+          {t('themeSettings.previewBannerText')}
+        </span>
+      </div>
+      <Button
+        variant="outline"
+        size="sm"
+        className="h-6 px-2.5 text-xs shrink-0 border-amber-500/50 text-amber-700 hover:bg-amber-500/10"
+        onClick={() => openPurchasePage()}
+      >
+        <ShoppingCart className="h-3 w-3 mr-1" />
+        {t('themeSettings.buyNow')}
+      </Button>
+    </div>
+  );
+}
+
 /** A clickable theme preview card */
 function ThemeCard({
   name,
   description,
   colors,
   isActive,
+  isPremium,
+  hasLicense,
+  isPreviewing,
   onClick,
 }: {
   name: string;
   description: string;
   colors: { bg: string; fg: string; accent: string; secondary: string };
   isActive: boolean;
+  isPremium?: boolean;
+  hasLicense?: boolean;
+  isPreviewing?: boolean;
   onClick: () => void;
 }) {
   return (
@@ -185,9 +295,23 @@ function ThemeCard({
       `}
     >
       {/* Active indicator */}
-      {isActive && (
+      {isActive && !isPreviewing && (
         <div className="absolute top-2 right-2 h-5 w-5 rounded-full bg-primary flex items-center justify-center">
           <Check className="h-3 w-3 text-primary-foreground" />
+        </div>
+      )}
+
+      {/* Preview indicator */}
+      {isPreviewing && (
+        <div className="absolute top-2 right-2 h-5 w-5 rounded-full bg-amber-500 flex items-center justify-center">
+          <Eye className="h-3 w-3 text-white" />
+        </div>
+      )}
+
+      {/* Premium badge */}
+      {isPremium && !hasLicense && !isActive && !isPreviewing && (
+        <div className="absolute top-2 right-2 flex items-center gap-0.5 rounded-full bg-amber-500/15 px-1.5 py-0.5">
+          <Sparkles className="h-3 w-3 text-amber-600" />
         </div>
       )}
 

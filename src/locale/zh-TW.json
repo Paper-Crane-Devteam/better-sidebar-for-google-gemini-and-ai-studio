@@ -744,6 +744,30 @@
     "customThemesDescription": "為 Gemini 介面套用自訂視覺主題。這些主題會覆蓋預設配色方案。",
     "default": "預設",
     "defaultDescription": "預設主題，支援淺色/深色模式切換",
-    "classicDescription": "經典 Gemini 外觀，冷藍色調面板"
+    "classicDescription": "經典 Gemini 外觀，冷藍色調面板",
+    "previewBannerText": "預覽模式 — 主題將在 5 分鐘後恢復預設。購買可永久使用。",
+    "buyNow": "立即購買"
+  },
+  "supportPack": {
+    "title": "支持包",
+    "heroTitle": "解鎖進階主題",
+    "heroDescription": "精心設計的主題，讓你的 AI 工作空間煥然一新。一次購買，最多 3 台裝置永久使用。",
+    "feature1": "永久解鎖所有進階主題",
+    "feature2": "未來新增主題免費取得",
+    "feature3": "最多可在 3 台裝置上啟用",
+    "feature4": "支持獨立開源開發者",
+    "buyButton": "取得支持包",
+    "afdian": "愛發電",
+    "alreadyPurchased": "已經購買了？",
+    "enterToken": "在下方輸入你從 Gumroad 或愛發電取得的啟用碼。",
+    "activate": "啟用",
+    "invalidToken": "格式無效。請輸入 BS-SP-XXXXXXXX 或 Gumroad 授權金鑰。",
+    "networkError": "網路錯誤，請檢查網路連線後重試。",
+    "maxDevices": "已達裝置上限（3 台裝置）。請先在其他裝置上停用。",
+    "activationFailed": "啟用失敗，請檢查啟用碼後重試。",
+    "activationSuccess": "啟用成功！所有進階主題已解鎖。",
+    "activatedTitle": "支持包已啟用",
+    "activatedDescription": "所有進階主題已解鎖。感謝你對 Better Sidebar 的支持！",
+    "deactivate": "停用"
   }
 }

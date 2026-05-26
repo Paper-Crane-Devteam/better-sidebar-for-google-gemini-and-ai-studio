@@ -743,6 +743,30 @@
     "customThemesDescription": "为 Gemini 界面应用自定义视觉主题，覆盖默认配色方案。",
     "default": "默认",
     "defaultDescription": "默认主题，支持浅色/深色模式切换",
-    "classicDescription": "经典 Gemini 外观，冷蓝色调面板"
+    "classicDescription": "经典 Gemini 外观，冷蓝色调面板",
+    "previewBannerText": "预览模式 — 主题将在 5 分钟后恢复默认。购买支持包可永久使用。",
+    "buyNow": "立即购买"
+  },
+  "supportPack": {
+    "title": "支持包",
+    "heroTitle": "解锁高级主题",
+    "heroDescription": "精心设计的主题，让你的 AI 工作空间焕然一新。一次购买，最多 3 台设备永久使用。",
+    "feature1": "永久解锁所有高级主题",
+    "feature2": "未来新增主题免费获取",
+    "feature3": "最多可在 3 台设备上激活",
+    "feature4": "支持独立开源开发者",
+    "buyButton": "获取支持包",
+    "afdian": "爱发电",
+    "alreadyPurchased": "已经购买了？",
+    "enterToken": "在下方输入你从 Gumroad 或爱发电获得的激活码。",
+    "activate": "激活",
+    "invalidToken": "格式无效。请输入 BS-SP-XXXXXXXX 或 Gumroad 许可证密钥。",
+    "networkError": "网络错误，请检查网络连接后重试。",
+    "maxDevices": "已达到设备上限（3 台设备）。请先在其他设备上取消激活。",
+    "activationFailed": "激活失败，请检查激活码后重试。",
+    "activationSuccess": "激活成功！所有高级主题已解锁。",
+    "activatedTitle": "支持包已激活",
+    "activatedDescription": "所有高级主题已解锁。感谢你对 Better Sidebar 的支持！",
+    "deactivate": "取消激活"
   }
 }

@@ -745,6 +745,30 @@
     "customThemesDescription": "Gemini インターフェースにカスタムビジュアルテーマを適用します。これらのテーマはデフォルトの配色を上書きします。",
     "default": "デフォルト",
     "defaultDescription": "デフォルトテーマ、ライト/ダークモード対応",
-    "classicDescription": "クラシック Gemini、クールブルーのサーフェス"
+    "classicDescription": "クラシック Gemini、クールブルーのサーフェス",
+    "previewBannerText": "プレビューモード — 5分後にデフォルトに戻ります。購入すると永続的に使用できます。",
+    "buyNow": "購入する"
+  },
+  "supportPack": {
+    "title": "サポートパック",
+    "heroTitle": "プレミアムテーマをアンロック",
+    "heroDescription": "美しくデザインされたテーマで AI ワークスペースを変身させましょう。一度の購入で最大3台のデバイスで永久に使用できます。",
+    "feature1": "すべてのプレミアムテーマを永久にアンロック",
+    "feature2": "今後追加されるテーマも追加料金なし",
+    "feature3": "最大3台のデバイスでアクティベート可能",
+    "feature4": "独立したオープンソース開発を支援",
+    "buyButton": "サポートパックを入手",
+    "afdian": "爱发电",
+    "alreadyPurchased": "すでに購入済みですか？",
+    "enterToken": "Gumroad または 爱发电 から取得したアクティベーショントークンを入力してください。",
+    "activate": "アクティベート",
+    "invalidToken": "形式が無効です。BS-SP-XXXXXXXX または Gumroad ライセンスキーを入力してください。",
+    "networkError": "ネットワークエラーです。接続を確認して再試行してください。",
+    "maxDevices": "デバイス上限に達しました（3台）。他のデバイスで無効化してください。",
+    "activationFailed": "アクティベーションに失敗しました。トークンを確認して再試行してください。",
+    "activationSuccess": "アクティベーション成功！すべてのプレミアムテーマがアンロックされました。",
+    "activatedTitle": "サポートパック有効",
+    "activatedDescription": "すべてのプレミアムテーマがアンロックされています。Better Sidebar をご支援いただきありがとうございます！",
+    "deactivate": "無効化"
   }
 }
