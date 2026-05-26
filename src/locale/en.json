@@ -653,8 +653,8 @@
     "additionalFeatures": "Additional Features",
     "autoHideInput": "Auto-hide Input",
     "autoHideInputDesc": "Hide input box until you hover the bottom area",
-    "autoHideRunSettings": "Auto-hide Run Settings",
-    "autoHideRunSettingsDesc": "Hide run settings panel until you hover the area"
+    "autoHideRunSettings": "Collapse Run Settings by Default",
+    "autoHideRunSettingsDesc": "Run settings panel stays collapsed when opening a chat, expand manually when needed"
   },
   "topBarTag": {
     "removeTag": "Remove tag",

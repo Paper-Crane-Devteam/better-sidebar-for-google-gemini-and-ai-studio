@@ -653,8 +653,8 @@
     "additionalFeatures": "Recursos Adicionais",
     "autoHideInput": "Ocultar entrada automaticamente",
     "autoHideInputDesc": "Ocultar a caixa de entrada até passar o cursor na área inferior",
-    "autoHideRunSettings": "Ocultar configurações de execução automaticamente",
-    "autoHideRunSettingsDesc": "Ocultar o painel de configurações de execução até passar o cursor na área"
+    "autoHideRunSettings": "Recolher Configurações de Execução por Padrão",
+    "autoHideRunSettingsDesc": "O painel de configurações de execução permanece recolhido ao abrir um chat, expanda manualmente quando necessário"
   },
   "topBarTag": {
     "removeTag": "Remover tag",

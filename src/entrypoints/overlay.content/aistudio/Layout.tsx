@@ -47,7 +47,7 @@ export async function initAiStudioOverlay(mainStyles: string): Promise<void> {
 
   const wrapper = document.createElement('div');
   wrapper.id = 'better-sidebar-for-google-ai-studio-sidebar-wrapper';
-  anchor.insertBefore(wrapper, anchor.firstChild);
+  anchor?.insertBefore(wrapper, anchor.firstChild);
 
   const syncSidebarWithNavbar = async () => {
     try {
@@ -75,13 +75,12 @@ export async function initAiStudioOverlay(mainStyles: string): Promise<void> {
   const sidebarStyle = document.createElement('style');
   sidebarStyle.id = 'better-sidebar-for-google-ai-studio-sidebar-styles';
   
-  // Function to update sidebar width based on layout density
-  const updateSidebarWidth = (density: 'compact' | 'relaxed') => {
-    const width = density === 'compact' ? '300px' : '320px';
+  // Function to update sidebar width based on user setting
+  const updateSidebarWidth = (widthPx: number) => {
     sidebarStyle.textContent = `
       #better-sidebar-for-google-ai-studio-sidebar-wrapper {
         height: 100%;
-        width: ${width};
+        width: ${widthPx}px;
         flex-shrink: 0;
         box-sizing: border-box;
         transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -104,13 +103,15 @@ export async function initAiStudioOverlay(mainStyles: string): Promise<void> {
     `;
   };
 
-  // Initial width based on current density
-  updateSidebarWidth(useSettingsStore.getState().layoutDensity);
+  // Initial width based on current store value
+  const initialWidth = useSettingsStore.getState().enhancedFeatures.aistudio?.sidebarWidth ?? 320;
+  updateSidebarWidth(initialWidth);
   document.head.appendChild(sidebarStyle);
 
-  // Subscribe to density changes
+  // Subscribe to sidebarWidth changes from the store
   useSettingsStore.subscribe((state) => {
-    updateSidebarWidth(state.layoutDensity);
+    const width = state.enhancedFeatures.aistudio?.sidebarWidth ?? 320;
+    updateSidebarWidth(width);
   });
 
   // Prevent keyboard/mouse events from bubbling to AI Studio's native listeners

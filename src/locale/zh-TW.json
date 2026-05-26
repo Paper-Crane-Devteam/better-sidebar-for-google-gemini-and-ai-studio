@@ -653,8 +653,8 @@
     "additionalFeatures": "額外功能",
     "autoHideInput": "自動隱藏輸入框",
     "autoHideInputDesc": "滑鼠懸停在底部區域時才顯示輸入框",
-    "autoHideRunSettings": "自動隱藏執行設定",
-    "autoHideRunSettingsDesc": "滑鼠懸停在該區域時才顯示執行設定面板"
+    "autoHideRunSettings": "預設收起執行設定",
+    "autoHideRunSettingsDesc": "開啟對話時不自動展開執行設定面板，需手動開啟"
   },
   "topBarTag": {
     "removeTag": "移除標籤",

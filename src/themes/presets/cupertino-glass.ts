@@ -129,9 +129,9 @@ body.bs-theme--cupertino-glass *:not(.material-symbols-outlined):not(.material-s
     { property: '--gem-sys-color--tertiary-container', value: '#f2f2f7' },
 
     // ─── Outline / Border (极细微) ──────────────────────────────────
-    { property: '--gem-sys-color--outline', value: '#c7c7cc' },
-    { property: '--gem-sys-color--outline-variant', value: '#d1d1d6' },
-    { property: '--gem-sys-color--outline-low', value: '#e5e5ea' },
+    { property: '--gem-sys-color--outline', value: '#d1d1d6' },
+    { property: '--gem-sys-color--outline-variant', value: 'rgba(0, 0, 0, 0.08)' },
+    { property: '--gem-sys-color--outline-low', value: 'rgba(0, 0, 0, 0.04)' },
 
     // ─── Inverse ────────────────────────────────────────────────────
     { property: '--gem-sys-color--inverse-surface', value: '#1c1c1e' },
@@ -164,7 +164,7 @@ body.bs-theme--cupertino-glass *:not(.material-symbols-outlined):not(.material-s
     { property: '--mat-menu-container-color', value: 'rgba(246,246,246,0.55)' },
     { property: '--mat-menu-item-label-text-color', value: '#1d1d1f' },
     { property: '--mat-menu-item-icon-color', value: '#48484a' },
-    { property: '--mat-menu-divider-color', value: '#e5e5ea' },
+    { property: '--mat-menu-divider-color', value: 'rgba(0, 0, 0, 0.06)' },
     {
       property: '--mat-menu-container-elevation-shadow',
       value: '0px 4px 24px rgba(0,0,0,0.12), 0px 1px 4px rgba(0,0,0,0.08)',
@@ -232,8 +232,8 @@ body.bs-theme--cupertino-glass *:not(.material-symbols-outlined):not(.material-s
     { property: '--accent-foreground', value: '0 58 122' },
     { property: '--destructive', value: '255 59 48' },        // #ff3b30
     { property: '--destructive-foreground', value: '255 255 255' },
-    { property: '--border', value: '209 209 214' },           // #d1d1d6
-    { property: '--input', value: '199 199 204' },            // #c7c7cc
+    { property: '--border', value: '230 230 235' },           // lighter, less muddy
+    { property: '--input', value: '220 220 225' },            // softer input border
     { property: '--ring', value: '0 122 255' },
     { property: '--sidebar-icon-color', value: '72 72 74' },  // #48484a
     { property: '--font-sans', value: '-apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", "Helvetica Neue", sans-serif' },

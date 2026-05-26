@@ -101,7 +101,7 @@ const useTemporaryChatToggle = () => {
 
     // Navigate to new chat first, then wait for the temp chat button to appear
     const newChatBtn = document.querySelector(
-      'bard-sidenav .overflow-container gem-nav-list-item',
+      'bard-sidenav .overflow-container gem-nav-list-item a',
     ) as HTMLElement;
     if (newChatBtn) {
       newChatBtn.click();

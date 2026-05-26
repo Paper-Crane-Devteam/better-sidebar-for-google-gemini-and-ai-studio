@@ -652,8 +652,8 @@
     "additionalFeatures": "额外功能",
     "autoHideInput": "自动隐藏输入框",
     "autoHideInputDesc": "隐藏输入框，鼠标悬停底部时自动显示",
-    "autoHideRunSettings": "自动隐藏运行设置",
-    "autoHideRunSettingsDesc": "隐藏运行设置面板，鼠标悬停时自动显示"
+    "autoHideRunSettings": "默认收起运行设置",
+    "autoHideRunSettingsDesc": "打开对话时不自动展开运行设置面板，需手动打开"
   },
   "topBarTag": {
     "removeTag": "移除标签",

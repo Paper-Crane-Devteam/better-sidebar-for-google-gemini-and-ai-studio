@@ -654,8 +654,8 @@
     "additionalFeatures": "追加機能",
     "autoHideInput": "入力欄の自動非表示",
     "autoHideInputDesc": "下部エリアにホバーするまで入力欄を非表示にする",
-    "autoHideRunSettings": "実行設定の自動非表示",
-    "autoHideRunSettingsDesc": "エリアにホバーするまで実行設定パネルを非表示にする"
+    "autoHideRunSettings": "実行設定をデフォルトで折りたたむ",
+    "autoHideRunSettingsDesc": "チャットを開いた時に実行設定パネルを自動展開しない（手動で開く）"
   },
   "topBarTag": {
     "removeTag": "タグを削除",

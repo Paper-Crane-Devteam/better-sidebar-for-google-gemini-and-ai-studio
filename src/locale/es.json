@@ -653,8 +653,8 @@
     "additionalFeatures": "Funciones Adicionales",
     "autoHideInput": "Ocultar Entrada Automáticamente",
     "autoHideInputDesc": "Ocultar el cuadro de entrada hasta que pases el cursor por la zona inferior",
-    "autoHideRunSettings": "Ocultar Configuración de Ejecución Automáticamente",
-    "autoHideRunSettingsDesc": "Ocultar el panel de configuración de ejecución hasta que pases el cursor por la zona"
+    "autoHideRunSettings": "Contraer Configuración de Ejecución por Defecto",
+    "autoHideRunSettingsDesc": "El panel de configuración de ejecución permanece contraído al abrir un chat, expandir manualmente cuando sea necesario"
   },
   "topBarTag": {
     "removeTag": "Eliminar etiqueta",

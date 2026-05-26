@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSettingsStore } from '@/shared/lib/settings-store';
+import { useCurrentConversationId } from '@/entrypoints/overlay.content/shared/hooks/useCurrentConversationId';
 
 /**
  * Auto-hide input feature for Gemini conversation pages.
@@ -9,6 +10,7 @@ import { useSettingsStore } from '@/shared/lib/settings-store';
  * - Its child `fieldset` gets `position: absolute` to visually slide down
  * - On `input-container:hover` or `input-container:focus-within`, fieldset slides back up
  * - When `.cdk-overlay-container` has children (popups/dropdowns open), keep fieldset visible
+ * - On conversation switch (detected via useCurrentConversationId), temporarily reveal fieldset
  *
  * Uses a MutationObserver on .cdk-overlay-container to toggle a body class
  * that forces fieldset to stay visible via CSS.
@@ -17,6 +19,48 @@ export const AutoHideInputFeature = () => {
   const autoHideInput = useSettingsStore(
     (s) => s.enhancedFeatures.gemini.autoHideInput,
   );
+  const conversationId = useCurrentConversationId();
+  const prevConversationIdRef = useRef<string | null | undefined>(undefined);
+
+  // Temporarily reveal input when conversation switches
+  useEffect(() => {
+    // Skip the initial mount (undefined → first value)
+    if (prevConversationIdRef.current === undefined) {
+      prevConversationIdRef.current = conversationId;
+      return;
+    }
+
+    // Only reveal when switching between conversations (both old and new are non-null)
+    if (
+      autoHideInput &&
+      conversationId &&
+      prevConversationIdRef.current &&
+      conversationId !== prevConversationIdRef.current
+    ) {
+      document.body.classList.add('bs-input-reveal');
+
+      // Focus the contenteditable input so user can start typing immediately.
+      // Once focused, :focus-within keeps the fieldset visible — no timeout needed.
+      const focusTimer = setTimeout(() => {
+        const editableDiv = document.querySelector(
+          'rich-textarea > div[contenteditable]',
+        ) as HTMLElement | null;
+        if (editableDiv) {
+          editableDiv.focus();
+          // :focus-within now keeps it visible, remove the reveal class
+          document.body.classList.remove('bs-input-reveal');
+        }
+      }, 300);
+
+      prevConversationIdRef.current = conversationId;
+      return () => {
+        clearTimeout(focusTimer);
+        document.body.classList.remove('bs-input-reveal');
+      };
+    }
+
+    prevConversationIdRef.current = conversationId;
+  }, [conversationId, autoHideInput]);
 
   useEffect(() => {
     const styleId = 'better-sidebar-auto-hide-input';
@@ -26,6 +70,7 @@ export const AutoHideInputFeature = () => {
     if (!autoHideInput) {
       if (styleEl) styleEl.remove();
       document.body.classList.remove('bs-overlay-open');
+      document.body.classList.remove('bs-input-reveal');
       return;
     }
 
@@ -38,12 +83,6 @@ export const AutoHideInputFeature = () => {
     };
 
     // Watch .cdk-overlay-container for children (popups/dropdowns)
-    // Only keep fieldset visible if it's currently in the "shown" state
-    // (i.e., input-container is hovered or focused), because some overlays
-    // are unrelated to the input area.
-    // Note: .cdk-overlay-container may not exist initially — it's created
-    // lazily on first popup. We use a MutationObserver on body to detect
-    // when it appears, then attach a child observer to it.
     const setupOverlayObserver = () => {
       const tryAttach = () => {
         const overlayContainer = document.querySelector('.cdk-overlay-container');
@@ -92,6 +131,11 @@ export const AutoHideInputFeature = () => {
     const applyStyle = () => {
       if (!isConversationPage()) {
         if (styleEl) styleEl.textContent = '';
+        // When navigating back to new chat, our absolute positioning CSS is removed.
+        // Gemini's layout may have stale calculations — fire resize to fix it.
+        requestAnimationFrame(() => {
+          window.dispatchEvent(new Event('resize'));
+        });
         return;
       }
 
@@ -110,7 +154,7 @@ export const AutoHideInputFeature = () => {
         /* fieldset is the visual element that hides/shows */
         input-container > fieldset {
           position: absolute !important;
-          transform: translateY(100%);
+          transform: translateY(101px);
           transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease;
           opacity: 0.3;
         }
@@ -127,6 +171,13 @@ export const AutoHideInputFeature = () => {
           transform: translateY(-12px) !important;
           opacity: 1 !important;
         }
+
+        /* Temporarily reveal on conversation switch */
+        body.bs-input-reveal input-container > fieldset {
+          transform: translateY(-12px) !important;
+          opacity: 1 !important;
+          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease !important;
+        }
       `;
 
       setupOverlayObserver();
@@ -134,7 +185,7 @@ export const AutoHideInputFeature = () => {
 
     applyStyle();
 
-    // Re-apply on SPA navigation
+    // Re-apply on SPA navigation (title changes)
     const navObserver = new MutationObserver(() => {
       requestAnimationFrame(applyStyle);
     });
@@ -152,6 +203,7 @@ export const AutoHideInputFeature = () => {
       if (overlayObserver) overlayObserver.disconnect();
       window.removeEventListener('popstate', applyStyle);
       document.body.classList.remove('bs-overlay-open');
+      document.body.classList.remove('bs-input-reveal');
       if (styleEl) styleEl.remove();
     };
   }, [autoHideInput]);
