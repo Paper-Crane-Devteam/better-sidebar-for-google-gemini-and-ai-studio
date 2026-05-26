@@ -52,6 +52,8 @@ import { GuidedTour } from '../shared/modules/guided-tour/GuidedTour';
 import { TourPromptDialog } from '../shared/modules/guided-tour/TourPromptDialog';
 import { useGuidedTour } from '../shared/modules/guided-tour/useGuidedTour';
 import { GEMINI_TOUR_STEPS } from '../shared/modules/guided-tour/tour-steps';
+import { useBadgeStore } from '@/shared/lib/badge-store';
+import { BadgeDot } from '@/shared/components/ui/badge-dot';
 
 export const OverlayPanel = ({ className }: { className?: string }) => {
   const moduleConfig = useModuleConfig();
@@ -62,6 +64,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
 
   const layoutDensity = useSettingsStore((state) => state.layoutDensity);
   const shortcuts = useSettingsStore((state) => state.shortcuts);
+  const hasSettingsBadge = useBadgeStore((s) => s.isGroupVisible('settings.'));
 
   const {
     fetchData,
@@ -257,9 +260,10 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               variant={isSettingsOpen ? 'secondary' : 'ghost'}
               size="icon"
               onClick={() => handleTabChange('settings')}
-              className="sidebar-btn transition-all"
+              className="sidebar-btn transition-all relative"
             >
               <Settings className="sidebar-icon" />
+              <BadgeDot visible={hasSettingsBadge} className="absolute top-1.5 right-1.5" />
             </Button>
           </SimpleTooltip>
         </div>
@@ -407,10 +411,11 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               variant={isSettingsOpen ? 'secondary' : 'ghost'}
               size="icon"
               onClick={() => handleTabChange('settings')}
-              className="sidebar-btn transition-all"
+              className="sidebar-btn transition-all relative"
               data-tour-id="tour-settings"
             >
               <Settings className="sidebar-icon" />
+              <BadgeDot visible={hasSettingsBadge} className="absolute top-1.5 right-1.5" />
             </Button>
           </SimpleTooltip>
         </div>

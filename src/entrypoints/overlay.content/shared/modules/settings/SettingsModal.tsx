@@ -11,6 +11,8 @@ import { SupportPackSettings } from './modules/SupportPackSettings';
 import { PlatformSettings } from './modules/PlatformSettings';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { detectPlatform, Platform } from '@/shared/types/platform';
+import { useBadgeStore } from '@/shared/lib/badge-store';
+import { BadgeDot } from '@/shared/components/ui/badge-dot';
 
 interface SettingsModalProps {
     open: boolean;
@@ -19,28 +21,46 @@ interface SettingsModalProps {
 
 type Section = 'general' | 'theme' | 'explorer' | 'data' | 'platform' | 'supportpack' | 'sponsor' | 'about';
 
+/**
+ * NavButton automatically shows a red dot if `settings.{id}` is an active badge.
+ * Clicking it dismisses the badge. No manual showBadge prop needed.
+ */
 const NavButton = ({ 
     id, 
     label, 
     icon: Icon, 
     activeSection, 
-    setActiveSection 
+    setActiveSection,
 }: { 
     id: Section; 
     label: string; 
     icon: any;
     activeSection: Section;
     setActiveSection: (s: Section) => void;
-}) => (
-    <Button
-        variant={activeSection === id ? "secondary" : "ghost"}
-        className="w-full justify-start"
-        onClick={() => setActiveSection(id)}
-    >
-        <Icon className="mr-2 h-4 w-4" />
-        {label}
-    </Button>
-);
+}) => {
+    const badgeKey = `settings.${id}`;
+    const showBadge = useBadgeStore((s) => s.isVisible(badgeKey));
+    const dismiss = useBadgeStore((s) => s.dismiss);
+
+    const handleClick = () => {
+        setActiveSection(id);
+        if (showBadge) dismiss(badgeKey);
+    };
+
+    return (
+        <Button
+            variant={activeSection === id ? "secondary" : "ghost"}
+            className="w-full justify-start"
+            onClick={handleClick}
+        >
+            <Icon className="mr-2 h-4 w-4" />
+            <span className="relative">
+                {label}
+                {showBadge && <BadgeDot className="absolute -top-1 -right-2.5" />}
+            </span>
+        </Button>
+    );
+};
 
 export const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
     const { t } = useI18n();

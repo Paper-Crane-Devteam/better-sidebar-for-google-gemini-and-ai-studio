@@ -41,6 +41,8 @@ import { useUrl } from '@/shared/hooks/useUrl';
 import { useModuleConfig } from './useModuleConfig';
 import { detectAccount } from '@/entrypoints/content/shared/detect-account';
 import { Platform } from '@/shared/types/platform';
+import { useBadgeStore } from '@/shared/lib/badge-store';
+import { BadgeDot } from '@/shared/components/ui/badge-dot';
 
 export const OverlayPanel = ({ className }: { className?: string }) => {
   const moduleConfig = useModuleConfig();
@@ -52,6 +54,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
   const layoutDensity = useSettingsStore((state) => state.layoutDensity);
   const newChatBehavior = useSettingsStore((state) => state.newChatBehavior);
   const shortcuts = useSettingsStore((state) => state.shortcuts);
+  const hasSettingsBadge = useBadgeStore((s) => s.isGroupVisible('settings.'));
   const {
     fetchData,
     ui,
@@ -360,9 +363,10 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
             variant={isSettingsOpen ? 'secondary' : 'ghost'}
             size="icon"
             onClick={() => handleTabChange('settings')}
-            className="sidebar-btn transition-all"
+            className="sidebar-btn transition-all relative"
           >
             <Settings className="sidebar-icon" />
+            <BadgeDot visible={hasSettingsBadge} className="absolute top-1.5 right-1.5" />
           </Button>
         </SimpleTooltip>
       </div>
