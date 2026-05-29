@@ -12,7 +12,7 @@ import { scanGems } from './tasks/scan-gems';
 import { notebookListScanner, scanNotebooks } from './tasks/scan-notebooks';
 
 import { syncConversations } from './tasks/sync-conversations';
-// import { initImageProcessor } from './tasks/process-images';
+import { initImageProcessor } from './tasks/process-images';
 import { detectAccount } from '../shared/detect-account';
 import i18n from '@/locale/i18n';
 
@@ -67,9 +67,9 @@ export async function initGemini() {
   notebookListScanner.start();
 
   // Start image watermark processor (MutationObserver on img tags)
-  // initImageProcessor().catch((e) => {
-  //   console.error('Better Sidebar: Image processor init failed', e);
-  // });
+  initImageProcessor().catch((e) => {
+    console.error('Better Sidebar: Image processor init failed', e);
+  });
 
   // Inject Main World Script
   const script = document.createElement('script');

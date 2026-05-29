@@ -297,8 +297,8 @@ export const GeminiUIControl = () => {
                   />
                 </div> */}
 
-                {/* [DEPRECATED] Remove AI Sparkle Image Watermark - Gemini no longer adds watermarks to downloads */}
-                {/* <div className="flex items-center justify-between group">
+                {/* Remove AI Sparkle Image Watermark */}
+                <div className="flex items-center justify-between group">
                   <div className="space-y-0.5">
                     <Label
                       className="text-xs font-semibold cursor-pointer"
@@ -314,7 +314,7 @@ export const GeminiUIControl = () => {
                     checked={removeWatermark}
                     onCheckedChange={(c) => setRemoveWatermark(c)}
                   />
-                </div> */}
+                </div>
 
                 {/* Smart Scrollbar */}
                 <div className="flex items-center justify-between group">
