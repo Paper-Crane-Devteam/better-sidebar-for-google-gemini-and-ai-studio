@@ -2,6 +2,29 @@ import type { ChangeLogItem } from './types';
 
 export const changelog: ChangeLogItem[] = [
   {
+    version: '2.6.0',
+    date: '2026-05-29',
+    features: [
+      '🎛️ **Controles de UI de AI Studio**: Ancho de barra lateral configurable, ocultar automáticamente el cuadro de entrada y el panel de configuración de ejecución para un espacio de trabajo más limpio.',
+      '💬 **Nuevo chat rápido**: Al crear una nueva conversación, aparece una entrada instantáneamente — establece el título antes de que se cree el chat para un flujo más ágil.',
+      '🎨 **Configuración de UI de Gemini**: Nuevas opciones de configuración de UI de Gemini en el panel de ajustes.',
+      '🖼️ **Eliminación de marca de agua**: Se reactivó la eliminación de marca de agua para las descargas de imágenes de Gemini.',
+    ],
+    fixes: [
+      'Corregido el problema de Scan Library que no funcionaba en AI Studio.',
+      'Corregida la imposibilidad de escribir la letra "R" mayúscula en AI Studio.',
+      'Adaptado al último rediseño de la UI de Gemini.',
+      'Corregidos problemas de visualización de la barra lateral en ventanas estrechas/móviles en Gemini.',
+    ],
+    announcement: {
+      title: 'Supporter Pack 🎨',
+      content: [
+        '**3 temas exclusivos** ahora disponibles como Supporter Pack — una forma de personalizar tu barra lateral mientras apoyas el proyecto.',
+        'Todas las funciones principales siguen siendo **100% gratuitas**. Esta extensión se desarrolla en mi tiempo libre, y tu apoyo me ayuda a seguir manteniendo y desarrollando nuevas funciones. ¡Gracias! ❤️',
+      ],
+    },
+  },
+  {
     version: '2.5.0',
     date: '2026-05-14',
     features: [

@@ -17,7 +17,7 @@ import { create } from 'zustand';
 
 // ─── Configuration ───────────────────────────────────────────────────────────
 // Bump this when you want badges to re-appear for a new release.
-export const BADGE_VERSION = '2.5.1';
+export const BADGE_VERSION = '2.6.0';
 
 // Keys of badges that should show for this version.
 export const ACTIVE_BADGES: string[] = [

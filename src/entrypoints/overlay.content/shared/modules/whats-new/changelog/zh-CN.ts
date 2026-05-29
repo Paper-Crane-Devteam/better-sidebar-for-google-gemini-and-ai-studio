@@ -2,6 +2,29 @@ import type { ChangeLogItem } from './types';
 
 export const changelog: ChangeLogItem[] = [
   {
+    version: '2.6.0',
+    date: '2026-05-29',
+    features: [
+      '🎛️ **AI Studio UI 控制**：可配置侧边栏宽度、自动隐藏输入框、自动隐藏运行设置面板，打造更清爽的工作区。',
+      '💬 **快速新建对话**：点击新建对话时立即显示入口，可在对话创建前设置标题，流程更顺畅。',
+      '🎨 **Gemini UI 设置**：设置面板中新增 Gemini UI 相关配置选项。',
+      '🖼️ **图片水印移除**：重新启用 Gemini 图片下载的水印移除功能。',
+    ],
+    fixes: [
+      '修复了 AI Studio 中 Scan Library 不工作的问题。',
+      '修复了 AI Studio 中无法输入大写字母 "R" 的问题。',
+      '适配了最新的 Gemini UI 改版。',
+      '修复了 Gemini 窄窗口/移动端宽度下侧边栏显示异常的问题。',
+    ],
+    announcement: {
+      title: '支持者皮肤包 🎨',
+      content: [
+        '**3 款独家主题皮肤**现已上线 — 一种个性化你的侧边栏的方式，同时也是对项目的支持。',
+        '所有核心功能保持**完全免费**。这个扩展是我利用工作之余开发的，你的支持能帮助我更好地维护和开发新功能。感谢！❤️',
+      ],
+    },
+  },
+  {
     version: '2.5.0',
     date: '2026-05-14',
     features: [

@@ -15,19 +15,23 @@ If you use **Gemini** or **Google AI Studio** heavily, you know the struggle: yo
 
 We built this extension to fix that. It gives you a clean, organized sidebar with folders, tags, and a powerful search engine that actually works across **both platforms**—all while keeping your data 100% local and private.
 
-## 🚀 What's New in v2.5.0
+## 🚀 What's New in v2.6.0
 
-### � Notebook Integration (Gemini)
+### 🎛️ AI Studio UI Controls
 
-Full notebook support — browse, organize, and manage your Gemini notebooks right from the sidebar.
+Configurable sidebar width, auto-hide input box, and auto-hide run settings panel — tailor your workspace to your preference.
 
-### ☁️ Auto Google Drive Sync
+### 💬 Quick New Chat
 
-Your settings and prompt library now sync to Google Drive automatically in the background. No more manual backups.
+Creating a new conversation now instantly shows an entry. Set the title before the chat is even created for a smoother workflow.
 
-### ✨ UX Improvements
+### 🎨 Gemini UI Settings
 
-Added loading states when creating conversations, plus various interaction polish for a smoother experience.
+New Gemini UI configuration options in the settings panel, plus adaptation to the latest Gemini UI redesign.
+
+### ❤️ Supporter Pack
+
+3 exclusive themes are now available as a Supporter Pack. All core features remain 100% free — this extension is built in spare time, and your support helps keep it maintained and growing.
 
 ---
 
@@ -87,6 +91,8 @@ We're just getting started. Here is what's on our mind:
 - [x] **True Rename & Delete** (Done in v2.4.0!)
 - [x] **Notebook Integration** (Done in v2.5.0!)
 - [x] **Auto Google Drive Sync** (Done in v2.5.0!)
+- [x] **AI Studio UI Controls** (Done in v2.6.0!)
+- [x] **Supporter Pack** (Done in v2.6.0!)
 - [ ] **Additional Platform Support**: Maybe bring this to ChatGPT or Claude?
 - [ ] **AI Auto-Tagging**: Using a local LLM to help organize your chats automatically.
 

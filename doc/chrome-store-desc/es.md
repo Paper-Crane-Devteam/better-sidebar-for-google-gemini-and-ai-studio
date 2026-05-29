@@ -5,86 +5,88 @@ Conoce Better Sidebar for Gemini & AI Studio — el potenciador de flujo de trab
 
 Transformamos la interfaz predeterminada de AI Studio en una base de conocimientos poderosa y organizada. Deja de desplazarte sin fin y comienza a organizar tus ideas de manera eficiente.
 
-🔥 NOVEDADES (v2.5.0)
-• 📓 Integración de Notebook (Gemini): Soporte completo de Notebook — navega, organiza y gestiona tus Gemini Notebooks directamente desde la barra lateral.
-• ☁️ Sincronización automática con Google Drive: Tus configuraciones y biblioteca de prompts ahora se sincronizan automáticamente con Google Drive. No más copias de seguridad manuales.
-• ✨ Mejoras de UX: Se añadieron estados de carga al crear conversaciones, además de varias mejoras de interacción para una experiencia más fluida.
+🔥 NOVEDADES (v2.6.0)
+• 🎛️ Controles de UI de AI Studio: Ancho de barra lateral configurable, ocultar automáticamente el cuadro de entrada y el panel de configuración de ejecución.
+• 💬 Nuevo chat rápido: Al crear una conversación, aparece una entrada instantáneamente — establece el título antes de que se cree el chat.
+• 🎨 Configuración de UI de Gemini: Nuevas opciones de configuración de UI de Gemini en el panel de ajustes.
+• 🖼️ Eliminación de marca de agua: Se reactivó la eliminación de marca de agua para las descargas de imágenes de Gemini.
+• ❤️ Supporter Pack: 3 temas exclusivos disponibles. Todas las funciones principales siguen siendo 100% gratuitas.
 
 ---
 
 🚀 CARACTERÍSTICAS PRINCIPALES
 
-🌟 Soporte Multiplataforma
-Gestiona conversaciones tanto en Gemini como en Google AI Studio sin problemas en una sola barra lateral unificada.
-
-👥 Perfiles Multicuenta
-Crea perfiles separados para uso laboral o personal. Cada uno mantiene su propia base de datos independiente.
-
-🔍 Búsqueda Encadenada
-Filtra conversaciones combinando múltiples condiciones — título, etiqueta y tipo — para resultados ultra precisos.
-
-💎 Gestión de Gems
-Integración completa de Gems — explora, filtra, crea e inicia conversaciones con tus Gems desde la barra lateral.
-
-📜 Barra de Desplazamiento Inteligente
-Una barra visual para conversaciones de Gemini. Salta directamente a cualquier mensaje en chats largos.
-
-🤖 Modelo Predeterminado
-Establece un modelo predeterminado para Gemini y cada nueva conversación lo usará automáticamente.
-
-✏️ Renombrado Real
-Renombra conversaciones y los cambios se sincronizan con los servidores de Google en tiempo real.
-
-🗑️ Eliminación Real y por Lotes
-Elimina conversaciones con eliminación real del lado del servidor. No más chats fantasma.
-
-🔐 Sesión Persistente
-Mantén tu sesión iniciada entre sesiones con fusión inteligente de datos sincronizados.
+📂 BARRA LATERAL Y ORGANIZACIÓN
 
 📂 Carpetas y Colores
 Arrastra y suelta tus chats en carpetas anidadas. Asigna colores personalizados a carpetas y etiquetas.
 
-📝 Biblioteca de Prompts
-Construye tu biblioteca personal de prompts reutilizables. Soporta variables de opción, composición de prompts y sistemas.
+🔍 Búsqueda y Filtrado
+Búsqueda de texto completo en todos los mensajes. Combina múltiples condiciones — título, etiqueta, tipo — para resultados precisos. Busca dentro del chat activo.
 
-📓 Integración de Notebook (NUEVO)
-Soporte completo de Notebook para Gemini — navega, organiza y gestiona tus Notebooks directamente desde la barra lateral.
-
-☁️ Sincronización Automática con Google Drive
-Tus configuraciones y biblioteca de prompts se sincronizan automáticamente con Google Drive en segundo plano. Siempre con respaldo.
-
-🔍 Búsqueda de Precisión
-Realiza búsquedas de texto completo en cada mensaje de tu historial. Limita la búsqueda al chat activo.
-
-🎨 Personalización de la UI
-Controles de diseño avanzados para Gemini, incluyendo el Modo Enfoque.
-
-⚙️ Gestor de Plataformas
-Usa el popup de la extensión para saltar rápidamente entre plataformas o habilitar/deshabilitarlas.
-
-🏷️ Sistema de Etiquetas Inteligente
-Asigna etiquetas personalizadas a tus conversaciones, ahora visibles directamente en el encabezado del chat.
+🏷️ Etiquetas Inteligentes
+Asigna etiquetas personalizadas, visibles directamente en el encabezado del chat. Filtrado instantáneo por etiqueta.
 
 ⭐ Favoritos y Fijación
-Mantén tus chats o prompts más utilizados en la parte superior para acceso rápido.
-
-🔄 Sincronización Automática
-Tus últimas conversaciones se sincronizan automáticamente en segundo plano cuando visitas la página.
+Mantén tus chats o prompts más importantes en la parte superior para acceso rápido.
 
 📊 Vista de Línea de Tiempo
-Visualiza tu flujo de trabajo con una línea de tiempo de "Hoy", "Ayer" y "Semana Pasada".
+Visualiza tu flujo de trabajo con agrupaciones de "Hoy", "Ayer" y "Semana Pasada".
 
-🖼️ Descarga de Imágenes sin Marca de Agua
-Elimina automáticamente las marcas de agua al descargar imágenes generadas en Gemini, incluyendo imágenes HD de cuentas Pro.
+🗑️ Eliminación por Lotes
+Elimina conversaciones por lotes con eliminación real del lado del servidor. No más chats fantasma.
 
 📥 Exportar Conversaciones
-Exporta tus conversaciones como Markdown, texto plano o JSON para documentación o respaldo.
+Exporta conversaciones como Markdown, texto plano o JSON.
 
-🌗 Integración Perfecta
-Se sincroniza automáticamente con los modos Claro y Oscuro de la plataforma.
+---
 
-💾 Respaldo Seguro de Datos
-Tus datos son tuyos. Exporta tu estructura de organización (volcado SQL) para respaldo.
+🎨 PERSONALIZACIÓN DE UI
+
+Gemini:
+• Ajusta el ancho de la barra lateral, contenido del chat y cuadro de entrada
+• Modo Enfoque — oculta elementos innecesarios (logo, disclaimer, botón de upgrade)
+• Barra de desplazamiento inteligente — salta directamente a cualquier mensaje
+• Descarga de imágenes sin marca de agua (incluyendo HD de cuentas Pro)
+
+AI Studio:
+• Ancho de barra lateral configurable
+• Ocultar automáticamente el cuadro de entrada
+• Ocultar automáticamente el panel de configuración de ejecución
+
+🎨 Temas
+3 temas exclusivos (Supporter Pack). Detección automática de modo claro/oscuro.
+
+---
+
+💎 GEMS, NOTEBOOKS Y PROMPTS
+
+💎 Gestión de Gems
+Integración completa de Gems — explora, filtra, crea e inicia conversaciones con Gems desde la barra lateral.
+
+📓 Integración de Notebook
+Soporte completo de Notebook para Gemini — navega, organiza y gestiona tus Notebooks desde la barra lateral.
+
+📝 Biblioteca de Prompts
+Construye tu biblioteca personal de prompts reutilizables. Soporta variables de opción, composición e importación de prompts del sistema.
+
+☁️ Sincronización Automática con Google Drive
+Configuraciones y biblioteca de prompts se sincronizan automáticamente con Google Drive en segundo plano.
+
+---
+
+⚙️ MÁS
+
+🌟 Soporte Multiplataforma
+Gestiona conversaciones de Gemini y Google AI Studio en una sola barra lateral unificada.
+
+👥 Perfiles Multicuenta
+Crea perfiles separados para uso laboral o personal con bases de datos independientes.
+
+💾 Control de Datos
+Tus datos son tuyos. Exporta tu estructura (volcado SQL) para respaldo en cualquier momento.
+
+---
 
 🔒 PRIVACY FIRST
 
@@ -95,7 +97,7 @@ Nos tomamos tu privacidad en serio.
 • Sin Entrenamiento: No leemos tus conversaciones para entrenar ningún modelo de IA.
 
 ¿Por qué la extensión necesita permisos?
-Requerimos acceso a aistudio.google.com y gemini.google.com únicamente para inyectar la interfaz de barra lateral mejorada y leer títulos de chat para organización. No accedemos a tu otro historial de navegación.
+Requerimos acceso a aistudio.google.com y gemini.google.com únicamente para inyectar la interfaz de barra lateral mejorada y leer títulos de chat para organización.
 
 ---
 
