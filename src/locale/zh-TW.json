@@ -262,6 +262,7 @@
     "codex": "Codex",
     "myStuff": "我的內容",
     "gems": "Gems",
+    "notebooks": "筆記本",
     "originalUI": "切換到原始側邊欄"
   },
   "overlay": {
@@ -744,7 +745,14 @@
     "customThemesDescription": "為 Gemini 介面套用自訂視覺主題。這些主題會覆蓋預設配色方案。",
     "default": "預設",
     "defaultDescription": "預設主題，支援淺色/深色模式切換",
+    "classic": "Gemini 經典",
     "classicDescription": "經典 Gemini 外觀，冷藍色調面板",
+    "cupertinoGlassName": "果味毛玻璃",
+    "cupertinoGlassDescription": "磨砂玻璃質感，系統原生字體，極簡黑白灰，純粹生產力",
+    "grimoireName": "魔法卷軸",
+    "grimoireDescription": "羊皮紙質感，溫暖做舊色調，襯線字體，沉浸式奇幻體驗",
+    "retroTerminalName": "復古終端機",
+    "retroTerminalDescription": "純黑底色，螢光綠文字，等寬字體，硬核極客命令控制台",
     "previewBannerText": "預覽模式 — 主題將在 5 分鐘後恢復預設。購買可永久使用。",
     "buyNow": "立即購買"
   },

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback } from 'react';
 import { Button } from '../../../components/ui/button';
 import { Separator } from '../../../components/ui/separator';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
@@ -17,6 +17,23 @@ import {
 
 /** Preview duration: 5 minutes */
 const PREVIEW_DURATION_MS = 5 * 60 * 1000;
+
+/**
+ * Module-level preview timer — survives component unmount/remount.
+ */
+let modulePreviewTimer: ReturnType<typeof setTimeout> | null = null;
+
+function startModulePreviewTimer(onExpire: () => void) {
+  clearModulePreviewTimer();
+  modulePreviewTimer = setTimeout(onExpire, PREVIEW_DURATION_MS);
+}
+
+function clearModulePreviewTimer() {
+  if (modulePreviewTimer) {
+    clearTimeout(modulePreviewTimer);
+    modulePreviewTimer = null;
+  }
+}
 
 /**
  * Theme card preview colors for each preset
@@ -45,6 +62,22 @@ const themePreviewColors: Record<
   },
 };
 
+/** Map theme preset ID to i18n keys */
+const themeI18nKeys: Record<ThemePresetId, { name: string; description: string }> = {
+  'cupertino-glass': {
+    name: 'themeSettings.cupertinoGlassName',
+    description: 'themeSettings.cupertinoGlassDescription',
+  },
+  grimoire: {
+    name: 'themeSettings.grimoireName',
+    description: 'themeSettings.grimoireDescription',
+  },
+  'retro-terminal': {
+    name: 'themeSettings.retroTerminalName',
+    description: 'themeSettings.retroTerminalDescription',
+  },
+};
+
 export const ThemeSettings = () => {
   const { t } = useI18n();
   const { theme, setTheme } = useTheme();
@@ -57,29 +90,15 @@ export const ThemeSettings = () => {
   const isDefaultTheme = customTheme === null && geminiStyle === 'default';
   const isClassicTheme = customTheme === null && geminiStyle === 'classic';
 
-  // Preview timer — resets to default after 5 min for unlicensed premium themes
-  const previewTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Preview timer — resets to default after expiry for unlicensed premium themes
   const { isPreviewActive, previewThemeId, startPreview, endPreview } = licenseState;
 
-  const clearPreviewTimer = useCallback(() => {
-    if (previewTimerRef.current) {
-      clearTimeout(previewTimerRef.current);
-      previewTimerRef.current = null;
-    }
-  }, []);
-
   const handlePreviewExpired = useCallback(() => {
-    clearPreviewTimer();
+    clearModulePreviewTimer();
     endPreview();
-    // Reset to default theme via the store (triggers the platform subscriber)
     setCustomTheme(null);
     setGeminiStyle('default');
-  }, [clearPreviewTimer, endPreview, setCustomTheme, setGeminiStyle]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => clearPreviewTimer();
-  }, [clearPreviewTimer]);
+  }, [endPreview, setCustomTheme, setGeminiStyle]);
 
   const handleThemeClick = (themeId: ThemePresetId) => {
     const preset = themeRegistry[themeId];
@@ -90,13 +109,12 @@ export const ThemeSettings = () => {
       setGeminiStyle('default');
       // Start preview tracking
       startPreview(themeId);
-      // Set auto-revert timer
-      clearPreviewTimer();
-      previewTimerRef.current = setTimeout(handlePreviewExpired, PREVIEW_DURATION_MS);
+      // Set auto-revert timer (module-level, survives unmount)
+      startModulePreviewTimer(handlePreviewExpired);
     } else {
       // Normal apply — clear any active preview
       if (isPreviewActive) {
-        clearPreviewTimer();
+        clearModulePreviewTimer();
         endPreview();
       }
       setCustomTheme(themeId);
@@ -106,7 +124,7 @@ export const ThemeSettings = () => {
 
   const handleDefaultClick = () => {
     if (isPreviewActive) {
-      clearPreviewTimer();
+      clearModulePreviewTimer();
       endPreview();
     }
     setCustomTheme(null);
@@ -115,7 +133,7 @@ export const ThemeSettings = () => {
 
   const handleClassicClick = () => {
     if (isPreviewActive) {
-      clearPreviewTimer();
+      clearModulePreviewTimer();
       endPreview();
     }
     setCustomTheme(null);
@@ -157,7 +175,7 @@ export const ThemeSettings = () => {
         {/* Gemini Classic Card — only on Gemini platform */}
         {isGemini && (
           <ThemeCard
-            name="Gemini Classic"
+            name={t('themeSettings.classic')}
             description={t('themeSettings.classicDescription')}
             colors={{
               bg: '#e9eef6',
@@ -175,11 +193,12 @@ export const ThemeSettings = () => {
           const preset = themeRegistry[id];
           const colors = themePreviewColors[id];
           const isPreviewing = isPreviewActive && previewThemeId === id;
+          const i18nKeys = themeI18nKeys[id];
           return (
             <ThemeCard
               key={id}
-              name={preset.nameZh}
-              description={preset.descriptionZh}
+              name={t(i18nKeys.name)}
+              description={t(i18nKeys.description)}
               colors={colors}
               isActive={customTheme === id}
               isPremium={preset.isPremium}

@@ -262,6 +262,7 @@
     "codex": "Codex",
     "myStuff": "Моё",
     "gems": "Gems",
+    "notebooks": "Блокноты",
     "originalUI": "Переключиться на оригинальную боковую панель"
   },
   "overlay": {
@@ -744,7 +745,14 @@
     "customThemesDescription": "Применить пользовательскую визуальную тему к интерфейсу Gemini. Эти темы переопределяют стандартную цветовую схему.",
     "default": "По умолчанию",
     "defaultDescription": "Тема по умолчанию с поддержкой светлого/тёмного режима",
+    "classic": "Gemini Классический",
     "classicDescription": "Классический Gemini с холодными голубыми оттенками",
+    "cupertinoGlassName": "Cupertino Glass",
+    "cupertinoGlassDescription": "Эстетика матового стекла с системными шрифтами и минимальной палитрой",
+    "grimoireName": "The Grimoire",
+    "grimoireDescription": "Эстетика древнего пергамента с тёплыми тонами и шрифтами с засечками",
+    "retroTerminalName": "Retro Terminal",
+    "retroTerminalDescription": "Эстетика CRT-терминала с неоново-зелёным текстом и моноширинным шрифтом",
     "previewBannerText": "Режим предпросмотра — тема вернётся к стандартной через 5 минут. Приобретите, чтобы сохранить навсегда.",
     "buyNow": "Купить"
   },

@@ -13,6 +13,7 @@
  */
 
 import { useSettingsStore } from '@/shared/lib/settings-store';
+import { useLicenseStore, isLicenseValid } from '@/shared/lib/license-store';
 import { themeRegistry, applySidebarTheme } from '@/themes';
 import { TooltipHelper } from '@/shared/lib/tooltip-helper';
 import { syncAiStudioTheme } from '@/shared/lib/utils/utils';
@@ -268,13 +269,23 @@ function removeAiStudioTheme(): void {
  * Returns an unsubscribe function.
  */
 export function initAiStudioThemeSync(): () => void {
-  // Apply initial theme if set
+  // On init: if a premium theme is persisted but user has no license, revert to default.
   const initialThemeId = useSettingsStore.getState().customTheme;
-  if (initialThemeId && themeRegistry[initialThemeId]) {
+  if (initialThemeId && themeRegistry[initialThemeId]?.isPremium) {
+    const licenseState = useLicenseStore.getState();
+    if (!isLicenseValid(licenseState)) {
+      useSettingsStore.getState().setCustomTheme(null);
+      useLicenseStore.getState().endPreview();
+    } else {
+      applyAiStudioTheme(themeRegistry[initialThemeId]);
+      const preset = themeRegistry[initialThemeId];
+      TooltipHelper.getInstance().setCustomThemeVariables(preset.sidebarVariables ?? null);
+      syncAiStudioTheme(preset.preferredMode);
+    }
+  } else if (initialThemeId && themeRegistry[initialThemeId]) {
     applyAiStudioTheme(themeRegistry[initialThemeId]);
     const preset = themeRegistry[initialThemeId];
     TooltipHelper.getInstance().setCustomThemeVariables(preset.sidebarVariables ?? null);
-    // Force page to the theme's preferred mode
     syncAiStudioTheme(preset.preferredMode);
   }
 

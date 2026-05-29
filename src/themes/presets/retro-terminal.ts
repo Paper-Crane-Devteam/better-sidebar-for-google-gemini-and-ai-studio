@@ -12,10 +12,8 @@ import type { ThemePreset } from '../types';
 export const retroTerminal: ThemePreset = {
   id: 'retro-terminal',
   name: 'Retro Terminal',
-  nameZh: '复古终端机',
   description:
     'CRT terminal aesthetic with neon green text and monospace typography',
-  descriptionZh: '纯黑底色，荧光绿文字，等宽字体，硬核极客命令控制台',
   isPremium: true,
   preferredMode: 'dark',
   fonts: ['Fira+Code:wght@300;400;500;600', 'JetBrains+Mono:wght@300;400;500;600'],

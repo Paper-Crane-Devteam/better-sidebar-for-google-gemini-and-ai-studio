@@ -262,6 +262,7 @@
     "codex": "Codex",
     "myStuff": "マイストッフ",
     "gems": "Gems",
+    "notebooks": "ノートブック",
     "originalUI": "元のサイドバーに切り替え"
   },
   "overlay": {
@@ -745,7 +746,14 @@
     "customThemesDescription": "Gemini インターフェースにカスタムビジュアルテーマを適用します。これらのテーマはデフォルトの配色を上書きします。",
     "default": "デフォルト",
     "defaultDescription": "デフォルトテーマ、ライト/ダークモード対応",
+    "classic": "Gemini クラシック",
     "classicDescription": "クラシック Gemini、クールブルーのサーフェス",
+    "cupertinoGlassName": "Cupertino Glass",
+    "cupertinoGlassDescription": "すりガラスの美学、システムフォント、ミニマルなカラーパレット",
+    "grimoireName": "The Grimoire",
+    "grimoireDescription": "古代の羊皮紙の美学、暖かいトーン、セリフ書体",
+    "retroTerminalName": "Retro Terminal",
+    "retroTerminalDescription": "CRTターミナルの美学、ネオングリーンのテキスト、等幅フォント",
     "previewBannerText": "プレビューモード — 5分後にデフォルトに戻ります。購入すると永続的に使用できます。",
     "buyNow": "購入する"
   },

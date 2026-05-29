@@ -11,10 +11,8 @@ import type { ThemePreset } from '../types';
 export const grimoire: ThemePreset = {
   id: 'grimoire',
   name: 'The Grimoire',
-  nameZh: '魔法卷轴',
   description:
     'Ancient parchment aesthetic with warm tones and serif typography',
-  descriptionZh: '羊皮纸质感，温暖做旧色调，衬线字体，沉浸式奇幻体验',
   isPremium: true,
   preferredMode: 'light',
   fonts: ['Merriweather:wght@300;400;700', 'Playfair+Display:wght@400;700'],

@@ -17,10 +17,8 @@ export interface ThemeVariable {
 /** Metadata for a theme preset */
 export interface ThemePresetMeta {
   id: ThemePresetId;
-  name: string; // Display name
-  nameZh: string; // Chinese display name
+  name: string; // Display name (English)
   description: string;
-  descriptionZh: string;
   author?: string;
   /** Whether this theme requires a Support Pack to use permanently */
   isPremium?: boolean;

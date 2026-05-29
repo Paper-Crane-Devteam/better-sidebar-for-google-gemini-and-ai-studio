@@ -7,7 +7,6 @@ import {
   ShoppingCart,
   Check,
   Loader2,
-  ExternalLink,
   KeyRound,
   Infinity,
   Monitor,
@@ -16,7 +15,7 @@ import {
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useLicenseStore, isLicenseValid } from '@/shared/lib/license-store';
 import { activateLicense, identifyTokenSource } from '@/shared/lib/license-api';
-import { openPurchasePage, getPurchaseLinks } from '@/shared/lib/license-links';
+import { openPurchasePage } from '@/shared/lib/license-links';
 
 export const SupportPackSettings = () => {
   const { t } = useI18n();
@@ -86,8 +85,6 @@ function ActivatedView({ t }: { t: (key: string) => string }) {
 
 /** View shown when the user hasn't purchased yet — designed for conversion */
 function PurchaseView({ t }: { t: (key: string) => string }) {
-  const links = getPurchaseLinks();
-
   return (
     <div className="space-y-6">
       {/* Hero section — uses theme tokens for colors */}
@@ -110,10 +107,6 @@ function PurchaseView({ t }: { t: (key: string) => string }) {
           text={t('supportPack.feature1')}
         />
         <FeatureItem
-          icon={<Infinity className="h-4 w-4 text-primary" />}
-          text={t('supportPack.feature2')}
-        />
-        <FeatureItem
           icon={<Monitor className="h-4 w-4 text-primary" />}
           text={t('supportPack.feature3')}
         />
@@ -123,7 +116,7 @@ function PurchaseView({ t }: { t: (key: string) => string }) {
         />
       </div>
 
-      {/* Purchase buttons */}
+      {/* Purchase button */}
       <div className="space-y-3">
         <Button
           className="w-full h-10 gap-2"
@@ -132,27 +125,6 @@ function PurchaseView({ t }: { t: (key: string) => string }) {
           <ShoppingCart className="h-4 w-4" />
           {t('supportPack.buyButton')}
         </Button>
-
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1 h-8 text-xs gap-1.5"
-            onClick={() => window.open(links.gumroad, '_blank')}
-          >
-            <ExternalLink className="h-3 w-3" />
-            Gumroad
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1 h-8 text-xs gap-1.5"
-            onClick={() => window.open(links.afdian, '_blank')}
-          >
-            <ExternalLink className="h-3 w-3" />
-            {t('supportPack.afdian')}
-          </Button>
-        </div>
       </div>
 
       <Separator />

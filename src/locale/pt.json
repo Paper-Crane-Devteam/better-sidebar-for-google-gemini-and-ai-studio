@@ -262,6 +262,7 @@
     "codex": "Codex",
     "myStuff": "Minhas Coisas",
     "gems": "Gems",
+    "notebooks": "Notebooks",
     "originalUI": "Alternar para Barra Lateral Original"
   },
   "overlay": {
@@ -744,7 +745,14 @@
     "customThemesDescription": "Aplique um tema visual personalizado à interface do Gemini. Esses temas substituem o esquema de cores padrão.",
     "default": "Padrão",
     "defaultDescription": "Tema padrão com suporte a modo claro/escuro",
+    "classic": "Gemini Clássico",
     "classicDescription": "Visual clássico do Gemini com superfícies em tons azulados",
+    "cupertinoGlassName": "Cupertino Glass",
+    "cupertinoGlassDescription": "Estética de vidro fosco com fontes do sistema e paleta de cores mínima",
+    "grimoireName": "The Grimoire",
+    "grimoireDescription": "Estética de pergaminho antigo com tons quentes e tipografia serifada",
+    "retroTerminalName": "Retro Terminal",
+    "retroTerminalDescription": "Estética de terminal CRT com texto verde neon e tipografia monoespaçada",
     "previewBannerText": "Modo de pré-visualização — o tema voltará ao padrão em 5 minutos. Compre para mantê-lo permanentemente.",
     "buyNow": "Comprar agora"
   },

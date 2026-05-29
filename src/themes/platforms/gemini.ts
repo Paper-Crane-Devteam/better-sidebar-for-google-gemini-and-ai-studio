@@ -10,6 +10,7 @@
  */
 
 import { useSettingsStore } from '@/shared/lib/settings-store';
+import { useLicenseStore, isLicenseValid } from '@/shared/lib/license-store';
 import { themeRegistry, applyTheme, removeTheme, applySidebarTheme } from '@/themes';
 import { TooltipHelper } from '@/shared/lib/tooltip-helper';
 import { syncGeminiTheme } from '@/shared/lib/utils/utils';
@@ -20,13 +21,25 @@ import { syncGeminiTheme } from '@/shared/lib/utils/utils';
  * Returns an unsubscribe function.
  */
 export function initGeminiThemeSync(): () => void {
-  // Apply initial theme if set
+  // On init: if a premium theme is persisted but user has no license, revert to default.
+  // Preview only lives within a single session — refresh = reset.
   const initialThemeId = useSettingsStore.getState().customTheme;
-  if (initialThemeId && themeRegistry[initialThemeId]) {
+  if (initialThemeId && themeRegistry[initialThemeId]?.isPremium) {
+    const licenseState = useLicenseStore.getState();
+    if (!isLicenseValid(licenseState)) {
+      useSettingsStore.getState().setCustomTheme(null);
+      useLicenseStore.getState().endPreview();
+      // Don't apply the premium theme — fall through to no-theme state
+    } else {
+      applyTheme(themeRegistry[initialThemeId]);
+      const preset = themeRegistry[initialThemeId];
+      TooltipHelper.getInstance().setCustomThemeVariables(preset.sidebarVariables ?? null);
+      syncGeminiTheme(preset.preferredMode);
+    }
+  } else if (initialThemeId && themeRegistry[initialThemeId]) {
     applyTheme(themeRegistry[initialThemeId]);
     const preset = themeRegistry[initialThemeId];
     TooltipHelper.getInstance().setCustomThemeVariables(preset.sidebarVariables ?? null);
-    // Force page to the theme's preferred mode
     syncGeminiTheme(preset.preferredMode);
   }
 

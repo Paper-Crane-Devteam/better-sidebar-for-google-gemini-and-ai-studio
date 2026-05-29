@@ -2,10 +2,15 @@ import { useEffect } from 'react';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 
 export const useTheme = () => {
-    const { theme, setTheme } = useSettingsStore();
+    const { theme, setTheme, customTheme } = useSettingsStore();
 
-    // Apply theme side effects
+    // Apply theme side effects — skip when a custom theme is active
+    // because the custom theme's preferredMode controls light/dark via the platform adapter.
     useEffect(() => {
+        // When a custom theme is active, the platform adapter (initGeminiThemeSync)
+        // handles forcing the page to the theme's preferredMode. Don't override it here.
+        if (customTheme) return;
+
         const applyTheme = (t: typeof theme) => {
             const isSystemDark = globalThis.matchMedia('(prefers-color-scheme: dark)').matches;
             const isDark = t === 'dark' || (t === 'system' && isSystemDark);
@@ -29,7 +34,7 @@ export const useTheme = () => {
             mediaQuery.addEventListener('change', handleChange);
             return () => mediaQuery.removeEventListener('change', handleChange);
         }
-    }, [theme]);
+    }, [theme, customTheme]);
 
     return { theme, setTheme };
 };

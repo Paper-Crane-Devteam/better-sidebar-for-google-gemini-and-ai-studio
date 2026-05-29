@@ -74,6 +74,13 @@ export const AutoHideInputFeature = () => {
         transform: translateY(0) !important;
         opacity: 1 !important;
       }
+
+      /* Add bottom padding to scroll area to compensate for hidden input height */
+      ms-autoscroll-container::after {
+        content: '';
+        display: block;
+        height: 118px;
+      }
     `;
 
     // Watch .cdk-overlay-container for children (popups/dropdowns).

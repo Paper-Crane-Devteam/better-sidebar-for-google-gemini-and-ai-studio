@@ -262,7 +262,8 @@
     "codex": "Codex",
     "myStuff": "我的内容",
     "gems": "Gems",
-    "originalUI": "切换到原始侧边栏"
+    "originalUI": "切换到原始侧边栏",
+    "notebooks": "笔记本"
   },
   "overlay": {
     "settingsPageComingSoon": "设置页面即将推出",
@@ -743,7 +744,14 @@
     "customThemesDescription": "为 Gemini 界面应用自定义视觉主题，覆盖默认配色方案。",
     "default": "默认",
     "defaultDescription": "默认主题，支持浅色/深色模式切换",
+    "classic": "Gemini 经典",
     "classicDescription": "经典 Gemini 外观，冷蓝色调面板",
+    "cupertinoGlassName": "果味毛玻璃",
+    "cupertinoGlassDescription": "磨砂玻璃质感，系统原生字体，极简黑白灰，纯粹生产力",
+    "grimoireName": "魔法卷轴",
+    "grimoireDescription": "羊皮纸质感，温暖做旧色调，衬线字体，沉浸式奇幻体验",
+    "retroTerminalName": "复古终端机",
+    "retroTerminalDescription": "纯黑底色，荧光绿文字，等宽字体，硬核极客命令控制台",
     "previewBannerText": "预览模式 — 主题将在 5 分钟后恢复默认。购买支持包可永久使用。",
     "buyNow": "立即购买"
   },
