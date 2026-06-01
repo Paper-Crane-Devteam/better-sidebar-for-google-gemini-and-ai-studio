@@ -754,7 +754,22 @@
     "retroTerminalName": "Retro Terminal",
     "retroTerminalDescription": "Estética de terminal CRT com texto verde neon e tipografia monoespaçada",
     "previewBannerText": "Modo de pré-visualização — o tema voltará ao padrão em 5 minutos. Compre para mantê-lo permanentemente.",
-    "buyNow": "Comprar agora"
+    "buyNow": "Comprar agora",
+    "aiGeneratorTitle": "Não encontrou o que procura?",
+    "aiGeneratorDescription": "Deixe a IA criar um tema para você. Crie um prompt, descreva seu estilo e a IA gerará seu tema personalizado.",
+    "createPromptButton": "Criar com IA",
+    "importThemeButton": "Importar Tema",
+    "importThemeTitle": "Importar Tema Personalizado",
+    "importJsonLabel": "Cole o JSON do tema gerado pela IA:",
+    "importJsonPlaceholder": "{\n  \"id\": \"my-theme\",\n  \"name\": \"My Theme\",\n  \"preferredMode\": \"dark\",\n  ...\n}",
+    "validTheme": "Formato de tema válido",
+    "invalidTheme": "Formato de tema inválido",
+    "importAndApply": "Importar e Aplicar",
+    "importRequiresLicense": "Importar temas personalizados requer o Pacote de Suporte.",
+    "importSuccess": "Tema importado e aplicado com sucesso!",
+    "promptAlreadyExists": "O prompt de tema com IA já existe. Mudando para a aba de Prompts.",
+    "promptCreated": "Prompt criado! Mudando para a aba de Prompts.",
+    "themeDeleted": "Tema personalizado removido."
   },
   "supportPack": {
     "title": "Pacote de Suporte",

@@ -2,18 +2,26 @@ import React, { useCallback } from 'react';
 import { Button } from '../../../components/ui/button';
 import { Separator } from '../../../components/ui/separator';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
-import { Moon, Sun, Monitor, Check, Sparkles, Eye, ShoppingCart } from 'lucide-react';
+import { Moon, Sun, Monitor, Check, Sparkles, Eye, ShoppingCart, Wand2, Download, Trash2 } from 'lucide-react';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { useLicenseStore, isLicenseValid } from '@/shared/lib/license-store';
 import { openPurchasePage } from '@/shared/lib/license-links';
 import { useTheme } from '../hooks/useTheme';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { detectPlatform, Platform } from '@/shared/types/platform';
+import { useModalStore } from '@/shared/lib/modal';
+import { useAppStore } from '@/shared/lib/store';
+import { toast } from '@/shared/lib/toast';
 import {
   themeRegistry,
   themePresetIds,
+  useUserThemeStore,
+  refreshThemeRegistry,
   type ThemePresetId,
+  type BuiltinThemePresetId,
 } from '@/themes';
+import { AI_THEME_PROMPT_TITLE, AI_THEME_PROMPT_CONTENT } from '@/themes/ai-theme-prompt';
+import { ImportThemeModalContentStateful, handleImportTheme } from '../components/ImportThemeModal';
 
 /** Preview duration: 5 minutes */
 const PREVIEW_DURATION_MS = 5 * 60 * 1000;
@@ -39,7 +47,7 @@ function clearModulePreviewTimer() {
  * Theme card preview colors for each preset
  */
 const themePreviewColors: Record<
-  ThemePresetId,
+  BuiltinThemePresetId,
   { bg: string; fg: string; accent: string; secondary: string }
 > = {
   grimoire: {
@@ -63,7 +71,7 @@ const themePreviewColors: Record<
 };
 
 /** Map theme preset ID to i18n keys */
-const themeI18nKeys: Record<ThemePresetId, { name: string; description: string }> = {
+const themeI18nKeys: Record<BuiltinThemePresetId, { name: string; description: string }> = {
   'cupertino-glass': {
     name: 'themeSettings.cupertinoGlassName',
     description: 'themeSettings.cupertinoGlassDescription',
@@ -84,6 +92,7 @@ export const ThemeSettings = () => {
   const { customTheme, setCustomTheme, geminiStyle, setGeminiStyle } = useSettingsStore();
   const licenseState = useLicenseStore();
   const hasLicense = isLicenseValid(licenseState);
+  const userThemes = useUserThemeStore((s) => s.themes);
 
   const platform = detectPlatform();
   const isGemini = platform === Platform.GEMINI;
@@ -140,6 +149,56 @@ export const ThemeSettings = () => {
     setGeminiStyle('classic');
   };
 
+  /** Create the AI theme generator prompt in Prompt Manager */
+  const handleCreatePrompt = useCallback(async () => {
+    const { prompts, createPrompt, setSettingsOpen, setActiveTab } = useAppStore.getState();
+    // Check if prompt already exists
+    const existing = prompts.find((p) => p.title === AI_THEME_PROMPT_TITLE);
+    if (existing) {
+      // Already exists — just navigate to prompts tab
+      setSettingsOpen(false);
+      setActiveTab('prompts');
+      toast.info(t('themeSettings.promptAlreadyExists'));
+      return;
+    }
+    await createPrompt(AI_THEME_PROMPT_TITLE, AI_THEME_PROMPT_CONTENT, 'normal', 'Palette', null);
+    // Close settings and switch to prompts tab
+    setSettingsOpen(false);
+    setActiveTab('prompts');
+    toast.success(t('themeSettings.promptCreated'));
+  }, [t]);
+
+  /** Open the import theme modal */
+  const handleOpenImportModal = useCallback(() => {
+    useModalStore.getState().open({
+      type: 'confirm',
+      title: t('themeSettings.importThemeTitle'),
+      content: <ImportThemeModalContentStateful />,
+      confirmText: t('themeSettings.importAndApply'),
+      cancelText: t('common.cancel'),
+      onConfirm: () => {
+        const success = handleImportTheme(t);
+        if (success) {
+          useModalStore.getState().close();
+        }
+      },
+      onCancel: () => useModalStore.getState().close(),
+      modalClassName: 'max-w-2xl',
+    });
+  }, [t]);
+
+  /** Delete a user theme */
+  const handleDeleteUserTheme = useCallback((themeId: string) => {
+    useUserThemeStore.getState().removeTheme(themeId);
+    refreshThemeRegistry();
+    // If the deleted theme was active, revert to default
+    if (useSettingsStore.getState().customTheme === themeId) {
+      setCustomTheme(null);
+      setGeminiStyle('default');
+    }
+    toast.success(t('themeSettings.themeDeleted'));
+  }, [setCustomTheme, setGeminiStyle, t]);
+
   return (
     <div className="space-y-6">
       {/* Section Header */}
@@ -150,6 +209,54 @@ export const ThemeSettings = () => {
         </p>
         <Separator />
       </div>
+
+      {/* Light/Dark/System Toggle — always visible when using default/classic */}
+      {(isDefaultTheme || isClassicTheme) && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <span className="text-sm font-medium">
+                {t('settings.theme')}
+              </span>
+              <p className="text-xs text-muted-foreground">
+                {t('settings.themeDescription')}
+              </p>
+            </div>
+            <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg border">
+              <SimpleTooltip content={t('settings.light')}>
+                <Button
+                  variant={theme === 'light' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => setTheme('light')}
+                >
+                  <Sun className="h-4 w-4" />
+                </Button>
+              </SimpleTooltip>
+              <SimpleTooltip content={t('settings.system')}>
+                <Button
+                  variant={theme === 'system' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => setTheme('system')}
+                >
+                  <Monitor className="h-4 w-4" />
+                </Button>
+              </SimpleTooltip>
+              <SimpleTooltip content={t('settings.dark')}>
+                <Button
+                  variant={theme === 'dark' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => setTheme('dark')}
+                >
+                  <Moon className="h-4 w-4" />
+                </Button>
+              </SimpleTooltip>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Preview Banner */}
       {isPreviewActive && (
@@ -208,55 +315,66 @@ export const ThemeSettings = () => {
             />
           );
         })}
+
+        {/* User-created themes */}
+        {userThemes.map((ut) => {
+          // Extract preview colors from the theme's variables
+          const getVar = (prop: string) =>
+            ut.variables.find((v) => v.property === prop)?.value ?? '';
+          const colors = {
+            bg: getVar('--gem-sys-color--surface') || '#888',
+            fg: getVar('--gem-sys-color--on-surface') || '#000',
+            accent: getVar('--gem-sys-color--primary') || '#666',
+            secondary: getVar('--gem-sys-color--secondary-container') || '#aaa',
+          };
+          return (
+            <ThemeCard
+              key={ut.id}
+              name={ut.name}
+              description={ut.description}
+              colors={colors}
+              isActive={customTheme === ut.id}
+              isUserTheme
+              onClick={() => handleThemeClick(ut.id)}
+              onDelete={() => handleDeleteUserTheme(ut.id)}
+            />
+          );
+        })}
       </div>
 
-      {/* Light/Dark/System Toggle — only shown when no custom preset is active */}
-      {(isDefaultTheme || isClassicTheme) && (
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <span className="text-sm font-medium">
-                {t('settings.theme')}
-              </span>
-              <p className="text-xs text-muted-foreground">
-                {t('settings.themeDescription')}
-              </p>
-            </div>
-            <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg border">
-              <SimpleTooltip content={t('settings.light')}>
-                <Button
-                  variant={theme === 'light' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  className="h-7 px-2"
-                  onClick={() => setTheme('light')}
-                >
-                  <Sun className="h-4 w-4" />
-                </Button>
-              </SimpleTooltip>
-              <SimpleTooltip content={t('settings.system')}>
-                <Button
-                  variant={theme === 'system' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  className="h-7 px-2"
-                  onClick={() => setTheme('system')}
-                >
-                  <Monitor className="h-4 w-4" />
-                </Button>
-              </SimpleTooltip>
-              <SimpleTooltip content={t('settings.dark')}>
-                <Button
-                  variant={theme === 'dark' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  className="h-7 px-2"
-                  onClick={() => setTheme('dark')}
-                >
-                  <Moon className="h-4 w-4" />
-                </Button>
-              </SimpleTooltip>
-            </div>
+      {/* AI Theme Generator Section */}
+      <div className="space-y-3">
+        <Separator />
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2">
+            <Wand2 className="h-4 w-4 text-primary" />
+            <h4 className="text-sm font-medium">{t('themeSettings.aiGeneratorTitle')}</h4>
           </div>
+          <p className="text-xs text-muted-foreground">
+            {t('themeSettings.aiGeneratorDescription')}
+          </p>
         </div>
-      )}
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-9 gap-2 text-xs"
+            onClick={handleCreatePrompt}
+          >
+            <Wand2 className="h-3.5 w-3.5" />
+            {t('themeSettings.createPromptButton')}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-9 gap-2 text-xs"
+            onClick={handleOpenImportModal}
+          >
+            <Download className="h-3.5 w-3.5" />
+            {t('themeSettings.importThemeButton')}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
@@ -293,7 +411,9 @@ function ThemeCard({
   isPremium,
   hasLicense,
   isPreviewing,
+  isUserTheme,
   onClick,
+  onDelete,
 }: {
   name: string;
   description: string;
@@ -302,7 +422,9 @@ function ThemeCard({
   isPremium?: boolean;
   hasLicense?: boolean;
   isPreviewing?: boolean;
+  isUserTheme?: boolean;
   onClick: () => void;
+  onDelete?: () => void;
 }) {
   return (
     <button
@@ -328,9 +450,22 @@ function ThemeCard({
       )}
 
       {/* Premium badge */}
-      {isPremium && !hasLicense && !isActive && !isPreviewing && (
+      {isPremium && !hasLicense && !isActive && !isPreviewing && !isUserTheme && (
         <div className="absolute top-2 right-2 flex items-center gap-0.5 rounded-full bg-amber-500/15 px-1.5 py-0.5">
           <Sparkles className="h-3 w-3 text-amber-600" />
+        </div>
+      )}
+
+      {/* User theme delete button */}
+      {isUserTheme && onDelete && !isActive && (
+        <div
+          className="absolute top-2 right-2 h-5 w-5 rounded-full bg-destructive/10 flex items-center justify-center hover:bg-destructive/20 transition-colors"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+        >
+          <Trash2 className="h-3 w-3 text-destructive" />
         </div>
       )}
 

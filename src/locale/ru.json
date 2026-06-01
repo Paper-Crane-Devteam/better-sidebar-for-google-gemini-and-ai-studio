@@ -754,7 +754,22 @@
     "retroTerminalName": "Retro Terminal",
     "retroTerminalDescription": "Эстетика CRT-терминала с неоново-зелёным текстом и моноширинным шрифтом",
     "previewBannerText": "Режим предпросмотра — тема вернётся к стандартной через 5 минут. Приобретите, чтобы сохранить навсегда.",
-    "buyNow": "Купить"
+    "buyNow": "Купить",
+    "aiGeneratorTitle": "Не нашли подходящую тему?",
+    "aiGeneratorDescription": "Пусть ИИ создаст тему для вас. Создайте промпт, опишите свой стиль, и ИИ сгенерирует персональную тему.",
+    "createPromptButton": "Создать с ИИ",
+    "importThemeButton": "Импорт темы",
+    "importThemeTitle": "Импорт пользовательской темы",
+    "importJsonLabel": "Вставьте JSON темы, сгенерированный ИИ:",
+    "importJsonPlaceholder": "{\n  \"id\": \"my-theme\",\n  \"name\": \"My Theme\",\n  \"preferredMode\": \"dark\",\n  ...\n}",
+    "validTheme": "Формат темы корректен",
+    "invalidTheme": "Некорректный формат темы",
+    "importAndApply": "Импортировать и применить",
+    "importRequiresLicense": "Импорт пользовательских тем требует Пакет поддержки.",
+    "importSuccess": "Тема успешно импортирована и применена!",
+    "promptAlreadyExists": "Промпт для темы с ИИ уже существует. Переход на вкладку промптов.",
+    "promptCreated": "Промпт создан! Переход на вкладку промптов.",
+    "themeDeleted": "Пользовательская тема удалена."
   },
   "supportPack": {
     "title": "Пакет поддержки",

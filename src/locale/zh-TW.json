@@ -754,7 +754,22 @@
     "retroTerminalName": "復古終端機",
     "retroTerminalDescription": "純黑底色，螢光綠文字，等寬字體，硬核極客命令控制台",
     "previewBannerText": "預覽模式 — 主題將在 5 分鐘後恢復預設。購買可永久使用。",
-    "buyNow": "立即購買"
+    "buyNow": "立即購買",
+    "aiGeneratorTitle": "沒有想要的主題？",
+    "aiGeneratorDescription": "讓 AI 為你量身定制。建立 Prompt 描述你的風格，AI 會幫你生成專屬主題。",
+    "createPromptButton": "用 AI 建立",
+    "importThemeButton": "匯入主題",
+    "importThemeTitle": "匯入自訂主題",
+    "importJsonLabel": "貼上 AI 產生的主題 JSON：",
+    "importJsonPlaceholder": "{\n  \"id\": \"my-theme\",\n  \"name\": \"My Theme\",\n  \"preferredMode\": \"dark\",\n  ...\n}",
+    "validTheme": "主題格式正確",
+    "invalidTheme": "主題格式無效",
+    "importAndApply": "匯入並套用",
+    "importRequiresLicense": "匯入自訂主題需要支持包。",
+    "importSuccess": "主題匯入並套用成功！",
+    "promptAlreadyExists": "AI 主題 Prompt 已存在，正在跳轉到 Prompt 管理。",
+    "promptCreated": "Prompt 已建立！正在跳轉到 Prompt 管理。",
+    "themeDeleted": "自訂主題已刪除。"
   },
   "supportPack": {
     "title": "支持包",

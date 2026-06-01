@@ -14,7 +14,7 @@
 
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { useLicenseStore, isLicenseValid } from '@/shared/lib/license-store';
-import { themeRegistry, applySidebarTheme } from '@/themes';
+import { themeRegistry, applySidebarTheme, refreshThemeRegistry } from '@/themes';
 import { TooltipHelper } from '@/shared/lib/tooltip-helper';
 import { syncAiStudioTheme } from '@/shared/lib/utils/utils';
 import type { ThemePreset, ThemeVariable } from '../types';
@@ -269,6 +269,9 @@ function removeAiStudioTheme(): void {
  * Returns an unsubscribe function.
  */
 export function initAiStudioThemeSync(): () => void {
+  // Ensure user themes are loaded into registry
+  refreshThemeRegistry();
+
   // On init: if a premium theme is persisted but user has no license, revert to default.
   const initialThemeId = useSettingsStore.getState().customTheme;
   if (initialThemeId && themeRegistry[initialThemeId]?.isPremium) {
@@ -316,6 +319,9 @@ export function initAiStudioThemeSync(): () => void {
  * Returns an unsubscribe function for cleanup.
  */
 export function bindAiStudioShadowRootToTheme(container: HTMLElement): () => void {
+  // Ensure user themes are in registry
+  refreshThemeRegistry();
+
   // Apply current theme
   const currentThemeId = useSettingsStore.getState().customTheme;
   if (currentThemeId && themeRegistry[currentThemeId]) {
@@ -325,6 +331,7 @@ export function bindAiStudioShadowRootToTheme(container: HTMLElement): () => voi
   // Subscribe to changes
   const unsubscribe = useSettingsStore.subscribe((state, prevState) => {
     if (state.customTheme !== prevState.customTheme) {
+      refreshThemeRegistry();
       const preset = state.customTheme ? themeRegistry[state.customTheme] : null;
       applySidebarTheme(container, preset);
     }

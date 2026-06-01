@@ -753,7 +753,22 @@
     "retroTerminalName": "复古终端机",
     "retroTerminalDescription": "纯黑底色，荧光绿文字，等宽字体，硬核极客命令控制台",
     "previewBannerText": "预览模式 — 主题将在 5 分钟后恢复默认。购买支持包可永久使用。",
-    "buyNow": "立即购买"
+    "buyNow": "立即购买",
+    "aiGeneratorTitle": "没有想要的主题？",
+    "aiGeneratorDescription": "让 AI 为你量身定制。创建 Prompt 描述你的风格，AI 会帮你生成专属主题。",
+    "createPromptButton": "用 AI 创建",
+    "importThemeButton": "导入主题",
+    "importThemeTitle": "导入自定义主题",
+    "importJsonLabel": "粘贴 AI 生成的主题 JSON：",
+    "importJsonPlaceholder": "{\n  \"id\": \"my-theme\",\n  \"name\": \"My Theme\",\n  \"preferredMode\": \"dark\",\n  ...\n}",
+    "validTheme": "主题格式正确",
+    "invalidTheme": "主题格式无效",
+    "importAndApply": "导入并应用",
+    "importRequiresLicense": "导入自定义主题需要支持包。",
+    "importSuccess": "主题导入并应用成功！",
+    "promptAlreadyExists": "AI 主题 Prompt 已存在，正在跳转到 Prompt 管理。",
+    "promptCreated": "Prompt 已创建！正在跳转到 Prompt 管理。",
+    "themeDeleted": "自定义主题已删除。"
   },
   "supportPack": {
     "title": "支持包",

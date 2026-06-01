@@ -755,7 +755,22 @@
     "retroTerminalName": "Retro Terminal",
     "retroTerminalDescription": "CRTターミナルの美学、ネオングリーンのテキスト、等幅フォント",
     "previewBannerText": "プレビューモード — 5分後にデフォルトに戻ります。購入すると永続的に使用できます。",
-    "buyNow": "購入する"
+    "buyNow": "購入する",
+    "aiGeneratorTitle": "お探しのテーマが見つかりませんか？",
+    "aiGeneratorDescription": "AI にお任せください。プロンプトを作成してスタイルを説明すれば、AI があなた専用のテーマを生成します。",
+    "createPromptButton": "AI で作成",
+    "importThemeButton": "テーマをインポート",
+    "importThemeTitle": "カスタムテーマをインポート",
+    "importJsonLabel": "AI が生成したテーマ JSON を貼り付けてください：",
+    "importJsonPlaceholder": "{\n  \"id\": \"my-theme\",\n  \"name\": \"My Theme\",\n  \"preferredMode\": \"dark\",\n  ...\n}",
+    "validTheme": "テーマ形式は正しいです",
+    "invalidTheme": "テーマ形式が無効です",
+    "importAndApply": "インポートして適用",
+    "importRequiresLicense": "カスタムテーマのインポートにはサポートパックが必要です。",
+    "importSuccess": "テーマのインポートと適用に成功しました！",
+    "promptAlreadyExists": "AI テーマプロンプトは既に存在します。プロンプトタブに移動します。",
+    "promptCreated": "プロンプトを作成しました！プロンプトタブに移動します。",
+    "themeDeleted": "カスタムテーマを削除しました。"
   },
   "supportPack": {
     "title": "サポートパック",

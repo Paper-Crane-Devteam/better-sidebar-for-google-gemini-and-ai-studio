@@ -5,8 +5,11 @@
  * document.body to override Gemini/AI Studio's native theme variables.
  */
 
-/** Unique identifier for a theme preset */
-export type ThemePresetId = 'grimoire' | 'cupertino-glass' | 'retro-terminal';
+/** Built-in theme preset identifiers */
+export type BuiltinThemePresetId = 'grimoire' | 'cupertino-glass' | 'retro-terminal';
+
+/** Theme preset ID — built-in or user-created (any string) */
+export type ThemePresetId = BuiltinThemePresetId | (string & {});
 
 /** A single CSS variable override */
 export interface ThemeVariable {
@@ -22,6 +25,8 @@ export interface ThemePresetMeta {
   author?: string;
   /** Whether this theme requires a Support Pack to use permanently */
   isPremium?: boolean;
+  /** Whether this is a user-generated theme (not built-in) */
+  isUserTheme?: boolean;
   /**
    * The preferred Gemini page color mode for this theme.
    * When a custom theme is applied, the page will be forced to this mode
@@ -52,5 +57,5 @@ export interface ThemePreset extends ThemePresetMeta {
   sidebarStyles?: Record<string, string>;
 }
 
-/** Registry of all available theme presets */
-export type ThemeRegistry = Record<ThemePresetId, ThemePreset>;
+/** Registry of all available theme presets (built-in + user) */
+export type ThemeRegistry = Record<string, ThemePreset>;
