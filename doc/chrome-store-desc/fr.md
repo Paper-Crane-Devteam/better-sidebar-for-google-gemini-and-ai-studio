@@ -5,12 +5,17 @@ Découvrez Better Sidebar for Gemini & AI Studio — le booster de flux de trava
 
 Nous transformons l'interface par défaut d'AI Studio en une base de connaissances puissante et organisée. Arrêtez de faire défiler sans fin et commencez à organiser vos idées efficacement.
 
-🔥 NOUVEAUTÉS (v2.6.0)
-• 🎛️ Contrôles UI d'AI Studio : Largeur de barre latérale configurable, masquage automatique de la zone de saisie et du panneau de paramètres d'exécution.
-• 💬 Nouveau chat rapide : Lors de la création d'une conversation, une entrée apparaît instantanément — définissez le titre avant même la création du chat.
-• 🎨 Paramètres UI Gemini : Nouvelles options de configuration UI Gemini dans le panneau de paramètres.
-• 🖼️ Suppression du filigrane : Réactivation de la suppression du filigrane pour les téléchargements d'images Gemini.
-• ❤️ Supporter Pack : 3 thèmes exclusifs disponibles. Toutes les fonctionnalités principales restent 100% gratuites.
+🔥 NOUVEAUTÉS (v2.7.0)
+
+✨ Nouvelles fonctionnalités :
+• ⌨️ Raccourcis clavier : Nouvelles touches de raccourci (Hotkeys) pour une navigation et des opérations plus rapides.
+
+🐛 Corrections :
+• 💬 Amélioration du style Markdown dans l'aperçu de recherche pour une meilleure lisibilité.
+
+❤️ Supporter Pack :
+• 🎨 Thèmes personnalisés par IA : Utilisez l'IA pour générer n'importe quel thème — cyberpunk, pastel, rétro, tout est possible.
+• 🎉 Nouveau canal de parrainage lancé. Merci pour votre incroyable soutien !
 
 ---
 

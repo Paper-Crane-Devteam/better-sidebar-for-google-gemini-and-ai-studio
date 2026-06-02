@@ -5,12 +5,17 @@ Conoce Better Sidebar for Gemini & AI Studio — el potenciador de flujo de trab
 
 Transformamos la interfaz predeterminada de AI Studio en una base de conocimientos poderosa y organizada. Deja de desplazarte sin fin y comienza a organizar tus ideas de manera eficiente.
 
-🔥 NOVEDADES (v2.6.0)
-• 🎛️ Controles de UI de AI Studio: Ancho de barra lateral configurable, ocultar automáticamente el cuadro de entrada y el panel de configuración de ejecución.
-• 💬 Nuevo chat rápido: Al crear una conversación, aparece una entrada instantáneamente — establece el título antes de que se cree el chat.
-• 🎨 Configuración de UI de Gemini: Nuevas opciones de configuración de UI de Gemini en el panel de ajustes.
-• 🖼️ Eliminación de marca de agua: Se reactivó la eliminación de marca de agua para las descargas de imágenes de Gemini.
-• ❤️ Supporter Pack: 3 temas exclusivos disponibles. Todas las funciones principales siguen siendo 100% gratuitas.
+🔥 NOVEDADES (v2.7.0)
+
+✨ Nuevas funciones:
+• ⌨️ Atajos de teclado: Nuevas teclas rápidas (Hotkeys) para una navegación y operación más eficiente.
+
+🐛 Correcciones:
+• 💬 Mejora del estilo Markdown en la vista previa de búsqueda para una mejor experiencia de lectura.
+
+❤️ Supporter Pack:
+• 🎨 Temas personalizados con IA: Usa IA para generar cualquier tema que puedas imaginar — cyberpunk, pastel, retro, lo que quieras.
+• 🎉 Nuevo canal de patrocinio lanzado. ¡Gracias por vuestro increíble apoyo!
 
 ---
 

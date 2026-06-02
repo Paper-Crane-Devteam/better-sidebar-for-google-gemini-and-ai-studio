@@ -21,6 +21,8 @@ export interface HotkeyDefinition {
   category: HotkeyCategory;
   /** Default key binding */
   defaultBinding: HotkeyBinding;
+  /** Platforms this hotkey is available on. If omitted, available on all. */
+  platforms?: ('gemini' | 'aistudio')[];
 }
 
 /** All available shortcut action IDs */
@@ -110,12 +112,14 @@ export const HOTKEY_DEFINITIONS: Record<HotkeyActionId, HotkeyDefinition> = {
     labelKey: 'hotkeys.navGems',
     category: 'navigation',
     defaultBinding: 'Alt+6',
+    platforms: ['gemini'],
   },
   navNotebooks: {
     id: 'navNotebooks',
     labelKey: 'hotkeys.navNotebooks',
     category: 'navigation',
     defaultBinding: 'Alt+7',
+    platforms: ['gemini'],
   },
 
   // Actions
@@ -124,6 +128,7 @@ export const HOTKEY_DEFINITIONS: Record<HotkeyActionId, HotkeyDefinition> = {
     labelKey: 'hotkeys.toggleZenMode',
     category: 'actions',
     defaultBinding: 'Alt+Shift+Z',
+    platforms: ['gemini'],
   },
   switchOriginalUI: {
     id: 'switchOriginalUI',

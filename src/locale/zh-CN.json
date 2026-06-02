@@ -658,7 +658,7 @@
     "autoHideRunSettings": "默认收起运行设置",
     "autoHideRunSettingsDesc": "打开对话时不自动展开运行设置面板，需手动打开",
     "hotkeyHelper": "快捷键助手",
-    "hotkeyHelperDesc": "在右下角显示键盘图标，快速查看快捷键",
+    "hotkeyHelperDesc": "在右下角显示键盘图标，快速查看快捷键"
   },
   "topBarTag": {
     "removeTag": "移除标签",

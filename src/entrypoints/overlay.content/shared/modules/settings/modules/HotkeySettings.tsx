@@ -11,6 +11,7 @@ import {
   HotkeyBinding,
   keyEventToBindingString,
 } from '@/shared/lib/hotkey-store';
+import { detectPlatform, Platform } from '@/shared/types/platform';
 
 // ─── Key Binding Display Component ───────────────────────────────────────────
 
@@ -291,24 +292,32 @@ export const HotkeySettings = () => {
     [resetBinding],
   );
 
-  // Group actions by category
+  // Group actions by category, filtering by platform
+  const platform = detectPlatform();
+  const platformKey = platform === Platform.GEMINI ? 'gemini' : 'aistudio';
+
+  const isAvailable = (id: HotkeyActionId) => {
+    const def = HOTKEY_DEFINITIONS[id];
+    return !def.platforms || def.platforms.includes(platformKey);
+  };
+
   const categories: { category: HotkeyCategory; ids: HotkeyActionId[] }[] = [
     {
       category: 'general',
       ids: Object.entries(HOTKEY_DEFINITIONS)
-        .filter(([, def]) => def.category === 'general')
+        .filter(([id, def]) => def.category === 'general' && isAvailable(id as HotkeyActionId))
         .map(([id]) => id as HotkeyActionId),
     },
     {
       category: 'navigation',
       ids: Object.entries(HOTKEY_DEFINITIONS)
-        .filter(([, def]) => def.category === 'navigation')
+        .filter(([id, def]) => def.category === 'navigation' && isAvailable(id as HotkeyActionId))
         .map(([id]) => id as HotkeyActionId),
     },
     {
       category: 'actions',
       ids: Object.entries(HOTKEY_DEFINITIONS)
-        .filter(([, def]) => def.category === 'actions')
+        .filter(([id, def]) => def.category === 'actions' && isAvailable(id as HotkeyActionId))
         .map(([id]) => id as HotkeyActionId),
     },
   ];

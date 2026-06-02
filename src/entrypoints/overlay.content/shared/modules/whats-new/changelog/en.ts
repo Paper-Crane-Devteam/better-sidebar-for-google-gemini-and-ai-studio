@@ -2,6 +2,23 @@ import type { ChangeLogItem } from './types';
 
 export const changelog: ChangeLogItem[] = [
   {
+    version: '2.7.0',
+    date: '2026-06-02',
+    features: [
+      '⌨️ **Hotkey Support**: Keyboard shortcuts for faster navigation and operations — a must-have for keyboard lovers.',
+    ],
+    fixes: [
+      'Improved Markdown styling in search preview messages for a better reading experience.',
+    ],
+    announcement: {
+      title: 'Supporter Pack Update 🎨',
+      content: [
+        '🎨 **AI-Generated Custom Themes**: Use AI to generate any custom theme you can imagine — cyberpunk, pastel, retro, anything goes. If you can dream it, we can generate it.',
+        '🎉 New sponsorship channel (Aifadian) launched for our Chinese users. Thank you all for your incredible support! ❤️',
+      ],
+    },
+  },
+  {
     version: '2.6.0',
     date: '2026-05-29',
     features: [

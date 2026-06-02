@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Keyboard, X, EyeOff } from 'lucide-react';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { useI18n } from '@/shared/hooks/useI18n';
@@ -86,24 +86,31 @@ export const HotkeyCheatsheet = () => {
     }
   };
 
-  // Group by category
+  // Group by category, filtering out hotkeys not available on current platform
+  const platformKey = platform === Platform.GEMINI ? 'gemini' : 'aistudio';
+
+  const isAvailable = (id: HotkeyActionId) => {
+    const def = HOTKEY_DEFINITIONS[id];
+    return !def.platforms || def.platforms.includes(platformKey);
+  };
+
   const categories: { category: HotkeyCategory; ids: HotkeyActionId[] }[] = [
     {
       category: 'general',
       ids: Object.entries(HOTKEY_DEFINITIONS)
-        .filter(([, def]) => def.category === 'general')
+        .filter(([id, def]) => def.category === 'general' && isAvailable(id as HotkeyActionId))
         .map(([id]) => id as HotkeyActionId),
     },
     {
       category: 'navigation',
       ids: Object.entries(HOTKEY_DEFINITIONS)
-        .filter(([, def]) => def.category === 'navigation')
+        .filter(([id, def]) => def.category === 'navigation' && isAvailable(id as HotkeyActionId))
         .map(([id]) => id as HotkeyActionId),
     },
     {
       category: 'actions',
       ids: Object.entries(HOTKEY_DEFINITIONS)
-        .filter(([, def]) => def.category === 'actions')
+        .filter(([id, def]) => def.category === 'actions' && isAvailable(id as HotkeyActionId))
         .map(([id]) => id as HotkeyActionId),
     },
   ];
@@ -137,28 +144,9 @@ const HotkeyCheatsheetInner = ({
   onHide: () => void;
 }) => {
   const { t } = useI18n();
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Click outside to close
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    // Delay to avoid the opening click triggering close
-    const timer = setTimeout(() => {
-      document.addEventListener('mousedown', handleClickOutside, true);
-    }, 0);
-    return () => {
-      clearTimeout(timer);
-      document.removeEventListener('mousedown', handleClickOutside, true);
-    };
-  }, [isOpen, setIsOpen]);
 
   return (
-    <div ref={containerRef} className="fixed bottom-8 right-8 z-40">
+    <div className="fixed bottom-8 right-8 z-40">
       {/* Cheatsheet panel (above the icon) */}
       {isOpen && (
         <div className="absolute bottom-12 right-0 w-[320px] rounded-lg border border-border bg-background/95 backdrop-blur-md shadow-xl p-4 animate-in fade-in-0 slide-in-from-bottom-2 duration-200">

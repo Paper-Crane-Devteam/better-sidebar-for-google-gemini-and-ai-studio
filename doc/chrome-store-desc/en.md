@@ -5,12 +5,17 @@ Meet BETTER SIDEBAR FOR GEMINI & AI STUDIO — the ultimate workflow booster for
 
 We transform the default AI Studio interface into a powerful, organized knowledge base. Stop scrolling endlessly and start organizing your ideas efficiently.
 
-🔥 WHAT'S NEW (v2.6.0)
-• 🎛️ AI Studio UI Controls: Configurable sidebar width, auto-hide input box, and auto-hide run settings panel.
-• 💬 Quick New Chat: Set the title before the chat is created — instant entry for a smoother workflow.
-• 🎨 Gemini UI Settings: New Gemini UI configuration options in the settings panel.
-• 🖼️ Image Watermark Removal: Re-enabled watermark removal for Gemini image downloads.
-• ❤️ Supporter Pack: 3 exclusive themes available. All core features remain 100% free.
+🔥 WHAT'S NEW (v2.7.0)
+
+✨ Features:
+• ⌨️ Hotkey Support: Keyboard shortcuts for faster navigation and operations.
+
+🐛 Fixes:
+• 💬 Improved Markdown styling in search preview messages for a better reading experience.
+
+❤️ Supporter Pack:
+• 🎨 AI-Generated Custom Themes: Use AI to generate any custom theme you can imagine — cyberpunk, pastel, retro, anything goes.
+• 🎉 New sponsorship channel launched (Aifadian) for our Chinese users. Thank you all for your incredible support!
 
 ---
 

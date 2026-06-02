@@ -2,6 +2,23 @@ import type { ChangeLogItem } from './types';
 
 export const changelog: ChangeLogItem[] = [
   {
+    version: '2.7.0',
+    date: '2026-06-02',
+    features: [
+      '⌨️ **Atalhos de teclado**: Novas teclas de atalho (Hotkeys) para navegação e operações mais rápidas — essencial para quem ama o teclado.',
+    ],
+    fixes: [
+      'Melhoria do estilo Markdown na pré-visualização de busca para uma melhor experiência de leitura.',
+    ],
+    announcement: {
+      title: 'Atualização do Supporter Pack 🎨',
+      content: [
+        '🎨 **Temas personalizados com IA**: Use IA para gerar qualquer tema que você imaginar — cyberpunk, pastel, retrô, o que quiser. Se você pode sonhar, nós podemos gerar.',
+        '🎉 Novo canal de patrocínio lançado. Obrigado pelo incrível apoio de todos! ❤️',
+      ],
+    },
+  },
+  {
     version: '2.6.0',
     date: '2026-05-29',
     features: [

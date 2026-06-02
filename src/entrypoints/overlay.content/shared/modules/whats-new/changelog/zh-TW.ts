@@ -2,6 +2,23 @@ import type { ChangeLogItem } from './types';
 
 export const changelog: ChangeLogItem[] = [
   {
+    version: '2.7.0',
+    date: '2026-06-02',
+    features: [
+      '⌨️ **快捷鍵支援**：新增快捷鍵功能（Hotkey），提升操作效率，鍵盤黨的福音。',
+    ],
+    fixes: [
+      '搜尋預覽訊息的 Markdown 樣式優化，閱讀體驗更舒適。',
+    ],
+    announcement: {
+      title: 'Supporter 專屬更新 🎨',
+      content: [
+        '🎨 **AI 生成自訂主題**：支援 AI 生成任意自訂主題，只要你敢想，它就能幫你生成！想要賽博龐克風？莫蘭迪色？二次元配色？統統可以。',
+        '🎉 愛發電贊助頻道正式上線！感謝大家對插件的支持與喜愛，歡迎來這裡解鎖專屬的自訂主題 Supporter Pack！❤️',
+      ],
+    },
+  },
+  {
     version: '2.6.0',
     date: '2026-05-29',
     features: [

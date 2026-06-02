@@ -17,8 +17,42 @@ import { detectPlatform, Platform } from '@/shared/types/platform';
  */
 const actionHandlers: Record<HotkeyActionId, () => void> = {
   toggleSidebar: () => {
-    const store = useAppStore.getState();
-    store.setSidebarExpanded(!store.ui.overlay.isSidebarExpanded);
+    // Trigger the native sidebar toggle button instead of directly modifying
+    // state, so that the actual sidebar animation fires and observers keep
+    // state in sync.
+
+    // AI Studio: toolbar toggle button
+    const aiStudioBtn = document.querySelector(
+      'ms-playground-toolbar .toolbar-left [aria-label="Toggle navigation menu"]',
+    ) as HTMLElement;
+    if (aiStudioBtn) {
+      aiStudioBtn.click();
+      return;
+    }
+
+    // Gemini Desktop: separate Open/Close sidebar buttons
+    const closeBtn = document.querySelector(
+      'button[aria-label="Close sidebar"]',
+    ) as HTMLElement;
+    if (closeBtn) {
+      closeBtn.click();
+      return;
+    }
+    const openBtn = document.querySelector(
+      'button[aria-label="Open sidebar"]',
+    ) as HTMLElement;
+    if (openBtn) {
+      openBtn.click();
+      return;
+    }
+
+    // Gemini Mobile fallback
+    const menuBtn = document.querySelector(
+      'button[aria-label="Main menu"]',
+    ) as HTMLElement;
+    if (menuBtn) {
+      menuBtn.click();
+    }
   },
 
   newConversation: () => {
