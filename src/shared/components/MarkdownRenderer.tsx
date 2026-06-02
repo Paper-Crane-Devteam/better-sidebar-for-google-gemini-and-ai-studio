@@ -96,20 +96,20 @@ export const MarkdownRenderer = memo(({ children, className, highlight, highligh
         );
       },
       pre: ({ children }: any) => (
-        <pre className="bg-muted p-0 rounded-lg overflow-x-auto my-4 border border-border/50 max-w-full">
+        <pre className="bg-muted p-0 rounded-md overflow-x-auto my-3 border border-border/50 max-w-full">
           {processChildren(children)}
         </pre>
       ),
-      p: ({ children }: any) => <p className="leading-7 [&:not(:first-child)]:mt-6">{processChildren(children)}</p>,
+      p: ({ children }: any) => <p className="leading-relaxed [&:not(:first-child)]:mt-3.5">{processChildren(children)}</p>,
       li: ({ children }: any) => <li>{processChildren(children)}</li>,
-      ul: ({ children }: any) => <ul className="my-6 ml-6 list-disc [&>li]:mt-2">{children}</ul>,
-      ol: ({ children }: any) => <ol className="my-6 ml-6 list-decimal [&>li]:mt-2">{children}</ol>,
-      h1: ({ children }: any) => <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">{processChildren(children)}</h1>,
-      h2: ({ children }: any) => <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">{processChildren(children)}</h2>,
-      h3: ({ children }: any) => <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">{processChildren(children)}</h3>,
-      h4: ({ children }: any) => <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">{processChildren(children)}</h4>,
-      h5: ({ children }: any) => <h5 className="scroll-m-20 text-lg font-semibold tracking-tight">{processChildren(children)}</h5>,
-      h6: ({ children }: any) => <h6 className="scroll-m-20 text-base font-semibold tracking-tight">{processChildren(children)}</h6>,
+      ul: ({ children }: any) => <ul className="my-3 ml-5 list-disc [&>li]:mt-1.5">{children}</ul>,
+      ol: ({ children }: any) => <ol className="my-3 ml-5 list-decimal [&>li]:mt-1.5">{children}</ol>,
+      h1: ({ children }: any) => <h1 className="text-xl font-semibold tracking-tight mt-5 mb-2.5 first:mt-0">{processChildren(children)}</h1>,
+      h2: ({ children }: any) => <h2 className="text-lg font-semibold tracking-tight mt-4 mb-2 first:mt-0">{processChildren(children)}</h2>,
+      h3: ({ children }: any) => <h3 className="text-base font-semibold tracking-tight mt-3.5 mb-1.5 first:mt-0">{processChildren(children)}</h3>,
+      h4: ({ children }: any) => <h4 className="text-sm font-semibold tracking-tight mt-3 mb-1.5 first:mt-0">{processChildren(children)}</h4>,
+      h5: ({ children }: any) => <h5 className="text-sm font-medium tracking-tight mt-2.5 mb-1 first:mt-0">{processChildren(children)}</h5>,
+      h6: ({ children }: any) => <h6 className="text-xs font-medium tracking-tight text-muted-foreground mt-2 mb-1 first:mt-0">{processChildren(children)}</h6>,
       strong: ({ children }: any) => <strong className="font-semibold">{processChildren(children)}</strong>,
       em: ({ children }: any) => <em className="italic">{processChildren(children)}</em>,
       blockquote: ({ children }: any) => (
