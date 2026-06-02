@@ -7,15 +7,17 @@ import {
   ShoppingCart,
   Check,
   Loader2,
+  ExternalLink,
   KeyRound,
   Infinity,
   Monitor,
   Heart,
+  Wand2,
 } from 'lucide-react';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useLicenseStore, isLicenseValid } from '@/shared/lib/license-store';
 import { activateLicense, identifyTokenSource } from '@/shared/lib/license-api';
-import { openPurchasePage } from '@/shared/lib/license-links';
+import { openPurchasePage, getPurchaseLinks } from '@/shared/lib/license-links';
 
 export const SupportPackSettings = () => {
   const { t } = useI18n();
@@ -85,6 +87,8 @@ function ActivatedView({ t }: { t: (key: string) => string }) {
 
 /** View shown when the user hasn't purchased yet — designed for conversion */
 function PurchaseView({ t }: { t: (key: string) => string }) {
+  const links = getPurchaseLinks();
+
   return (
     <div className="space-y-6">
       {/* Hero section — uses theme tokens for colors */}
@@ -107,6 +111,14 @@ function PurchaseView({ t }: { t: (key: string) => string }) {
           text={t('supportPack.feature1')}
         />
         <FeatureItem
+          icon={<Infinity className="h-4 w-4 text-primary" />}
+          text={t('supportPack.feature2')}
+        />
+        <FeatureItem
+          icon={<Wand2 className="h-4 w-4 text-primary" />}
+          text={t('supportPack.feature5')}
+        />
+        <FeatureItem
           icon={<Monitor className="h-4 w-4 text-primary" />}
           text={t('supportPack.feature3')}
         />
@@ -116,8 +128,8 @@ function PurchaseView({ t }: { t: (key: string) => string }) {
         />
       </div>
 
-      {/* Purchase button */}
-      <div className="space-y-3">
+      {/* Purchase button + platform switcher */}
+      <div className="space-y-2">
         <Button
           className="w-full h-10 gap-2"
           onClick={() => openPurchasePage()}
@@ -125,6 +137,26 @@ function PurchaseView({ t }: { t: (key: string) => string }) {
           <ShoppingCart className="h-4 w-4" />
           {t('supportPack.buyButton')}
         </Button>
+
+        {/* Small platform switcher */}
+        <div className="flex items-center justify-center gap-3 text-xs text-muted-foreground">
+          <span>{t('supportPack.otherPlatform')}</span>
+          <button
+            className="inline-flex items-center gap-1 underline underline-offset-2 hover:text-foreground transition-colors"
+            onClick={() => window.open(links.gumroad, '_blank')}
+          >
+            Gumroad
+            <ExternalLink className="h-3 w-3" />
+          </button>
+          <span>|</span>
+          <button
+            className="inline-flex items-center gap-1 underline underline-offset-2 hover:text-foreground transition-colors"
+            onClick={() => window.open(links.afdian, '_blank')}
+          >
+            {t('supportPack.afdian')}
+            <ExternalLink className="h-3 w-3" />
+          </button>
+        </div>
       </div>
 
       <Separator />
@@ -194,7 +226,7 @@ function ActivationInput({ t }: { t: (key: string) => string }) {
             setError(null);
             setSuccess(false);
           }}
-          placeholder="BS-SP-XXXXXXXX"
+          placeholder={t('supportPack.tokenPlaceholder')}
           className="flex-1 h-9 rounded-md border border-input bg-background px-3 text-sm font-mono placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleActivate();
