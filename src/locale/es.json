@@ -655,7 +655,9 @@
     "autoHideInput": "Ocultar Entrada Automáticamente",
     "autoHideInputDesc": "Ocultar el cuadro de entrada hasta que pases el cursor por la zona inferior",
     "autoHideRunSettings": "Contraer Configuración de Ejecución por Defecto",
-    "autoHideRunSettingsDesc": "El panel de configuración de ejecución permanece contraído al abrir un chat, expandir manualmente cuando sea necesario"
+    "autoHideRunSettingsDesc": "El panel de configuración de ejecución permanece contraído al abrir un chat, expandir manualmente cuando sea necesario",
+    "hotkeyHelper": "Ayuda de Atajos",
+    "hotkeyHelperDesc": "Mostrar icono de teclado en la esquina inferior derecha para referencia rápida de atajos"
   },
   "topBarTag": {
     "removeTag": "Eliminar etiqueta",
@@ -795,5 +797,37 @@
     "activatedTitle": "Pack de Soporte Activo",
     "activatedDescription": "Todos los temas premium están desbloqueados. ¡Gracias por apoyar Better Sidebar!",
     "deactivate": "Desactivar"
+  },
+  "hotkeys": {
+    "title": "Atajos de teclado",
+    "description": "Haz clic en un atajo para grabar una nueva combinación de teclas. Los atajos solo funcionan cuando la página de destino está enfocada.",
+    "categoryGeneral": "General",
+    "categoryNavigation": "Navegación de pestañas",
+    "categoryActions": "Acciones",
+    "toggleSidebar": "Alternar barra lateral",
+    "newConversation": "Nueva conversación",
+    "openSearch": "Abrir búsqueda",
+    "openSettings": "Abrir configuración",
+    "navExplorer": "Ir al explorador",
+    "navSearch": "Ir a búsqueda",
+    "navPrompts": "Ir a prompts",
+    "navTags": "Ir a etiquetas",
+    "navFavorites": "Ir a favoritos",
+    "navGems": "Ir a Gems",
+    "navNotebooks": "Ir a notebooks",
+    "toggleZenMode": "Alternar modo Zen",
+    "switchOriginalUI": "Cambiar a barra lateral original",
+    "toggleBatchMode": "Alternar modo de lotes",
+    "collapseAll": "Contraer todas las carpetas",
+    "toggleViewMode": "Alternar vista árbol/línea de tiempo",
+    "recording": "Presiona teclas...",
+    "pressKeys": "Presiona la combinación de teclas deseada",
+    "clickToRecord": "Haz clic para cambiar el atajo",
+    "resetToDefault": "Restaurar predeterminado",
+    "resetAll": "Restablecer todo",
+    "conflictWith": "Conflicto con: {{action}}",
+    "helpRecording": "💡 Haz clic en un botón de atajo y luego presiona la combinación de teclas deseada.",
+    "helpUnbind": "⌫ Presiona Backspace o Delete durante la grabación para desvincular.",
+    "helpEscape": "⎋ Presiona Escape para cancelar la grabación."
   }
 }

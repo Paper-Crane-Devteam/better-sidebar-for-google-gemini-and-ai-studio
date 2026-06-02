@@ -1,7 +1,7 @@
 {
   "name": "better-sidebar-for-google-ai-studio",
   "type": "module",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "private": true,
   "description": "Better Gemini & AI Studio: Folders, tags, prompt library, full-text search, chat export, UI tweaks, smart scrollbar & more.",
   "author": "Paper Crane Devteam",

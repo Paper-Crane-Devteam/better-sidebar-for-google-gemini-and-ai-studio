@@ -656,7 +656,9 @@
     "autoHideInput": "入力欄の自動非表示",
     "autoHideInputDesc": "下部エリアにホバーするまで入力欄を非表示にする",
     "autoHideRunSettings": "実行設定をデフォルトで折りたたむ",
-    "autoHideRunSettingsDesc": "チャットを開いた時に実行設定パネルを自動展開しない（手動で開く）"
+    "autoHideRunSettingsDesc": "チャットを開いた時に実行設定パネルを自動展開しない（手動で開く）",
+    "hotkeyHelper": "ショートカットヘルパー",
+    "hotkeyHelperDesc": "右下にキーボードアイコンを表示してショートカットをすぐに確認"
   },
   "topBarTag": {
     "removeTag": "タグを削除",
@@ -796,5 +798,37 @@
     "activatedTitle": "サポートパック有効",
     "activatedDescription": "すべてのプレミアムテーマがアンロックされています。Better Sidebar をご支援いただきありがとうございます！",
     "deactivate": "無効化"
+  },
+  "hotkeys": {
+    "title": "キーボードショートカット",
+    "description": "ショートカットをクリックして新しいキーの組み合わせを録音します。ショートカットは対象ページがフォーカスされている場合のみ動作します。",
+    "categoryGeneral": "一般",
+    "categoryNavigation": "タブナビゲーション",
+    "categoryActions": "アクション",
+    "toggleSidebar": "サイドバーの切り替え",
+    "newConversation": "新しい会話",
+    "openSearch": "検索を開く",
+    "openSettings": "設定を開く",
+    "navExplorer": "エクスプローラーへ移動",
+    "navSearch": "検索へ移動",
+    "navPrompts": "プロンプトへ移動",
+    "navTags": "タグへ移動",
+    "navFavorites": "お気に入りへ移動",
+    "navGems": "Gems へ移動",
+    "navNotebooks": "ノートブックへ移動",
+    "toggleZenMode": "Zen モードの切り替え",
+    "switchOriginalUI": "元のサイドバーに切り替え",
+    "toggleBatchMode": "一括モードの切り替え",
+    "collapseAll": "すべてのフォルダを折りたたむ",
+    "toggleViewMode": "ツリー/タイムラインの切り替え",
+    "recording": "キーを押してください...",
+    "pressKeys": "キーの組み合わせを押してください",
+    "clickToRecord": "クリックしてショートカットを変更",
+    "resetToDefault": "デフォルトに戻す",
+    "resetAll": "すべてリセット",
+    "conflictWith": "競合：{{action}}",
+    "helpRecording": "💡 ショートカットボタンをクリックし、目的のキーの組み合わせを押してください。",
+    "helpUnbind": "⌫ 録音中に Backspace または Delete を押すと解除されます。",
+    "helpEscape": "⎋ Escape を押すと録音をキャンセルします。"
   }
 }

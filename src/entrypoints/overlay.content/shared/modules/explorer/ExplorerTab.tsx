@@ -348,6 +348,13 @@ export const ExplorerTab = ({
     treeRef.current?.collapseAll();
   };
 
+  // Listen for hotkey-triggered collapse-all event
+  useEffect(() => {
+    const handler = () => treeRef.current?.collapseAll();
+    window.addEventListener('better-sidebar:collapse-all', handler);
+    return () => window.removeEventListener('better-sidebar:collapse-all', handler);
+  }, []);
+
   const handleSelectAll = () => {
     treeRef.current?.selectAll?.();
   };

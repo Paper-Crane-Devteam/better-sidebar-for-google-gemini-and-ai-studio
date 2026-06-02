@@ -643,7 +643,9 @@
     "smartScrollbar": "Smart Scrollbar (Experimental)",
     "smartScrollbarDesc": "Show conversation navigation on the right side",
     "autoHideInput": "Auto-hide Input",
-    "autoHideInputDesc": "Hide input box until you hover the bottom area"
+    "autoHideInputDesc": "Hide input box until you hover the bottom area",
+    "hotkeyHelper": "Shortcut Helper",
+    "hotkeyHelperDesc": "Show keyboard icon in bottom-right for quick shortcut reference"
   },
   "aistudioUI": {
     "title": "UI Controls",
@@ -654,7 +656,9 @@
     "autoHideInput": "Auto-hide Input",
     "autoHideInputDesc": "Hide input box until you hover the bottom area",
     "autoHideRunSettings": "Collapse Run Settings by Default",
-    "autoHideRunSettingsDesc": "Run settings panel stays collapsed when opening a chat, expand manually when needed"
+    "autoHideRunSettingsDesc": "Run settings panel stays collapsed when opening a chat, expand manually when needed",
+    "hotkeyHelper": "Shortcut Helper",
+    "hotkeyHelperDesc": "Show keyboard icon in bottom-right for quick shortcut reference"
   },
   "topBarTag": {
     "removeTag": "Remove tag",
@@ -794,5 +798,43 @@
     "activatedTitle": "Support Pack Active",
     "activatedDescription": "All premium themes are unlocked. Thank you for supporting Better Sidebar!",
     "deactivate": "Deactivate"
+  },
+  "hotkeys": {
+    "title": "Keyboard Shortcuts",
+    "description": "Click a shortcut to record a new key combination. Shortcuts only work when the target page is focused.",
+    "categoryGeneral": "General",
+    "categoryNavigation": "Tab Navigation",
+    "categoryActions": "Actions",
+    "toggleSidebar": "Toggle Sidebar",
+    "newConversation": "New Conversation",
+    "openSearch": "Open Search",
+    "openSettings": "Open Settings",
+    "navExplorer": "Go to Explorer",
+    "navSearch": "Go to Search",
+    "navPrompts": "Go to Prompts",
+    "navTags": "Go to Tags",
+    "navFavorites": "Go to Favorites",
+    "navGems": "Go to Gems",
+    "navNotebooks": "Go to Notebooks",
+    "toggleZenMode": "Toggle Zen Mode",
+    "switchOriginalUI": "Toggle Original Sidebar",
+    "toggleBatchMode": "Toggle Batch Mode",
+    "collapseAll": "Collapse All Folders",
+    "toggleViewMode": "Toggle Tree/Timeline View",
+    "recording": "Press keys...",
+    "pressKeys": "Press the desired key combination",
+    "clickToRecord": "Click to change shortcut",
+    "resetToDefault": "Reset to default",
+    "resetAll": "Reset All",
+    "conflictWith": "Conflicts with: {{action}}",
+    "helpRecording": "💡 Click a shortcut button, then press your desired key combination.",
+    "helpUnbind": "⌫ Press Backspace or Delete while recording to unbind.",
+    "helpEscape": "⎋ Press Escape to cancel recording."
+  },
+  "hotkeyHelper": {
+    "title": "Keyboard Shortcuts",
+    "hide": "Hide this icon",
+    "hideTitle": "Hide Shortcut Helper?",
+    "hideConfirm": "You can re-enable it in Settings → UI Controls → Element Visibility."
   }
 }

@@ -21,12 +21,14 @@ interface GeminiEnhancedFeatures {
   showSmartScrollbar: boolean;
   quickResend: boolean;
   autoHideInput: boolean;
+  showHotkeyHelper: boolean;
 }
 
 interface AIStudioEnhancedFeatures {
   sidebarWidth: number;
   autoHideInput: boolean;
   autoHideRunSettings: boolean;
+  showHotkeyHelper: boolean;
 }
 
 interface SettingsState {
@@ -180,11 +182,13 @@ export const useSettingsStore = create<SettingsState>()(
           showSmartScrollbar: true,
           quickResend: false,
           autoHideInput: false,
+          showHotkeyHelper: true,
         },
         aistudio: {
           sidebarWidth: 320,
           autoHideInput: false,
           autoHideRunSettings: false,
+          showHotkeyHelper: true,
         },
       },
 

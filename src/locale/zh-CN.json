@@ -643,7 +643,9 @@
     "smartScrollbar": "智能滚动条（实验性）",
     "smartScrollbarDesc": "在右侧显示对话导航",
     "autoHideInput": "自动隐藏输入框",
-    "autoHideInputDesc": "隐藏输入框，鼠标悬停底部时自动显示"
+    "autoHideInputDesc": "隐藏输入框，鼠标悬停底部时自动显示",
+    "hotkeyHelper": "快捷键助手",
+    "hotkeyHelperDesc": "在右下角显示键盘图标，悬停查看快捷键"
   },
   "aistudioUI": {
     "title": "界面控制",
@@ -654,7 +656,9 @@
     "autoHideInput": "自动隐藏输入框",
     "autoHideInputDesc": "隐藏输入框，鼠标悬停底部时自动显示",
     "autoHideRunSettings": "默认收起运行设置",
-    "autoHideRunSettingsDesc": "打开对话时不自动展开运行设置面板，需手动打开"
+    "autoHideRunSettingsDesc": "打开对话时不自动展开运行设置面板，需手动打开",
+    "hotkeyHelper": "快捷键助手",
+    "hotkeyHelperDesc": "在右下角显示键盘图标，快速查看快捷键",
   },
   "topBarTag": {
     "removeTag": "移除标签",
@@ -794,5 +798,43 @@
     "activatedTitle": "支持包已激活",
     "activatedDescription": "所有高级主题已解锁。感谢你对 Better Sidebar 的支持！",
     "deactivate": "取消激活"
+  },
+  "hotkeys": {
+    "title": "快捷键",
+    "description": "点击快捷键按钮录制新的组合键。快捷键仅在目标页面聚焦时生效。",
+    "categoryGeneral": "常用",
+    "categoryNavigation": "标签页导航",
+    "categoryActions": "操作",
+    "toggleSidebar": "显示/隐藏侧边栏",
+    "newConversation": "新建对话",
+    "openSearch": "打开搜索",
+    "openSettings": "打开设置",
+    "navExplorer": "跳转到文件管理器",
+    "navSearch": "跳转到搜索",
+    "navPrompts": "跳转到 Prompt 库",
+    "navTags": "跳转到标签",
+    "navFavorites": "跳转到收藏",
+    "navGems": "跳转到 Gems",
+    "navNotebooks": "跳转到笔记本",
+    "toggleZenMode": "切换专注模式",
+    "switchOriginalUI": "切换原始/增强侧边栏",
+    "toggleBatchMode": "切换批量选择模式",
+    "collapseAll": "折叠全部文件夹",
+    "toggleViewMode": "切换树形/时间线视图",
+    "recording": "请按键...",
+    "pressKeys": "按下你想要的组合键",
+    "clickToRecord": "点击修改快捷键",
+    "resetToDefault": "恢复默认",
+    "resetAll": "全部重置",
+    "conflictWith": "与「{{action}}」冲突",
+    "helpRecording": "💡 点击快捷键按钮，然后按下你想要的组合键。",
+    "helpUnbind": "⌫ 录制时按 Backspace 或 Delete 可取消绑定。",
+    "helpEscape": "⎋ 按 Escape 取消录制。"
+  },
+  "hotkeyHelper": {
+    "title": "快捷键速查",
+    "hide": "隐藏此图标",
+    "hideTitle": "隐藏快捷键助手？",
+    "hideConfirm": "你可以在 设置 → 界面控制 → 元素可见性 中重新开启。"
   }
 }

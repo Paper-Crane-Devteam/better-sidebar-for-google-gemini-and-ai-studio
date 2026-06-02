@@ -231,6 +231,22 @@ export const GeminiPlatformSettings = () => {
               />
             </div>
           )}
+
+          {/* Hotkey Helper */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label className="text-sm font-medium">
+                {t('geminiUI.hotkeyHelper')}
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                {t('geminiUI.hotkeyHelperDesc')}
+              </p>
+            </div>
+            <Switch
+              checked={geminiSettings.showHotkeyHelper}
+              onCheckedChange={(c) => setGeminiFeature('showHotkeyHelper', c)}
+            />
+          </div>
         </div>
       </div>
 

@@ -655,7 +655,9 @@
     "autoHideInput": "自動隱藏輸入框",
     "autoHideInputDesc": "滑鼠懸停在底部區域時才顯示輸入框",
     "autoHideRunSettings": "預設收起執行設定",
-    "autoHideRunSettingsDesc": "開啟對話時不自動展開執行設定面板，需手動開啟"
+    "autoHideRunSettingsDesc": "開啟對話時不自動展開執行設定面板，需手動開啟",
+    "hotkeyHelper": "快捷鍵助手",
+    "hotkeyHelperDesc": "在右下角顯示鍵盤圖示，快速查看快捷鍵"
   },
   "topBarTag": {
     "removeTag": "移除標籤",
@@ -795,5 +797,37 @@
     "activatedTitle": "支持包已啟用",
     "activatedDescription": "所有進階主題已解鎖。感謝你對 Better Sidebar 的支持！",
     "deactivate": "停用"
+  },
+  "hotkeys": {
+    "title": "鍵盤快捷鍵",
+    "description": "點擊快捷鍵按鈕以錄製新的組合鍵。快捷鍵僅在目標頁面取得焦點時生效。",
+    "categoryGeneral": "一般",
+    "categoryNavigation": "標籤頁導覽",
+    "categoryActions": "操作",
+    "toggleSidebar": "切換側邊欄",
+    "newConversation": "新增對話",
+    "openSearch": "開啟搜尋",
+    "openSettings": "開啟設定",
+    "navExplorer": "前往資源管理器",
+    "navSearch": "前往搜尋",
+    "navPrompts": "前往 Prompt",
+    "navTags": "前往標籤",
+    "navFavorites": "前往收藏",
+    "navGems": "前往 Gems",
+    "navNotebooks": "前往筆記本",
+    "toggleZenMode": "切換專注模式",
+    "switchOriginalUI": "切換到原始側邊欄",
+    "toggleBatchMode": "切換批次模式",
+    "collapseAll": "摺疊全部資料夾",
+    "toggleViewMode": "切換樹狀/時間軸檢視",
+    "recording": "按下按鍵...",
+    "pressKeys": "按下想要的組合鍵",
+    "clickToRecord": "點擊以更改快捷鍵",
+    "resetToDefault": "恢復預設",
+    "resetAll": "全部重設",
+    "conflictWith": "與以下功能衝突：{{action}}",
+    "helpRecording": "💡 點擊快捷鍵按鈕，然後按下想要的組合鍵。",
+    "helpUnbind": "⌫ 錄製時按 Backspace 或 Delete 可解除綁定。",
+    "helpEscape": "⎋ 按 Escape 取消錄製。"
   }
 }

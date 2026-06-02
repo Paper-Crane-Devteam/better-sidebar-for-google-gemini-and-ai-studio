@@ -655,7 +655,9 @@
     "autoHideInput": "Ocultar entrada automaticamente",
     "autoHideInputDesc": "Ocultar a caixa de entrada até passar o cursor na área inferior",
     "autoHideRunSettings": "Recolher Configurações de Execução por Padrão",
-    "autoHideRunSettingsDesc": "O painel de configurações de execução permanece recolhido ao abrir um chat, expanda manualmente quando necessário"
+    "autoHideRunSettingsDesc": "O painel de configurações de execução permanece recolhido ao abrir um chat, expanda manualmente quando necessário",
+    "hotkeyHelper": "Ajuda de Atalhos",
+    "hotkeyHelperDesc": "Mostrar ícone de teclado no canto inferior direito para referência rápida de atalhos"
   },
   "topBarTag": {
     "removeTag": "Remover tag",
@@ -795,5 +797,37 @@
     "activatedTitle": "Pacote de Suporte ativo",
     "activatedDescription": "Todos os temas premium estão desbloqueados. Obrigado por apoiar o Better Sidebar!",
     "deactivate": "Desativar"
+  },
+  "hotkeys": {
+    "title": "Atalhos de teclado",
+    "description": "Clique em um atalho para gravar uma nova combinação de teclas. Os atalhos só funcionam quando a página de destino está em foco.",
+    "categoryGeneral": "Geral",
+    "categoryNavigation": "Navegação de abas",
+    "categoryActions": "Ações",
+    "toggleSidebar": "Alternar barra lateral",
+    "newConversation": "Nova conversa",
+    "openSearch": "Abrir pesquisa",
+    "openSettings": "Abrir configurações",
+    "navExplorer": "Ir para o explorador",
+    "navSearch": "Ir para pesquisa",
+    "navPrompts": "Ir para prompts",
+    "navTags": "Ir para tags",
+    "navFavorites": "Ir para favoritos",
+    "navGems": "Ir para Gems",
+    "navNotebooks": "Ir para notebooks",
+    "toggleZenMode": "Alternar modo Zen",
+    "switchOriginalUI": "Alternar para barra lateral original",
+    "toggleBatchMode": "Alternar modo de lote",
+    "collapseAll": "Recolher todas as pastas",
+    "toggleViewMode": "Alternar visualização árvore/linha do tempo",
+    "recording": "Pressione as teclas...",
+    "pressKeys": "Pressione a combinação de teclas desejada",
+    "clickToRecord": "Clique para alterar o atalho",
+    "resetToDefault": "Restaurar padrão",
+    "resetAll": "Redefinir tudo",
+    "conflictWith": "Conflito com: {{action}}",
+    "helpRecording": "💡 Clique em um botão de atalho e pressione a combinação de teclas desejada.",
+    "helpUnbind": "⌫ Pressione Backspace ou Delete durante a gravação para desvincular.",
+    "helpEscape": "⎋ Pressione Escape para cancelar a gravação."
   }
 }

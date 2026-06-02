@@ -43,10 +43,13 @@ import { detectAccount } from '@/entrypoints/content/shared/detect-account';
 import { Platform } from '@/shared/types/platform';
 import { useBadgeStore } from '@/shared/lib/badge-store';
 import { BadgeDot } from '@/shared/components/ui/badge-dot';
+import { useHotkeyListener } from '@/shared/hooks/useHotkeyListener';
+import { HotkeyCheatsheet } from '../shared/components/HotkeyCheatsheet';
 
 export const OverlayPanel = ({ className }: { className?: string }) => {
   const moduleConfig = useModuleConfig();
   useAppInit();
+  useHotkeyListener();
   const { t } = useI18n();
   const { path } = useUrl();
 
@@ -413,6 +416,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
       <GlobalModal />
       <ProfilePickerDialog />
       <GlobalToast />
+      <HotkeyCheatsheet />
     </div>
   );
 };
