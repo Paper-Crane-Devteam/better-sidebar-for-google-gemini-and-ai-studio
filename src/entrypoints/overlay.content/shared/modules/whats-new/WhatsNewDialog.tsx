@@ -6,6 +6,7 @@ import {
   Sparkles,
   CheckCircle2,
   Wrench,
+  Heart,
 } from 'lucide-react';
 import { useModalStore } from '@/shared/lib/modal';
 import { useI18n } from '@/shared/hooks/useI18n';
@@ -80,6 +81,33 @@ export const WhatsNewDialog = () => {
                         >
                           <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground mt-1.5 ml-1 shrink-0" />
                           <span>{fix}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Announcement Section */}
+                {latestUpdate.announcement && (
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-medium text-primary flex items-center gap-2">
+                      <Heart className="w-4 h-4 text-pink-500" /> {latestUpdate.announcement.title}
+                    </h4>
+                    <ul className="space-y-2">
+                      {latestUpdate.announcement.content.map((line: string, idx: number) => (
+                        <li
+                          key={idx}
+                          className="text-sm text-muted-foreground flex items-start gap-2"
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full bg-pink-400 mt-1.5 ml-1 shrink-0" />
+                          <span
+                            dangerouslySetInnerHTML={{
+                              __html: line.replace(
+                                /\*\*(.*?)\*\*/g,
+                                '<strong>$1</strong>',
+                              ),
+                            }}
+                          />
                         </li>
                       ))}
                     </ul>

@@ -1,97 +1,104 @@
-Is your Google AI Studio prompt history becoming a mess?
-Struggling to find that one perfect prompt you wrote last week?
+The all-in-one chat organizer, prompt manager & productivity toolkit for Google Gemini and AI Studio.
+Organize conversations into folders, search across all messages, export chats, sync to Google Drive, and customize your UI — all in one extension.
 
-Meet BETTER SIDEBAR FOR GEMINI & AI STUDIO — the ultimate workflow booster for developers, prompt engineers, and AI enthusiasts.
+Meet BETTER SIDEBAR FOR GEMINI & AI STUDIO — the ultimate workflow booster for developers, prompt engineers, and AI power users.
 
-We transform the default AI Studio interface into a powerful, organized knowledge base. Stop scrolling endlessly and start organizing your ideas efficiently.
+We transform the default interface into a powerful, organized knowledge base. Stop scrolling endlessly through conversation history and start working efficiently.
 
-🔥 WHAT'S NEW (v2.5.0)
-• 📓 Notebook Integration (Gemini): Full notebook support — browse, organize, and manage your Gemini notebooks right from the sidebar.
-• ☁️ Auto Google Drive Sync: Your settings and prompt library now sync to Google Drive automatically. No more manual backups.
-• ✨ UX Improvements: Added loading states when creating conversations, plus various interaction polish for a smoother experience.
+🔥 WHAT'S NEW (v2.7.0)
+
+✨ Features:
+• ⌨️ Hotkey Support: Keyboard shortcuts for faster navigation and operations.
+
+🐛 Fixes:
+• 💬 Improved Markdown styling in search preview messages for a better reading experience.
+
+❤️ Supporter Pack:
+• 🎨 AI-Generated Custom Themes: Use AI to generate any custom theme you can imagine — cyberpunk, pastel, retro, anything goes.
+• 🎉 New sponsorship channel launched (Aifadian) for our Chinese users. Thank you all for your incredible support!
 
 ---
 
 🚀 KEY FEATURES
 
-🌟 Multi-Platform Support
-Manage conversations across both Gemini and Google AI Studio seamlessly in one unified sidebar.
-
-👥 Multi-Account Profiles
-Create separate profiles for work or personal use. Each maintains its own independent database.
-
-🔍 Chained Search
-Filter conversations by combining multiple conditions — title, tag, and type — for laser-precise results.
-
-💎 Gem Management
-Full Gem integration — browse, filter, create, and start conversations with your Gems right from the sidebar.
-
-📜 Smart Scrollbar
-A visual scrollbar for Gemini conversations. Jump directly to any message in long chats — no more endless scrolling.
-
-🤖 Default Model
-Set a default model for Gemini and every new conversation will automatically use it.
-
-✏️ True Rename
-Rename conversations directly — changes are synced to Google's servers in real time.
-
-🗑️ True Delete & Batch Delete
-Delete or batch-delete conversations with real server-side removal. No more ghost chats.
-
-🔐 Persistent Login
-Stay logged in across sessions with smart merge for synced data.
+📂 SIDEBAR & ORGANIZATION
 
 📂 Folders & Colors
-Drag and drop your chats into nested folders. Assign custom colors to folders and tags.
+Drag and drop your chats into nested folders. Assign custom colors to folders and tags for visual clarity.
+
+🔍 Search & Filter
+Full-text search across every message in your history. Combine multiple conditions — title, tag, type — for laser-precise results. Search within the active chat for immediate context.
+
+🏷️ Smart Tagging
+Assign custom tags to conversations, visible directly in the chat header. Filter instantly by tag.
+
+⭐ Favorites & Pinning
+Pin your most important chats or prompts to the top for quick access.
+
+📊 Timeline View
+Visualize your workflow with "Today", "Yesterday", and "Last Week" groupings.
+
+🗑️ Batch Delete
+Batch-delete conversations with real server-side removal. No more ghost chats.
+
+� Conversation Export
+Export conversations as Markdown, Plain Text, or JSON for documentation or backup.
+
+---
+
+🎨 UI CUSTOMIZATION
+
+Gemini:
+• Adjust sidebar, chat content, and input box widths
+• Focus Mode — hide unnecessary elements (logo, disclaimer, upgrade button)
+• Smart Scrollbar — jump directly to any message in long conversations
+• Watermark-free image downloads (including Pro HD images)
+
+AI Studio:
+• Configurable sidebar width
+• Auto-hide input box
+• Auto-hide run settings panel
+
+🎨 Themes
+3 exclusive themes available via Supporter Pack. Light/dark mode auto-detected.
+
+---
+
+� GEMS, NOTEBOOKS & PROMPTS
+
+💎 Gem Management
+Full Gem integration — browse, filter, create, and start Gem conversations right from the sidebar.
+
+📓 Notebook Integration
+Full notebook support for Gemini — browse, organize, and manage your notebooks from the sidebar.
 
 📝 Prompt Library
 Build your personal library of reusable prompts. Supports option variables, prompt composition, and system prompt imports.
 
-🔍 Precision Search
-Perform full-text searches across every message in your history. Limit search to the active chat for immediate context.
-
-📓 Notebook Integration (NEW)
-Full notebook support for Gemini — browse, organize, and manage your notebooks right from the sidebar.
-
 ☁️ Google Drive Auto Sync
 Automatically sync your settings, prompts, and config data to Google Drive in the background. Always backed up.
 
-🎨 UI Customization
-Advanced layout controls for Gemini, including width adjustments and Focus Mode.
+---
 
-⚙️ Platform Manager
-Use the extension popup to quickly jump between platforms or enable/disable them on the fly.
+⚙️ MORE
 
-🏷️ Smart Tagging System
-Assign custom tags to your conversations, now visible directly in the chat header.
+🌟 Multi-Platform Support
+Manage conversations across both Gemini and Google AI Studio in one unified sidebar.
 
-⭐ Favorites & Pinning
-Keep your most frequently used chats or specific prompts at the top for quick access.
+� Multi-Account Profiles
+Create separate profiles for work or personal use. Each maintains its own independent database.
 
-🔄 Automatic Sync
-Your latest conversations are automatically synced behind the scenes when you visit the page.
+💾 Data Control
+Your data is yours. Export your organization structure (SQL dump) anytime for backup.
 
-📊 Timeline View
-Visualize your workflow with a "Today", "Yesterday", and "Last Week" timeline.
-
-🖼️ Watermark-Free Image Downloads
-Automatically remove watermarks when downloading generated images in Gemini, including Pro HD images.
-
-📥 Conversation Export
-Export your conversations as Markdown, Plain Text, or JSON for documentation or backup.
-
-🌗 Seamless Integration
-Automatically matches the platform's light/dark mode.
-
-💾 Secure Data Backup
-Your data is yours. Export your organization structure (SQL dump) for backup.
+---
 
 🔒 PRIVACY FIRST
 
 We take your privacy seriously.
 
 • 100% Local: We use an embedded SQLite database running entirely within your browser.
-• No Cloud Sync: Your folders, tags, and notes are NOT sent to our servers.
+• No Cloud Sync to Our Servers: Your folders, tags, and notes are NOT sent to our servers.
 • No Training: We do not read your conversations to train any AI models.
 
 WHY DOES THE EXTENSION NEED PERMISSIONS?

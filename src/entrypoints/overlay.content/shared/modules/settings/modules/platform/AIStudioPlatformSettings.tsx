@@ -118,6 +118,22 @@ export const AIStudioPlatformSettings = () => {
               }
             />
           </div>
+
+          {/* Hotkey Helper */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label className="text-sm font-medium">
+                {t('aistudioUI.hotkeyHelper')}
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                {t('aistudioUI.hotkeyHelperDesc')}
+              </p>
+            </div>
+            <Switch
+              checked={aistudioSettings.showHotkeyHelper ?? true}
+              onCheckedChange={(c) => setAIStudioFeature('showHotkeyHelper', c)}
+            />
+          </div>
         </div>
       </div>
     </div>

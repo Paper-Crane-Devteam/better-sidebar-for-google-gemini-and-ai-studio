@@ -262,7 +262,8 @@
     "codex": "Codex",
     "myStuff": "我的内容",
     "gems": "Gems",
-    "originalUI": "切换到原始侧边栏"
+    "originalUI": "切换到原始侧边栏",
+    "notebooks": "笔记本"
   },
   "overlay": {
     "settingsPageComingSoon": "设置页面即将推出",
@@ -642,7 +643,11 @@
     "smartScrollbar": "智能滚动条（实验性）",
     "smartScrollbarDesc": "在右侧显示对话导航",
     "autoHideInput": "自动隐藏输入框",
-    "autoHideInputDesc": "隐藏输入框，鼠标悬停底部时自动显示"
+    "autoHideInputDesc": "隐藏输入框，鼠标悬停底部时自动显示",
+    "slashCommand": "斜杠命令",
+    "slashCommandDesc": "在输入框中输入 / 快速插入提示词库中的提示词",
+    "hotkeyHelper": "快捷键助手",
+    "hotkeyHelperDesc": "在右下角显示键盘图标，悬停查看快捷键"
   },
   "aistudioUI": {
     "title": "界面控制",
@@ -653,7 +658,11 @@
     "autoHideInput": "自动隐藏输入框",
     "autoHideInputDesc": "隐藏输入框，鼠标悬停底部时自动显示",
     "autoHideRunSettings": "默认收起运行设置",
-    "autoHideRunSettingsDesc": "打开对话时不自动展开运行设置面板，需手动打开"
+    "autoHideRunSettingsDesc": "打开对话时不自动展开运行设置面板，需手动打开",
+    "slashCommand": "斜杠命令",
+    "slashCommandDesc": "在输入框中输入 / 快速插入提示词库中的提示词",
+    "hotkeyHelper": "快捷键助手",
+    "hotkeyHelperDesc": "在右下角显示键盘图标，快速查看快捷键"
   },
   "topBarTag": {
     "removeTag": "移除标签",
@@ -663,6 +672,17 @@
     "noTagsAvailable": "没有可用的标签。",
     "saveChanges": "保存更改",
     "cancel": "取消"
+  },
+  "slashCommand": {
+    "promptLibrary": "提示词库",
+    "noResults": "未找到匹配的提示词",
+    "results": "个结果",
+    "navigate": "导航",
+    "select": "选择",
+    "dismiss": "关闭",
+    "fillVariables": "填写变量",
+    "insert": "插入",
+    "promptInserted": "提示词已插入"
   },
   "filterBar": {
     "all": "全部"
@@ -743,9 +763,31 @@
     "customThemesDescription": "为 Gemini 界面应用自定义视觉主题，覆盖默认配色方案。",
     "default": "默认",
     "defaultDescription": "默认主题，支持浅色/深色模式切换",
+    "classic": "Gemini 经典",
     "classicDescription": "经典 Gemini 外观，冷蓝色调面板",
+    "cupertinoGlassName": "果味毛玻璃",
+    "cupertinoGlassDescription": "磨砂玻璃质感，系统原生字体，极简黑白灰，纯粹生产力",
+    "grimoireName": "魔法卷轴",
+    "grimoireDescription": "羊皮纸质感，温暖做旧色调，衬线字体，沉浸式奇幻体验",
+    "retroTerminalName": "复古终端机",
+    "retroTerminalDescription": "纯黑底色，荧光绿文字，等宽字体，硬核极客命令控制台",
     "previewBannerText": "预览模式 — 主题将在 5 分钟后恢复默认。购买支持包可永久使用。",
-    "buyNow": "立即购买"
+    "buyNow": "立即购买",
+    "aiGeneratorTitle": "没有想要的主题？",
+    "aiGeneratorDescription": "让 AI 为你量身定制。创建 Prompt 描述你的风格，AI 会帮你生成专属主题。",
+    "createPromptButton": "用 AI 创建",
+    "importThemeButton": "导入主题",
+    "importThemeTitle": "导入自定义主题",
+    "importJsonLabel": "粘贴 AI 生成的主题 JSON：",
+    "importJsonPlaceholder": "{\n  \"id\": \"my-theme\",\n  \"name\": \"My Theme\",\n  \"preferredMode\": \"dark\",\n  ...\n}",
+    "validTheme": "主题格式正确",
+    "invalidTheme": "主题格式无效",
+    "importAndApply": "导入并应用",
+    "importRequiresLicense": "导入自定义主题需要支持包。",
+    "importSuccess": "主题导入并应用成功！",
+    "promptAlreadyExists": "AI 主题 Prompt 已存在，正在跳转到 Prompt 管理。",
+    "promptCreated": "Prompt 已创建！正在跳转到 Prompt 管理。",
+    "themeDeleted": "自定义主题已删除。"
   },
   "supportPack": {
     "title": "支持包",
@@ -755,10 +797,13 @@
     "feature2": "未来新增主题免费获取",
     "feature3": "最多可在 3 台设备上激活",
     "feature4": "支持独立开源开发者",
+    "feature5": "创建 AI 生成的自定义主题",
     "buyButton": "获取支持包",
+    "otherPlatform": "其他平台：",
     "afdian": "爱发电",
     "alreadyPurchased": "已经购买了？",
     "enterToken": "在下方输入你从 Gumroad 或爱发电获得的激活码。",
+    "tokenPlaceholder": "输入激活码",
     "activate": "激活",
     "invalidToken": "格式无效。请输入 BS-SP-XXXXXXXX 或 Gumroad 许可证密钥。",
     "networkError": "网络错误，请检查网络连接后重试。",
@@ -768,5 +813,43 @@
     "activatedTitle": "支持包已激活",
     "activatedDescription": "所有高级主题已解锁。感谢你对 Better Sidebar 的支持！",
     "deactivate": "取消激活"
+  },
+  "hotkeys": {
+    "title": "快捷键",
+    "description": "点击快捷键按钮录制新的组合键。快捷键仅在目标页面聚焦时生效。",
+    "categoryGeneral": "常用",
+    "categoryNavigation": "标签页导航",
+    "categoryActions": "操作",
+    "toggleSidebar": "显示/隐藏侧边栏",
+    "newConversation": "新建对话",
+    "openSearch": "打开搜索",
+    "openSettings": "打开设置",
+    "navExplorer": "跳转到文件管理器",
+    "navSearch": "跳转到搜索",
+    "navPrompts": "跳转到 Prompt 库",
+    "navTags": "跳转到标签",
+    "navFavorites": "跳转到收藏",
+    "navGems": "跳转到 Gems",
+    "navNotebooks": "跳转到笔记本",
+    "toggleZenMode": "切换专注模式",
+    "switchOriginalUI": "切换原始/增强侧边栏",
+    "toggleBatchMode": "切换批量选择模式",
+    "collapseAll": "折叠全部文件夹",
+    "toggleViewMode": "切换树形/时间线视图",
+    "recording": "请按键...",
+    "pressKeys": "按下你想要的组合键",
+    "clickToRecord": "点击修改快捷键",
+    "resetToDefault": "恢复默认",
+    "resetAll": "全部重置",
+    "conflictWith": "与「{{action}}」冲突",
+    "helpRecording": "💡 点击快捷键按钮，然后按下你想要的组合键。",
+    "helpUnbind": "⌫ 录制时按 Backspace 或 Delete 可取消绑定。",
+    "helpEscape": "⎋ 按 Escape 取消录制。"
+  },
+  "hotkeyHelper": {
+    "title": "快捷键速查",
+    "hide": "隐藏此图标",
+    "hideTitle": "隐藏快捷键助手？",
+    "hideConfirm": "你可以在 设置 → 界面控制 → 元素可见性 中重新开启。"
   }
 }

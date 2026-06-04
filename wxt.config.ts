@@ -74,11 +74,6 @@ export default defineConfig({
     plugins: [
       viteStaticCopy({
         targets: [
-          // Copy all SQLite WASM assets to root (for Main World and general access)
-          // {
-          //   src: 'node_modules/@sqlite.org/sqlite-wasm/sqlite-wasm/jswasm/*',
-          //   dest: '.',
-          // },
           // Copy all SQLite WASM assets to assets/ (for Worker default relative path resolution)
           {
             src: 'src/assets/wa-sqlite-fts5/*',
@@ -87,6 +82,16 @@ export default defineConfig({
         ],
       }),
     ],
+    worker: {
+      rollupOptions: {
+        output: {
+          // Use fixed file names for worker assets (no hash) so offscreen.ts
+          // can reference them via chrome.runtime.getURL() with a known path.
+          entryFileNames: 'assets/[name].js',
+          chunkFileNames: 'assets/[name].js',
+        },
+      },
+    },
     optimizeDeps: {
       exclude: ['wa-sqlite'],
     },

@@ -12,6 +12,7 @@ import {
   Infinity,
   Monitor,
   Heart,
+  Wand2,
 } from 'lucide-react';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useLicenseStore, isLicenseValid } from '@/shared/lib/license-store';
@@ -114,6 +115,10 @@ function PurchaseView({ t }: { t: (key: string) => string }) {
           text={t('supportPack.feature2')}
         />
         <FeatureItem
+          icon={<Wand2 className="h-4 w-4 text-primary" />}
+          text={t('supportPack.feature5')}
+        />
+        <FeatureItem
           icon={<Monitor className="h-4 w-4 text-primary" />}
           text={t('supportPack.feature3')}
         />
@@ -123,8 +128,8 @@ function PurchaseView({ t }: { t: (key: string) => string }) {
         />
       </div>
 
-      {/* Purchase buttons */}
-      <div className="space-y-3">
+      {/* Purchase button + platform switcher */}
+      <div className="space-y-2">
         <Button
           className="w-full h-10 gap-2"
           onClick={() => openPurchasePage()}
@@ -133,25 +138,24 @@ function PurchaseView({ t }: { t: (key: string) => string }) {
           {t('supportPack.buyButton')}
         </Button>
 
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1 h-8 text-xs gap-1.5"
+        {/* Small platform switcher */}
+        <div className="flex items-center justify-center gap-3 text-xs text-muted-foreground">
+          <span>{t('supportPack.otherPlatform')}</span>
+          <button
+            className="inline-flex items-center gap-1 underline underline-offset-2 hover:text-foreground transition-colors"
             onClick={() => window.open(links.gumroad, '_blank')}
           >
-            <ExternalLink className="h-3 w-3" />
             Gumroad
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1 h-8 text-xs gap-1.5"
+            <ExternalLink className="h-3 w-3" />
+          </button>
+          <span>|</span>
+          <button
+            className="inline-flex items-center gap-1 underline underline-offset-2 hover:text-foreground transition-colors"
             onClick={() => window.open(links.afdian, '_blank')}
           >
-            <ExternalLink className="h-3 w-3" />
             {t('supportPack.afdian')}
-          </Button>
+            <ExternalLink className="h-3 w-3" />
+          </button>
         </div>
       </div>
 
@@ -222,7 +226,7 @@ function ActivationInput({ t }: { t: (key: string) => string }) {
             setError(null);
             setSuccess(false);
           }}
-          placeholder="BS-SP-XXXXXXXX"
+          placeholder={t('supportPack.tokenPlaceholder')}
           className="flex-1 h-9 rounded-md border border-input bg-background px-3 text-sm font-mono placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleActivate();

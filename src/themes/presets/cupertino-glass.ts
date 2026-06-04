@@ -12,10 +12,8 @@ import type { ThemePreset } from '../types';
 export const cupertinoGlass: ThemePreset = {
   id: 'cupertino-glass',
   name: 'Cupertino Glass',
-  nameZh: '果味毛玻璃',
   description:
     'Frosted glass aesthetic with system fonts and minimal color palette',
-  descriptionZh: '磨砂玻璃质感，系统原生字体，极简黑白灰，纯粹生产力',
   isPremium: true,
   preferredMode: 'light',
   fonts: ['Inter:wght@300;400;500;600'],

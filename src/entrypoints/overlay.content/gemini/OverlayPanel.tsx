@@ -55,9 +55,13 @@ import { GEMINI_TOUR_STEPS } from '../shared/modules/guided-tour/tour-steps';
 import { useBadgeStore } from '@/shared/lib/badge-store';
 import { BadgeDot } from '@/shared/components/ui/badge-dot';
 
+import { useHotkeyListener } from '@/shared/hooks/useHotkeyListener';
+import { HotkeyCheatsheet } from '../shared/components/HotkeyCheatsheet';
+
 export const OverlayPanel = ({ className }: { className?: string }) => {
   const moduleConfig = useModuleConfig();
   useAppInit();
+  useHotkeyListener();
   const guidedTour = useGuidedTour();
   const { t } = useI18n();
   const { path } = useUrl();
@@ -308,6 +312,17 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               <Sparkles className="sidebar-icon" />
             </Button>
           </SimpleTooltip>
+          <SimpleTooltip content={t('tabs.tags')}>
+            <Button
+              variant={activeTab === 'tags' ? 'secondary' : 'ghost'}
+              size="icon"
+              onClick={() => handleTabChange('tags')}
+              className="sidebar-btn transition-all"
+              data-tour-id="tour-tags"
+            >
+              <Tag className="sidebar-icon" />
+            </Button>
+          </SimpleTooltip>
           {shortcuts?.favorites && (
             <SimpleTooltip content={t('tabs.favorites')}>
               <Button
@@ -321,34 +336,9 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               </Button>
             </SimpleTooltip>
           )}
-          <SimpleTooltip content={t('tabs.tags')}>
-            <Button
-              variant={activeTab === 'tags' ? 'secondary' : 'ghost'}
-              size="icon"
-              onClick={() => handleTabChange('tags')}
-              className="sidebar-btn transition-all"
-              data-tour-id="tour-tags"
-            >
-              <Tag className="sidebar-icon" />
-            </Button>
-          </SimpleTooltip>
 
-          {((shortcuts?.myStuff ?? true) || (shortcuts?.gems ?? true) || (shortcuts?.notebooks ?? true)) && (
+          {((shortcuts?.gems ?? true) || (shortcuts?.notebooks ?? true) || (shortcuts?.myStuff ?? true)) && (
             <Separator className="w-8 my-1" />
-          )}
-
-          {(shortcuts?.notebooks ?? true) && (
-            <SimpleTooltip content={t('tabs.notebooks')}>
-              <Button
-                variant={activeTab === 'notebooks' ? 'secondary' : 'ghost'}
-                size="icon"
-                onClick={() => handleTabChange('notebooks')}
-                className="sidebar-btn transition-all"
-                data-tour-id="tour-notebooks"
-              >
-                <NotebookText className="sidebar-icon" />
-              </Button>
-            </SimpleTooltip>
           )}
 
           {(shortcuts?.gems ?? true) && (
@@ -361,6 +351,20 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
                 data-tour-id="tour-gems"
               >
                 <Gem className="sidebar-icon" />
+              </Button>
+            </SimpleTooltip>
+          )}
+
+          {(shortcuts?.notebooks ?? true) && (
+            <SimpleTooltip content={t('tabs.notebooks')}>
+              <Button
+                variant={activeTab === 'notebooks' ? 'secondary' : 'ghost'}
+                size="icon"
+                onClick={() => handleTabChange('notebooks')}
+                className="sidebar-btn transition-all"
+                data-tour-id="tour-notebooks"
+              >
+                <NotebookText className="sidebar-icon" />
               </Button>
             </SimpleTooltip>
           )}
@@ -482,6 +486,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
       <ProfilePickerDialog />
       <RatingPromptDialog />
       <GlobalToast />
+      <HotkeyCheatsheet />
       {guidedTour.showPrompt && isSidebarExpanded && (
         <TourPromptDialog
           isOpen={guidedTour.showPrompt}

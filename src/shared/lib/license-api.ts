@@ -8,7 +8,7 @@
 import type { LicenseTier } from './license-store';
 
 /** The base URL of the license validation worker */
-const LICENSE_API_URL = 'https://license.bettersidebar.workers.dev';
+const LICENSE_API_URL = import.meta.env.VITE_LICENSE_API_URL;
 
 /** Validation duration: 14 days in milliseconds */
 const VALIDATION_DURATION_MS = 14 * 24 * 60 * 60 * 1000;

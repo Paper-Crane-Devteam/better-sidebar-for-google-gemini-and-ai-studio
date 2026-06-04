@@ -40,6 +40,8 @@ export const GeminiUIControl = () => {
     setQuickResend,
     autoHideInput,
     setAutoHideInput,
+    slashCommand,
+    setSlashCommand,
   } = useGeminiUI();
 
   return (
@@ -297,8 +299,8 @@ export const GeminiUIControl = () => {
                   />
                 </div> */}
 
-                {/* [DEPRECATED] Remove AI Sparkle Image Watermark - Gemini no longer adds watermarks to downloads */}
-                {/* <div className="flex items-center justify-between group">
+                {/* Remove AI Sparkle Image Watermark */}
+                <div className="flex items-center justify-between group">
                   <div className="space-y-0.5">
                     <Label
                       className="text-xs font-semibold cursor-pointer"
@@ -314,7 +316,7 @@ export const GeminiUIControl = () => {
                     checked={removeWatermark}
                     onCheckedChange={(c) => setRemoveWatermark(c)}
                   />
-                </div> */}
+                </div>
 
                 {/* Smart Scrollbar */}
                 <div className="flex items-center justify-between group">
@@ -351,6 +353,25 @@ export const GeminiUIControl = () => {
                   <Switch
                     checked={autoHideInput}
                     onCheckedChange={(c) => setAutoHideInput(c)}
+                  />
+                </div>
+
+                {/* Slash Command */}
+                <div className="flex items-center justify-between group">
+                  <div className="space-y-0.5">
+                    <Label
+                      className="text-xs font-semibold cursor-pointer"
+                      onClick={() => setSlashCommand(!slashCommand)}
+                    >
+                      {t('geminiUI.slashCommand')}
+                    </Label>
+                    <p className="text-[10px] text-muted-foreground">
+                      {t('geminiUI.slashCommandDesc')}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={slashCommand}
+                    onCheckedChange={(c) => setSlashCommand(c)}
                   />
                 </div>
               </div>
