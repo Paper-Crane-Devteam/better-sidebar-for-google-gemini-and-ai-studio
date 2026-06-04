@@ -644,7 +644,11 @@
     "smartScrollbar": "智慧捲軸（實驗性）",
     "smartScrollbarDesc": "在右側顯示對話導覽",
     "autoHideInput": "自動隱藏輸入框",
-    "autoHideInputDesc": "滑鼠懸停在底部區域時才顯示輸入框"
+    "autoHideInputDesc": "滑鼠懸停在底部區域時才顯示輸入框",
+    "slashCommand": "斜線命令",
+    "slashCommandDesc": "在輸入框中輸入 / 快速插入提示詞庫中的提示詞",
+    "hotkeyHelper": "快捷鍵助手",
+    "hotkeyHelperDesc": "在右下角顯示鍵盤圖示，懸停查看快捷鍵"
   },
   "aistudioUI": {
     "title": "介面控制",
@@ -656,6 +660,8 @@
     "autoHideInputDesc": "滑鼠懸停在底部區域時才顯示輸入框",
     "autoHideRunSettings": "預設收起執行設定",
     "autoHideRunSettingsDesc": "開啟對話時不自動展開執行設定面板，需手動開啟",
+    "slashCommand": "斜線命令",
+    "slashCommandDesc": "在輸入框中輸入 / 快速插入提示詞庫中的提示詞",
     "hotkeyHelper": "快捷鍵助手",
     "hotkeyHelperDesc": "在右下角顯示鍵盤圖示，快速查看快捷鍵"
   },

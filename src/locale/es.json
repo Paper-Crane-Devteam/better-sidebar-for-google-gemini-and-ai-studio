@@ -644,7 +644,11 @@
     "smartScrollbar": "Barra de desplazamiento inteligente (Experimental)",
     "smartScrollbarDesc": "Mostrar navegación de conversación en el lado derecho",
     "autoHideInput": "Ocultar entrada automáticamente",
-    "autoHideInputDesc": "Ocultar el cuadro de entrada hasta que pases el cursor por la zona inferior"
+    "autoHideInputDesc": "Ocultar el cuadro de entrada hasta que pases el cursor por la zona inferior",
+    "slashCommand": "Comandos con barra",
+    "slashCommandDesc": "Escribe / en la entrada para insertar rápidamente prompts de la biblioteca",
+    "hotkeyHelper": "Ayuda de Atajos",
+    "hotkeyHelperDesc": "Mostrar icono de teclado en la esquina inferior derecha para referencia rápida de atajos"
   },
   "aistudioUI": {
     "title": "Controles de Interfaz",
@@ -656,6 +660,8 @@
     "autoHideInputDesc": "Ocultar el cuadro de entrada hasta que pases el cursor por la zona inferior",
     "autoHideRunSettings": "Contraer Configuración de Ejecución por Defecto",
     "autoHideRunSettingsDesc": "El panel de configuración de ejecución permanece contraído al abrir un chat, expandir manualmente cuando sea necesario",
+    "slashCommand": "Comandos con barra",
+    "slashCommandDesc": "Escribe / en la entrada para insertar rápidamente prompts de la biblioteca",
     "hotkeyHelper": "Ayuda de Atajos",
     "hotkeyHelperDesc": "Mostrar icono de teclado en la esquina inferior derecha para referencia rápida de atajos"
   },

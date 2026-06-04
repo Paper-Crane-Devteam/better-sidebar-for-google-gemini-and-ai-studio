@@ -645,7 +645,11 @@
     "smartScrollbar": "スマートスクロールバー（実験的）",
     "smartScrollbarDesc": "右側に会話ナビゲーションを表示",
     "autoHideInput": "入力欄の自動非表示",
-    "autoHideInputDesc": "下部エリアにホバーするまで入力欄を非表示にする"
+    "autoHideInputDesc": "下部エリアにホバーするまで入力欄を非表示にする",
+    "slashCommand": "スラッシュコマンド",
+    "slashCommandDesc": "入力欄で / を入力してライブラリからプロンプトをすばやく挿入",
+    "hotkeyHelper": "ショートカットヘルパー",
+    "hotkeyHelperDesc": "右下にキーボードアイコンを表示してショートカットをすぐに確認"
   },
   "aistudioUI": {
     "title": "UI コントロール",
@@ -657,6 +661,8 @@
     "autoHideInputDesc": "下部エリアにホバーするまで入力欄を非表示にする",
     "autoHideRunSettings": "実行設定をデフォルトで折りたたむ",
     "autoHideRunSettingsDesc": "チャットを開いた時に実行設定パネルを自動展開しない（手動で開く）",
+    "slashCommand": "スラッシュコマンド",
+    "slashCommandDesc": "入力欄で / を入力してライブラリからプロンプトをすばやく挿入",
     "hotkeyHelper": "ショートカットヘルパー",
     "hotkeyHelperDesc": "右下にキーボードアイコンを表示してショートカットをすぐに確認"
   },

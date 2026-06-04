@@ -644,6 +644,8 @@
     "smartScrollbarDesc": "Show conversation navigation on the right side",
     "autoHideInput": "Auto-hide Input",
     "autoHideInputDesc": "Hide input box until you hover the bottom area",
+    "slashCommand": "Slash Commands",
+    "slashCommandDesc": "Type / in input to quickly insert prompts from library",
     "hotkeyHelper": "Shortcut Helper",
     "hotkeyHelperDesc": "Show keyboard icon in bottom-right for quick shortcut reference"
   },
@@ -657,6 +659,8 @@
     "autoHideInputDesc": "Hide input box until you hover the bottom area",
     "autoHideRunSettings": "Collapse Run Settings by Default",
     "autoHideRunSettingsDesc": "Run settings panel stays collapsed when opening a chat, expand manually when needed",
+    "slashCommand": "Slash Commands",
+    "slashCommandDesc": "Type / in input to quickly insert prompts from library",
     "hotkeyHelper": "Shortcut Helper",
     "hotkeyHelperDesc": "Show keyboard icon in bottom-right for quick shortcut reference"
   },
@@ -668,6 +672,17 @@
     "noTagsAvailable": "No tags available.",
     "saveChanges": "Save changes",
     "cancel": "Cancel"
+  },
+  "slashCommand": {
+    "promptLibrary": "Prompt Library",
+    "noResults": "No matching prompts found",
+    "results": "results",
+    "navigate": "navigate",
+    "select": "select",
+    "dismiss": "dismiss",
+    "fillVariables": "Fill Variables",
+    "insert": "Insert",
+    "promptInserted": "Prompt inserted"
   },
   "filterBar": {
     "all": "All"

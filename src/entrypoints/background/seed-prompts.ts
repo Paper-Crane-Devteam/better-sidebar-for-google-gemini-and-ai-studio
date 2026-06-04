@@ -16,7 +16,7 @@ export async function seedDefaultPrompts(): Promise<void> {
         id: crypto.randomUUID(),
         title: 'Translate',
         content:
-          'Translate the following text to {{language:English,Chinese,Japanese,Spanish,French,German,Korean,Portuguese,Russian}}:\n\n{{text}}',
+          'Translate the following text to {{target_language:English,Chinese,Japanese,Spanish,French,German,Korean,Portuguese,Russian}}:',
         type: 'normal' as const,
         icon: 'MessageSquare',
         order_index: 0,
@@ -27,7 +27,7 @@ export async function seedDefaultPrompts(): Promise<void> {
         id: crypto.randomUUID(),
         title: 'Summarize',
         content:
-          'Please summarize the following content concisely, highlighting the key points:\n\n{{content}}',
+          'Please summarize the following content concisely, highlighting the key points:',
         type: 'normal' as const,
         icon: 'FileText',
         order_index: 1,

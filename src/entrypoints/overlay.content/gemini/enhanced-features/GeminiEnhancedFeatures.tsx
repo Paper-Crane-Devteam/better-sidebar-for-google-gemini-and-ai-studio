@@ -6,6 +6,8 @@ import { ZenModeFeature } from './ZenModeFeature';
 import { SmartScrollbarFeature } from './SmartScrollbar/SmartScrollbarFeature';
 import { QuickResendFeature } from './QuickResendFeature';
 import { AutoHideInputFeature } from './AutoHideInputFeature';
+import { SlashCommandFeature } from './SlashCommandFeature';
+import { GlobalModal } from '@/shared/components/GlobalModal';
 
 /**
  * Container for all Gemini enhanced features.
@@ -24,6 +26,8 @@ export const GeminiEnhancedFeatures = () => {
       <SmartScrollbarFeature />
       <QuickResendFeature />
       <AutoHideInputFeature />
+      <SlashCommandFeature />
+      <GlobalModal />
     </>
   );
 };

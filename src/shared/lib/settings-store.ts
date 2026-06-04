@@ -22,6 +22,7 @@ interface GeminiEnhancedFeatures {
   quickResend: boolean;
   autoHideInput: boolean;
   showHotkeyHelper: boolean;
+  slashCommand: boolean;
 }
 
 interface AIStudioEnhancedFeatures {
@@ -29,6 +30,7 @@ interface AIStudioEnhancedFeatures {
   autoHideInput: boolean;
   autoHideRunSettings: boolean;
   showHotkeyHelper: boolean;
+  slashCommand: boolean;
 }
 
 interface SettingsState {
@@ -183,12 +185,14 @@ export const useSettingsStore = create<SettingsState>()(
           quickResend: false,
           autoHideInput: false,
           showHotkeyHelper: true,
+          slashCommand: true,
         },
         aistudio: {
           sidebarWidth: 320,
           autoHideInput: false,
           autoHideRunSettings: false,
           showHotkeyHelper: true,
+          slashCommand: true,
         },
       },
 
@@ -259,7 +263,7 @@ export const useSettingsStore = create<SettingsState>()(
     {
       name: getStorageName(),
       storage: createJSONStorage(() => storage),
-      version: 3,
+      version: 4,
       migrate: (persistedState: any, version: number) => {
         if (version === 0) {
           const oldEnhanced = persistedState.enhancedFeatures || {};
@@ -299,6 +303,15 @@ export const useSettingsStore = create<SettingsState>()(
               autoHideInput: false,
               autoHideRunSettings: false,
             };
+          }
+        }
+        if (version < 4) {
+          // Add slashCommand feature flag defaults
+          if (persistedState.enhancedFeatures?.gemini) {
+            persistedState.enhancedFeatures.gemini.slashCommand ??= true;
+          }
+          if (persistedState.enhancedFeatures?.aistudio) {
+            persistedState.enhancedFeatures.aistudio.slashCommand ??= true;
           }
         }
         return persistedState;

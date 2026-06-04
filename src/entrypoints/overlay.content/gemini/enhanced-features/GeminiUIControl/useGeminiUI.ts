@@ -281,5 +281,7 @@ export const useGeminiUI = () => {
     setQuickResend: (v: boolean) => setGeminiFeature('quickResend', v),
     autoHideInput: geminiSettings.autoHideInput,
     setAutoHideInput: (v: boolean) => setGeminiFeature('autoHideInput', v),
+    slashCommand: geminiSettings.slashCommand,
+    setSlashCommand: (v: boolean) => setGeminiFeature('slashCommand', v),
   };
 };

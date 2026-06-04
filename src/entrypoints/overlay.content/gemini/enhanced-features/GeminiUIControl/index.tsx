@@ -40,6 +40,8 @@ export const GeminiUIControl = () => {
     setQuickResend,
     autoHideInput,
     setAutoHideInput,
+    slashCommand,
+    setSlashCommand,
   } = useGeminiUI();
 
   return (
@@ -351,6 +353,25 @@ export const GeminiUIControl = () => {
                   <Switch
                     checked={autoHideInput}
                     onCheckedChange={(c) => setAutoHideInput(c)}
+                  />
+                </div>
+
+                {/* Slash Command */}
+                <div className="flex items-center justify-between group">
+                  <div className="space-y-0.5">
+                    <Label
+                      className="text-xs font-semibold cursor-pointer"
+                      onClick={() => setSlashCommand(!slashCommand)}
+                    >
+                      {t('geminiUI.slashCommand')}
+                    </Label>
+                    <p className="text-[10px] text-muted-foreground">
+                      {t('geminiUI.slashCommandDesc')}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={slashCommand}
+                    onCheckedChange={(c) => setSlashCommand(c)}
                   />
                 </div>
               </div>

@@ -644,6 +644,8 @@
     "smartScrollbarDesc": "在右侧显示对话导航",
     "autoHideInput": "自动隐藏输入框",
     "autoHideInputDesc": "隐藏输入框，鼠标悬停底部时自动显示",
+    "slashCommand": "斜杠命令",
+    "slashCommandDesc": "在输入框中输入 / 快速插入提示词库中的提示词",
     "hotkeyHelper": "快捷键助手",
     "hotkeyHelperDesc": "在右下角显示键盘图标，悬停查看快捷键"
   },
@@ -657,6 +659,8 @@
     "autoHideInputDesc": "隐藏输入框，鼠标悬停底部时自动显示",
     "autoHideRunSettings": "默认收起运行设置",
     "autoHideRunSettingsDesc": "打开对话时不自动展开运行设置面板，需手动打开",
+    "slashCommand": "斜杠命令",
+    "slashCommandDesc": "在输入框中输入 / 快速插入提示词库中的提示词",
     "hotkeyHelper": "快捷键助手",
     "hotkeyHelperDesc": "在右下角显示键盘图标，快速查看快捷键"
   },
@@ -668,6 +672,17 @@
     "noTagsAvailable": "没有可用的标签。",
     "saveChanges": "保存更改",
     "cancel": "取消"
+  },
+  "slashCommand": {
+    "promptLibrary": "提示词库",
+    "noResults": "未找到匹配的提示词",
+    "results": "个结果",
+    "navigate": "导航",
+    "select": "选择",
+    "dismiss": "关闭",
+    "fillVariables": "填写变量",
+    "insert": "插入",
+    "promptInserted": "提示词已插入"
   },
   "filterBar": {
     "all": "全部"
