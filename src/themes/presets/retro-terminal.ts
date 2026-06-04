@@ -46,7 +46,7 @@ body.bs-theme--retro-terminal::after {
 
 /* Monospace font override */
 body.bs-theme--retro-terminal {
-  font-family: 'Fira Code', 'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace !important;
+  font-family: 'Fira Code', 'JetBrains Mono', 'Cascadia Code', 'Consolas', 'Microsoft YaHei', monospace !important;
 }
 
 body.bs-theme--retro-terminal *:not(.material-symbols-outlined):not(.material-symbols-rounded):not(.material-symbols-sharp):not(.google-symbols):not(mat-icon):not(.mat-icon):not([class*="material-symbols"]):not([class*="google-symbols"]) {
@@ -278,7 +278,7 @@ body.bs-theme--retro-terminal rich-textarea {
     { property: '--input', value: '26 58 26' },
     { property: '--ring', value: '0 255 65' },
     { property: '--sidebar-icon-color', value: '0 204 51' },  // #00cc33
-    { property: '--font-sans', value: '"Fira Code", "JetBrains Mono", "Cascadia Code", "Consolas", monospace' },
+    { property: '--font-sans', value: '"Fira Code", "JetBrains Mono", "Cascadia Code", "Consolas", "Microsoft YaHei", monospace' },
     { property: '--gem-sys-color--primary-container', value: '#0a2a0a' },
     { property: '--gem-sys-color--on-primary-container', value: '#00ff41' },
     { property: '--radius', value: '0px' },

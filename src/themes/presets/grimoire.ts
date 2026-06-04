@@ -32,7 +32,7 @@ body.bs-theme--grimoire::before {
 
 /* Serif font override for main content */
 body.bs-theme--grimoire {
-  font-family: 'Merriweather', Georgia, 'Times New Roman', serif !important;
+  font-family: 'STKaiti', 'KaiTi', 'Noto Serif SC', 'Source Han Serif SC', 'Merriweather', Georgia, 'Times New Roman', serif !important;
 }
 
 body.bs-theme--grimoire *:not(.material-symbols-outlined):not(.material-symbols-rounded):not(.material-symbols-sharp):not(.google-symbols):not(mat-icon):not(.mat-icon):not([class*="material-symbols"]):not([class*="google-symbols"]) {
@@ -43,7 +43,7 @@ body.bs-theme--grimoire *:not(.material-symbols-outlined):not(.material-symbols-
 body.bs-theme--grimoire h1,
 body.bs-theme--grimoire h2,
 body.bs-theme--grimoire h3 {
-  font-family: 'Playfair Display', Georgia, serif !important;
+  font-family: 'STKaiti', 'KaiTi', 'Noto Serif SC', 'Source Han Serif SC', 'Playfair Display', Georgia, serif !important;
 }
 `,
   variables: [
@@ -228,7 +228,7 @@ body.bs-theme--grimoire h3 {
     { property: '--input', value: '224 212 192' },            // #e0d4c0
     { property: '--ring', value: '139 32 32' },
     { property: '--sidebar-icon-color', value: '92 74 56' },  // #5c4a38
-    { property: '--font-sans', value: '"Merriweather", Georgia, "Times New Roman", serif' },
+    { property: '--font-sans', value: '"STKaiti", "KaiTi", "Noto Serif SC", "Source Han Serif SC", "Merriweather", Georgia, "Times New Roman", serif' },
     { property: '--gem-sys-color--primary-container', value: '#f5d5c8' },
     { property: '--gem-sys-color--on-primary-container', value: '#5c1010' },
   ],

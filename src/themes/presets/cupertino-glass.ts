@@ -237,7 +237,7 @@ body.bs-theme--cupertino-glass *:not(.material-symbols-outlined):not(.material-s
     { property: '--input', value: '220 220 225' },            // softer input border
     { property: '--ring', value: '0 122 255' },
     { property: '--sidebar-icon-color', value: '72 72 74' },  // #48484a
-    { property: '--font-sans', value: '-apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", "Helvetica Neue", sans-serif' },
+    { property: '--font-sans', value: '-apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", "Helvetica Neue", "Microsoft YaHei", "PingFang SC", sans-serif' },
     { property: '--gem-sys-color--primary-container', value: '#e3f2ff' },
     { property: '--gem-sys-color--on-primary-container', value: '#003a7a' },
     { property: '--radius', value: '12px' },
