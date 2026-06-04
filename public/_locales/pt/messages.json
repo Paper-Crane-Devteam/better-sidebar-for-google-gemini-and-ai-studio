@@ -1,10 +1,10 @@
 {
   "extensionName": {
-    "message": "Barra Lateral Melhorada para Gemini & AI Studio: Pastas, Prompts e Busca",
+    "message": "Barra Lateral Melhorada para Gemini & AI Studio: Pastas, Busca, Exportar e Sincronizar",
     "description": "O nome da extensão"
   },
   "extensionDescription": {
-    "message": "Better Gemini & AI Studio: Pastas, tags, biblioteca de prompts, busca de texto completo, exportação de chats, ajustes de UI, barra de rolagem inteligente e mais.",
+    "message": "Organize chats do Gemini & AI Studio: pastas, tags, busca de texto completo, biblioteca de prompts, exportação, sincronização com Google Drive, temas e mais.",
     "description": "A descrição da extensão"
   }
 }
