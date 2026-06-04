@@ -1,10 +1,10 @@
 {
   "extensionName": {
-    "message": "Gemini & AI Studio 拡張サイドバー：フォルダ、検索、エクスポート＆同期",
+    "message": "Gemini & AI Studio 拡張サイドバー：フォルダ、プロンプト＆検索",
     "description": "拡張機能の名前"
   },
   "extensionDescription": {
-    "message": "Gemini & AI Studioのチャットを整理：フォルダ、タグ、全文検索、プロンプトライブラリ、チャットエクスポート、Google Drive同期、テーマなど。",
+    "message": "Better Gemini & AI Studio：フォルダ、タグ、プロンプトライブラリ、全文検索、チャットエクスポート、UI調整、スマートスクロールバーなど。",
     "description": "拡張機能の説明"
   }
 }

@@ -1,10 +1,9 @@
 ¿Se está volviendo un desastre el historial de prompts de tu Google AI Studio?
 ¿Luchando por encontrar ese prompt perfecto que escribiste la semana pasada?
 
-Conoce Better Sidebar for Gemini & AI Studio — el organizador todo-en-uno de chats, gestor de prompts y kit de productividad para Google Gemini y AI Studio.
-Organiza conversaciones en carpetas, busca en todos los mensajes, exporta chats, sincroniza con Google Drive y personaliza tu interfaz — todo en una sola extensión.
+Conoce Better Sidebar for Gemini & AI Studio — el potenciador de flujo de trabajo definitivo para desarrolladores, ingenieros de prompts y entusiastas de la IA.
 
-Transformamos la interfaz predeterminada en una base de conocimientos poderosa y organizada. Deja de desplazarte sin fin por el historial y comienza a trabajar eficientemente.
+Transformamos la interfaz predeterminada de AI Studio en una base de conocimientos poderosa y organizada. Deja de desplazarte sin fin y comienza a organizar tus ideas de manera eficiente.
 
 🔥 NOVEDADES (v2.7.0)
 

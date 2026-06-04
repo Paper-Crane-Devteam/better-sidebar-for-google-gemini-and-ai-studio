@@ -1,10 +1,10 @@
 {
   "extensionName": {
-    "message": "Gemini & AI Studio 增強側邊欄：資料夾、搜尋、匯出與同步",
+    "message": "Gemini & AI Studio 增強側邊欄：資料夾、提示詞與搜尋",
     "description": "插件名稱"
   },
   "extensionDescription": {
-    "message": "整理 Gemini & AI Studio 對話：資料夾、標籤、全文搜尋、提示詞庫、對話匯出、Google Drive 同步、主題美化等。",
+    "message": "更好的 Gemini & AI Studio：資料夾、標籤、提示詞庫、全文搜尋、對話匯出、UI 優化、智慧捲軸等。",
     "description": "插件描述"
   }
 }
