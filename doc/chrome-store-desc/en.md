@@ -1,9 +1,9 @@
-Is your Google AI Studio prompt history becoming a mess?
-Struggling to find that one perfect prompt you wrote last week?
+The all-in-one chat organizer, prompt manager & productivity toolkit for Google Gemini and AI Studio.
+Organize conversations into folders, search across all messages, export chats, sync to Google Drive, and customize your UI — all in one extension.
 
-Meet BETTER SIDEBAR FOR GEMINI & AI STUDIO — the ultimate workflow booster for developers, prompt engineers, and AI enthusiasts.
+Meet BETTER SIDEBAR FOR GEMINI & AI STUDIO — the ultimate workflow booster for developers, prompt engineers, and AI power users.
 
-We transform the default AI Studio interface into a powerful, organized knowledge base. Stop scrolling endlessly and start organizing your ideas efficiently.
+We transform the default interface into a powerful, organized knowledge base. Stop scrolling endlessly through conversation history and start working efficiently.
 
 🔥 WHAT'S NEW (v2.7.0)
 
