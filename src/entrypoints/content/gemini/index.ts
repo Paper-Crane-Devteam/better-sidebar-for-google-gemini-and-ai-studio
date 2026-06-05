@@ -12,8 +12,9 @@ import { scanGems } from './tasks/scan-gems';
 import { notebookListScanner, scanNotebooks } from './tasks/scan-notebooks';
 
 import { syncConversations } from './tasks/sync-conversations';
-// import { initImageProcessor } from './tasks/process-images';
+import { initImageProcessor } from './tasks/process-images';
 import { detectAccount } from '../shared/detect-account';
+import i18n from '@/locale/i18n';
 
 /**
  * Initialize Gemini content script
@@ -66,9 +67,9 @@ export async function initGemini() {
   notebookListScanner.start();
 
   // Start image watermark processor (MutationObserver on img tags)
-  // initImageProcessor().catch((e) => {
-  //   console.error('Better Sidebar: Image processor init failed', e);
-  // });
+  initImageProcessor().catch((e) => {
+    console.error('Better Sidebar: Image processor init failed', e);
+  });
 
   // Inject Main World Script
   const script = document.createElement('script');
@@ -177,7 +178,7 @@ export async function initGemini() {
         type: 'SAVE_NOTEBOOK',
         payload: {
           id,
-          name: name || 'Untitled Notebook',
+          name: name || i18n.t('notebooks.untitledNotebook'),
           external_id: id,
           external_url: `https://gemini.google.com/notebook/notebooks%2F${id}`,
           platform: 'gemini',

@@ -29,6 +29,7 @@ import { useDeleteHandler } from '../../hooks/useDeleteHandler';
 import { useExplorerContext } from '../../ExplorerContext';
 import { NodeActionBar } from '@/entrypoints/overlay.content/shared/components/node-action-bar';
 import { useExplorerMenuItems } from './useExplorerMenuItems';
+import { PendingEntryNode } from './PendingEntryNode';
 
 export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
   const { t } = useI18n();
@@ -121,7 +122,7 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
     setNewName(node.data.name);
   }, [node.data.name, node.isEditing]);
 
-  // Render loading skeleton for pending new chat (after all hooks)
+  // Render loading skeleton for pending new chat (after all hooks) — legacy shimmer
   if (node.data.data?.isPendingNewChat) {
     return (
       <div style={style} className="h-[calc(100%-2px)] w-[calc(100%-4px)] mx-auto mt-[1px]">
@@ -136,6 +137,20 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
           />
         </div>
       </div>
+    );
+  }
+
+  // Render the new pending entry (singleton temporary entry)
+  if (node.data.data?.isPendingEntry) {
+    const phase = node.data.data.pendingPhase;
+    const pendingTitle = node.data.data.pendingTitle || '';
+
+    return (
+      <PendingEntryNode
+        style={style}
+        phase={phase}
+        title={pendingTitle}
+      />
     );
   }
 

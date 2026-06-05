@@ -20,6 +20,7 @@ import {
 import type { ExplorerTypeFilter } from '../../types/filter';
 import type { SplitDropdownItem } from '@/shared/components/ui/split-icon-button';
 import { ExplorerContext } from './ExplorerContext';
+import { usePendingNewChat } from './hooks/usePendingNewChat';
 
 interface ExplorerTabProps {
   onNewChat: () => void;
@@ -49,6 +50,7 @@ export const ExplorerTab = ({
     isLoading,
     createFolder,
     fetchData,
+    renameItem,
     ui,
     tags: allTags,
     setIsScanning,
@@ -67,12 +69,42 @@ export const ExplorerTab = ({
   const lastProcessedConversationIdRef = useRef<string | null>(null);
   const lastConversationIdsRef = useRef<Set<string>>(new Set());
 
-  // Track which folder a new chat is being created in (for loading state)
+  // Track which folder a new chat is being created in (for loading state) — legacy shimmer
   const [pendingNewChatFolderId, setPendingNewChatFolderId] = useState<string | null>(null);
   // Track whether the user clicked "new chat" from a folder (waiting for generate)
   const pendingFolderRef = useRef<string | null>(null);
   // Skip scrollTo when auto-selecting a newly created conversation
   const skipScrollForIdRef = useRef<string | null>(null);
+
+  // --- New pending entry system (singleton temporary entry) ---
+  const {
+    pendingEntry,
+    createPendingEntry,
+    updateTitle: updatePendingTitle,
+    commitEditing: commitPendingEditing,
+    startEditing: startPendingEditing,
+    removePendingEntry,
+    markIntercepted,
+    finalize: finalizePendingEntry,
+  } = usePendingNewChat();
+
+  // Keep a ref to pendingEntry for use in event handlers (avoids stale closures)
+  const pendingEntryRef = useRef(pendingEntry);
+  pendingEntryRef.current = pendingEntry;
+
+  // Sync pending entry title to window variable for AI Studio CreatePrompt interception.
+  // Dispatches a CustomEvent so the main-world script (different JS context) can read it.
+  useEffect(() => {
+    const title = pendingEntry?.title?.trim() || '';
+    window.dispatchEvent(new CustomEvent('BETTER_SIDEBAR_SET_PENDING_TITLE', {
+      detail: { title },
+    }));
+    return () => {
+      window.dispatchEvent(new CustomEvent('BETTER_SIDEBAR_SET_PENDING_TITLE', {
+        detail: { title: '' },
+      }));
+    };
+  }, [pendingEntry?.title]);
 
   // Clear stale selection
   useEffect(() => {
@@ -97,36 +129,50 @@ export const ExplorerTab = ({
     }
   }, [folders, conversations, selectedNode]);
 
-  // Wrap onNewChat to record the target folder and expand it
+  // Wrap onNewChat to record the target folder and create a pending entry
   const handleNewChatFromFolder = useCallback(() => {
+    let targetFolderId: string | null = null;
     if (selectedNode && selectedNode.data.type === 'folder' && !selectedNode.data.data?.isTimeGroup) {
-      pendingFolderRef.current = selectedNode.data.id;
-      // Expand the folder so the loading entry is visible
+      targetFolderId = selectedNode.data.id;
+      pendingFolderRef.current = targetFolderId;
+      // Expand the folder so the pending entry is visible
       treeRef.current?.open(selectedNode.data.id);
     } else {
       pendingFolderRef.current = null;
     }
+    // Create the singleton pending entry (replaces any existing one)
+    createPendingEntry(targetFolderId);
+    // Still trigger the native new chat navigation
     onNewChat();
-  }, [selectedNode, onNewChat]);
+  }, [selectedNode, createPendingEntry, onNewChat]);
 
   // Called from folder node action bar with explicit folderId
   const handleNewChatInFolder = useCallback((folderId: string) => {
     pendingFolderRef.current = folderId;
     treeRef.current?.open(folderId);
+    // Create the singleton pending entry in this folder
+    createPendingEntry(folderId);
+    // Still trigger the native new chat navigation
     onNewChat();
-  }, [onNewChat]);
+  }, [createPendingEntry, onNewChat]);
 
-  // Listen for generate request start → show loading entry in the pending folder
+  // Listen for generate request start → decide which path to take
   useEffect(() => {
     const handleGenerateStart = () => {
-      if (pendingFolderRef.current) {
-        setPendingNewChatFolderId(pendingFolderRef.current);
-        pendingFolderRef.current = null;
+      if (pendingEntryRef.current) {
+        // New path: pending entry exists → mark it as intercepted, skip legacy shimmer
+        markIntercepted('');
+      } else {
+        // Legacy path: no pending entry → use old shimmer logic
+        if (pendingFolderRef.current) {
+          setPendingNewChatFolderId(pendingFolderRef.current);
+          pendingFolderRef.current = null;
+        }
       }
     };
     globalThis.addEventListener('BETTER_SIDEBAR_GENERATE_START', handleGenerateStart);
     return () => globalThis.removeEventListener('BETTER_SIDEBAR_GENERATE_START', handleGenerateStart);
-  }, []);
+  }, [markIntercepted]);
 
   // Safety timeout: clear loading state after 30s in case the event never fires
   useEffect(() => {
@@ -135,26 +181,52 @@ export const ExplorerTab = ({
     return () => clearTimeout(timer);
   }, [pendingNewChatFolderId]);
 
-  // Handle New Chat Creation — assign to selected folder if one is active.
-  // The actual DB save is handled by PromptCreateScanner in the content script,
-  // so this only needs to move the conversation when a folder is selected.
+  // Handle New Chat Creation — assign to the correct folder.
+  // If pendingEntry exists → use its folderId as target.
+  // If no pendingEntry (user deleted it) → fall back to selectedNode (legacy behavior).
   useEffect(() => {
     const handleCreate = async (event: any) => {
-      const { id } = event.detail;
+      const { id, title: apiTitle } = event.detail;
 
-      // Clear loading state — the real conversation will appear after fetchData
+      // Clear legacy loading state
       setPendingNewChatFolderId(null);
       // The folder is already in view; don't scroll the tree when auto-selecting this id
       skipScrollForIdRef.current = id;
 
+      // Determine target folder: prefer pendingEntry.folderId, fall back to selectedNode
       let targetFolderId: string | null = null;
-      if (selectedNode) {
-        if (selectedNode.data.type === 'folder') {
-          if (!selectedNode.data.data?.isTimeGroup) {
-            targetFolderId = selectedNode.data.id;
+      const currentPendingEntry = pendingEntryRef.current;
+
+      if (currentPendingEntry) {
+        // New path: pending entry drives the folder target
+        targetFolderId = currentPendingEntry.folderId;
+        // Finalize: clear the entry and check if rename is needed
+        const { needsRename, userTitle } = finalizePendingEntry(apiTitle || '');
+
+        if (needsRename) {
+          // Wait for PromptCreateScanner to save the conversation to DB,
+          // then fetchData to load it into the store, THEN rename.
+          // (For AI Studio, CreatePrompt title injection means this rarely triggers,
+          //  but it's still needed for Gemini where title comes from the response.)
+          await new Promise((r) => setTimeout(r, 300));
+          await fetchData(true);
+          try {
+            await renameItem(id, userTitle, 'file');
+          } catch (e) {
+            console.error('Better Sidebar: Failed to rename new conversation', e);
           }
-        } else {
-          targetFolderId = selectedNode.data.data?.folder_id || null;
+        }
+      } else {
+        // Legacy path: no pending entry, use selected node
+        const currentSelectedNode = selectedNodeRef.current;
+        if (currentSelectedNode) {
+          if (currentSelectedNode.data.type === 'folder') {
+            if (!currentSelectedNode.data.data?.isTimeGroup) {
+              targetFolderId = currentSelectedNode.data.id;
+            }
+          } else {
+            targetFolderId = currentSelectedNode.data.data?.folder_id || null;
+          }
         }
       }
 
@@ -183,8 +255,7 @@ export const ExplorerTab = ({
         'BETTER_SIDEBAR_PROMPT_CREATE',
         handleCreate,
       );
-  }, [selectedNode, fetchData]);
-
+  }, [fetchData, finalizePendingEntry]);
 
   // Handle URL changes to auto-select prompt
   useEffect(() => {
@@ -277,6 +348,13 @@ export const ExplorerTab = ({
     treeRef.current?.collapseAll();
   };
 
+  // Listen for hotkey-triggered collapse-all event
+  useEffect(() => {
+    const handler = () => treeRef.current?.collapseAll();
+    window.addEventListener('better-sidebar:collapse-all', handler);
+    return () => window.removeEventListener('better-sidebar:collapse-all', handler);
+  }, []);
+
   const handleSelectAll = () => {
     treeRef.current?.selectAll?.();
   };
@@ -288,7 +366,16 @@ export const ExplorerTab = ({
   };
 
   return (
-    <ExplorerContext.Provider value={{ onNewChat: handleNewChatFromFolder, onNewChatInFolder: handleNewChatInFolder, pendingNewChatFolderId }}>
+    <ExplorerContext.Provider value={{
+      onNewChat: handleNewChatFromFolder,
+      onNewChatInFolder: handleNewChatInFolder,
+      pendingNewChatFolderId,
+      pendingEntry,
+      updatePendingTitle,
+      commitPendingEditing,
+      startPendingEditing,
+      removePendingEntry,
+    }}>
     <div className="flex flex-col h-full w-full relative">
       {isScanning && (
         <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background/50 backdrop-blur-[1px] gap-2">

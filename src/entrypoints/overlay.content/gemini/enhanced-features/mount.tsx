@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client';
 import { GeminiEnhancedFeatures } from './GeminiEnhancedFeatures';
 import { ShadowRootProvider } from '@/shared/components/ShadowRootContext';
 import { applyShadowStyles } from '@/shared/lib/utils';
+import { bindShadowRootToTheme } from '@/themes';
+import { useSettingsStore } from '@/shared/lib/settings-store';
 
 /**
  * Independent mounting of Gemini enhanced features (like Default Model selector)
@@ -22,6 +24,24 @@ export function mountEnhancedFeatures(mainStyles: string) {
 
     const enhancedRoot = document.createElement('div');
     enhancedRoot.classList.add('shadow-body', 'theme-gemini');
+
+    // Gemini style sync (default v2 vs classic)
+    const syncGeminiStyle = () => {
+      const style = useSettingsStore.getState().geminiStyle;
+      if (style === 'classic') {
+        enhancedRoot.classList.remove('theme-gemini');
+        enhancedRoot.classList.add('theme-gemini-classic');
+      } else {
+        enhancedRoot.classList.remove('theme-gemini-classic');
+        enhancedRoot.classList.add('theme-gemini');
+      }
+    };
+    syncGeminiStyle();
+    useSettingsStore.subscribe((state, prevState) => {
+      if (state.geminiStyle !== prevState.geminiStyle) {
+        syncGeminiStyle();
+      }
+    });
 
     // Theme sync for enhanced features container
     const syncEnhancedTheme = () => {
@@ -47,6 +67,9 @@ export function mountEnhancedFeatures(mainStyles: string) {
     });
 
     enhancedShadow.appendChild(enhancedRoot);
+
+    // Bind custom theme to this Shadow DOM container
+    bindShadowRootToTheme(enhancedRoot);
 
     const enhancedReactRoot = ReactDOM.createRoot(enhancedRoot);
     enhancedReactRoot.render(

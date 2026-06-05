@@ -1,4 +1,6 @@
 import { applyShadowStyles } from './utils/utils';
+import type { ThemeVariable } from '@/themes/types';
+import { clearSidebarTheme } from '@/themes/engine';
 
 export class TooltipHelper {
   private static instance: TooltipHelper;
@@ -41,11 +43,9 @@ export class TooltipHelper {
     this.wrapper = document.createElement('div');
     // Ensure wrapper doesn't block clicks but children do
     this.wrapper.style.pointerEvents = 'auto';
-    // Actually, TooltipContent is positioned absolutely, so wrapper size doesn't matter much
-    // but we need to ensure the wrapper can hold the portal content.
 
     // We add the theme class to this wrapper
-    this.wrapper.classList.add('font-sans'); // Add base font class if needed
+    this.wrapper.classList.add('font-sans');
 
     this.shadow.appendChild(this.wrapper);
   }
@@ -61,6 +61,26 @@ export class TooltipHelper {
       this.wrapper.classList.add('dark');
     } else {
       this.wrapper.classList.remove('dark');
+    }
+  }
+
+  /**
+   * Apply custom theme variables to the tooltip container.
+   * Pass null to clear custom theme variables.
+   */
+  setCustomThemeVariables(variables: ThemeVariable[] | null) {
+    if (!this.wrapper) return;
+
+    // Always clear previous theme first to prevent property leaking between themes
+    clearSidebarTheme(this.wrapper);
+
+    if (!variables || variables.length === 0) {
+      return;
+    }
+
+    this.wrapper.setAttribute('data-custom-theme', 'active');
+    for (const v of variables) {
+      this.wrapper.style.setProperty(v.property, v.value);
     }
   }
 }

@@ -52,16 +52,23 @@ import { GuidedTour } from '../shared/modules/guided-tour/GuidedTour';
 import { TourPromptDialog } from '../shared/modules/guided-tour/TourPromptDialog';
 import { useGuidedTour } from '../shared/modules/guided-tour/useGuidedTour';
 import { GEMINI_TOUR_STEPS } from '../shared/modules/guided-tour/tour-steps';
+import { useBadgeStore } from '@/shared/lib/badge-store';
+import { BadgeDot } from '@/shared/components/ui/badge-dot';
+
+import { useHotkeyListener } from '@/shared/hooks/useHotkeyListener';
+import { HotkeyCheatsheet } from '../shared/components/HotkeyCheatsheet';
 
 export const OverlayPanel = ({ className }: { className?: string }) => {
   const moduleConfig = useModuleConfig();
   useAppInit();
+  useHotkeyListener();
   const guidedTour = useGuidedTour();
   const { t } = useI18n();
   const { path } = useUrl();
 
   const layoutDensity = useSettingsStore((state) => state.layoutDensity);
   const shortcuts = useSettingsStore((state) => state.shortcuts);
+  const hasSettingsBadge = useBadgeStore((s) => s.isGroupVisible('settings.'));
 
   const {
     fetchData,
@@ -169,13 +176,29 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
   };
 
   const handleMainMenuClick = () => {
+    // Desktop: separate Open/Close sidebar buttons
+    const closeBtn = document.querySelector(
+      'button[aria-label="Close sidebar"]',
+    ) as HTMLElement;
+    if (closeBtn) {
+      closeBtn.click();
+      return;
+    }
+    const openBtn = document.querySelector(
+      'button[aria-label="Open sidebar"]',
+    ) as HTMLElement;
+    if (openBtn) {
+      openBtn.click();
+      return;
+    }
+    // Mobile fallback
     const menuBtn = document.querySelector(
-      '.mdc-icon-button[aria-label="Main menu"]',
+      'button[aria-label="Main menu"]',
     ) as HTMLElement;
     if (menuBtn) {
       menuBtn.click();
     } else {
-      console.warn('Main menu button not found');
+      console.warn('Sidebar toggle button not found');
     }
   };
 
@@ -199,7 +222,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
             variant="ghost"
             size="icon"
             onClick={handleMainMenuClick}
-            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+            className="sidebar-btn transition-all"
           >
             <Menu className="sidebar-icon" />
           </Button>
@@ -218,7 +241,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               variant="ghost"
               size="icon"
               onClick={() => moduleConfig.explorer.onNewChat()}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              className="sidebar-btn transition-all"
             >
               <SquarePen className="sidebar-icon" />
             </Button>
@@ -230,7 +253,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsFeatureEnabled(false)}
-                className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+                className="sidebar-btn transition-all"
               >
                 <LogOut className="sidebar-icon" />
               </Button>
@@ -241,9 +264,10 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               variant={isSettingsOpen ? 'secondary' : 'ghost'}
               size="icon"
               onClick={() => handleTabChange('settings')}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              className="sidebar-btn transition-all relative"
             >
               <Settings className="sidebar-icon" />
+              <BadgeDot visible={hasSettingsBadge} className="absolute top-1.5 right-1.5" />
             </Button>
           </SimpleTooltip>
         </div>
@@ -260,7 +284,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               variant={activeTab === 'files' ? 'secondary' : 'ghost'}
               size="icon"
               onClick={() => handleTabChange('files')}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              className="sidebar-btn transition-all"
               data-tour-id="tour-files"
             >
               <Files className="sidebar-icon" />
@@ -271,7 +295,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               variant={activeTab === 'search' ? 'secondary' : 'ghost'}
               size="icon"
               onClick={() => handleTabChange('search')}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              className="sidebar-btn transition-all"
               data-tour-id="tour-search"
             >
               <Search className="sidebar-icon" />
@@ -282,10 +306,21 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               variant={activeTab === 'prompts' ? 'secondary' : 'ghost'}
               size="icon"
               onClick={() => handleTabChange('prompts')}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              className="sidebar-btn transition-all"
               data-tour-id="tour-prompts"
             >
               <Sparkles className="sidebar-icon" />
+            </Button>
+          </SimpleTooltip>
+          <SimpleTooltip content={t('tabs.tags')}>
+            <Button
+              variant={activeTab === 'tags' ? 'secondary' : 'ghost'}
+              size="icon"
+              onClick={() => handleTabChange('tags')}
+              className="sidebar-btn transition-all"
+              data-tour-id="tour-tags"
+            >
+              <Tag className="sidebar-icon" />
             </Button>
           </SimpleTooltip>
           {shortcuts?.favorites && (
@@ -294,41 +329,16 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
                 variant={activeTab === 'favorites' ? 'secondary' : 'ghost'}
                 size="icon"
                 onClick={() => handleTabChange('favorites')}
-                className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+                className="sidebar-btn transition-all"
                 data-tour-id="tour-favorites"
               >
                 <Star className="sidebar-icon" />
               </Button>
             </SimpleTooltip>
           )}
-          <SimpleTooltip content={t('tabs.tags')}>
-            <Button
-              variant={activeTab === 'tags' ? 'secondary' : 'ghost'}
-              size="icon"
-              onClick={() => handleTabChange('tags')}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-              data-tour-id="tour-tags"
-            >
-              <Tag className="sidebar-icon" />
-            </Button>
-          </SimpleTooltip>
 
-          {((shortcuts?.myStuff ?? true) || (shortcuts?.gems ?? true) || (shortcuts?.notebooks ?? true)) && (
+          {((shortcuts?.gems ?? true) || (shortcuts?.notebooks ?? true) || (shortcuts?.myStuff ?? true)) && (
             <Separator className="w-8 my-1" />
-          )}
-
-          {(shortcuts?.notebooks ?? true) && (
-            <SimpleTooltip content={t('tabs.notebooks')}>
-              <Button
-                variant={activeTab === 'notebooks' ? 'secondary' : 'ghost'}
-                size="icon"
-                onClick={() => handleTabChange('notebooks')}
-                className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
-                data-tour-id="tour-notebooks"
-              >
-                <NotebookText className="sidebar-icon" />
-              </Button>
-            </SimpleTooltip>
           )}
 
           {(shortcuts?.gems ?? true) && (
@@ -337,10 +347,24 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
                 variant={activeTab === 'gems' ? 'secondary' : 'ghost'}
                 size="icon"
                 onClick={() => handleTabChange('gems')}
-                className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+                className="sidebar-btn transition-all"
                 data-tour-id="tour-gems"
               >
                 <Gem className="sidebar-icon" />
+              </Button>
+            </SimpleTooltip>
+          )}
+
+          {(shortcuts?.notebooks ?? true) && (
+            <SimpleTooltip content={t('tabs.notebooks')}>
+              <Button
+                variant={activeTab === 'notebooks' ? 'secondary' : 'ghost'}
+                size="icon"
+                onClick={() => handleTabChange('notebooks')}
+                className="sidebar-btn transition-all"
+                data-tour-id="tour-notebooks"
+              >
+                <NotebookText className="sidebar-icon" />
               </Button>
             </SimpleTooltip>
           )}
@@ -351,7 +375,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('https://gemini.google.com/mystuff')}
-                className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+                className="sidebar-btn transition-all"
                 data-tour-id="tour-mystuff"
               >
                 <Library className="sidebar-icon" />
@@ -367,7 +391,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsFeatureEnabled(false)}
-                className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+                className="sidebar-btn transition-all"
                 data-tour-id="tour-original-ui"
               >
                 <LogOut className="sidebar-icon" />
@@ -380,7 +404,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               variant={activeTab === 'feedback' ? 'secondary' : 'ghost'}
               size="icon"
               onClick={() => handleTabChange('feedback')}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              className="sidebar-btn transition-all"
               data-tour-id="tour-feedback"
             >
               <MessageSquare className="sidebar-icon" />
@@ -391,10 +415,11 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               variant={isSettingsOpen ? 'secondary' : 'ghost'}
               size="icon"
               onClick={() => handleTabChange('settings')}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              className="sidebar-btn transition-all relative"
               data-tour-id="tour-settings"
             >
               <Settings className="sidebar-icon" />
+              <BadgeDot visible={hasSettingsBadge} className="absolute top-1.5 right-1.5" />
             </Button>
           </SimpleTooltip>
         </div>
@@ -461,6 +486,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
       <ProfilePickerDialog />
       <RatingPromptDialog />
       <GlobalToast />
+      <HotkeyCheatsheet />
       {guidedTour.showPrompt && isSidebarExpanded && (
         <TourPromptDialog
           isOpen={guidedTour.showPrompt}

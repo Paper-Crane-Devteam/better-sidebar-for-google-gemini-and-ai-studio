@@ -1,42 +1,67 @@
 import React, { useState } from 'react';
 import { Button } from '../../components/ui/button';
-import { X, Settings, Heart, Info, LayoutTemplate, Database } from 'lucide-react';
+import { X, Settings, Heart, Info, LayoutTemplate, Database, SlidersHorizontal, Palette, Sparkles, Keyboard } from 'lucide-react';
 import { GeneralSettings } from './modules/GeneralSettings';
+import { ThemeSettings } from './modules/ThemeSettings';
 import { ExplorerSettings } from './modules/ExplorerSettings';
 import { DataSettings } from './modules/DataSettings';
 import { AboutSettings } from './modules/AboutSettings';
 import { SponsorSettings } from './modules/SponsorSettings';
+import { SupportPackSettings } from './modules/SupportPackSettings';
+import { PlatformSettings } from './modules/PlatformSettings';
+import { HotkeySettings } from './modules/HotkeySettings';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { detectPlatform, Platform } from '@/shared/types/platform';
+import { useBadgeStore } from '@/shared/lib/badge-store';
+import { BadgeDot } from '@/shared/components/ui/badge-dot';
 
 interface SettingsModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
 }
 
-type Section = 'general' | 'explorer' | 'data' | 'sponsor' | 'about';
+type Section = 'general' | 'theme' | 'explorer' | 'data' | 'hotkeys' | 'platform' | 'supportpack' | 'sponsor' | 'about';
 
+/**
+ * NavButton automatically shows a red dot if `settings.{id}` is an active badge.
+ * Clicking it dismisses the badge. No manual showBadge prop needed.
+ */
 const NavButton = ({ 
     id, 
     label, 
     icon: Icon, 
     activeSection, 
-    setActiveSection 
+    setActiveSection,
 }: { 
     id: Section; 
     label: string; 
     icon: any;
     activeSection: Section;
     setActiveSection: (s: Section) => void;
-}) => (
-    <Button
-        variant={activeSection === id ? "secondary" : "ghost"}
-        className="w-full justify-start"
-        onClick={() => setActiveSection(id)}
-    >
-        <Icon className="mr-2 h-4 w-4" />
-        {label}
-    </Button>
-);
+}) => {
+    const badgeKey = `settings.${id}`;
+    const showBadge = useBadgeStore((s) => s.isVisible(badgeKey));
+    const dismiss = useBadgeStore((s) => s.dismiss);
+
+    const handleClick = () => {
+        setActiveSection(id);
+        if (showBadge) dismiss(badgeKey);
+    };
+
+    return (
+        <Button
+            variant={activeSection === id ? "secondary" : "ghost"}
+            className="w-full justify-start"
+            onClick={handleClick}
+        >
+            <Icon className="mr-2 h-4 w-4" />
+            <span className="relative">
+                {label}
+                {showBadge && <BadgeDot className="absolute -top-1 -right-2.5" />}
+            </span>
+        </Button>
+    );
+};
 
 export const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
     const { t } = useI18n();
@@ -44,14 +69,25 @@ export const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
 
     if (!open) return null;
 
+    const platform = detectPlatform();
+    const hasPlatformSettings = platform === Platform.GEMINI || platform === Platform.AI_STUDIO;
+
     const renderContent = () => {
         switch (activeSection) {
             case 'general':
                 return <GeneralSettings />;
+            case 'theme':
+                return <ThemeSettings />;
             case 'explorer':
                 return <ExplorerSettings />;
+            case 'platform':
+                return <PlatformSettings />;
             case 'data':
                 return <DataSettings />;
+            case 'hotkeys':
+                return <HotkeySettings />;
+            case 'supportpack':
+                return <SupportPackSettings />;
             case 'sponsor':
                 return <SponsorSettings />;
             case 'about':
@@ -62,8 +98,8 @@ export const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in-0">
-            <div className="relative w-[800px] h-[600px] max-h-[90vh] bg-background border rounded-lg shadow-lg flex overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center animate-in fade-in-0" style={{ backgroundColor: 'var(--overlay-bg)', backdropFilter: 'var(--overlay-blur)', WebkitBackdropFilter: 'var(--overlay-blur)' }}>
+            <div className="relative w-[800px] h-[600px] max-h-[90vh] border rounded-lg shadow-lg flex overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4" style={{ backgroundColor: 'var(--panel-bg)', backdropFilter: 'var(--panel-blur)', WebkitBackdropFilter: 'var(--panel-blur)' }}>
                 {/* Close Button */}
                 <Button
                     variant="ghost"
@@ -81,11 +117,17 @@ export const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
                     </div>
                     
                     <NavButton id="general" label={t('settings.general')} icon={Settings} activeSection={activeSection} setActiveSection={setActiveSection} />
+                    <NavButton id="theme" label={t('themeSettings.title')} icon={Palette} activeSection={activeSection} setActiveSection={setActiveSection} />
                     <NavButton id="explorer" label={t('settings.library')} icon={LayoutTemplate} activeSection={activeSection} setActiveSection={setActiveSection} />
+                    {hasPlatformSettings && (
+                        <NavButton id="platform" label={t('settings.uiControls')} icon={SlidersHorizontal} activeSection={activeSection} setActiveSection={setActiveSection} />
+                    )}
                     <NavButton id="data" label={t('settings.dataStorage')} icon={Database} activeSection={activeSection} setActiveSection={setActiveSection} />
+                    <NavButton id="hotkeys" label={t('hotkeys.title')} icon={Keyboard} activeSection={activeSection} setActiveSection={setActiveSection} />
                     
                     <div className="h-px bg-border my-2 mx-2" />
                     
+                    <NavButton id="supportpack" label={t('supportPack.title')} icon={Sparkles} activeSection={activeSection} setActiveSection={setActiveSection} />
                     <NavButton id="sponsor" label={t('settings.sponsor')} icon={Heart} activeSection={activeSection} setActiveSection={setActiveSection} />
                     
                     <div className="flex-1" />

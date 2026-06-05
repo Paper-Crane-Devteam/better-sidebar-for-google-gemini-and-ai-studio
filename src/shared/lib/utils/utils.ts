@@ -241,6 +241,25 @@ export function syncAiStudioTheme(theme: 'light' | 'dark' | 'system') {
         localStorage.setItem(key, JSON.stringify(prefs));
       }
     }
+
+    // Also sync DOM classes for immediate effect
+    if (typeof document !== 'undefined') {
+      let isDark = false;
+      if (theme === 'system') {
+        isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      } else {
+        isDark = theme === 'dark';
+      }
+
+      if (isDark) {
+        document.body.classList.add('dark-theme');
+        document.body.classList.remove('light-theme');
+      } else {
+        document.body.classList.remove('dark-theme');
+        document.body.classList.add('light-theme');
+      }
+      document.body.style.colorScheme = isDark ? 'dark' : 'light';
+    }
   } catch (e) {
     // ignore
   }

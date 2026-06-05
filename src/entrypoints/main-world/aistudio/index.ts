@@ -10,6 +10,38 @@ import { handleDeletePromptResponse } from './interceptors/delete';
 import { aiStudioRequestBuilder } from './lib/request-builder';
 import i18n from '@/locale/i18n';
 
+/**
+ * Patch Element.prototype.animate to skip Angular slideInOut animations
+ * inside ms-right-side-panel when auto-hide run settings is active.
+ */
+let killRunSettingsAnimation = false;
+
+function patchElementAnimate() {
+  const originalAnimate = Element.prototype.animate;
+  Element.prototype.animate = function (
+    this: Element,
+    keyframes: Keyframe[] | PropertyIndexedKeyframes | null,
+    options?: number | KeyframeAnimationOptions,
+  ) {
+    if (killRunSettingsAnimation && this.closest('ms-right-side-panel')) {
+      // Force duration to 0 to skip the animation
+      if (typeof options === 'number') {
+        options = 0;
+      } else if (options && typeof options === 'object') {
+        options = { ...options, duration: 0 };
+      }
+    }
+    return originalAnimate.call(this, keyframes, options);
+  };
+}
+
+patchElementAnimate();
+
+// Listen for toggle from content script
+globalThis.addEventListener('BETTER_SIDEBAR_KILL_RUN_SETTINGS_ANIM', (e: Event) => {
+  killRunSettingsAnimation = !!(e as CustomEvent).detail?.enabled;
+});
+
 const showUpdateToast = throttle(
   () => {
     const message = i18n.t('toast.interfaceUpdated');
@@ -52,6 +84,13 @@ const showUpdateToast = throttle(
 
 export function initAiStudioInterceptors() {
   console.log('Better Sidebar: Main World Script (AI Studio) Initialized');
+
+  // Cache pending create title from overlay content script (different JS context).
+  // The overlay dispatches BETTER_SIDEBAR_SET_PENDING_TITLE via DOM CustomEvent.
+  let pendingCreateTitle = '';
+  globalThis.addEventListener('BETTER_SIDEBAR_SET_PENDING_TITLE', (e: Event) => {
+    pendingCreateTitle = (e as CustomEvent).detail?.title || '';
+  });
 
   // Expose request builder for content script via custom events
   globalThis.addEventListener('AISTUDIO_API_EXECUTE', async (e: Event) => {
@@ -153,6 +192,24 @@ export function initAiStudioInterceptors() {
 
         // Notify overlay that a new chat generation has started
         if (config.url?.includes('CreatePrompt')) {
+          // If a custom title is pending, inject it into the CreatePrompt request body
+          if (pendingCreateTitle) {
+            try {
+              let body = config.body;
+              if (typeof body === 'string') {
+                body = JSON.parse(body);
+              }
+              if (Array.isArray(body) && Array.isArray(body[0]) && Array.isArray(body[0][4])) {
+                body[0][4][0] = pendingCreateTitle;
+                config.body = JSON.stringify(body);
+                console.log('Better Sidebar (AI Studio): Injected custom title into CreatePrompt:', pendingCreateTitle);
+              }
+            } catch (e) {
+              console.warn('Better Sidebar (AI Studio): Failed to inject title into CreatePrompt', e);
+            }
+            pendingCreateTitle = '';
+          }
+
           globalThis.dispatchEvent(
             new CustomEvent('BETTER_SIDEBAR_GENERATE_START'),
           );

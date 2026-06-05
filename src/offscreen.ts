@@ -1,13 +1,21 @@
 // This script runs in the offscreen document
 // It acts as a bridge between the Background Script and the DB Worker
-import DbWorker from '@/shared/workers/db-worker?worker';
+//
+// NOTE: We cannot use Vite's `?worker` import because in dev mode it creates
+// a Worker URL pointing to http://localhost:3000 which doesn't match the
+// chrome-extension:// origin of the offscreen document. Chrome 149+ enforces
+// strict same-origin checks on Dedicated Workers (DWH_INVALID_SCRIPT_URL_ORIGIN).
+//
+// Instead, we reference the pre-bundled worker file from web_accessible_resources
+// using chrome.runtime.getURL(), which stays within the extension's origin.
 
 let worker: Worker | null = null;
 
-// Initialize the worker
+// Initialize the worker using the bundled asset URL (same origin as extension)
 try {
-  worker = new DbWorker();
-  console.log('[Offscreen] DB Worker initialized');
+  const workerUrl = browser.runtime.getURL('assets/db-worker.js');
+  worker = new Worker(workerUrl);
+  console.log('[Offscreen] DB Worker initialized via extension URL:', workerUrl);
 
   worker.onmessage = async (e) => {
     // Forward result back to background script

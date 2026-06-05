@@ -2,6 +2,46 @@ import type { ChangeLogItem } from './types';
 
 export const changelog: ChangeLogItem[] = [
   {
+    version: '2.7.0',
+    date: '2026-06-02',
+    features: [
+      '⌨️ **Atalhos de teclado**: Novas teclas de atalho (Hotkeys) para navegação e operações mais rápidas — essencial para quem ama o teclado.',
+    ],
+    fixes: [
+      'Melhoria do estilo Markdown na pré-visualização de busca para uma melhor experiência de leitura.',
+    ],
+    announcement: {
+      title: 'Atualização do Supporter Pack 🎨',
+      content: [
+        '🎨 **Temas personalizados com IA**: Use IA para gerar qualquer tema que você imaginar — cyberpunk, pastel, retrô, o que quiser. Se você pode sonhar, nós podemos gerar.',
+        '🎉 Novo canal de patrocínio lançado. Obrigado pelo incrível apoio de todos! ❤️',
+      ],
+    },
+  },
+  {
+    version: '2.6.0',
+    date: '2026-05-29',
+    features: [
+      '🎛️ **Controles de UI do AI Studio**: Largura da barra lateral configurável, ocultar automaticamente a caixa de entrada e o painel de configurações de execução para um espaço de trabalho mais limpo.',
+      '💬 **Novo chat rápido**: Ao criar uma nova conversa, uma entrada aparece instantaneamente — defina o título antes mesmo do chat ser criado para um fluxo mais suave.',
+      '🎨 **Configurações de UI do Gemini**: Novas opções de configuração de UI do Gemini no painel de configurações.',
+      '🖼️ **Remoção de marca d\'água**: Reativada a remoção de marca d\'água para downloads de imagens do Gemini.',
+    ],
+    fixes: [
+      'Corrigido o problema do Scan Library não funcionar no AI Studio.',
+      'Corrigida a impossibilidade de digitar a letra "R" maiúscula no AI Studio.',
+      'Adaptado ao mais recente redesign da UI do Gemini.',
+      'Corrigidos problemas de exibição da barra lateral em janelas estreitas/largura móvel no Gemini.',
+    ],
+    announcement: {
+      title: 'Supporter Pack 🎨',
+      content: [
+        '**3 temas exclusivos** agora disponíveis como Supporter Pack — uma forma de personalizar sua barra lateral enquanto apoia o projeto.',
+        'Todas as funcionalidades principais continuam **100% gratuitas**. Esta extensão é desenvolvida no meu tempo livre, e seu apoio me ajuda a continuar mantendo e desenvolvendo novas funcionalidades. Obrigado! ❤️',
+      ],
+    },
+  },
+  {
     version: '2.5.0',
     date: '2026-05-14',
     features: [

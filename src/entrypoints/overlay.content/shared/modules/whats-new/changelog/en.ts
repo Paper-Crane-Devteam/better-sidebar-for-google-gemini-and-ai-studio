@@ -2,6 +2,46 @@ import type { ChangeLogItem } from './types';
 
 export const changelog: ChangeLogItem[] = [
   {
+    version: '2.7.0',
+    date: '2026-06-02',
+    features: [
+      '⌨️ **Hotkey Support**: Keyboard shortcuts for faster navigation and operations — a must-have for keyboard lovers.',
+    ],
+    fixes: [
+      'Improved Markdown styling in search preview messages for a better reading experience.',
+    ],
+    announcement: {
+      title: 'Supporter Pack Update 🎨',
+      content: [
+        '🎨 **AI-Generated Custom Themes**: Use AI to generate any custom theme you can imagine — cyberpunk, pastel, retro, anything goes. If you can dream it, we can generate it.',
+        '🎉 New sponsorship channel (Aifadian) launched for our Chinese users. Thank you all for your incredible support! ❤️',
+      ],
+    },
+  },
+  {
+    version: '2.6.0',
+    date: '2026-05-29',
+    features: [
+      '🎛️ **AI Studio UI Controls**: Configurable sidebar width, auto-hide input box, and auto-hide run settings panel for a cleaner workspace.',
+      '💬 **Quick New Chat**: Creating a new conversation now instantly shows an entry — set the title before the chat is even created for a smoother workflow.',
+      '🎨 **Gemini UI Settings**: New Gemini UI configuration options in the settings panel.',
+      '🖼️ **Image Watermark Removal**: Re-enabled watermark removal for Gemini image downloads.',
+    ],
+    fixes: [
+      'Fixed Scan Library not working in AI Studio.',
+      'Fixed inability to type uppercase "R" in AI Studio.',
+      'Adapted to the latest Gemini UI redesign.',
+      'Fixed sidebar display issues in narrow/mobile-width windows on Gemini.',
+    ],
+    announcement: {
+      title: 'Supporter Pack 🎨',
+      content: [
+        '**3 exclusive themes** are now available as a Supporter Pack — a small way to personalize your sidebar while supporting the project.',
+        'All core features remain **100% free**. This extension is built in my spare time, and your support helps me keep maintaining and developing new features. Thank you! ❤️',
+      ],
+    },
+  },
+  {
     version: '2.5.0',
     date: '2026-05-14',
     features: [

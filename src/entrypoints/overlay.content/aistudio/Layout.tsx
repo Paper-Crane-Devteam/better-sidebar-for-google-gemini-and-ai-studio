@@ -5,10 +5,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { OverlayPanel } from './OverlayPanel';
+import { AIStudioEnhancedFeatures } from './enhanced-features/AIStudioEnhancedFeatures';
 import { ShadowRootProvider } from '@/shared/components/ShadowRootContext';
 import { TooltipHelper } from '@/shared/lib/tooltip-helper';
 import { applyShadowStyles, querySelectorDeep, waitForElement } from '@/shared/lib/utils';
 import { useSettingsStore } from '@/shared/lib/settings-store';
+import { initAiStudioThemeSync, bindAiStudioShadowRootToTheme } from '@/themes/platforms/aistudio';
 
 export async function initAiStudioOverlay(mainStyles: string): Promise<void> {
   console.log('Better Sidebar: Overlay (AI Studio) Initialized');
@@ -45,7 +47,7 @@ export async function initAiStudioOverlay(mainStyles: string): Promise<void> {
 
   const wrapper = document.createElement('div');
   wrapper.id = 'better-sidebar-for-google-ai-studio-sidebar-wrapper';
-  anchor.insertBefore(wrapper, anchor.firstChild);
+  anchor?.insertBefore(wrapper, anchor.firstChild);
 
   const syncSidebarWithNavbar = async () => {
     try {
@@ -73,13 +75,12 @@ export async function initAiStudioOverlay(mainStyles: string): Promise<void> {
   const sidebarStyle = document.createElement('style');
   sidebarStyle.id = 'better-sidebar-for-google-ai-studio-sidebar-styles';
   
-  // Function to update sidebar width based on layout density
-  const updateSidebarWidth = (density: 'compact' | 'relaxed') => {
-    const width = density === 'compact' ? '300px' : '320px';
+  // Function to update sidebar width based on user setting
+  const updateSidebarWidth = (widthPx: number) => {
     sidebarStyle.textContent = `
       #better-sidebar-for-google-ai-studio-sidebar-wrapper {
         height: 100%;
-        width: ${width};
+        width: ${widthPx}px;
         flex-shrink: 0;
         box-sizing: border-box;
         transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -102,14 +103,32 @@ export async function initAiStudioOverlay(mainStyles: string): Promise<void> {
     `;
   };
 
-  // Initial width based on current density
-  updateSidebarWidth(useSettingsStore.getState().layoutDensity);
+  // Initial width based on current store value
+  const initialWidth = useSettingsStore.getState().enhancedFeatures.aistudio?.sidebarWidth ?? 320;
+  updateSidebarWidth(initialWidth);
   document.head.appendChild(sidebarStyle);
 
-  // Subscribe to density changes
+  // Subscribe to sidebarWidth changes from the store
   useSettingsStore.subscribe((state) => {
-    updateSidebarWidth(state.layoutDensity);
+    const width = state.enhancedFeatures.aistudio?.sidebarWidth ?? 320;
+    updateSidebarWidth(width);
   });
+
+  // Prevent keyboard/mouse events from bubbling to AI Studio's native listeners
+  const stopPropagation = (e: Event) => e.stopPropagation();
+  for (const evt of [
+    'click',
+    'mousedown',
+    'mouseup',
+    'pointerdown',
+    'pointerup',
+    'contextmenu',
+    'keydown',
+    'keyup',
+    'keypress',
+  ]) {
+    wrapper.addEventListener(evt, stopPropagation);
+  }
 
   const shadow = wrapper.attachShadow({ mode: 'open' });
   applyShadowStyles(shadow, mainStyles);
@@ -133,6 +152,12 @@ export async function initAiStudioOverlay(mainStyles: string): Promise<void> {
 
   shadow.appendChild(rootContainer);
 
+  // Bind custom theme to sidebar Shadow DOM
+  bindAiStudioShadowRootToTheme(rootContainer);
+
+  // Initialize custom theme sync (applies CSS variables to body for native AI Studio UI)
+  initAiStudioThemeSync();
+
   const root = ReactDOM.createRoot(rootContainer);
   root.render(
     <ShadowRootProvider container={rootContainer}>
@@ -141,4 +166,27 @@ export async function initAiStudioOverlay(mainStyles: string): Promise<void> {
       </div>
     </ShadowRootProvider>
   );
+
+  // Mount enhanced features independently (CSS-based features that work on the native page)
+  mountAIStudioEnhancedFeatures();
+}
+
+/**
+ * Mount AI Studio enhanced features (auto-hide input, etc.)
+ * These inject CSS into the main document and don't need a shadow DOM.
+ */
+function mountAIStudioEnhancedFeatures() {
+  try {
+    const enhancedWrapper = document.createElement('div');
+    enhancedWrapper.id = 'better-sidebar-aistudio-enhanced-features';
+    enhancedWrapper.style.display = 'none';
+    document.body.appendChild(enhancedWrapper);
+
+    const enhancedRoot = ReactDOM.createRoot(enhancedWrapper);
+    enhancedRoot.render(<AIStudioEnhancedFeatures />);
+
+    console.log('Better Sidebar: AI Studio enhanced features mounted');
+  } catch (e) {
+    console.error('Better Sidebar: AI Studio enhanced features initialization failed', e);
+  }
 }

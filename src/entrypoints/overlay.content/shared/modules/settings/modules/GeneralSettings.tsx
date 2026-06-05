@@ -1,12 +1,10 @@
 import React, { useMemo } from 'react';
 import { Button } from '../../../components/ui/button';
 import { Separator } from '../../../components/ui/separator';
-import { SimpleTooltip } from '@/shared/components/ui/tooltip';
-import { Moon, Sun, Monitor, ChevronDown, Folder } from 'lucide-react';
+import { ChevronDown, Folder } from 'lucide-react';
 import { Switch } from '@/shared/components/ui/switch';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { usePegasusStore } from '@/shared/lib/pegasus-store';
-import { useTheme } from '../hooks/useTheme';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useAppStore } from '@/shared/lib/store';
 import { detectPlatform, Platform } from '@/shared/types/platform';
@@ -34,7 +32,6 @@ export const GeneralSettings = () => {
   const { language, setLanguage, defaultSyncFolderId, setDefaultSyncFolderId } = usePegasusStore();
   const folders = useAppStore((state) => state.folders);
 
-  const { theme, setTheme } = useTheme();
   const platform = detectPlatform();
   const openModal = useModalStore((state) => state.open);
   const closeModal = useModalStore((state) => state.close);
@@ -52,47 +49,6 @@ export const GeneralSettings = () => {
         <h3 className="text-lg font-medium">{t('settings.appearance')}</h3>
         <Separator />
         <div className="grid gap-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <span className="text-sm font-medium">{t('settings.theme')}</span>
-              <p className="text-xs text-muted-foreground">
-                {t('settings.themeDescription')}
-              </p>
-            </div>
-            <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg border">
-              <SimpleTooltip content={t('settings.light')}>
-                <Button
-                  variant={theme === 'light' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  className="h-7 px-2"
-                  onClick={() => setTheme('light')}
-                >
-                  <Sun className="h-4 w-4" />
-                </Button>
-              </SimpleTooltip>
-              <SimpleTooltip content={t('settings.system')}>
-                <Button
-                  variant={theme === 'system' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  className="h-7 px-2"
-                  onClick={() => setTheme('system')}
-                >
-                  <Monitor className="h-4 w-4" />
-                </Button>
-              </SimpleTooltip>
-              <SimpleTooltip content={t('settings.dark')}>
-                <Button
-                  variant={theme === 'dark' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  className="h-7 px-2"
-                  onClick={() => setTheme('dark')}
-                >
-                  <Moon className="h-4 w-4" />
-                </Button>
-              </SimpleTooltip>
-            </div>
-          </div>
-
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <span className="text-sm font-medium">

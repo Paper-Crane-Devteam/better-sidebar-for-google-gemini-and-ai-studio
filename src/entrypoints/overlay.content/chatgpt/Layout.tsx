@@ -51,7 +51,7 @@ export async function initChatGPTOverlay(mainStyles: string): Promise<void> {
 
   // 2. Inject custom sidebar as first child of parent
   const originalSidebar = await waitForElement('#stage-slideover-sidebar');
-  const parent = originalSidebar.parentElement;
+  const parent = originalSidebar?.parentElement;
   
   if (!parent) {
     console.error('Better Sidebar: Failed to find parent of #stage-slideover-sidebar');

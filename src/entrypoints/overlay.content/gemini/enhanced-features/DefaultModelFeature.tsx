@@ -5,12 +5,13 @@ import { useSettingsStore } from '@/shared/lib/settings-store';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { waitForElement, applyShadowStyles } from '@/shared/lib/utils';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { bindShadowRootToTheme } from '@/themes';
 import mainStyles from '@/index.scss?inline';
 
 const MODEL_MAPPING: Record<string, string> = {
-  fast: 'Fast', 
-  thinking: 'Thinking',
-  pro: 'Pro',
+  'flash-lite': '3.1 Flash-Lite', 
+  flash: '3 Flash',
+  pro: '3.1 Pro',
 };
 
 const DefaultModelUI = ({ container }: { container: Element }) => {
@@ -41,9 +42,9 @@ const DefaultModelUI = ({ container }: { container: Element }) => {
         </SelectTrigger>
         <SelectContent container={container as HTMLElement}>
           <SelectItem value="default" className="text-xs">{t('geminiUI.defaultModelNone')}</SelectItem>
-          <SelectItem value="fast" className="text-xs">Fast</SelectItem>
-          <SelectItem value="thinking" className="text-xs">Thinking</SelectItem>
-          <SelectItem value="pro" className="text-xs">Pro</SelectItem>
+          <SelectItem value="flash-lite" className="text-xs">3.1 Flash-Lite</SelectItem>
+          <SelectItem value="flash" className="text-xs">3 Flash</SelectItem>
+          <SelectItem value="pro" className="text-xs">3.1 Pro</SelectItem>
         </SelectContent>
       </Select>
     </div>,
@@ -199,7 +200,8 @@ export const DefaultModelFeature = () => {
           applyShadowStyles(shadow, mainStyles);
           
           const shadowBody = document.createElement('div');
-          shadowBody.classList.add('shadow-body', 'theme-gemini');
+          shadowBody.classList.add('shadow-body');
+          shadowBody.classList.add(useSettingsStore.getState().geminiStyle === 'classic' ? 'theme-gemini-classic' : 'theme-gemini');
           if (document.body.classList.contains('dark-theme') || document.body.getAttribute('data-theme') === 'dark') {
             shadowBody.classList.add('dark');
           }
@@ -212,6 +214,7 @@ export const DefaultModelFeature = () => {
           shadowBody.addEventListener('touchstart', stopProp);
           
           shadow.appendChild(shadowBody);
+          bindShadowRootToTheme(shadowBody);
           setPortalTarget(shadowBody);
         }
       } else {

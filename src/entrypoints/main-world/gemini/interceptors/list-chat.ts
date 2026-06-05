@@ -38,7 +38,7 @@ export function handleListChatResponse(response: any, url: string) {
         
         // Use common helper to extract payloads
         const payloads = extractWrbFrPayloads(chunks);
-        
+        console.log('Better Sidebar (Gemini): WrbFrPayloads:', payloads)
         for (const payload of payloads) {
             try {
                 // User says: payload[2] is the list
@@ -89,7 +89,7 @@ export function handleListChatResponse(response: any, url: string) {
         }
         
         if (items.length > 0) {
-            console.log(`Better Sidebar (Gemini): Parsed ${items.length} chats`);
+            console.log(`Better Sidebar (Gemini): Parsed ${items.length} chats`, items);
         }
 
         globalThis.dispatchEvent(

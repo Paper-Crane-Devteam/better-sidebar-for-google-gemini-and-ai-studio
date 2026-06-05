@@ -1,6 +1,3 @@
-
-import DbWorker from '@/shared/workers/db-worker?worker';
-
 const pendingRequests = new Map<string, { resolve: (val: any) => void; reject: (err: any) => void }>();
 let isOffscreenCreating = false;
 let localWorker: Worker | null = null;
@@ -58,6 +55,8 @@ async function ensureWorker() {
     if (localWorker) return;
     
     console.log('Initializing local DB Worker (Fallback/Firefox mode)...');
+    // Dynamic import to avoid `new Worker()` appearing in service worker context (Chrome MV3)
+    const { default: DbWorker } = await import('@/shared/workers/db-worker?worker');
     localWorker = new DbWorker();
     localWorker.onmessage = (e) => {
       const { id, success, data, error, chunk } = e.data;

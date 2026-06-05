@@ -6,9 +6,10 @@ import {
   syncAiStudioTheme,
   syncChatGPTTheme,
 } from './utils/utils';
+import type { ThemePresetId } from '@/themes/types';
 
 interface GeminiEnhancedFeatures {
-  defaultModel: 'default' | 'fast' | 'thinking' | 'pro';
+  defaultModel: 'default' | 'flash-lite' | 'flash' | 'pro';
   sidebarWidth: number;
   chatWidth: number;
   inputWidth: number;
@@ -19,10 +20,25 @@ interface GeminiEnhancedFeatures {
   zenMode: boolean;
   showSmartScrollbar: boolean;
   quickResend: boolean;
+  autoHideInput: boolean;
+  showHotkeyHelper: boolean;
+  slashCommand: boolean;
+}
+
+interface AIStudioEnhancedFeatures {
+  sidebarWidth: number;
+  autoHideInput: boolean;
+  autoHideRunSettings: boolean;
+  showHotkeyHelper: boolean;
+  slashCommand: boolean;
 }
 
 interface SettingsState {
   theme: 'light' | 'dark' | 'system';
+  /** Custom theme preset ID, or null for default Gemini theme */
+  customTheme: ThemePresetId | null;
+  /** Gemini sidebar base style: 'default' (v2) or 'classic' (pre-v2 blue-tinted) */
+  geminiStyle: 'default' | 'classic';
   layoutDensity: 'compact' | 'relaxed';
   newChatBehavior: 'current-tab' | 'new-tab';
   autoScanLibrary: boolean;
@@ -49,10 +65,13 @@ interface SettingsState {
   };
   enhancedFeatures: {
     gemini: GeminiEnhancedFeatures;
+    aistudio: AIStudioEnhancedFeatures;
   };
 
   // Actions
   setTheme: (theme: 'light' | 'dark' | 'system') => void;
+  setCustomTheme: (themeId: ThemePresetId | null) => void;
+  setGeminiStyle: (style: 'default' | 'classic') => void;
   setLayoutDensity: (density: 'compact' | 'relaxed') => void;
   setNewChatBehavior: (behavior: 'current-tab' | 'new-tab') => void;
   setAutoScanLibrary: (enabled: boolean) => void;
@@ -68,6 +87,10 @@ interface SettingsState {
   setGeminiFeature: <K extends keyof GeminiEnhancedFeatures>(
     key: K,
     value: GeminiEnhancedFeatures[K],
+  ) => void;
+  setAIStudioFeature: <K extends keyof AIStudioEnhancedFeatures>(
+    key: K,
+    value: AIStudioEnhancedFeatures[K],
   ) => void;
   setLastSelectedGemId: (id: string | null) => void;
 }
@@ -121,6 +144,8 @@ export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
       theme: 'system',
+      customTheme: null,
+      geminiStyle: 'default',
       layoutDensity: 'relaxed',
       newChatBehavior: 'current-tab',
       autoScanLibrary: false,
@@ -158,6 +183,16 @@ export const useSettingsStore = create<SettingsState>()(
           zenMode: false,
           showSmartScrollbar: true,
           quickResend: false,
+          autoHideInput: false,
+          showHotkeyHelper: true,
+          slashCommand: true,
+        },
+        aistudio: {
+          sidebarWidth: 320,
+          autoHideInput: false,
+          autoHideRunSettings: false,
+          showHotkeyHelper: true,
+          slashCommand: true,
         },
       },
 
@@ -175,6 +210,14 @@ export const useSettingsStore = create<SettingsState>()(
         // if(platform === Platform.CLAUDE) {
         //   syncClaudeTheme(theme)
         // }
+      },
+      setCustomTheme: (themeId) => {
+        set({ customTheme: themeId });
+        // Theme engine apply/remove is handled by the content script
+        // that subscribes to this store change
+      },
+      setGeminiStyle: (style) => {
+        set({ geminiStyle: style });
       },
       setLayoutDensity: (layoutDensity) => set({ layoutDensity }),
       setNewChatBehavior: (newChatBehavior) => set({ newChatBehavior }),
@@ -201,12 +244,26 @@ export const useSettingsStore = create<SettingsState>()(
             gemini: { ...state.enhancedFeatures.gemini, [key]: value },
           },
         })),
+      setAIStudioFeature: (key, value) =>
+        set((state) => ({
+          enhancedFeatures: {
+            ...state.enhancedFeatures,
+            aistudio: {
+              ...(state.enhancedFeatures.aistudio ?? {
+                sidebarWidth: 320,
+                autoHideInput: false,
+                autoHideRunSettings: false,
+              }),
+              [key]: value,
+            },
+          },
+        })),
       setLastSelectedGemId: (id) => set({ lastSelectedGemId: id }),
     }),
     {
       name: getStorageName(),
       storage: createJSONStorage(() => storage),
-      version: 2,
+      version: 4,
       migrate: (persistedState: any, version: number) => {
         if (version === 0) {
           const oldEnhanced = persistedState.enhancedFeatures || {};
@@ -233,6 +290,28 @@ export const useSettingsStore = create<SettingsState>()(
               old === 'bottom-right'
                 ? { x: window.innerWidth - 60, y: 16 }
                 : { x: 16, y: 16 };
+          }
+        }
+        if (version < 3) {
+          // Add aistudio enhanced features defaults
+          if (!persistedState.enhancedFeatures) {
+            persistedState.enhancedFeatures = {};
+          }
+          if (!persistedState.enhancedFeatures.aistudio) {
+            persistedState.enhancedFeatures.aistudio = {
+              sidebarWidth: 320,
+              autoHideInput: false,
+              autoHideRunSettings: false,
+            };
+          }
+        }
+        if (version < 4) {
+          // Add slashCommand feature flag defaults
+          if (persistedState.enhancedFeatures?.gemini) {
+            persistedState.enhancedFeatures.gemini.slashCommand ??= true;
+          }
+          if (persistedState.enhancedFeatures?.aistudio) {
+            persistedState.enhancedFeatures.aistudio.slashCommand ??= true;
           }
         }
         return persistedState;

@@ -297,7 +297,8 @@ export const TopBarTagFeature = () => {
           applyShadowStyles(shadow, mainStyles);
 
           const shadowBody = document.createElement('div');
-          shadowBody.classList.add('shadow-body', 'theme-gemini');
+          shadowBody.classList.add('shadow-body');
+          shadowBody.classList.add(useSettingsStore.getState().geminiStyle === 'classic' ? 'theme-gemini-classic' : 'theme-gemini');
           shadowBody.style.display = 'flex';
           shadowBody.style.alignItems = 'center';
           shadowBody.style.height = '100%';

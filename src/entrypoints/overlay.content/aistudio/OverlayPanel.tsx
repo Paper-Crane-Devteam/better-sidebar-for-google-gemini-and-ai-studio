@@ -41,10 +41,15 @@ import { useUrl } from '@/shared/hooks/useUrl';
 import { useModuleConfig } from './useModuleConfig';
 import { detectAccount } from '@/entrypoints/content/shared/detect-account';
 import { Platform } from '@/shared/types/platform';
+import { useBadgeStore } from '@/shared/lib/badge-store';
+import { BadgeDot } from '@/shared/components/ui/badge-dot';
+import { useHotkeyListener } from '@/shared/hooks/useHotkeyListener';
+import { HotkeyCheatsheet } from '../shared/components/HotkeyCheatsheet';
 
 export const OverlayPanel = ({ className }: { className?: string }) => {
   const moduleConfig = useModuleConfig();
   useAppInit();
+  useHotkeyListener();
   const { t } = useI18n();
   const { path } = useUrl();
 
@@ -52,6 +57,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
   const layoutDensity = useSettingsStore((state) => state.layoutDensity);
   const newChatBehavior = useSettingsStore((state) => state.newChatBehavior);
   const shortcuts = useSettingsStore((state) => state.shortcuts);
+  const hasSettingsBadge = useBadgeStore((s) => s.isGroupVisible('settings.'));
   const {
     fetchData,
     ui,
@@ -237,7 +243,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
             variant={activeTab === 'files' ? 'secondary' : 'ghost'}
             size="icon"
             onClick={() => handleTabChange('files')}
-            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+            className="sidebar-btn transition-all"
           >
             <Files className="sidebar-icon" />
           </Button>
@@ -247,7 +253,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
             variant={activeTab === 'search' ? 'secondary' : 'ghost'}
             size="icon"
             onClick={() => handleTabChange('search')}
-            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+            className="sidebar-btn transition-all"
           >
             <Search className="sidebar-icon" />
           </Button>
@@ -257,7 +263,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
             variant={activeTab === 'prompts' ? 'secondary' : 'ghost'}
             size="icon"
             onClick={() => handleTabChange('prompts')}
-            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+            className="sidebar-btn transition-all"
           >
             <Sparkles className="sidebar-icon" />
           </Button>
@@ -268,7 +274,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               variant={activeTab === 'favorites' ? 'secondary' : 'ghost'}
               size="icon"
               onClick={() => handleTabChange('favorites')}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              className="sidebar-btn transition-all"
             >
               <Star className="sidebar-icon" />
             </Button>
@@ -279,7 +285,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
             variant={activeTab === 'tags' ? 'secondary' : 'ghost'}
             size="icon"
             onClick={() => handleTabChange('tags')}
-            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+            className="sidebar-btn transition-all"
           >
             <Tag className="sidebar-icon" />
           </Button>
@@ -295,7 +301,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               variant="ghost"
               size="icon"
               onClick={() => handleNavigation('/apps')}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              className="sidebar-btn transition-all"
             >
               <Hammer className="sidebar-icon" />
             </Button>
@@ -308,7 +314,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               variant="ghost"
               size="icon"
               onClick={() => handleNavigation('/api-keys')}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              className="sidebar-btn transition-all"
             >
               <LayoutDashboard className="sidebar-icon" />
             </Button>
@@ -323,7 +329,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               onClick={() =>
                 handleExternalLink('https://ai.google.dev/gemini-api/docs')
               }
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              className="sidebar-btn transition-all"
             >
               <BookOpen className="sidebar-icon" />
             </Button>
@@ -338,7 +344,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               variant="ghost"
               size="icon"
               onClick={() => setIsUIVisible(false)}
-              className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+              className="sidebar-btn transition-all"
             >
               <LogOut className="sidebar-icon" />
             </Button>
@@ -350,7 +356,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
             variant={activeTab === 'feedback' ? 'secondary' : 'ghost'}
             size="icon"
             onClick={() => handleTabChange('feedback')}
-            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+            className="sidebar-btn transition-all"
           >
             <MessageSquare className="sidebar-icon" />
           </Button>
@@ -360,9 +366,10 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
             variant={isSettingsOpen ? 'secondary' : 'ghost'}
             size="icon"
             onClick={() => handleTabChange('settings')}
-            className="sidebar-btn rounded-xl transition-all hover:rounded-xl"
+            className="sidebar-btn transition-all relative"
           >
             <Settings className="sidebar-icon" />
+            <BadgeDot visible={hasSettingsBadge} className="absolute top-1.5 right-1.5" />
           </Button>
         </SimpleTooltip>
       </div>
@@ -409,6 +416,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
       <GlobalModal />
       <ProfilePickerDialog />
       <GlobalToast />
+      <HotkeyCheatsheet />
     </div>
   );
 };

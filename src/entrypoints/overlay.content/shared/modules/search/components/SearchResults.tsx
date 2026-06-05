@@ -6,20 +6,17 @@ import {
   ChevronDown,
   Info,
   ExternalLink,
-  Copy,
-  FileCode,
   X,
   Loader2,
 } from 'lucide-react';
-import { cn, stripMarkdown } from '@/shared/lib/utils/utils';
+import { cn } from '@/shared/lib/utils/utils';
 import dayjs from 'dayjs';
-import { navigate } from '@/shared/lib/navigation';
 import { browser } from 'wxt/browser';
 import { MarkdownRenderer } from '@/shared/components/MarkdownRenderer';
+import { ContentToolbar } from '@/shared/components/ContentToolbar';
 import { Button } from '@/shared/components/ui/button';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
 import { useI18n } from '@/shared/hooks/useI18n';
-import { toast } from '@/shared/lib/toast';
 import type { Message } from '@/shared/types/db';
 import AIStudioIcon from '@/assets/icons/aistudio.png';
 import GeminiIcon from '@/assets/icons/gemini.svg';
@@ -107,6 +104,7 @@ const MessagePreviewContent = ({
         >
           {match.content}
         </MarkdownRenderer>
+        <ContentToolbar content={match.content} />
       </div>
 
       {/* Context section - Adjacent message */}
@@ -121,11 +119,6 @@ const MessagePreviewContent = ({
             <ChevronRight className="h-4 w-4" />
           )}
           <span>{t('search.context')}</span>
-          {/* {!isLoading && adjacentMessage && (
-            <span className="text-xs bg-muted px-1.5 py-0.5 rounded">
-              {contextLabel}
-            </span>
-          )} */}
         </button>
 
         {isExpanded && (
@@ -150,6 +143,7 @@ const MessagePreviewContent = ({
                     {adjacentMessage.content || ''}
                   </MarkdownRenderer>
                 </div>
+                <ContentToolbar content={adjacentMessage.content || ''} />
               </div>
             ) : (
               <div className="text-sm text-muted-foreground py-2 italic">
@@ -322,16 +316,6 @@ const MatchItem = ({
     onNavigate?.(match);
   };
 
-  const handleCopyAsText = async () => {
-    const plain = stripMarkdown(match.content);
-    await navigator.clipboard.writeText(plain);
-    toast.success(t('toast.copiedToClipboard'), 1500);
-  };
-  const handleCopyAsMarkdown = async () => {
-    await navigator.clipboard.writeText(match.content);
-    toast.success(t('toast.copiedToClipboard'), 1500);
-  };
-
   const handlePreview = (e: React.MouseEvent) => {
     e.stopPropagation();
     useModalStore.getState().open({
@@ -344,43 +328,21 @@ const MatchItem = ({
         />
       ),
       headerActions: (
-        <>
-          <SimpleTooltip content={t('search.copyAsText')}>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleCopyAsText}
-            >
-              <Copy className="h-4 w-4" />
-            </Button>
-          </SimpleTooltip>
-          <SimpleTooltip content={t('search.copyAsMarkdown')}>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleCopyAsMarkdown}
-            >
-              <FileCode className="h-4 w-4" />
-            </Button>
-          </SimpleTooltip>
-          <SimpleTooltip content={t('common.close')}>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => useModalStore.getState().close()}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </SimpleTooltip>
-        </>
+        <SimpleTooltip content={t('common.close')}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => useModalStore.getState().close()}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </SimpleTooltip>
       ),
       modalClassName: 'max-w-4xl',
       type: 'confirm',
       confirmText: t('common.close'),
       cancelText: t('search.jumpToConversation'),
       onCancel: () => {
-        // We reuse the handleNavigation logic.
-        // But we need to close the modal first.
         useModalStore.getState().close();
 
         // Wait for modal to close

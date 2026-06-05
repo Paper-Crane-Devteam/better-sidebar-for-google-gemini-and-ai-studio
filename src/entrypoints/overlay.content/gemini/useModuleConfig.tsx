@@ -1,4 +1,4 @@
-import { navigate, navigateToGem } from '@/shared/lib/navigation';
+import { navigate, navigateToGem, navigateToNewChat } from '@/shared/lib/navigation';
 import { handleSearchNavigation } from '../shared/utils';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSettingsStore } from '@/shared/lib/settings-store';
@@ -53,7 +53,8 @@ const useTemporaryChatToggle = () => {
     };
 
     const checkAndObserve = () => {
-      const btn = document.querySelector('button[aria-label="Temporary chat"]');
+      const container = document.querySelector('div[data-test-id="temp-chat-button-container"]');
+      const btn = container?.querySelector('button') || null;
       if (btn) {
         if (btn !== currentBtn) {
           currentBtn = btn;
@@ -83,48 +84,54 @@ const useTemporaryChatToggle = () => {
   }, []);
 
   const toggle = () => {
-    const isOnNewChat = window.location.pathname === '/app';
-
-    const clickTempChatBtn = () => {
-      const btn = document.querySelector(
-        'button[aria-label="Temporary chat"]',
-      ) as HTMLButtonElement;
+    const clickTempChatBtn = (): boolean => {
+      const container = document.querySelector(
+        'div[data-test-id="temp-chat-button-container"]',
+      );
+      const btn = container?.querySelector('button') as HTMLButtonElement;
       if (btn) {
         btn.click();
-      } else {
-        console.warn('Temporary chat button not found');
+        return true;
       }
+      return false;
     };
 
-    if (isOnNewChat) {
-      clickTempChatBtn();
+    // Try clicking directly first — works if already on /app
+    if (clickTempChatBtn()) return;
+
+    // Navigate to new chat first, then wait for the temp chat button to appear
+    const newChatBtn = document.querySelector(
+      'bard-sidenav .overflow-container gem-nav-list-item a',
+    ) as HTMLElement;
+    if (newChatBtn) {
+      newChatBtn.click();
     } else {
-      // Navigate to new chat first, then toggle after the page settles
-      const newChatBtn = document.querySelector(
-        'side-navigation-content mat-action-list side-nav-action-button a[aria-label="New chat"]',
-      ) as HTMLElement;
-      if (newChatBtn) {
-        newChatBtn.click();
-      } else {
-        navigate('/app');
-      }
-      // Wait for the new chat page to render the temporary chat button
-      const waitAndClick = (retries = 10) => {
-        setTimeout(() => {
-          const btn = document.querySelector(
-            'button[aria-label="Temporary chat"]',
-          ) as HTMLButtonElement;
-          if (btn) {
-            btn.click();
-          } else if (retries > 0) {
-            waitAndClick(retries - 1);
-          } else {
-            console.warn('Temporary chat button not found after navigation');
-          }
-        }, 300);
-      };
-      waitAndClick();
+      navigate('/app');
     }
+
+    // Use MutationObserver to detect the temp chat button as soon as it renders
+    const waitForTempChatBtn = () => {
+      // Check immediately in case it's already there after navigation
+      if (clickTempChatBtn()) return;
+
+      const obs = new MutationObserver(() => {
+        if (clickTempChatBtn()) {
+          obs.disconnect();
+          clearTimeout(timeout);
+        }
+      });
+      obs.observe(document.body, { childList: true, subtree: true });
+
+      // Fallback timeout to avoid observing forever
+      const timeout = setTimeout(() => {
+        obs.disconnect();
+        if (!clickTempChatBtn()) {
+          console.warn('Temporary chat button not found after navigation');
+        }
+      }, 5000);
+    };
+
+    waitForTempChatBtn();
   };
 
   return { isTempChat, toggle };
@@ -204,18 +211,10 @@ export const useModuleConfig = (): ModuleConfig => {
     },
     explorer: {
       onNewChat: () => {
-        const url = 'https://gemini.google.com/app';
         if (newChatBehavior === 'new-tab') {
-          window.open(url, '_blank');
+          window.open('https://gemini.google.com/app', '_blank');
         } else {
-          const newChatBtn = document.querySelector(
-            'side-navigation-content mat-action-list side-nav-action-button a[aria-label="New chat"]',
-          ) as HTMLElement;
-          if (newChatBtn) {
-            newChatBtn.click();
-          } else {
-            window.location.href = url;
-          }
+          navigateToNewChat();
         }
       },
       newChatDropdownItems: [

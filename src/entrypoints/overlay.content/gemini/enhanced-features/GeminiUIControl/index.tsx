@@ -38,6 +38,10 @@ export const GeminiUIControl = () => {
     setShowSmartScrollbar,
     quickResend,
     setQuickResend,
+    autoHideInput,
+    setAutoHideInput,
+    slashCommand,
+    setSlashCommand,
   } = useGeminiUI();
 
   return (
@@ -46,7 +50,7 @@ export const GeminiUIControl = () => {
         <DropdownMenuTrigger asChild>
           <button
             className={cn(
-              'flex h-9 w-9 items-center justify-center rounded-xl border border-border/50 bg-background/60 backdrop-blur-md transition-all hover:bg-accent',
+              'flex h-9 w-9 items-center justify-center rounded-lg border border-border/50 bg-background/60 backdrop-blur-md transition-all hover:bg-accent',
               isOpen && 'bg-accent shadow-sm ring-2 ring-ring/20',
             )}
           >
@@ -60,7 +64,7 @@ export const GeminiUIControl = () => {
         <DropdownMenuContent
           align="end"
           sideOffset={8}
-          className="z-[39] w-[340px] max-h-[85vh] flex flex-col rounded-2xl border border-border bg-popover/95 p-0 backdrop-blur-xl shadow-2xl animate-in fade-in zoom-in-95 duration-200 overflow-hidden"
+          className="z-[39] w-[340px] max-h-[85vh] flex flex-col rounded-lg border border-border bg-popover p-0 shadow-2xl animate-in fade-in zoom-in-95 duration-200 overflow-hidden"
         >
           {/* Header */}
           <div className="flex items-center gap-2.5 p-5 pb-4 border-b border-border/40 bg-popover/50 backdrop-blur-sm z-10">
@@ -167,8 +171,8 @@ export const GeminiUIControl = () => {
               </div>
 
               <div className="space-y-4">
-                {/* Gemini Brand */}
-                <div className="flex items-center justify-between group">
+                {/* [DEPRECATED] Gemini Brand - element no longer exists in new Gemini UI */}
+                {/* <div className="flex items-center justify-between group">
                   <div className="space-y-0.5">
                     <Label
                       className="text-xs font-semibold cursor-pointer"
@@ -184,7 +188,7 @@ export const GeminiUIControl = () => {
                     checked={!hideBrand}
                     onCheckedChange={(c) => setHideBrand(!c)}
                   />
-                </div>
+                </div> */}
 
                 {/* AI Disclaimer */}
                 <div className="flex items-center justify-between group">
@@ -276,8 +280,8 @@ export const GeminiUIControl = () => {
                   />
                 </div>
 
-                {/* Top Bar Conversation Tag */}
-                <div className="flex items-center justify-between group">
+                {/* [DEPRECATED] Top Bar Conversation Tag - removed due to Gemini UI redesign */}
+                {/* <div className="flex items-center justify-between group">
                   <div className="space-y-0.5">
                     <Label
                       className="text-xs font-semibold cursor-pointer"
@@ -293,7 +297,7 @@ export const GeminiUIControl = () => {
                     checked={showTopBarTag}
                     onCheckedChange={(c) => setShowTopBarTag(c)}
                   />
-                </div>
+                </div> */}
 
                 {/* Remove AI Sparkle Image Watermark */}
                 <div className="flex items-center justify-between group">
@@ -330,6 +334,44 @@ export const GeminiUIControl = () => {
                   <Switch
                     checked={showSmartScrollbar}
                     onCheckedChange={(c) => setShowSmartScrollbar(c)}
+                  />
+                </div>
+
+                {/* Auto-hide Input */}
+                <div className="flex items-center justify-between group">
+                  <div className="space-y-0.5">
+                    <Label
+                      className="text-xs font-semibold cursor-pointer"
+                      onClick={() => setAutoHideInput(!autoHideInput)}
+                    >
+                      {t('geminiUI.autoHideInput')}
+                    </Label>
+                    <p className="text-[10px] text-muted-foreground">
+                      {t('geminiUI.autoHideInputDesc')}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={autoHideInput}
+                    onCheckedChange={(c) => setAutoHideInput(c)}
+                  />
+                </div>
+
+                {/* Slash Command */}
+                <div className="flex items-center justify-between group">
+                  <div className="space-y-0.5">
+                    <Label
+                      className="text-xs font-semibold cursor-pointer"
+                      onClick={() => setSlashCommand(!slashCommand)}
+                    >
+                      {t('geminiUI.slashCommand')}
+                    </Label>
+                    <p className="text-[10px] text-muted-foreground">
+                      {t('geminiUI.slashCommandDesc')}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={slashCommand}
+                    onCheckedChange={(c) => setSlashCommand(c)}
                   />
                 </div>
               </div>

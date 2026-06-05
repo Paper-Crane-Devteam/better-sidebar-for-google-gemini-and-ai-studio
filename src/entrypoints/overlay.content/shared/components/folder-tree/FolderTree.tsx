@@ -67,10 +67,7 @@ export const FolderTree = forwardRef<FolderTreeHandle, FolderTreeProps>(
           rowHeight={rowHeight}
           openByDefault={false}
           initialOpenState={initialOpenState}
-          searchTerm={searchTerm}
-          searchMatch={(node, term) =>
-            node.data.name.toLowerCase().includes(term.toLowerCase())
-          }
+
           renderRow={renderRow}
         >
           {renderNode}

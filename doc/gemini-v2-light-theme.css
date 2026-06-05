@@ -1,0 +1,205 @@
+:root .light-theme {
+    --bard-color-neutral-90: #e3e3e3;
+    --bard-color-neutral-95: #f2f2f2;
+    --bard-color-neutral-96: #f4f3f2;
+    --bard-color-enterprise-greeting: #c7c7c7;
+    --bard-color-custom-primary-container: #d3e3fd;
+    --bard-color-surface-tint: #6991d6;
+    --bard-color-tertiary-60: #1ea446;
+    --bard-color-surface-3-opacity-11: rgba(105,
+    145,
+    214,
+    0.1098039216);
+    --bard-color-surface-5-opacity-14: rgba(105,
+    145,
+    214,
+    0.1411764706);
+    --bard-color-footer-background: #f8f9fa;
+    --bard-color-draft-chip-background: #e8eaed;
+    --bard-color-sidenav-background-desktop: #e9eef6;
+    --bard-color-sidenav-background-mobile: var(--gem-sys-color--surface-container);
+    --bard-color-mode-switcher-container: var(--gem-sys-color--surface-container);
+    --bard-color-mode-switcher-slider: var(--gem-sys-color--surface-bright);
+    --bard-color-inverse-primary-background: #000;
+    --bard-color-response-container-flipped-background: #f3f6fc;
+    --bard-color-sos-footer: #757575;
+    --bard-color-code-comment: #5f6368;
+    --bard-color-code-variables: #d93025;
+    --bard-color-code-literal: #b55908;
+    --bard-color-code-class: #996900;
+    --bard-color-code-string: #188038;
+    --bard-color-code-quotes-and-meta: #1967d2;
+    --bard-color-code-keyword: #8430ce;
+    --bard-color-code-chip-foreground: #8430ce;
+    --bard-color-code-chip-background: #f7e3ff;
+    --bard-color-code-chip-background-selected: #f0c6ff;
+    --bard-color-continue-chat-discovery-tooltip-button-text: #0b57d0;
+    --bard-color-fact-check-tooltip-entailed-highlight: #ddf8d8;
+    --bard-color-fact-check-tooltip-entailed-selected: rgba(128,
+    218,
+    128,
+    0.75);
+    --bard-color-fact-check-tooltip-contradictory-highlight: #ffede1;
+    --bard-color-fact-check-tooltip-contradictory-selected: rgba(255,
+    182,
+    131,
+    0.75);
+    --bard-color-fact-check-button-complete: #d3e3fd;
+    --bard-color-fact-title: #006c35;
+    --bard-color-fact-title-invalid: #9a4600;
+    --bard-color-recitation-background: #e7f2ff;
+    --bard-color-tooltip-box-shadow: rgba(60,
+    64,
+    67,
+    0.16);
+    --bard-color-sentence-prefix-color: #000;
+    --bard-color-sentence-words-color: #80868b;
+    --bard-color-image-overlay-background: rgba(255,
+    255,
+    255,
+    0.75);
+    --bard-color-pup-banner: #fbbc04;
+    --bard-color-share-link: #0842a0;
+    --bard-color-strong-focus-indicator: #000;
+    --bard-color-inverse-strong-focus-indicator: #fff;
+    --bard-color-tool-fuse-background-left: #dddeff;
+    --bard-color-tool-fuse-background-middle: #e7e9fe;
+    --bard-color-tool-fuse-background-right: #f3f6fc;
+    --bard-color-tool-fuse-foreground-left: #cbddff;
+    --bard-color-tool-fuse-foreground-middle: #d8e2ff;
+    --bard-color-tool-fuse-foreground-right: #ccceff;
+    --bard-color-bard-avatar-v2-basic-circle-stop-1: #9168c0;
+    --bard-color-bard-avatar-v2-basic-circle-stop-2: #5684d1;
+    --bard-color-bard-avatar-v2-basic-circle-stop-3: #1ba1e3;
+    --bard-color-bard-avatar-v2-advanced-circle-stop-1: #9e72ba;
+    --bard-color-bard-avatar-v2-advanced-circle-stop-2: #d65c67;
+    --bard-color-bard-avatar-v2-advanced-circle-stop-3: #d6635c;
+    --bard-color-icon-separator: #d9d9d9;
+    --bard-color-chrome-experiment-badge: #1b6ef3;
+    --bard-color-onegooglebar-product-controls: #5f6368;
+    --bard-color-share-title-card-border: #c4c7c5;
+    --bard-color-share-selected-title-card-border: #0b57d0;
+    --bard-color-share-social-media-icon-focus: #e9eef6;
+    --bard-color-share-social-media-icon-background: #f8fafd;
+    --bard-color-form-field-outline: #80868b;
+    --bard-color-form-field-outline-active: #1a73e8;
+    --bard-color-form-field-outline-hover: #202124;
+    --bard-color-form-field-placeholder: #5f6368;
+    --bard-color-zero-state-card-selected: #d3e3fd;
+    --bard-color-zero-state-prompt-chip-background: #d3e3fd;
+    --bard-color-zero-state-prompt-chip-text: #0b57d0;
+    --bard-color-processing-animation-color-1: #e3e3e3;
+    --bard-color-processing-animation-color-2: #f0f4f9;
+    --bard-color-onhover-conversation-metadata-button-v2: #dde3ea;
+    --bard-color-new-conversation-button: #dde3ea;
+    --bard-color-on-new-conversation-button: #444746;
+    --bard-color-icon-container-background: #fff;
+    --bard-color-bot-power-up-button-background: #e8eaed;
+    --bard-color-bot-onboarding-banner-bg-step-1: #efdbff;
+    --bard-color-bot-onboarding-banner-bg-step-2: #c2e7ff;
+    --bard-color-bot-onboarding-banner-bg-step-3: #c2e7ff;
+    --bard-color-bot-onboarding-banner-bg-step-4: #efdbff;
+    --bard-color-bot-logo-bg-default: #e1e3e1;
+    --bard-color-bot-logo-text-default: #5c5f5e;
+    --bard-color-bot-logo-border-default: #a9acaa;
+    --bard-color-lightbox-background: #fff;
+    --bard-color-image-lightbox-text: #757575;
+    --bard-color-image-placeholder-background: #d3dbe5;
+    --bard-color-chart-highlighted-background: #e9eef6;
+    --bard-color-skeleton-loader-background-1: #f0f4f9;
+    --bard-color-skeleton-loader-background-2: #e9eef6;
+    --bard-color-skeleton-loader-background-3: #487fed;
+    --bard-color-skeleton-loader-background-alt-1: #f0f4f9;
+    --bard-color-skeleton-loader-background-alt-2: #e8cde2;
+    --bard-color-skeleton-loader-background-alt-3: #e5989f;
+    --bard-color-skeleton-loader-background-grayscale-1: #f0f4f9;
+    --bard-color-skeleton-loader-background-grayscale-2: #d3dbe5;
+    --bard-color-skeleton-loader-background-grayscale-3: #f0f4f8;
+    --bard-color-gallery-separator-line: #e1e3e1;
+    --bard-color-gallery-image-card-text: #fff;
+    --bard-color-brand-text-gradient-stop-1: #4285f4;
+    --bard-color-brand-text-gradient-stop-2: #9b72cb;
+    --bard-color-brand-text-gradient-stop-3: #d96570;
+    --bard-color-brand-text-gradient-v2-stop-1: #3983ff;
+    --bard-color-brand-text-gradient-v2-stop-2: #3e6af0;
+    --bard-color-brand-text-gradient-v2-stop-3: #579fff;
+    --bard-color-input-area-buttons-hover-background: #3c4043;
+    --bard-color-sidenav-mobile-controls: #444746;
+    --bard-color-sidenav-scrim: rgba(19,
+    19,
+    20,
+    0.4);
+    --bard-color-get-app-banner-background: #d6e2fb;
+    --bard-color-get-app-banner-text: #444746;
+    --bard-color-get-app-mobile-dialog-text: #fff;
+    --bard-color-get-app-mobile-dialog-disclaimer: #e3e3e3;
+    --bard-color-get-app-mobile-dialog-background: #14181d;
+    --bard-color-get-app-qr-code-border: #fff;
+    --bard-color-imagen-loading-gradient-step-1: rgba(240,
+    244,
+    249,
+    0.2);
+    --bard-color-imagen-loading-gradient-step-2: #f0f4f9;
+    --bard-color-imagen-loading-gradient-step-3: #d3dbe5;
+    --bard-color-imagen-selection-dialog-background: #fff;
+    --bard-color-enterprise-disclaimer-encrypted: #8e4e00;
+    --bard-color-enterprise-disclaimer-encrypted-background: #ffdcc1;
+    --bard-color-planner-status-indicator-bar-error: #ec928e;
+    --bard-color-planner-status-indicator-bar-warning: #ffb683;
+    --bard-color-planner-status-indicator-bar-update: #7cacf8;
+    --bard-color-resize-canvas-background: #ecf3fe;
+    --bard-color-immersive-editor-comment-selection: #ffe9c4;
+    --bard-color-immersive-editor-comment-selection-focused: #ffd289;
+    --bard-color-immersive-editor-user-selection: #a8c7fa;
+    --bard-color-immersive-learning-correct-background: var(--gem-sys-color--tertiary-container);
+    --bard-color-immersive-learning-correct-border: var(--gem-sys-color--tertiary-container);
+    --bard-color-immersive-learning-incorrect-background: #fff8f8;
+    --bard-color-immersive-learning-incorrect-border: #fff8f8;
+    --bard-color-immersive-learning-answered-in-rehearsal-background: var(--gem-sys-color--secondary-container);
+    --bard-color-immersive-learning-answered-in-rehearsal-border: var(--gem-sys-color--secondary-fixed-dim);
+    --bard-color-product-card-image-container-background: #fff;
+    --bard-color-surface-dim-tmp: #f0f4f8;
+    --bard-color-sidenav-tile-background-aurora: #e5ecf2;
+    --bard-color-sidenav-tile-text-aurora: #4c505a;
+    --bard-color-input-companion-button-hover-background: #edf2fc;
+    --bard-color-input-companion-button-active-background: #e8eefb;
+    --bard-color-lm-on-surface-variant: rgba(0,
+    0,
+    0,
+    0.54);
+    --bard-color-lm-on-surface-low: rgba(0,
+    0,
+    0,
+    0.08);
+    --bard-color-lm-states-focus: rgba(0,
+    0,
+    0,
+    0.08);
+    --bard-color-lm-states-hover: rgba(0,
+    0,
+    0,
+    0.08);
+    --bard-color-lm-states-pressed: rgba(0,
+    0,
+    0,
+    0.12);
+    --bard-color-lm-elevation-level1-color: rgba(0,
+    0,
+    0,
+    0.04);
+    --bard-color-lm-elevation-level2-color: rgba(0,
+    0,
+    0,
+    0.11);
+    --bard-color-remy-surface: #faf9f9;
+    --bard-color-progress-on-track: #9be69a;
+    --bard-color-progress-still-working: #fdd663;
+    --bard-color-progress-not-started: #dadce0;
+    --bard-color-progress-on-track-text: #002220;
+    --bard-color-progress-still-working-text: #652000;
+    --bard-color-progress-not-started-text: #1f1f1f;
+    --bard-color-gemini-u-top-priority-bg: #f4faff;
+    --bard-color-gemini-u-top-priority-text: #2051da;
+    --bard-color-gemini-u-lesson-tile-hover-bg: #f2f0f0;
+    --bard-color-lm-shimmer-selected-overlay: color(from var(--lumi-sys-color--surface) srgb r g b/0.94);
+}

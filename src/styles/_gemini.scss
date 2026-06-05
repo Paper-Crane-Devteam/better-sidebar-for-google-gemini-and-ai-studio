@@ -1,5 +1,5 @@
 @layer base {
-  /* Gemini Theme */
+  /* Gemini Theme (v2 - 2025 Redesign) */
   .theme-gemini,
   :host(.theme-gemini) {
     /* Light Theme */
@@ -11,7 +11,7 @@
     --sidebar-padding-y: 0.5rem;
     --sidebar-icon-color: 68 71 70;
 
-    --background: 233 238 246; /* #e9eef6 */
+    --background: 250 249 249; /* #faf9f9 - remy-surface */
     --foreground: 31 31 31; /* #1f1f1f */
 
     --card: 255 255 255; /* #ffffff */
@@ -23,20 +23,20 @@
     --primary: 11 87 208; /* #0b57d0 */
     --primary-foreground: 255 255 255;
 
-    --secondary: 221 227 234; /* #dde3ea */
+    --secondary: 240 244 249; /* #f0f4f9 - surface-container */
     --secondary-foreground: 31 31 31;
 
-    --muted: 221 227 234;
+    --muted: 240 244 249;
     --muted-foreground: 68 71 70; /* #444746 */
 
-    --accent: 221 227 234;
+    --accent: 233 238 246; /* #e9eef6 - surface-container-high */
     --accent-foreground: 31 31 31;
 
     --destructive: 179 38 30; /* #b3261e */
     --destructive-foreground: 255 255 255;
 
-    --border: 226 226 226; /* #e2e2e2 */
-    --input: 220 220 220; /* #dcdcdc */
+    --border: 225 227 225; /* #e1e3e1 - outline-low */
+    --input: 196 199 197; /* #c4c7c5 - outline-variant */
     --ring: 11 87 208;
 
     --radius: 16px;
@@ -47,31 +47,31 @@
 
     /* Gemini Font */
     --font-sans:
-      'Google Sans Flex', 'Google Sans', 'Helvetica Neue', sans-serif;
+      'Google Sans Flex', 'Google Sans', 'Helvetica Neue', 'Microsoft YaHei', 'PingFang SC', sans-serif;
   }
 
   .theme-gemini.dark,
   :host(.theme-gemini.dark) {
     /* Dark Theme */
-    --background: 30 31 32; /* #1e1f20 */
+    --background: 3 3 3; /* #030303 - remy-surface */
     --foreground: 227 227 227; /* #e3e3e3 */
 
-    --card: 40 42 44; /* #282a2c */
+    --card: 34 35 39; /* #222327 - custom-primary-container */
     --card-foreground: 227 227 227;
 
-    --popover: 40 42 44;
+    --popover: 34 35 39;
     --popover-foreground: 227 227 227;
 
     --primary: 168 199 250; /* #a8c7fa */
     --primary-foreground: 4 30 73; /* #041e49 */
 
-    --secondary: 59 68 86; /* #3b4456 */
+    --secondary: 55 57 59; /* #37393b - neutral-90 */
     --secondary-foreground: 227 227 227;
 
-    --muted: 59 68 86;
+    --muted: 55 57 59;
     --muted-foreground: 196 199 197; /* #c4c7c5 */
 
-    --accent: 59 68 86;
+    --accent: 59 68 86; /* #3b4456 */
     --accent-foreground: 227 227 227;
 
     --destructive: 236 146 142; /* #ec928e */
@@ -79,8 +79,8 @@
 
     --sidebar-icon-color: 196 199 197; /* #c4c7c5 */
 
-    --border: 60 64 67; /* #3c4043 */
-    --input: 142 145 143; /* #8e918f */
+    --border: 55 57 59; /* #37393b - neutral-90 */
+    --input: 122 122 122; /* #7a7a7a - icon-separator */
     --ring: 168 199 250;
 
     /* Custom Gemini Colors */

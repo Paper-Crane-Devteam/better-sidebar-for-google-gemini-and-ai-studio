@@ -135,9 +135,10 @@ export const useGeminiUI = () => {
     let css = '';
 
     // Visibility Toggles
-    if (hideBrand) {
-      css += `bard-mode-switcher:has(bard-logo) { display: none !important; }\n`;
-    }
+    // [DEPRECATED] hideBrand - bard-mode-switcher element no longer exists in new Gemini UI
+    // if (hideBrand) {
+    //   css += `bard-mode-switcher:has(bard-logo) { display: none !important; }\n`;
+    // }
     if (hideDisclaimer) {
       css += `hallucination-disclaimer { visibility: hidden !important; height: 10px !important; }\n`;
     }
@@ -181,28 +182,29 @@ export const useGeminiUI = () => {
 
     if (zenMode) {
       css += `
-        bard-sidenav, top-bar-actions, .boqOnegoogleliteOgbOneGoogleBar, .side-nav-menu-button { display: none !important; }
+        bard-sidenav, top-bar-actions, .boqOnegoogleliteOgbOneGoogleBar, .side-nav-menu-button, side-nav-sparkle-button { display: none !important; }
       `;
     }
 
-    if (geminiSettings.showTopBarTag) {
-      css += `
-      /* Override center-section max-width when showing tags */
-      top-bar-actions .center-section {
-        max-width: none !important;
-      }
-      `;
-    }
+    // [DEPRECATED] showTopBarTag - removed due to Gemini UI redesign
+    // if (geminiSettings.showTopBarTag) {
+    //   css += `
+    //   /* Override center-section max-width when showing tags */
+    //   top-bar-actions .center-section {
+    //     max-width: none !important;
+    //   }
+    //   `;
+    // }
 
     styleEl.textContent = css;
   }, [
-    hideBrand,
+    // [DEPRECATED] hideBrand,
     hideDisclaimer,
     hideUpgrade,
     storeSidebarWidth,
     storeChatWidth,
     storeInputWidth,
-    geminiSettings.showTopBarTag,
+    // [DEPRECATED] geminiSettings.showTopBarTag,
     zenMode,
   ]);
 
@@ -222,26 +224,25 @@ export const useGeminiUI = () => {
     });
   }, [isSidebarExpanded, storeSidebarWidth]);
 
-  // Bard mode switcher (Gemini Logo/Brand) diff width
-  // This element's width is calculated as current closed width + this diff.
-  useEffect(() => {
-    const updateBardModeSwitcher = (el?: HTMLElement) => {
-      const bardModeSwitcher = el;
-      if (bardModeSwitcher) {
-        const density = useSettingsStore.getState().layoutDensity;
-        const closedWidth = density === 'compact' ? 56 : 64;
-        const diffWidth = storeSidebarWidth - closedWidth;
-        bardModeSwitcher.style.setProperty(
-          '--bard-sidenav-open-closed-width-diff',
-          `${diffWidth}px`,
-        );
-      }
-    };
-
-    waitForElement('main>div>bard-mode-switcher').then((el) => {
-      updateBardModeSwitcher(el as HTMLElement);
-    });
-  }, [storeSidebarWidth]);
+  // [DEPRECATED] Bard mode switcher (Gemini Logo/Brand) - element no longer exists in new Gemini UI
+  // useEffect(() => {
+  //   const updateBardModeSwitcher = (el?: HTMLElement) => {
+  //     const bardModeSwitcher = el;
+  //     if (bardModeSwitcher) {
+  //       const density = useSettingsStore.getState().layoutDensity;
+  //       const closedWidth = density === 'compact' ? 56 : 64;
+  //       const diffWidth = storeSidebarWidth - closedWidth;
+  //       bardModeSwitcher.style.setProperty(
+  //         '--bard-sidenav-open-closed-width-diff',
+  //         `${diffWidth}px`,
+  //       );
+  //     }
+  //   };
+  //
+  //   waitForElement('main>div>bard-mode-switcher').then((el) => {
+  //     updateBardModeSwitcher(el as HTMLElement);
+  //   });
+  // }, [storeSidebarWidth]);
 
   return {
     sidebarWidth: localSidebarWidth,
@@ -278,5 +279,9 @@ export const useGeminiUI = () => {
       setPegasusGeminiFeature('removeWatermark', v),
     quickResend: geminiSettings.quickResend,
     setQuickResend: (v: boolean) => setGeminiFeature('quickResend', v),
+    autoHideInput: geminiSettings.autoHideInput,
+    setAutoHideInput: (v: boolean) => setGeminiFeature('autoHideInput', v),
+    slashCommand: geminiSettings.slashCommand,
+    setSlashCommand: (v: boolean) => setGeminiFeature('slashCommand', v),
   };
 };

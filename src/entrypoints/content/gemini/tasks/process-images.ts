@@ -15,7 +15,6 @@ async function getEngine(): Promise<WatermarkEngine> {
 async function processImg(img: HTMLImageElement): Promise<void> {
   const src = img.src;
   if (!IMAGE_URL_PATTERN.test(src)) return;
-  // Avoid reprocessing
   if (img.dataset.bsProcessed) return;
   img.dataset.bsProcessed = 'pending';
 
@@ -26,9 +25,7 @@ async function processImg(img: HTMLImageElement): Promise<void> {
       return;
     }
 
-    // Upscale: replace size suffix with full resolution
     const upscaledSrc = src.replace(/=s\d+(-[a-z]+)*$/, '=s0');
-
     const engine = await getEngine();
     const res = await fetch(upscaledSrc);
     const blob = await res.blob();
@@ -52,31 +49,16 @@ export function startImageProcessor(): () => void {
       for (const node of mutation.addedNodes) {
         if (node instanceof HTMLImageElement) {
           processImg(node);
-        } else if (node instanceof Element) {
+        } else if (node instanceof HTMLElement) {
           node.querySelectorAll<HTMLImageElement>('img').forEach(processImg);
         }
-      }
-      // Also catch src attribute changes on existing images
-      if (
-        mutation.type === 'attributes' &&
-        mutation.attributeName === 'src' &&
-        mutation.target instanceof HTMLImageElement
-      ) {
-        const img = mutation.target as HTMLImageElement;
-        delete img.dataset.bsProcessed;
-        processImg(img);
       }
     }
   });
 
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-    attributes: true,
-    attributeFilter: ['src'],
-  });
+  observer.observe(document.body, { childList: true, subtree: true });
 
-  // Process any images already in the DOM
+  // Process existing images
   document.querySelectorAll<HTMLImageElement>('img').forEach(processImg);
 
   return () => observer.disconnect();
