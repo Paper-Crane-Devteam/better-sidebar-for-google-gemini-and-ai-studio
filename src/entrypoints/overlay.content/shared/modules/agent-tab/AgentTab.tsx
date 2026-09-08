@@ -34,8 +34,13 @@ import { WorkspaceIntro } from './components/WorkspaceIntro';
 import { WorkspaceView } from './workspace/WorkspaceView';
 import { useAgentConfigStore } from '../agent-loop/agent-config-store';
 import { getAgent, normalizeAgentId } from '../agent-loop/agents/registry';
+import { SplitNewChatButton } from '@/shared/components/ui/split-new-chat-button';
+import { UIcon } from '@/shared/components/ui/icon';
+import { useI18n } from '@/shared/hooks/useI18n';
+import { navigateToNewChat } from '@/shared/lib/navigation';
 
 export const AgentTab: React.FC = () => {
+  const { t } = useI18n();
   const selectedAgentId = useAgentConfigStore((s) => normalizeAgentId(s.selectedAgentId));
   const setSelectedAgentId = useAgentConfigStore((s) => s.setSelectedAgentId);
   const agent = getAgent(selectedAgentId);
@@ -47,7 +52,24 @@ export const AgentTab: React.FC = () => {
         scrollable and the workspace one owns its whole height, so a switcher inside either
         of them would either scroll out of reach or have to be duplicated.
       */}
-      <div className="shrink-0 px-3 pt-3">
+      <div className="shrink-0 space-y-2 px-3 pt-3">
+        {/*
+          "Open a chat first" is a precondition for *both* agents — they run through the
+          page's composer, not the sidebar — so the action that satisfies it belongs to the
+          tab, not to one panel's step list. It used to live inside the Better Sidebar
+          launcher's step 1, which meant the Workspace panel had no way to open a chat at
+          all. Its own row, full width, so it stays a decision rather than a footnote.
+
+          Above the switcher, not below: it is the step that comes first in time, and it
+          applies to both segments — sitting under them would read as belonging to whichever
+          one is selected.
+        */}
+        <SplitNewChatButton
+          icon={<UIcon icon="tabler:message-plus" className="h-4 w-4" />}
+          label={t('explorerHeader.newChat')}
+          tooltip={t('tooltip.newChat')}
+          onClick={navigateToNewChat}
+        />
         <AgentSwitcher selected={selectedAgentId} onSelect={setSelectedAgentId} />
       </div>
 

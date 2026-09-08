@@ -133,9 +133,21 @@ export function selectLiveTail(
   messages: Array<{ id: string; role: 'user' | 'model'; content: string }>,
 ): { user: string; answer: string; finished: boolean } | null {
   if (!state.answer && !state.user) return null;
-  if (!currentConversationId) return null;
   // An unbound stream is the new chat we are currently looking at — it has nowhere
   // else it could belong. Anything already bound has to match.
+  //
+  // ⚠️ Note what is *not* here: a `!currentConversationId` guard. It used to be, and it
+  // silently disabled this whole feature for the first turn of every new chat — the one
+  // turn it exists for. AI Studio's new chat is `/prompts/new_chat`, and `new_chat` is a
+  // reserved segment that resolves to null (see `RESERVED_CONVERSATION_SEGMENTS`), so
+  // the live pair was dropped until AI Studio finished creating the prompt and the URL
+  // picked up a real id. Measured effect: the agent view stayed blank for the whole first
+  // generation, not even showing the question, then the finished reply appeared at once.
+  //
+  // The binding check below is the whole protection needed. The case worth defending
+  // against is a generation started in conversation A while the user walks to another
+  // page; there `state.conversationId` is A — non-null — so it is caught. A null
+  // `state.conversationId` can only have come from a new chat, i.e. this screen.
   if (state.conversationId !== null && state.conversationId !== currentConversationId) {
     return null;
   }

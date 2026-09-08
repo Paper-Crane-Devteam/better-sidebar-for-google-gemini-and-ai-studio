@@ -35,7 +35,7 @@ import { NotebookPickerContent } from '../../../notebooks/components/NotebookPic
 import { useExplorerContext } from '../../ExplorerContext';
 import type { Gem, Notebook } from '@/shared/types/db';
 import { MoveItemsDialog } from '../batch/MoveItemsDialog';
-import { detectPlatform, PLATFORM_CONFIG } from '@/shared/types/platform';
+import { detectPlatform, Platform, PLATFORM_CONFIG } from '@/shared/types/platform';
 import { ColorPickerGrid } from '@/entrypoints/overlay.content/shared/components/ColorPickerGrid';
 import obsidianIcon from '@/assets/icons/obsidian.svg';
 import notionIcon from '@/assets/icons/notion.svg';
@@ -224,28 +224,31 @@ export function useExplorerMenuItems({
 
   // Folder-specific items
   if (node.data.type === 'folder') {
-    // — New chat with Gem / Notebook (picker) —
-    items.push({
-      type: 'item',
-      key: 'new-gem-chat',
-      icon: <UIcon icon="tabler:diamond" className="h-4 w-4" />,
-      label: t('newChatButton.newGemChat'),
-      onClick: (e) => {
-        e?.stopPropagation();
-        void handleNewGemChatInFolder(e);
-      },
-    });
-    items.push({
-      type: 'item',
-      key: 'new-notebook-chat',
-      icon: <UIcon icon="tabler:notebook" className="h-4 w-4" />,
-      label: t('newChatButton.newNotebookChat'),
-      onClick: (e) => {
-        e?.stopPropagation();
-        void handleNewNotebookChatInFolder(e);
-      },
-    });
-    items.push({ type: 'separator', key: 'sep-folder-new-chat' });
+    // — New chat with Gem / Notebook (picker) — Gemini only, these concepts
+    // don't exist on AI Studio.
+    if (detectPlatform() === Platform.GEMINI) {
+      items.push({
+        type: 'item',
+        key: 'new-gem-chat',
+        icon: <UIcon icon="tabler:diamond" className="h-4 w-4" />,
+        label: t('newChatButton.newGemChat'),
+        onClick: (e) => {
+          e?.stopPropagation();
+          void handleNewGemChatInFolder(e);
+        },
+      });
+      items.push({
+        type: 'item',
+        key: 'new-notebook-chat',
+        icon: <UIcon icon="tabler:notebook" className="h-4 w-4" />,
+        label: t('newChatButton.newNotebookChat'),
+        onClick: (e) => {
+          e?.stopPropagation();
+          void handleNewNotebookChatInFolder(e);
+        },
+      });
+      items.push({ type: 'separator', key: 'sep-folder-new-chat' });
+    }
     items.push({
       type: 'item',
       key: 'new-folder',

@@ -178,7 +178,7 @@ export const AgentLauncher: React.FC = () => {
         </h2>
       </div>
 
-      <LauncherCta entryTitle={entryTitle} onNewChat={handleNewChat} />
+      <LauncherCta entryTitle={entryTitle} />
 
       {unavailable && (
         <div className="-mx-2 space-y-2 rounded-lg bg-orange-500/10 px-2 py-2">

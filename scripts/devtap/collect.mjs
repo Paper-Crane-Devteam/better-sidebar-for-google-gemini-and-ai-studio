@@ -78,15 +78,18 @@ export function argToText(arg) {
  * file bodies, and a single one of those is tens of thousands of characters. Left
  * unclipped, one log line buries the fifty around it that give it meaning.
  */
+export function clipPart(value, maxValueLen) {
+  const s = typeof value === 'string' ? value : String(value);
+  // Newlines would break the one-line-per-entry contract the output relies on,
+  // and multi-line SQL is logged constantly here.
+  const flat = s.replace(/\s*\n\s*/g, ' ⏎ ');
+  return flat.length > maxValueLen
+    ? `${flat.slice(0, maxValueLen)}…(+${flat.length - maxValueLen})`
+    : flat;
+}
+
 function clipParts(entry, maxValueLen) {
-  entry.parts = (entry.parts || []).map((p) => {
-    const s = typeof p === 'string' ? p : String(p);
-    // Newlines would break the one-line-per-entry contract the output relies on.
-    const flat = s.replace(/\n/g, '⏎');
-    return flat.length > maxValueLen
-      ? `${flat.slice(0, maxValueLen)}…(+${flat.length - maxValueLen})`
-      : flat;
-  });
+  entry.parts = (entry.parts || []).map((p) => clipPart(p, maxValueLen));
 }
 
 function worldOf(execContext) {

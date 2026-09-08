@@ -86,6 +86,20 @@ interface SettingsState {
   setThemeGridPage: (page: number) => void;
 }
 
+/**
+ * Where the floating toggle sits before the user ever drags it, as an offset
+ * from the bottom-left corner.
+ *
+ * `x` clears the host's own collapsed nav rail (~72px on both Gemini and AI
+ * Studio) so the button lands *beside* that sidebar instead of on top of its
+ * bottom items. It cannot be exact — the rail expands, and our own sidebar
+ * width is user-set — but the button is draggable, so approximate is enough.
+ *
+ * `y` keeps it clear of the screen edge; the old 16px read as stuck to the
+ * corner and collided with page furniture that lives down there.
+ */
+export const DEFAULT_OVERLAY_POSITION = { x: 88, y: 56 };
+
 const storage: StateStorage = {
   getItem: async (name: string): Promise<string | null> => {
     try {
@@ -138,7 +152,7 @@ export const useSettingsStore = create<SettingsState>()(
       compactModeHintShown: false,
       autoScanLibrary: false,
       skipDeleteConfirm: false,
-      overlayPosition: { x: 16, y: 16 },
+      overlayPosition: { ...DEFAULT_OVERLAY_POSITION },
       lastSelectedGemId: null,
       lastSelectedNotebookId: null,
       explorer: {
@@ -210,7 +224,7 @@ export const useSettingsStore = create<SettingsState>()(
     {
       name: getStorageName(),
       storage: createJSONStorage(() => storage),
-      version: 9,
+      version: 10,
       partialize: (state) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { themeGridPage, ...rest } = state;
@@ -252,6 +266,15 @@ export const useSettingsStore = create<SettingsState>()(
           // "New chat behavior" (current tab vs new tab) was removed — new chats
           // always open in the current tab now.
           delete persistedState.newChatBehavior;
+        }
+        if (version < 10) {
+          // The toggle's default corner moved out beside the host sidebar. Only
+          // rewrite positions still sitting on the old default — anything else
+          // is where the user dragged it, and that must survive the upgrade.
+          const old = persistedState.overlayPosition;
+          if (old && old.x === 16 && old.y === 16) {
+            persistedState.overlayPosition = { ...DEFAULT_OVERLAY_POSITION };
+          }
         }
         return persistedState;
       },

@@ -199,17 +199,40 @@ export async function listTargets(port) {
 /**
  * Evaluate an expression and return its value, turning a thrown exception into a
  * rejected promise rather than a silently empty result.
+ *
+ * Top-level `await` is wrapped rather than handed to `replMode`. Almost everything
+ * worth asking a live extension needs it (`await browser.storage.local.get(...)`),
+ * and plain `Runtime.evaluate` treats it as a syntax error — but `replMode: true`
+ * is not the fix: it silently disables `awaitPromise`, so the call returns the
+ * Promise itself, which serializes to `{}`. An empty object where the answer
+ * should be, with no error anywhere.
  */
 export async function evaluate(session, expression, opts = {}) {
   const { timeoutMs = 15000, ...rest } = opts;
-  const res = await session.send(
-    'Runtime.evaluate',
-    { expression, returnByValue: true, awaitPromise: true, ...rest },
-    timeoutMs,
-  );
-  if (res.exceptionDetails) {
+
+  const needsWrap =
+    /(^|[^.\w$])await[\s(]/.test(expression) && !/^\s*\(\s*async/.test(expression);
+
+  // Expression form first, statement form as the fallback: `await x` and
+  // `const a = await x; return a` are both things a caller reasonably types.
+  const candidates = needsWrap
+    ? [`(async () => { return (${expression}); })()`, `(async () => { ${expression} })()`]
+    : [expression];
+
+  let lastError;
+  for (const candidate of candidates) {
+    const res = await session.send(
+      'Runtime.evaluate',
+      { expression: candidate, returnByValue: true, awaitPromise: true, ...rest },
+      timeoutMs,
+    );
+    if (!res.exceptionDetails) return res.result?.value;
+
     const d = res.exceptionDetails;
-    throw new Error(d.exception?.description || d.text || 'evaluation threw');
+    lastError = new Error(d.exception?.description || d.text || 'evaluation threw');
+    // Only a syntax error means the other wrapping might work; a real throw from
+    // the code should surface as-is rather than being retried.
+    if (!/SyntaxError/.test(lastError.message)) throw lastError;
   }
-  return res.result?.value;
+  throw lastError;
 }

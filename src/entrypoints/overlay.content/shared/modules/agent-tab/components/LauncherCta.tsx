@@ -38,14 +38,11 @@
 import React from 'react';
 import { Bot } from 'lucide-react';
 import { cn } from '@/shared/lib/utils/utils';
-import { Button } from '@/shared/components/ui/button';
-import { UIcon } from '@/shared/components/ui/icon';
 import { useI18n } from '@/shared/hooks/useI18n';
 
 interface LauncherCtaProps {
   /** Label of the auto entry, as it appears in the `>` picker. */
   entryTitle: string;
-  onNewChat: () => void;
 }
 
 /** A step number. `accent` fills it, for the step that carries the actual instruction. */
@@ -60,7 +57,7 @@ const Step: React.FC<{ n: number; accent?: boolean }> = ({ n, accent }) => (
   </span>
 );
 
-export const LauncherCta: React.FC<LauncherCtaProps> = ({ entryTitle, onNewChat }) => {
+export const LauncherCta: React.FC<LauncherCtaProps> = ({ entryTitle }) => {
   const { t } = useI18n();
 
   return (
@@ -75,25 +72,14 @@ export const LauncherCta: React.FC<LauncherCtaProps> = ({ entryTitle, onNewChat 
         {t('agent.launcher.stepsTitle', { defaultValue: 'How to run it' })}
       </h3>
 
-      {/* 1 — there has to be a chat open, since the composer is where this runs */}
+      {/* 1 — there has to be a chat open, since the composer is where this runs. The button
+          that opens one is not here: it is a precondition both agents share, so it sits in
+          the tab header above the switcher's panels rather than inside this list. */}
       <div className="flex items-start gap-2">
         <Step n={1} />
-        <div className="min-w-0 flex-1">
-          <p className="text-[13px] leading-snug text-muted-foreground">
-            {t('agent.launcher.step1', { defaultValue: 'Open a chat — any chat.' })}
-          </p>
-          <div className="mt-1.5">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-6 gap-1 bg-muted/60 px-2 text-xs hover:bg-muted"
-              onClick={onNewChat}
-            >
-              <UIcon icon="tabler:message-plus" className="h-3 w-3" />
-              {t('explorerHeader.newChat')}
-            </Button>
-          </div>
-        </div>
+        <p className="min-w-0 flex-1 text-[13px] leading-snug text-muted-foreground">
+          {t('agent.launcher.step1', { defaultValue: 'Open a chat — any chat.' })}
+        </p>
       </div>
 
       {/* 2 — the keystroke, drawn: this is the whole point of the panel. It carries the

@@ -4,7 +4,7 @@ import { appendFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 
 import { attach, evaluate } from './cdp.mjs';
-import { argToText, collect, formatEntry, locate, toNdjson } from './collect.mjs';
+import { argToText, clipPart, collect, formatEntry, toNdjson } from './collect.mjs';
 import {
   CTX,
   discover,
@@ -159,7 +159,7 @@ export async function cmdWatch(flags) {
 
       const parts = await Promise.all(
         (args || []).map(async (a) => {
-          if (!a.objectId) return argToText(a);
+          if (!a.objectId) return clipPart(argToText(a), maxLen);
           try {
             const r = await node.session.send('Runtime.callFunctionOn', {
               objectId: a.objectId,
@@ -169,9 +169,9 @@ export async function cmdWatch(flags) {
               returnByValue: true,
             });
             const v = r?.result?.value;
-            return typeof v === 'string' ? v : argToText(a);
+            return clipPart(typeof v === 'string' ? v : argToText(a), maxLen);
           } catch {
-            return argToText(a);
+            return clipPart(argToText(a), maxLen);
           }
         }),
       );
@@ -238,6 +238,38 @@ export async function cmdSql(flags) {
 }
 
 /**
+ * Display width, not character count.
+ *
+ * Almost every title, folder name and prompt in this project's data is Chinese,
+ * and CJK glyphs occupy two terminal columns each. Padding by `length` makes every
+ * row after the first one ragged, which is exactly the case the table is for.
+ */
+const WIDE = /[\u1100-\u115F\u2E80-\uA4CF\uA960-\uA97F\uAC00-\uD7A3\uF900-\uFAFF\uFE10-\uFE19\uFE30-\uFE6F\uFF00-\uFF60\uFFE0-\uFFE6]/;
+
+function displayWidth(s) {
+  let w = 0;
+  for (const ch of s) w += WIDE.test(ch) ? 2 : 1;
+  return w;
+}
+
+/** Pad or truncate to an exact display width. */
+function fit(s, width) {
+  const total = displayWidth(s);
+  if (total <= width) return s + ' '.repeat(width - total);
+
+  // Only now is an ellipsis needed, so only now does it cost a column.
+  let w = 0;
+  let out = '';
+  for (const ch of s) {
+    const cw = WIDE.test(ch) ? 2 : 1;
+    if (w + cw > width - 1) break;
+    out += ch;
+    w += cw;
+  }
+  return out + '…' + ' '.repeat(Math.max(0, width - w - 1));
+}
+
+/**
  * Rows as an aligned table, because that is how a schema or a row count is
  * actually read. Falls back to JSON for anything that is not a row set.
  */
@@ -251,15 +283,15 @@ function renderRows(rows, limit) {
 
   const cell = (v) =>
     v == null ? 'NULL' : typeof v === 'string' ? v.replace(/\s+/g, ' ') : JSON.stringify(v);
+
   const widths = cols.map((c) =>
-    Math.min(48, Math.max(c.length, ...shown.map((r) => cell(r?.[c]).length))),
+    Math.min(46, Math.max(displayWidth(c), ...shown.map((r) => displayWidth(cell(r?.[c]))))),
   );
-  const clip = (s, w) => (s.length > w ? s.slice(0, w - 1) + '…' : s.padEnd(w));
 
   return [
-    cols.map((c, i) => clip(c, widths[i])).join('  '),
+    cols.map((c, i) => fit(c, widths[i])).join('  '),
     widths.map((w) => '─'.repeat(w)).join('  '),
-    ...shown.map((r) => cols.map((c, i) => clip(cell(r?.[c]), widths[i])).join('  ')),
+    ...shown.map((r) => cols.map((c, i) => fit(cell(r?.[c]), widths[i])).join('  ')),
     rows.length > shown.length
       ? `… ${rows.length - shown.length} more rows`
       : `(${rows.length} row${rows.length === 1 ? '' : 's'})`,

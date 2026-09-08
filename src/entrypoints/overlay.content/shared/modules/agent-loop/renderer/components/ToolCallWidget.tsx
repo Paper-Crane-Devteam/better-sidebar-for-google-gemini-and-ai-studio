@@ -278,8 +278,8 @@ export const ToolCallWidget: React.FC<ToolCallWidgetProps> = ({
       >
         <span
           className={cn(
-            'flex h-5 w-5 items-center justify-center rounded',
-            isPending ? 'bg-warning/20 text-warning' : 'bg-success/20 text-success',
+            'flex h-5 w-5 shrink-0 items-center justify-center',
+            isPending ? 'text-warning' : 'text-success',
           )}
         >
           <Settings className="h-4 w-4" />

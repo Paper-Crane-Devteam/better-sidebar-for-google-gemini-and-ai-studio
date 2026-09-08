@@ -7,9 +7,11 @@
  * `fixed inset-0` plus `left: <sidebar width>` is how the snippet reader does it, and the
  * width is measured rather than assumed because the sidebar is resizable.
  *
- * Markdown is rendered; everything else is monospace text. No syntax highlighting — the
- * project carries no highlighter, and adding one for a preview pane is a poor trade
- * against the bundle it costs.
+ * Markdown is rendered; everything else goes through `CodePreview`, which is monospace text
+ * plus syntax colouring when the extension names a language we have a grammar for. An
+ * unrecognised file still previews, just uncoloured, so nothing about the reader depends on
+ * that list being complete. See `shared/lib/syntax-highlight.ts` for what the highlighter
+ * costs and why it is a static import.
  */
 
 import React, { useEffect, useState } from 'react';
@@ -30,6 +32,7 @@ import {
   isProbablyBinary,
 } from '@/shared/workspace/file-kinds';
 import { useFileViewerStore } from '../../agent-loop/workspace/file-viewer-store';
+import { CodePreview } from './CodePreview';
 import { downloadFile } from './workspace-io';
 import { useWorkspaceRevision } from './useWorkspaceRevision';
 
@@ -347,9 +350,7 @@ export const WorkspaceFileDrawer: React.FC = () => {
               <MarkdownRenderer>{content}</MarkdownRenderer>
             </div>
           ) : (
-            <pre className="whitespace-pre-wrap break-words font-mono text-xs text-foreground">
-              {content}
-            </pre>
+            <CodePreview code={content} path={path} />
           )}
         </div>
       </div>

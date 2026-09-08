@@ -104,26 +104,79 @@ export async function runSql(session, contextId, sql) {
  * reflects reality rather than a page's cached copy.
  */
 export const BACKGROUND_PROBE = `(async () => {
-  const out = { at: new Date().toISOString() };
-  try { out.manifestVersion = browser.runtime.getManifest().version; } catch (e) {}
-  try {
-    const local = await browser.storage.local.get(null);
-    out.storageKeys = Object.keys(local).sort();
-    const small = {};
-    for (const [k, v] of Object.entries(local)) {
-      const s = (() => { try { return JSON.stringify(v); } catch (e) { return '[unserializable]'; } })();
-      // Backups and exported database blobs live in here and are megabytes each.
-      small[k] = s == null ? null : s.length > 600 ? '[' + s.length + ' chars] ' + s.slice(0, 200) + '…' : JSON.parse(s);
+  var out = { at: new Date().toISOString() };
+
+  // The license store keeps a real activation token and a signed payload, and the
+  // Drive integration keeps OAuth tokens. This output gets written to files and
+  // pasted into conversations, so those never leave the browser.
+  var SECRET = /token|secret|password|credential|signedpayload|apikey|api_key|clientsecret/i;
+  function redact(value, depth) {
+    if (depth > 6 || value === null || typeof value !== 'object') return value;
+    if (Array.isArray(value)) return value.map(function (v) { return redact(v, depth + 1); });
+    var out = {};
+    for (var k of Object.keys(value)) {
+      var v = value[k];
+      if (SECRET.test(k) && v != null && typeof v !== 'object') {
+        out[k] = '[redacted ' + String(v).length + ' chars]';
+      } else {
+        out[k] = redact(v, depth + 1);
+      }
     }
-    out.storage = small;
+    return out;
+  }
+
+  // Persisted zustand stores are strings holding JSON. Left as strings they are
+  // unreadable and unredactable, so they get parsed back into structure.
+  function revive(v) {
+    if (typeof v !== 'string') return v;
+    var t = v.trim();
+    if (t[0] !== '{' && t[0] !== '[') return v;
+    try { return JSON.parse(t); } catch (e) { return v; }
+  }
+
+  try { out.version = browser.runtime.getManifest().version; } catch (e) {}
+
+  try {
+    var local = await browser.storage.local.get(null);
+    var store = {};
+    for (var k of Object.keys(local).sort()) {
+      var parsed = redact(revive(local[k]), 0);
+      var s;
+      try { s = JSON.stringify(parsed); } catch (e) { s = '[unserializable]'; }
+      // Database backups and export blobs live in here at hundreds of KB each.
+      store[k] = s != null && s.length > 800
+        ? '[' + s.length + ' chars] ' + s.slice(0, 240) + '\\u2026'
+        : parsed;
+    }
+    out.storage = store;
+
+    // Which database is open decides whether anything else in a bug report makes
+    // sense — a query against the wrong profile explains a great many "my data
+    // vanished" reports.
+    var reg = revive(local['profile-registry']);
+    if (reg && reg.profiles) {
+      out.activeProfile = {
+        id: reg.activeProfileId,
+        name: (reg.profiles[reg.activeProfileId] || {}).name,
+        dbName: (reg.profiles[reg.activeProfileId] || {}).dbName,
+        all: Object.values(reg.profiles).map(function (p) { return p.name + ' → ' + p.dbName; }),
+      };
+    }
   } catch (e) { out.storageError = String(e.message || e); }
+
   try {
-    const ctxs = await browser.runtime.getContexts({});
-    out.contexts = ctxs.map(c => ({ type: c.contextType, url: (c.documentUrl || '').split('/').pop() }));
+    var ctxs = await browser.runtime.getContexts({});
+    out.contexts = ctxs.map(function (c) {
+      return c.contextType + ' ' + String(c.documentUrl || '').split('/').pop();
+    });
   } catch (e) { out.contextsError = String(e.message || e); }
+
   try {
-    const alarms = await browser.alarms.getAll();
-    out.alarms = alarms.map(a => ({ name: a.name, inMs: a.scheduledTime - Date.now(), period: a.periodInMinutes }));
+    var alarms = await browser.alarms.getAll();
+    out.alarms = alarms.map(function (a) {
+      return { name: a.name, inSec: Math.round((a.scheduledTime - Date.now()) / 1000), periodMin: a.periodInMinutes };
+    });
   } catch (e) {}
+
   return JSON.stringify(out);
 })()`;

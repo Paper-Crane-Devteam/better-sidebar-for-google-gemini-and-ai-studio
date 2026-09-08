@@ -31,6 +31,14 @@
  *   state                         Background storage, contexts, alarms
  *   snapshot                      All of the above into one file
  *
+ * Context labels:
+ *   bg     background service worker
+ *   off    offscreen document
+ *   dbw    SQLite worker (reachable only through `off`, see contexts.mjs)
+ *   docw   document parsing worker
+ *   gem    a gemini.google.com tab — logs are tagged gem/main or gem/ext
+ *   ais    an aistudio.google.com tab
+ *
  * Options:
  *   --ctx bg,off,gem,ais,dbw      Restrict to these contexts
  *   --grep <regex>                Keep matching lines only (case-insensitive)
@@ -39,9 +47,12 @@
  *   -n, --limit <n>               Max entries / rows (default 300 logs, 50 rows)
  *   -o, --out <file>              Write here. `logs` defaults to a file; pass
  *                                 `--out=` to force stdout
+ *   --maxval <n>                  Per-argument character cap (default 400)
  *   --json                        NDJSON instead of aligned text
  *   --stack                       Include stack frames
  *   --raw                         Skip object hydration (faster, lossier)
+ *   --noise                       Keep the host page's own preload / deprecation
+ *                                 warnings, which are dropped by default
  *   --write                       Allow a mutating SQL statement
  *   --port <n>                    CDP port (default 9222)
  *   --quiet                       Suppress the "→ path" confirmation
@@ -50,8 +61,10 @@
  *   node scripts/devtap.mjs targets
  *   node scripts/devtap.mjs logs --ctx bg --grep 'AutoSync|Backup' -n 80
  *   node scripts/devtap.mjs logs --level warn --stack --out=
+ *   node scripts/devtap.mjs logs --grep AgentLoop --since 2m
  *   node scripts/devtap.mjs sql "SELECT id, title FROM conversations LIMIT 5"
  *   node scripts/devtap.mjs eval bg 'JSON.stringify(await browser.alarms.getAll())'
+ *   node scripts/devtap.mjs msg GET_FOLDERS
  *   node scripts/devtap.mjs snapshot
  */
 
@@ -89,11 +102,13 @@ const HELP = `devtap — read the running extension from the command line
   state                       background storage / contexts / alarms
   snapshot                    everything, into one file
 
-  --ctx bg,off,dbw,gem,ais    --grep <re>    --level warn|error   --since 5m
-  -n <count>                  -o <file>      --json  --stack  --raw  --write
-  --port 9222                 --quiet
+contexts: bg  off  dbw  docw  gem  ais   (page logs are tagged gem/main, gem/ext)
 
-Full notes: head -60 scripts/devtap.mjs
+  --ctx bg,dbw   --grep <re>   --level warn|error   --since 5m   -n <count>
+  -o <file>      --json        --stack   --raw   --noise   --write
+  --maxval 400   --port 9222   --quiet
+
+Full notes: head -80 scripts/devtap.mjs
 `;
 
 async function main() {

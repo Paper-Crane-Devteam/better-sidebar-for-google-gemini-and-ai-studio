@@ -1,0 +1,147 @@
+/**
+ * Syntax colours, expressed in the active theme's palette.
+ *
+ * Two surfaces share these rules: the workspace file reader (`CodePreview`) and fenced code
+ * blocks in rendered Markdown (`MarkdownRenderer`), which covers the agent conversation and
+ * the snippet reader. Both mark up with `highlight.js`'s class names, so neither needs
+ * anything of its own here.
+ *
+ * ## ⚠️ Why this is not in `@layer components`
+ *
+ * It was, and every rule below silently vanished from the build. Tailwind treats custom CSS
+ * inside `@layer components` and `@layer utilities` as *candidates*: a rule survives only if
+ * its class name is found by the content scan. `.hljs-keyword` and friends are emitted by
+ * highlight.js at runtime and appear nowhere in the source, so they were all dropped — while
+ * `.hljs` itself stayed, because the string appears in a `className`. The result was
+ * correctly-marked-up code with no colour, which looks exactly like the highlighter failing.
+ *
+ * Unlayered rules are not subject to that, so they stay put. (`_agent-conversation.scss` gets
+ * to use `@layer components` because its class is written out in a component.)
+ *
+ * ## The cost of using theme tokens
+ *
+ * A theme guarantees five accent tokens (`primary`, `success`, `warning`, `destructive`,
+ * `highlight`) plus `foreground` and `muted-foreground`. A dedicated code theme has a dozen
+ * or more. So distinctions a real editor draws — type versus class, property versus variable
+ * — collapse here. The groups are chosen so that what survives is what helps when skimming:
+ * comments recede, literals are one colour, names of things another, keywords another.
+ *
+ * The alternative was one of highlight.js's 250 stylesheets, every one a fixed palette.
+ * `github-dark` would look right in roughly one of the sidebar's themes; a Solarized sidebar
+ * with GitHub's blues in its code pane reads as a rendering bug rather than a choice.
+ *
+ * `--bs-syntax-*` is the escape hatch: a theme that wants proper code colours can set these
+ * seven without touching the `.hljs-*` rules.
+ *
+ * Only `color` and font style are set. Backgrounds, padding and radius stay with the surface
+ * — a fence in the conversation sits on `bg-muted`, the reader's pane on nothing.
+ */
+
+.hljs {
+  --bs-syntax-comment: rgb(var(--muted-foreground));
+  /* Language grammar: `if`, `def`, `struct`, and the literals a grammar treats the same way
+     (`true`, `null`). */
+  --bs-syntax-keyword: rgb(var(--highlight));
+  /* Anything quoted. Strings are the most common thing to want to pick out of a config file,
+     so they get the token most themes keep legible rather than decorative. */
+  --bs-syntax-string: rgb(var(--success));
+  /* Numeric and near-numeric literals, plus the metadata lines (`#!`, `@decorator`) that sit
+     outside the program proper. */
+  --bs-syntax-literal: rgb(var(--warning));
+  /* Names being declared or referenced: functions, classes, keys, attributes. */
+  --bs-syntax-name: rgb(var(--primary));
+  /* Names the language supplies rather than the file: types, built-ins, tag names. */
+  --bs-syntax-type: rgb(var(--destructive));
+  /* Brackets, operators, tag delimiters. Present but out of the way. */
+  --bs-syntax-punctuation: rgb(var(--foreground) / 0.65);
+}
+
+/* Italic as well as dimmed: in a low-contrast theme the colour difference alone can be
+   almost nothing, and a monospace italic is unmistakable. */
+.hljs-comment,
+.hljs-quote {
+  color: var(--bs-syntax-comment);
+  font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-doctag,
+.hljs-subst,
+.hljs-keyword.hljs-meta {
+  color: var(--bs-syntax-keyword);
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-char.escape_,
+.hljs-meta .hljs-string {
+  color: var(--bs-syntax-string);
+}
+
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-meta,
+.hljs-link {
+  color: var(--bs-syntax-literal);
+}
+
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.function_,
+.hljs-section,
+.hljs-name,
+.hljs-attr,
+.hljs-attribute,
+.hljs-property,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: var(--bs-syntax-name);
+}
+
+.hljs-type,
+.hljs-built_in,
+.hljs-class,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-variable.language_ {
+  color: var(--bs-syntax-type);
+}
+
+/* `hljs-tag` wraps the whole element including its `<`, `>` and the nested `hljs-name`, so it
+   has to be the dim one — colouring it as a name would tint the attributes and strings inside
+   it too. */
+.hljs-tag,
+.hljs-punctuation,
+.hljs-operator,
+.hljs-params {
+  color: var(--bs-syntax-punctuation);
+}
+
+/* Diffs. The only place a background is warranted: in a patch the changed line matters more
+   than the token, and a `+`/`-` in the gutter is easy to lose at this size. */
+.hljs-addition {
+  color: rgb(var(--success));
+  background: rgb(var(--success) / 0.1);
+  display: inline-block;
+  width: 100%;
+}
+
+.hljs-deletion {
+  color: rgb(var(--destructive));
+  background: rgb(var(--destructive) / 0.1);
+  display: inline-block;
+  width: 100%;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: 600;
+}

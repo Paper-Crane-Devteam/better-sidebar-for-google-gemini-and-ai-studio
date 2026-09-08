@@ -13,6 +13,7 @@
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
     "compile": "tsc --noEmit",
+    "devtap": "node scripts/devtap.mjs",
     "postinstall": "patch-package && wxt prepare",
     "release": "bash scripts/release.sh",
     "publishGumroad": "gumroad products page publish eklogd ./landing.html --json --no-input --non-interactive"
@@ -46,6 +47,7 @@
     "dayjs": "^1.11.19",
     "dnd-core": "14.0.1",
     "fflate": "^0.8.3",
+    "highlight.js": "11.11.1",
     "i18next": "^25.7.3",
     "katex": "^0.16.47",
     "lodash": "^4.17.21",
