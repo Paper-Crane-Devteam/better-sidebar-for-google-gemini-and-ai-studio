@@ -199,6 +199,16 @@ export class ResultHandoff {
    * slip through between the click and the start of observation.
    */
   private async watchSend(action: () => Promise<unknown>): Promise<SendOutcome> {
+    // The one gate every send passes through, which is why the stream boundary is
+    // recorded here rather than in each caller. It has to happen before `action`:
+    // stage ② admits an answer only if its generation is newer than this, and the
+    // generation starts the instant the send lands. See `LoopContext.streamBoundary`.
+    //
+    // Also covers the `autoSend: false` checkpoint, where the user presses send
+    // themselves minutes later — the boundary was taken when the watcher was armed,
+    // and nothing generates in between.
+    this.ctx.markSendBoundary();
+
     const watcher = waitForSend({
       adapter: this.ctx.adapter,
       shape: this.shape,

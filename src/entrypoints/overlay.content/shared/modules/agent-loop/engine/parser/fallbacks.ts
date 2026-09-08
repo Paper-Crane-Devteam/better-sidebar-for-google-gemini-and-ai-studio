@@ -12,16 +12,6 @@ import type { ParsedToolCall } from '../../types';
 import { SUPPORTED_TOOLS } from './tool-schema';
 
 /**
- * Whether `position` sits inside a fenced code block, i.e. after an odd number of
- * ``` markers. Tool calls quoted in a fence are documentation, not instructions.
- */
-export function isInsideCodeBlock(text: string, position: number): boolean {
-  const before = text.substring(0, position);
-  const fenceMatches = before.match(/```/g);
-  return (fenceMatches?.length ?? 0) % 2 !== 0;
-}
-
-/**
  * Primary format: a JSON object.
  * Returns null when the block isn't valid JSON with a `name`.
  */

@@ -1,5 +1,6 @@
 import { proxy } from 'ajax-hook';
 import { handleGenerateResponse } from './interceptors/generate';
+import { observeStreamGenerate } from './interceptors/stream-generate';
 import { handleChatContentResponse } from './interceptors/chat-content';
 import { handleListChatResponse } from './interceptors/list-chat';
 import { handleDeleteResponse } from './interceptors/delete';
@@ -74,6 +75,20 @@ export function initGeminiInterceptors() {
         globalThis.dispatchEvent(
           new CustomEvent('BETTER_SIDEBAR_GENERATE_START'),
         );
+
+        // Read the reply as it streams, not in `onResponse`. `handleGenerateResponse`
+        // still runs there and still writes the transcript; this is the lossless copy
+        // the agent loop parses instead of the rendered DOM — see
+        // `interceptors/stream-generate.ts`.
+        if (config.xhr) {
+          try {
+            observeStreamGenerate(config.xhr, config.body);
+          } catch (e) {
+            // The live view is an improvement on the response path, not a
+            // prerequisite for it. Losing it must not cost us the transcript.
+            console.warn('Better Sidebar (Gemini): could not observe stream', e);
+          }
+        }
       }
 
       handler.next(config);

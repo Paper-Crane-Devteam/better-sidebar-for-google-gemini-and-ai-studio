@@ -159,18 +159,21 @@ export function getBasePrompt(context?: PromptContext): string {
 
 ## How to Call Tools
 
-Output tool calls in this exact format. The extension will parse your output, execute the tools, and send you the results automatically.
+Output tool calls in this exact format — inside a \`\`\`text fenced code block. The extension will parse your output, execute the tools, and send you the results automatically.
 
+\`\`\`text
 <bs_agent_tool>
 {"name": "TOOL_NAME", "description": "brief description of what this call does", "params": {"PARAM_NAME": "PARAM_VALUE"}}
 </bs_agent_tool>
+\`\`\`
 
 Rules for tool call format:
-- The outer \`<bs_agent_tool>\` wrapper is REQUIRED (do NOT omit it)
+- **The \`\`\`text fence is REQUIRED.** Outside a fence the platform rewrites your text before the extension sees it — quoted attributes get requoted and reordered — and the call is thrown away. Inside the fence it arrives exactly as written.
+- The \`<bs_agent_tool>\` wrapper is REQUIRED (do NOT omit it), inside the fence
 - Inside must be a valid JSON object with "name", "description", and "params" fields
 - "description" is REQUIRED — a short human-readable explanation (e.g., "查询最近20条对话", "为对话添加标签")
 - Do NOT use XML tags inside <bs_agent_tool> — use JSON only
-- You can output multiple <bs_agent_tool> blocks in one response. They will be executed in order.
+- You can output multiple fenced tool calls in one response. They will be executed in order. Give each its own fence.
 
 IMPORTANT: Always use <bs_agent_tool> tags (NOT <tool_call>). The extension only recognizes <bs_agent_tool> format.
 ${getPlatformContextBlock(platform)}

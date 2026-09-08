@@ -145,7 +145,12 @@ export function assembleTurns(raw: RawTurn[]): DisplayMessageTurn[] {
         previous.toolOutcomes = deriveToolOutcomes(previous.toolCalls, toolResults);
       }
     } else {
-      const toolCalls = parseAllToolCallsFromText(text);
+      // A block still being written is only meaningful while the turn is arriving.
+      // On a settled turn an unclosed block is a truncation, and a placeholder that
+      // never resolves would be worse than none — see `findPendingToolCall`.
+      const toolCalls = parseAllToolCallsFromText(text, {
+        includePending: item.isStreaming,
+      });
 
       turns.push({
         id: item.id,

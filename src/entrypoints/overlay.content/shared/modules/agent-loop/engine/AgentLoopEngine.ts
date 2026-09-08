@@ -84,6 +84,9 @@ export class AgentLoopEngine {
     this.ctx.breaker.reset();
     this.handoff.reset();
     this.unattendedStreak = 0;
+    // Round 1 follows a prompt that has *already* been sent, so its generation is
+    // in flight before the engine exists — no boundary to draw, and none wanted.
+    this.ctx.streamBoundary = null;
     // Undo covers one task: the previous session's snapshot is no longer something
     // the user could meaningfully revert to once a new task starts changing things.
     resetSnapshots();
@@ -117,6 +120,17 @@ export class AgentLoopEngine {
     this.ctx.breaker.reset();
     this.handoff.reset();
     this.unattendedStreak = 0;
+    /**
+     * No send of ours precedes this round, so there is no boundary to compare against
+     * and stage ② takes whatever finished generation the store holds.
+     *
+     * Sound because both sides mean "the newest": this path is entered with
+     * `getLastAIResponseElement()`, and the stream store only ever holds the newest
+     * generation. When the page was reloaded the store is empty instead, and stage ②
+     * falls back to the DOM — a degraded read of the right turn, which is the correct
+     * trade against a lossless read of the wrong one.
+     */
+    this.ctx.streamBoundary = null;
     resetSnapshots();
     this.ctx.store.start(maxRounds, session);
     toolCallRecorder.startSession({

@@ -1,28 +1,29 @@
 /**
- * Hook: useAiStudioStream
+ * Hook: useModelStream
  *
- * Carries `AI_STUDIO_STREAM` from the main-world interceptor into the live stream
- * store. Call once at the AI Studio overlay root, alongside
- * `useInitConversationMessages`.
+ * Carries `MODEL_STREAM` from the main-world interceptor into the live stream store.
+ * Call once at each platform's overlay root, alongside `useInitConversationMessages`.
+ *
+ * Platform-neutral on purpose: nothing in here knows which site it is on. The two
+ * wire formats are reconciled by their readers before the event is dispatched, and
+ * `getPlatformDomAdapter()` already answers "which conversation is this" for both. So
+ * a second copy of this file would only be a second place to relearn the
+ * unbound-new-chat rule below.
  *
  * The event crosses from the page's own JS context into the content script, same as
  * `AI_STUDIO_RESPONSE` already does — `detail` is structured-cloned on the way.
  */
 
 import { useEffect, useRef } from 'react';
-import { useAiStudioStreamStore } from '@/shared/lib/aistudio-stream-store';
-import { useConversationMessagesStore } from '@/shared/lib/conversation-messages-store';
+import { useModelStreamStore } from '@/shared/lib/model-stream-store';
 import { getPlatformDomAdapter } from '@/shared/lib/platform-dom-adapter';
 import { useUrl } from '@/shared/hooks/useUrl';
-import {
-  AI_STUDIO_STREAM_EVENT,
-  type AiStudioStreamDetail,
-} from '@/shared/types/aistudio-stream';
+import { MODEL_STREAM_EVENT, type ModelStreamDetail } from '@/shared/types/model-stream';
 
-export function useAiStudioStream() {
+export function useModelStream() {
   const { path } = useUrl();
-  const apply = useAiStudioStreamStore((s) => s.apply);
-  const reset = useAiStudioStreamStore((s) => s.reset);
+  const apply = useModelStreamStore((s) => s.apply);
+  const reset = useModelStreamStore((s) => s.reset);
 
   // Read at event time rather than closed over, so a generation that finishes just
   // after a navigation is attributed to the conversation it actually came from.
@@ -55,12 +56,12 @@ export function useAiStudioStream() {
 
   useEffect(() => {
     const onStream = (event: Event) => {
-      const detail = (event as CustomEvent<AiStudioStreamDetail>).detail;
+      const detail = (event as CustomEvent<ModelStreamDetail>).detail;
       if (!detail?.streamId) return;
 
       const adapter = getPlatformDomAdapter();
       // May be null on a brand new chat. Passed through rather than dropped — the
-      // store binds it as soon as AI Studio assigns the real id.
+      // store binds it as soon as the platform assigns the real id.
       const conversationId = adapter?.extractExternalId(pathRef.current) ?? null;
 
       apply({
@@ -72,13 +73,11 @@ export function useAiStudioStream() {
         // '' means "there is no question" and would blank it on every tick.
         user: detail.user ?? null,
         finished: !!detail.finished,
-        // Only used when this is the first event of a new stream — see the store.
-        anchorId:
-          useConversationMessagesStore.getState().messages.at(-1)?.id ?? null,
+        turnId: detail.turnId ?? null,
       });
     };
 
-    globalThis.addEventListener(AI_STUDIO_STREAM_EVENT, onStream);
-    return () => globalThis.removeEventListener(AI_STUDIO_STREAM_EVENT, onStream);
+    globalThis.addEventListener(MODEL_STREAM_EVENT, onStream);
+    return () => globalThis.removeEventListener(MODEL_STREAM_EVENT, onStream);
   }, [apply]);
 }

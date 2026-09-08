@@ -24,9 +24,11 @@
  * carries meaning inside a glob, a regex and a SQL projection, and it matches what
  * `htmlToMarkdown` already shows in the sidebar.
  *
- * Fences are deliberately *not* restored: `<pre>` content comes back verbatim without
- * its ``` markers. Restoring them would let `isInsideCodeBlock` start discarding real
- * tool calls the moment a platform decided to render one as a code block.
+ * Fences are not restored: `<pre>` content comes back verbatim without its ``` markers.
+ * That no longer matters either way — the parser stopped treating a fenced block as
+ * documentation, precisely because the protocol now requires the fence (see
+ * `parser/index.ts`). Left as is because nothing needs the markers: this is the degraded
+ * path, and it feeds a parser that does not look at them.
  */
 
 /** Tags the renderer produces from paired inline markers, and the marker to restore. */

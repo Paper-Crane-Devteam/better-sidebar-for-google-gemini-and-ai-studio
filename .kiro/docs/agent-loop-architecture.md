@@ -153,6 +153,8 @@ AgentLoopEngine.start(20, { conversationId, title })
   adapter.observeAIResponseComplete(30s 静默)              │
        ↓ AI 回复完成（静默超时 → pause + return）           │
 ② stages/parse-response.ts                                │
+  取文：selectSettledAnswer(model-stream-store)            │
+        ← API 流原文；为空才回落 DOM（有 warn）             │
   status = parsing → parseToolCalls()                     │
   无 tool call：                                           │
     标签未闭合 / JSON 解析失败                              │
@@ -253,6 +255,35 @@ Gemini 是被动的：不给它发消息，它永远不会再说话。而 ④ �
 `ResultHandoff` 是唯一有状态的阶段：它记着「已 staged 但还没确认发出」的 payload。
 `resume()` 靠这个决定是先补发上一轮结果还是直接进下一轮 —— 少了它，Retry 会去等一个
 根本没发出去的消息的回复，表现为卡到 60s 超时。
+
+### 模型回复从哪读：API 流，不是 DOM
+
+两个平台都把模型输出先过一遍 CommonMark 渲染器再进文档，而渲染器会吃掉自己的语法。
+实测：`\"` 变成 `"`（ASCII 标点的反斜杠转义被消费），`\\` 变成 `\`，`*a*` 变成 `a`；
+Gemini 上裸 HTML 标签直接消失、URL 被换成链接组件。所以 `write_file` 的 content 本身
+是 JSON 时，`JSON.parse` 会失败 —— 一个真实会话里 15 个调用挂了 11 个。**能解析的那些
+也可能已经被静默改坏**：`tailwind.config.js` 的 `*/` 丢了一个 `*`，照那样写进了磁盘。
+
+所以 stage ② 读 `selectSettledAnswer(model-stream-store)`，也就是拦截器抓的原文，
+只在它为空时才回落 DOM（并打 warn）。两个平台的原文都验证过与模型输出逐字一致。
+
+喂这个 store 的是两个读取器，线格式完全不同，差异在读取器里就被吸收掉了：
+
+| | 端点 | 文本语义 | 完成信号 |
+|---|---|---|---|
+| AI Studio | `GenerateContent` | **增量**，要累加 | payload 里的 `finishReason` |
+| Gemini | `StreamGenerate` | **全量快照**，要替换 | `readyState 4`（线上没有等价字段） |
+
+⚠️ **这不只是解析问题，还是身份问题。** `buildToolCallKey` / `buildToolCallFingerprint`
+是对 params 做的摘要，而引擎和渲染卡片的组件**各自独立算一遍**。两边读到的字节不同，
+摘要就不同，后果是：审批时引擎 publish 的 fingerprint 对不上任何卡片，**审批按钮不会
+出现在任何地方**，引擎在等一个用户从没被询问过的决定；`records[joinKey]` 同样查不到，
+跑过的调用显示成 Not run。所以渲染层必须和引擎同源 —— 见
+`renderer/useConversationMessages.ts` 的 `verbatimModelText`。
+
+DOM 那条路**刻意保留**：这些是 Google 的私有格式、按数组下标寻址，会变。下标一旦对不上，
+代价应该是「降级的 agent」而不是「死掉的 agent」，所以 `response-text.ts` 和 parser 里的
+转义容忍都还在，只是不在默认路径上了。
 
 ### 怎么判断「AI 回复完了」
 

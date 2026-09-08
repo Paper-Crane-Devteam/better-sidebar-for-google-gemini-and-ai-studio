@@ -24,19 +24,27 @@ import { ROUND_BUDGET } from '../../engine/stages/handoff/budget';
 export function toolProtocolBlock(): string {
   return `## How to Call Tools
 
-Output tool calls in this exact format:
+Every tool call goes inside a \`\`\`text fenced code block, like this:
 
+\`\`\`text
 <bs_agent_tool>
 {"name": "TOOL_NAME", "description": "brief description of what this call does", "params": {"PARAM_NAME": "PARAM_VALUE"}}
 </bs_agent_tool>
+\`\`\`
 
 Rules for tool call format:
-- The outer \`<bs_agent_tool>\` wrapper is REQUIRED
+- **The \`\`\`text fence is REQUIRED.** Outside a fence the platform rewrites your text
+  before the extension sees it: quoted attributes get requoted and reordered, so
+  \`className=\\"w-4 h-4\\"\` arrives as \`className="\\"w-4" h-4\\"\` and the call is discarded.
+  Inside the fence it arrives exactly as you wrote it. This is not a style preference —
+  it is the difference between the call running and the call being thrown away.
+- The \`<bs_agent_tool>\` wrapper is REQUIRED, inside the fence
 - Inside must be a valid JSON object with "name", "description", and "params" fields
 - "description" is REQUIRED — a short human-readable explanation
 - Escape quotes inside all JSON strings (including summary/change_summary); use Chinese quotation marks 「…」 in prose to avoid nested double quotes. Do not Markdown-escape tag names or tool names.
 - A param that takes a list is a real JSON array: \`"ids": ["a", "b"]\`. Never a quoted string \`"ids": "[...]"\` — the inner quotes come out unescaped and the entire tool call is discarded unparsed
-- You can output multiple <bs_agent_tool> blocks in one response (executed in order)
+- You can output multiple fenced tool calls in one response (executed in order). Give each
+  its own fence rather than putting several in one.
 - IMPORTANT: Always use <bs_agent_tool> tags (NOT <tool_call>)`;
 }
 

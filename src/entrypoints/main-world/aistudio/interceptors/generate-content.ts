@@ -19,10 +19,7 @@ import {
   GenerateContentStreamReader,
   readPendingUserText,
 } from '../lib/generate-content-stream';
-import {
-  AI_STUDIO_STREAM_EVENT,
-  type AiStudioStreamDetail,
-} from '@/shared/types/aistudio-stream';
+import { MODEL_STREAM_EVENT, type ModelStreamDetail } from '@/shared/types/model-stream';
 
 /**
  * How often to tell the overlay. Each event lands in a zustand store and repaints
@@ -54,14 +51,17 @@ export function observeGenerateContentStream(
     userText: string | null,
     finished: boolean,
   ) => {
-    const detail: AiStudioStreamDetail = {
+    const detail: ModelStreamDetail = {
       streamId,
       thought,
       answer,
       user: userText,
       finished,
+      // AI Studio's renderer reads the transcript store, so it never has to line a stream
+      // up against a DOM node — see the field's doc.
+      turnId: null,
     };
-    globalThis.dispatchEvent(new CustomEvent(AI_STUDIO_STREAM_EVENT, { detail }));
+    globalThis.dispatchEvent(new CustomEvent(MODEL_STREAM_EVENT, { detail }));
   };
 
   const dispatchProgress = throttle(

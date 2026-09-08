@@ -12,6 +12,7 @@ import type { DisplayMessageTurn } from '../useConversationMessages';
 
 import { MarkdownRenderer } from '@/shared/components/MarkdownRenderer';
 import { ToolCallWidget } from './ToolCallWidget';
+import { StreamingToolWidget } from './StreamingToolWidget';
 import { splitTurnContent } from '../helpers/model-prose';
 
 interface CustomModelResponseProps {
@@ -33,15 +34,32 @@ export const CustomModelResponse: React.FC<CustomModelResponseProps> = ({
 
       {/* Content — full-width, no bubble */}
       <div className="text-[rgb(var(--foreground))]">
-        {parts.map((part, i) =>
-          part.kind === 'text' ? (
-            <MarkdownRenderer
-              key={`text-${i}`}
-              className={`leading-relaxed ${part.trailing ? (i > 0 ? 'mt-2' : '') : 'mb-2'}`}
-            >
-              {part.text}
-            </MarkdownRenderer>
-          ) : (
+        {parts.map((part, i) => {
+          if (part.kind === 'text') {
+            return (
+              <MarkdownRenderer
+                key={`text-${i}`}
+                className={`leading-relaxed ${part.trailing ? (i > 0 ? 'mt-2' : '') : 'mb-2'}`}
+              >
+                {part.text}
+              </MarkdownRenderer>
+            );
+          }
+
+          if (part.kind === 'pending-tool') {
+            // Same key as the settled card it becomes, so React swaps the node in
+            // place instead of unmounting one card and mounting another — which would
+            // read as the call disappearing and a different one taking its place.
+            return (
+              <StreamingToolWidget
+                key={`tool-${part.index}`}
+                toolName={part.call.toolCall.name}
+                description={part.call.toolCall.description}
+              />
+            );
+          }
+
+          return (
             <ToolCallWidget
               key={`tool-${part.index}`}
               toolName={part.call.toolCall.name}
@@ -51,8 +69,8 @@ export const CustomModelResponse: React.FC<CustomModelResponseProps> = ({
               isLatestResponse={isLatestResponse}
               outcome={message.toolOutcomes[part.index] ?? null}
             />
-          ),
-        )}
+          );
+        })}
       </div>
     </div>
   );
