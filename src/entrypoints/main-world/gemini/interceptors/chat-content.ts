@@ -1,5 +1,6 @@
 import { parseStreamingResponse, extractWrbFrPayloads } from '../lib/response-parser';
 import { parseBatchExecuteRequest } from '../lib/request-parser';
+import { trace } from '@/shared/lib/trace';
 
 export function handleChatContentResponse(response: any, url: string) {
   if (response.status === 200) {
@@ -9,7 +10,7 @@ export function handleChatContentResponse(response: any, url: string) {
         const requestData = requestBody || response.config?.data;
         if (requestData && typeof requestData === 'string') {
             const parsedBody = parseBatchExecuteRequest(requestData);
-            console.log('Better Sidebar (Gemini): Parsed Chat Content Request:', parsedBody);
+            trace('Better Sidebar (Gemini): Parsed Chat Content Request:', parsedBody);
         }
     } catch (e) {
         console.error('Better Sidebar (Gemini): Error handling chat content request', e);
@@ -30,12 +31,12 @@ export function handleChatContentResponse(response: any, url: string) {
       const retChunks = parseStreamingResponse(responseBody);
       const chunks = retChunks.map(chunk => chunk[0]);
       
-      console.log('Better Sidebar (Gemini): Chat Content chunks:', chunks);
+      trace('Better Sidebar (Gemini): Chat Content chunks:', chunks);
 
       if (chunks.length > 0) {
         // Use common helper to extract payloads
         const payloads = extractWrbFrPayloads(chunks);
-        console.log('Better Sidebar (Gemini): Chat Content Payloads:', payloads);
+        trace('Better Sidebar (Gemini): Chat Content Payloads:', payloads);
 
         // Carries a scratch `_sortMs` ordering key, stripped before dispatch.
         const chatHistory: any[] = [];
@@ -121,7 +122,8 @@ export function handleChatContentResponse(response: any, url: string) {
         chatHistory.sort((a, b) => a._sortMs - b._sortMs);
         const messages = chatHistory.map(({ _sortMs, ...msg }) => msg);
 
-        console.log(`Better Sidebar (Gemini): Parsed ${messages.length} history items`, messages);
+        console.log(`Better Sidebar (Gemini): Parsed ${messages.length} history items`);
+        trace('Better Sidebar (Gemini): History items:', messages);
 
         globalThis.dispatchEvent(
           new CustomEvent('GEMINI_CHAT_CONTENT_RESPONSE', {

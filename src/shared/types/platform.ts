@@ -110,7 +110,6 @@ export function detectPlatform(hostname?: string): Platform {
 function _detectPlatform(hostname: string): Platform {
   for (const [platform, config] of Object.entries(PLATFORM_CONFIG)) {
     if (hostname === config.hostname) {
-      console.log('Detected platform:', platform);
       return platform as Platform;
     }
   }

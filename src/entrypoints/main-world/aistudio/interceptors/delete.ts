@@ -1,7 +1,5 @@
 export function handleDeletePromptResponse(response: any, url: string) {
   if (response.status === 200) {
-    console.log('Better Sidebar: Intercepted DeletePrompt');
-
     let requestBody = response.config.body;
     if (typeof requestBody !== 'string') {
       requestBody = JSON.stringify(requestBody);

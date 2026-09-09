@@ -63,11 +63,15 @@ function parsePromptMarker(text: string): {
     return { promptId: null, promptTitle: null, promptContent: null, cleanText: text };
   }
 
-  // Resolve against the current agent entries (auto entry + skills). The old built-in
-  // prompt registry doesn't know skill ids, so titles fell back to raw ids.
+  // Resolve against the current agent entries. `getAgentEntryById` falls back to the
+  // default agent, so historical skill ids in old markers still get a readable title
+  // instead of the raw id.
   const entry = getAgentEntryById(promptId);
   const promptTitle = entry?.title || promptId;
-  const promptContent = entry?.skill?.promptContent || '';
+  // Entries are agents now, and an agent's prompt is built per-session from its soul —
+  // there is no static text to show here. Left empty on purpose: the renderer falls back
+  // to the raw message, which is the prompt that was actually sent.
+  const promptContent = '';
 
   let cleanText = '';
   if (text.includes('## User Request')) {

@@ -3,6 +3,7 @@
  *
  * Returns the current user's username/email for the given platform.
  */
+import { trace } from '@/shared/lib/trace';
 
 import { Platform } from '@/shared/types/platform';
 
@@ -43,7 +44,7 @@ export async function detectAiStudioAccount(
     );
     const text = el?.textContent?.trim();
     if (text) {
-      console.log('[DetectAccount] AI Studio account:', text);
+      trace('[DetectAccount] AI Studio account:', text);
       return text;
     }
   } catch (e) {
@@ -64,7 +65,7 @@ export async function detectGeminiAccount(
     const el = await waitForSelector('meta[name="og-profile-acct"]', timeoutMs);
     const content = el?.getAttribute('content')?.trim();
     if (content) {
-      console.log('[DetectAccount] Gemini account:', content);
+      trace('[DetectAccount] Gemini account:', content);
       return content;
     }
   } catch (e) {
@@ -90,7 +91,7 @@ export async function detectChatGPTAccount(): Promise<string | null> {
     const data = await resp.json();
     const name = data?.name?.trim();
     if (name) {
-      console.log('[DetectAccount] ChatGPT account:', name);
+      trace('[DetectAccount] ChatGPT account:', name);
       return name;
     }
   } catch (e) {

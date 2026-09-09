@@ -68,7 +68,7 @@ export async function handleSnippets(
     case 'CREATE_SNIPPET': {
       const { id, title, content, sourceUrl, sourcePlatform, folderId, orderIndex } =
         message.payload;
-      console.log('[handleSnippets] CREATE_SNIPPET called:', { id, title, content, sourceUrl, sourcePlatform, folderId });
+      console.log('[handleSnippets] CREATE_SNIPPET:', { id, title, sourcePlatform, folderId });
       await snippetRepo.create({
         id,
         title,

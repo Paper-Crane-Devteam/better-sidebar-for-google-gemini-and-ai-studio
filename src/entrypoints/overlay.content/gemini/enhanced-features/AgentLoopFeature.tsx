@@ -599,7 +599,9 @@ export const AgentLoopFeature: React.FC = () => {
         // This session continues the interrupted task, so the rounds after the delivery
         // need the tools it was using. Without it the continuation runs as the default
         // agent and is refused its own tools.
-        agentId: resolveAgentForRecoveredSession(owed.rows.map((row) => row.tool_name)),
+        agentId: resolveAgentForRecoveredSession(
+          owed.rows.flatMap((row) => (row.tool_name ? [row.tool_name] : [])),
+        ),
       });
 
       if (!delivered) {

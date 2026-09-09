@@ -22,9 +22,9 @@ When you use a tool every day, convenience is everything. I've packed several qu
 
 This is absolutely what I'm most excited about in this update! I've always felt that just chatting isn't enough; AI should actually do the work for me. So, the Workspace Agent is here!
 
-**How to use it? Super easy:** It sits right alongside the classic BetterSidebar Agent. Just type a `>` symbol in the input box, select the Workspace Agent, and upload your files to the workspace.
+**How to use it? Super easy:** It sits right alongside the classic BetterSidebar Agent. Just type a `>` symbol in the input box to activate the Workspace Agent. You can drag and drop your local files into the workspace to work on them; **or even better—you don't have to upload anything at all, and can ask AI to create brand new files from scratch!**
 
-Once uploaded, you can let the AI view and even edit your files. **So what can it actually do? Let me give you some real-world examples:**
+Whether you want it to tweak existing files or generate a new project from thin air, it handles both with ease. **So what can it actually do? Let me give you some real-world examples:**
 
 *   **📝 The Paper/Report Savior (Supports Word `.docx`)**
     Drag in your 50-page `thesis.docx` and ask the AI to polish specific paragraphs. Here’s the kicker: it **won't just brutally overwrite your file**. It acts like a mentor, adding **comments** where there are issues, or using **Tracked Changes** to rewrite. Your hard-earned formatting and citations stay perfectly intact. You just click "Accept/Reject" in Word.
@@ -36,12 +36,14 @@ Once uploaded, you can let the AI view and even edit your files. **So what can i
     Drag in a PDF. While it can't directly edit the body text (due to format limitations), it can extract info and even **highlight key points and add sticky notes** directly onto the PDF.
 *   **🪧 Presentation Helper (Supports PPT `.pptx`)**
     It can read slide content, replace text, edit speaker notes, and even help you reorder the slides.
-*   **💻 Developer & Writer Favorite (Supports plain text, `.md`, and code files)**
-    This is actually the most common use case! Whether it's organizing Markdown notes, writing/fixing code, or tweaking complex config files, the Agent can easily read and accurately modify them—like having a dedicated, all-around assistant living right in your workspace.
+*   **💻 Developer & Writer Favorite: Not Just Editing, but Creating from Scratch! (Supports plain text, `.md`, and all code files)**
+    This is where many people misunderstand—**don't assume you must upload a file before AI can do anything!**
+    For all text and code files (HTML, CSS, JS/TS, Python, Markdown, etc.), the AI can not only make precise edits and refactors, **it can scaffold brand new projects from scratch**. For instance, just tell it: "Build me a complete React todo app from scratch", and it will generate HTML, component files, stylesheets, and configs right inside the workspace. A full frontend project whipped up in minutes—like having a full-stack dev living right in your workspace.
 
 **Notice a pattern? Its biggest advantage is: it absolutely preserves your formatting!** Thanks to specialized underlying document handling, whether it's Word or Excel, your original styling is protected. This is what a real productivity tool should look like.
 
-*   **A Small Regret & A Promise**: Due to browser extension limitations, files currently must be uploaded to the workspace first, and we don't yet support previewing them directly in the sidebar. I've noted these inconveniences and will definitely find ways to fix them.
+*   **About Format Capabilities**: Text and code files can be freely created from scratch and edited at will. Complex compound document formats (Word, Excel, PPT, PDF) currently focus on **reading, annotating, and precisely modifying existing uploaded files** (guaranteeing that styling, formulas, and charts remain intact); generating entirely new compound binary files from scratch is not yet supported.
+*   **A Small Regret & A Promise**: Due to browser extension limitations, when working with existing Word or Excel documents, you currently need to drag them into the workspace first; additionally, rich previewing inside the sidebar isn't supported yet (files can be downloaded or viewed externally). I've noted these inconveniences and will definitely find ways to improve them.
 *   **Feedback Welcome**: This feature is currently in Beta. If you run into bugs or find something counterintuitive, let me know anytime and I promise lightning-fast fixes!
 
 ---

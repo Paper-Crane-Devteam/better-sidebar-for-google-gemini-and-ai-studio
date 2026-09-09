@@ -1,5 +1,6 @@
 import { parseEventStream, extractMessagesFromEventStream } from '../lib/response-parser';
 import { parseConversationRequest } from '../lib/request-parser';
+import { trace } from '@/shared/lib/trace';
 
 export function handleConversationResponse(response: any, url: string) {
   if (response.status === 200) {
@@ -12,7 +13,6 @@ export function handleConversationResponse(response: any, url: string) {
         const parsedRequest = parseConversationRequest(requestBody);
         if (parsedRequest?.prompt) {
           prompt = parsedRequest.prompt;
-          console.log('Better Sidebar (ChatGPT): Parsed User Prompt:', prompt);
         }
       }
     } catch (e) {
@@ -35,15 +35,16 @@ export function handleConversationResponse(response: any, url: string) {
     try {
       // Parse the event stream
       const events = parseEventStream(responseBody);
-      console.log('Better Sidebar (ChatGPT): Parsed Event Stream:', events);
+      trace('Better Sidebar (ChatGPT): Parsed Event Stream:', events);
 
-      // Extract messages from events
       const { messages, conversationId, title } = extractMessagesFromEventStream(events, prompt);
 
       if (messages.length > 0 && conversationId) {
-        console.log('Better Sidebar (ChatGPT): Extracted Messages:', messages);
-        console.log('Better Sidebar (ChatGPT): Conversation ID:', conversationId);
-        console.log('Better Sidebar (ChatGPT): Title:', title);
+        console.log('Better Sidebar (ChatGPT): Captured turn', {
+          conversationId,
+          messageCount: messages.length,
+          ...(title ? { title } : {}),
+        });
 
         // If this is a new conversation (has title), dispatch create event
         if (title) {

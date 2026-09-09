@@ -8,6 +8,8 @@
  * scanner picks up.
  */
 
+import { trace } from '@/shared/lib/trace';
+
 /** Spinner Gemini shows inside the sidebar history while a page is loading. */
 const SPINNER_SELECTOR = '.loading-history-spinner-container';
 
@@ -29,7 +31,7 @@ export function findHistoryScroller(): HTMLElement | null {
   for (const selector of SIDEBAR_SCROLLER_SELECTORS) {
     const el = document.querySelector(selector);
     if (el) {
-      console.log(`[BS History] matched scroller via "${selector}"`);
+      trace(`[BS History] matched scroller via "${selector}"`);
       return el as HTMLElement;
     }
   }
@@ -43,7 +45,7 @@ export function findHistoryScroller(): HTMLElement | null {
     all.find((el) => !el.closest('chat-window')) ??
     null;
 
-  console.log(
+  console.warn(
     `[BS History] no sidebar-scoped match; ${all.length} infinite-scroller(s) on page, fallback=${
       fallback ? 'found' : 'none'
     }`,
@@ -159,7 +161,7 @@ export function pickScrollTarget(scroller: HTMLElement): HTMLElement {
   });
 
   if (scrollable && scrollable !== scroller) {
-    console.log(
+    trace(
       '[BS History] scroll target is not the infinite-scroller:',
       describeElement(scrollable),
     );
@@ -176,7 +178,7 @@ export function pickScrollTarget(scroller: HTMLElement): HTMLElement {
 function ensureScrollable(scroller: HTMLElement): () => void {
   if (scroller.clientHeight > 0) return () => {};
 
-  console.log(
+  trace(
     '[BS History] scroller has no viewport (clientHeight=0), applying temporary height',
   );
   const prevHeight = scroller.style.height;
@@ -216,7 +218,7 @@ export async function scrollHistoryToEnd(
   const restoreStyles = ensureScrollable(scroller);
   const deadline = Date.now() + maxDuration;
 
-  console.log(`${logPrefix}: scrolling`, describeElement(scroller));
+  trace(`${logPrefix}: scrolling`, describeElement(scroller));
 
   let previousScrollHeight = 0;
   let noChangeCount = 0;
@@ -240,14 +242,14 @@ export async function scrollHistoryToEnd(
       const spinner = scroller.querySelector(SPINNER_SELECTOR);
       const isLoading = !!spinner && spinner.classList.contains('is-loading');
 
-      console.log(
+      trace(
         `${logPrefix}: round ${++round} scrollTop ${before}→${scroller.scrollTop} / ` +
           `scrollHeight ${scroller.scrollHeight} / clientHeight ${scroller.clientHeight} / ` +
           `spinner ${spinner ? (isLoading ? 'loading' : 'idle') : 'missing'}`,
       );
 
       if (isLoading) {
-        console.log(`${logPrefix}: loading older page...`);
+        trace(`${logPrefix}: loading older page...`);
         await waitForSpinnerStopLoading(scroller, 20000);
         noChangeCount = 0;
         // Small buffer for the DOM to settle.
@@ -261,7 +263,7 @@ export async function scrollHistoryToEnd(
 
       if (currentScrollHeight === previousScrollHeight) {
         noChangeCount++;
-        console.log(
+        trace(
           `${logPrefix}: idle with no height change (${noChangeCount})`,
         );
 

@@ -12,8 +12,6 @@ export function handleCreatePromptResponse(
   isTemporary = false,
 ) {
   if (response.status === 200) {
-    console.log('Better Sidebar: Intercepted CreatePrompt');
-
     let responseBody = response.response;
     if (typeof responseBody !== 'string') {
       responseBody = JSON.stringify(responseBody);

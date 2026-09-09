@@ -1,4 +1,5 @@
 import { runQuery, runCommand, runBatch } from '../index';
+import { trace } from '@/shared/lib/trace';
 import type { Message } from '../../types/db';
 
 export const messageRepo = {
@@ -361,7 +362,7 @@ export const messageRepo = {
       // We always treat it as a phrase match in FTS to reduce noise before filtering
       matchQuery = `"${query.replace(/"/g, '""')}"`;
 
-      console.log('[DB] FTS Search:', matchQuery);
+      trace('[DB] FTS Search:', matchQuery);
 
       // The join is on id alone by design. One FTS row is shared by every copy of
       // a message id (branched conversations reuse them), so a single index hit
@@ -380,7 +381,7 @@ export const messageRepo = {
       `;
       params.push(matchQuery);
     } else {
-      console.log('[DB] Short query, fallback to LIKE:', query);
+      trace('[DB] Short query, fallback to LIKE:', query);
 
       sql += `
         SELECT m.*, c.title as conversation_title, c.folder_id, f.name as folder_name, c.external_url, c.platform

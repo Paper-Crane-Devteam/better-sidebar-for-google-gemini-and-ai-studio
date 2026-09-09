@@ -31,6 +31,8 @@ export interface AiStudioExecuteOptions {
 
 let captured: CapturedParams | null = null;
 
+let lastLearnedFingerprint = '';
+
 const BASE_URL =
   'https://alkalimakersuite-pa.clients6.google.com/$rpc/google.internal.alkali.applications.makersuite.v1.MakerSuiteService';
 
@@ -83,11 +85,15 @@ export const aiStudioRequestBuilder = {
         headers: kept,
       };
 
-      console.log('Better Sidebar (AI Studio): Request builder params updated', {
-        hasAuth: !!captured.authorization,
-        hasApiKey: !!captured.apiKey,
-        headerCount: Object.keys(kept).length,
-      });
+      const fingerprint = `${!!captured.authorization}|${!!captured.apiKey}|${Object.keys(kept).sort().join(',')}`;
+      if (fingerprint !== lastLearnedFingerprint) {
+        lastLearnedFingerprint = fingerprint;
+        console.log('Better Sidebar (AI Studio): Request builder params updated', {
+          hasAuth: !!captured.authorization,
+          hasApiKey: !!captured.apiKey,
+          headerCount: Object.keys(kept).length,
+        });
+      }
     } catch (e) {
       console.error('Better Sidebar (AI Studio): Failed to learn request params', e);
     }

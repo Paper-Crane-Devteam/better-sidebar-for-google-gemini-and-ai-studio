@@ -17,6 +17,7 @@ import {
 } from './tab-profile-map';
 import { notifyDataUpdated } from './notify';
 import { purgeExpiredTemporaryChats } from '@/shared/lib/temporary-chat-cleanup';
+import { trace } from '@/shared/lib/trace';
 
 console.log(
   'Better Sidebar for Gemini & AI Studio: Background Service Worker Starting...',
@@ -56,7 +57,7 @@ export default defineBackground(() => {
 
   browser.runtime.onMessage.addListener(
     (message: ExtensionMessage, sender, sendResponse) => {
-      console.log(
+      trace(
         '[Background] Received message:',
         message.type,
         sender.tab ? `from tab ${sender.tab.id}` : 'from extension',

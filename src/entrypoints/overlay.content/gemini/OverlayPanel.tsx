@@ -44,6 +44,7 @@ import { useModuleConfig } from './useModuleConfig';
 import { toast } from '@/shared/lib/toast';
 import { detectAccount } from '@/entrypoints/content/shared/detect-account';
 import { Platform } from '@/shared/types/platform';
+import { trace } from '@/shared/lib/trace';
 import { useBadge } from '@/shared/lib/badge-store';
 import { FeatureBadge } from '@/shared/components/ui/badge-dot';
 
@@ -107,7 +108,6 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
         // Only process in the active tab — background DB may belong to another profile
         if (document.visibilityState !== 'visible') return;
 
-        console.log('Received DATA_UPDATED signal, refreshing...');
         fetchData(true);
 
         // Handle specific update types with payload
@@ -135,7 +135,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
   useEffect(() => {
     const handleVisibilityChange = async () => {
       if (document.visibilityState === 'visible') {
-        console.log('Tab became visible, syncing profile and refreshing...');
+        trace('Tab became visible, syncing profile and refreshing...');
         try {
           const username = await detectAccount(Platform.GEMINI);
           if (username) {
@@ -244,7 +244,6 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               </Button>
             </SimpleTooltip>
           )}
-          <AccountButton config={GEMINI_ACCOUNT} />
           <SimpleTooltip content={t('tabs.settings')}>
             <Button
               variant={isSettingsOpen ? 'secondary' : 'ghost'}
@@ -256,6 +255,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               <FeatureBadge badgeKey="settings." group />
             </Button>
           </SimpleTooltip>
+          <AccountButton config={GEMINI_ACCOUNT} />
         </div>
 
         <div
@@ -434,7 +434,6 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               <MessageSquare className="sidebar-icon" />
             </Button>
           </SimpleTooltip>
-          <AccountButton config={GEMINI_ACCOUNT} />
           <SimpleTooltip content={t('tabs.settings')}>
             <Button
               variant={isSettingsOpen ? 'secondary' : 'ghost'}
@@ -447,6 +446,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               <FeatureBadge badgeKey="settings." group />
             </Button>
           </SimpleTooltip>
+          <AccountButton config={GEMINI_ACCOUNT} />
         </div>
       </div>
 

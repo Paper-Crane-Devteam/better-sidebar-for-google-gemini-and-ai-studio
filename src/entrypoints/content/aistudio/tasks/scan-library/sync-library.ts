@@ -1,4 +1,5 @@
 import { Platform } from '@/shared/types/platform';
+import { trace } from '@/shared/lib/trace';
 
 /**
  * Auto-sync handler for AI Studio Library
@@ -15,7 +16,7 @@ class AutoSyncHandler {
             if (!customEvent.detail || !customEvent.detail.items) return;
 
             const items = customEvent.detail.items;
-            console.log(`AutoSync: Received ${items.length} items from API`);
+            trace(`AutoSync: Received ${items.length} items from API`);
 
             // Transform to conversation format
             const conversations = items
@@ -38,12 +39,11 @@ class AutoSyncHandler {
 
             if (conversations.length > 0) {
                 try {
-                    console.log(`AutoSync: Syncing ${conversations.length} conversations to database...`);
                     await browser.runtime.sendMessage({
                         type: 'SYNC_CONVERSATIONS',
                         payload: { items: conversations },
                     });
-                    console.log('AutoSync: Successfully synced conversations');
+                    console.log(`AutoSync: Synced ${conversations.length} conversations`);
                 } catch (err) {
                     console.error('AutoSync: Failed to sync conversations:', err);
                 }
@@ -56,7 +56,7 @@ class AutoSyncHandler {
      */
     start() {
         if (this.isEnabled) return;
-        console.log('AutoSync: Started listening for AI_STUDIO_LIBRARY_DATA');
+        trace('AutoSync: Started listening for AI_STUDIO_LIBRARY_DATA');
         window.addEventListener('AI_STUDIO_LIBRARY_DATA', this.listener);
         this.isEnabled = true;
     }
@@ -66,7 +66,7 @@ class AutoSyncHandler {
      */
     stop() {
         if (!this.isEnabled) return;
-        console.log('AutoSync: Stopped listening');
+        trace('AutoSync: Stopped listening');
         window.removeEventListener('AI_STUDIO_LIBRARY_DATA', this.listener);
         this.isEnabled = false;
     }

@@ -22,9 +22,9 @@ No uso diário, a conveniência é o mais importante. Desta vez coloquei várias
 
 Essa é, de longe, a função que mais me empolga nessa atualização! Eu sempre achei que só bater papo não era o suficiente; a IA devia conseguir, de fato, fazer o trabalho por mim. E assim, chegou o Workspace Agent!
 
-**Como usar? Super simples:** Ele fica lado a lado com o BetterSidebar Agent de sempre. Você só precisa digitar o símbolo `>` na caixa de texto, selecionar o Workspace Agent e fazer o upload dos seus arquivos para o workspace.
+**Como usar? Super simples:** Ele fica lado a lado com o BetterSidebar Agent de sempre. Você só precisa digitar o símbolo `>` na caixa de texto para acionar o Workspace Agent. Você pode arrastar seus arquivos locais para o espaço de trabalho para que ele trabalhe neles; **ou melhor ainda: não precisa fazer upload de nada, pode pedir para a IA criar novos arquivos do zero!**
 
-Depois de upar, você pode deixar a IA visualizar e até editar seus arquivos diretamente. **O que ele pode fazer afinal? Deixe-me dar alguns exemplos reais:**
+Seja para ajustar arquivos existentes ou para criar projetos do nada, ele resolve tudo numa boa. **O que ele pode fazer afinal? Deixe-me dar alguns exemplos reais:**
 
 *   **📝 O salva-vidas de Teses/Relatórios (Suporta Word `.docx`)**
     Você pode arrastar as suas 50 páginas de `thesis.docx` pra lá e pedir pra IA dar uma polida num parágrafo específico. E aqui vai o ponto chave: ele **não vai substituir o seu arquivo original na brutalidade**. Ele age como um orientador, adicionando **comentários** onde há problemas, ou usando o modo de **Revisão** (Tracked Changes) pra reescrever pra você. A formatação que você suou pra arrumar e as suas referências não vão bagunçar nem um pouco, você só precisa ir no Word e clicar em "Aceitar/Rejeitar".
@@ -36,12 +36,14 @@ Depois de upar, você pode deixar a IA visualizar e até editar seus arquivos di
     Arraste um PDF e, embora ele não possa editar o texto principal diretamente devido às limitações do formato, ele pode ajudar a extrair informações e até mesmo **destacar pontos importantes e adicionar notas adesivas** diretamente no PDF para você.
 *   **🪧 Ajudante de Apresentações (Suporta PPT `.pptx`)**
     Suporta ler o conteúdo dos slides, substituir textos, modificar notas do orador e até mesmo ajudar a reorganizar a ordem dos slides.
-*   **💻 O favorito de Programadores e Escritores (Suporta texto puro, `.md` e arquivos de código)**
-    Este é, na verdade, o cenário mais amplo e mais básico! Seja para ajudar a organizar anotações em Markdown, escrever/corrigir códigos ou lidar com arquivos de configuração complexos, o Agent pode ler facilmente e modificar com precisão, quase como ter um assistente versátil e dedicado morando no seu espaço de trabalho.
+*   **💻 O favorito de Programadores e Escritores: Não apenas edita, cria do zero! (Suporta texto puro, `.md` e todos os arquivos de código)**
+    É aqui que muitos se enganam — **não ache que você precisa obrigatoriamente enviar um arquivo antes de a IA poder fazer algo!**
+    Para todos os arquivos de texto e código (HTML, CSS, JS/TS, Python, Markdown, etc.), a IA não só faz edições e refatorações cirúrgicas, **como pode criar novos projetos do zero absoluto**. Por exemplo, basta pedir: "Crie um app completo de tarefas em React do zero", e ele criará o HTML, arquivos de componentes, folhas de estilo e configurações direto no workspace. Um projeto frontend completo montado em minutos!
 
 **Percebeu? A maior vantagem dele é: não bagunçar a sua formatação!** Graças ao suporte subjacente especializado em formatos de documentos, não importa se ele está editando um Word ou um Excel, os estilos originais são protegidos perfeitamente. É assim que uma ferramenta de produtividade de verdade deve ser.
 
-*   **Um pequeno arrependimento e uma promessa**: Devido às limitações do ambiente das extensões de navegador, os arquivos atualmente precisam ser enviados ao espaço de trabalho antes de poderem ser usados, e ainda não oferecemos suporte à visualização direta do conteúdo na barra lateral. Eu anotei esses inconvenientes no meu caderninho e definitivamente vou encontrar um jeito de resolvê-los no futuro.
+*   **Sobre os limites de suporte de formatos**: Arquivos de texto e código podem ser criados do zero e editados livremente. Formatos compostos e complexos (Word, Excel, PPT, PDF) atualmente focam em **ler, anotar e modificar com precisão arquivos já existentes** (garantindo que o layout, gráficos e fórmulas continuem impecáveis); a criação do zero desses formatos binários ainda não é suportada.
+*   **Um pequeno arrependimento e uma promessa**: Devido às limitações do ambiente das extensões de navegador, para lidar com documentos Word ou Excel existentes é necessário arrastá-los para o workspace; além disso, a pré-visualização rica na barra lateral ainda não está disponível (os arquivos podem ser baixados ou visualizados externamente). Eu anotei esses inconvenientes no meu caderninho e definitivamente vou buscar melhorias.
 *   **Me avise se tiver problemas**: Esta função está atualmente em fase de testes Beta. Quando usarem, se encontrarem qualquer bug ou acharem algo anti-intuitivo, mandem feedback a qualquer momento; prometo consertar na velocidade da luz!
 
 ---

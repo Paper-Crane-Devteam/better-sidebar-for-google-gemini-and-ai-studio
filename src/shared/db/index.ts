@@ -1,5 +1,6 @@
 import { NO_DB_OPEN } from './protocol';
 import { ensureOffscreenDocument } from '@/shared/offscreen-host';
+import { trace } from '@/shared/lib/trace';
 
 const pendingRequests = new Map<string, { resolve: (val: any) => void; reject: (err: any) => void }>();
 let localWorker: Worker | null = null;
@@ -413,17 +414,17 @@ export const getDB = () => {
 };
 
 export const runQuery = async (sql: string, bind?: any[]) => {
-  console.log('[DB Query]', sql, bind);
+  trace('[DB Query]', sql, bind);
   return sendWorkerMessage('EXEC', { sql, bind });
 };
 
 export const runCommand = async (sql: string, bind?: any[]) => {
-  console.log('[DB Command]', sql, bind);
+  trace('[DB Command]', sql, bind);
   return sendWorkerMessage('RUN', { sql, bind });
 };
 
 export const runBatch = async (operations: { sql: string; bind?: any[] }[]) => {
-  console.log('[DB Batch]', operations.length, 'operations');
+  trace('[DB Batch]', operations.length, 'operations');
   return sendWorkerMessage('RUN_BATCH', { operations });
 };
 

@@ -37,6 +37,7 @@ import { useUrl } from '@/shared/hooks/useUrl';
 import { useModuleConfig } from './useModuleConfig';
 import { detectAccount } from '@/entrypoints/content/shared/detect-account';
 import { Platform } from '@/shared/types/platform';
+import { trace } from '@/shared/lib/trace';
 import { useBadge } from '@/shared/lib/badge-store';
 import { FeatureBadge } from '@/shared/components/ui/badge-dot';
 import { useHotkeyListener } from '@/shared/hooks/useHotkeyListener';
@@ -145,7 +146,6 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
         // Only process in the active tab — background DB may belong to another profile
         if (document.visibilityState !== 'visible') return;
 
-        console.log('Received DATA_UPDATED signal, refreshing...');
         fetchData(true);
 
         // Handle specific update types with payload
@@ -173,7 +173,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
   useEffect(() => {
     const handleVisibilityChange = async () => {
       if (document.visibilityState === 'visible') {
-        console.log('Tab became visible, syncing profile and refreshing...');
+        trace('Tab became visible, syncing profile and refreshing...');
         // Re-detect account to ensure background DB matches this tab's profile
         try {
           const username = await detectAccount(Platform.AI_STUDIO);
@@ -389,7 +389,6 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
             <MessageSquare className="sidebar-icon" />
           </Button>
         </SimpleTooltip>
-        <AccountButton config={AISTUDIO_ACCOUNT} />
         <SimpleTooltip content={t('tabs.settings')}>
           <Button
             variant={isSettingsOpen ? 'secondary' : 'ghost'}
@@ -401,6 +400,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
             <FeatureBadge badgeKey="settings." group />
           </Button>
         </SimpleTooltip>
+        <AccountButton config={AISTUDIO_ACCOUNT} />
       </div>
 
       {/* Main Content Area */}

@@ -264,7 +264,8 @@ export const ConversationOverlay: React.FC = () => {
         styleEl.id = styleId;
         document.head.appendChild(styleEl);
       }
-      styleEl.textContent = HIDE_NATIVE_CSS[platform] ?? HIDE_NATIVE_CSS[Platform.GEMINI];
+      styleEl.textContent =
+        HIDE_NATIVE_CSS[platform] ?? HIDE_NATIVE_CSS[Platform.GEMINI] ?? '';
     } else {
       if (styleEl) {
         styleEl.remove();

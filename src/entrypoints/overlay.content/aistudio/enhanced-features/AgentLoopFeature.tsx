@@ -499,7 +499,9 @@ export const AgentLoopFeature: React.FC = () => {
         title: t('agent.owed.sessionTitle', { defaultValue: 'Recovered task' }),
         // The rounds after the delivery continue the interrupted task and need the tools
         // it was using, so the agent has to be recovered rather than defaulted.
-        agentId: resolveAgentForRecoveredSession(owed.rows.map((row) => row.tool_name)),
+        agentId: resolveAgentForRecoveredSession(
+          owed.rows.flatMap((row) => (row.tool_name ? [row.tool_name] : [])),
+        ),
       });
 
       if (!delivered) {

@@ -1,4 +1,5 @@
 import i18n from '@/locale/i18n';
+import { trace } from '@/shared/lib/trace';
 
 export class GemCreationScanner {
   private listener: (event: Event) => void;
@@ -25,7 +26,7 @@ export class GemCreationScanner {
         })
         .then((response) => {
           if (response?.success) {
-            console.log('Gemini GemCreationScanner: Gem saved successfully');
+            trace('Gemini GemCreationScanner: Gem saved successfully');
             // Notify overlay about the newly created gem for "last created" shortcut
             window.dispatchEvent(
               new CustomEvent('BETTER_SIDEBAR_GEM_CREATED', {
@@ -42,7 +43,7 @@ export class GemCreationScanner {
 
   start() {
     if (this.isListening) return;
-    console.log(
+    trace(
       'Gemini GemCreationScanner: Started listening for GEMINI_GEM_CREATED',
     );
     window.addEventListener('GEMINI_GEM_CREATED', this.listener);
