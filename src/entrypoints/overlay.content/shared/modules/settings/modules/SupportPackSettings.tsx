@@ -7,17 +7,31 @@ import {
   ExternalLink,
   KeyRound,
   ShoppingCart,
+  AlertTriangle,
+  RefreshCw,
+  LogOut,
 } from 'lucide-react';
 import { UIcon } from '@/shared/components/ui/icon';
 import { useI18n } from '@/shared/hooks/useI18n';
-import { useLicenseStore, isLicenseValid, type LicenseTier } from '@/shared/lib/license-store';
-import { activateLicense, identifyTokenSource } from '@/shared/lib/license-api';
+import {
+  useLicenseStore,
+  isLicenseValid,
+  isLicenseInGracePeriod,
+  type LicenseTier,
+} from '@/shared/lib/license-store';
+import {
+  activateLicense,
+  identifyTokenSource,
+  releaseLicense,
+} from '@/shared/lib/license-api';
+import { renewLicenseIfNeeded } from '@/shared/lib/license-renewal';
 import { openPurchasePage, getPurchaseLinks } from '@/shared/lib/license-links';
 
 export const SupportPackSettings = () => {
   const { t } = useI18n();
   const licenseState = useLicenseStore();
   const hasLicense = isLicenseValid(licenseState);
+  const inGracePeriod = isLicenseInGracePeriod(licenseState);
 
   return (
     <div className="space-y-6">
@@ -34,7 +48,7 @@ export const SupportPackSettings = () => {
       </div>
 
       {hasLicense ? (
-        <ActivatedView t={t} tier={licenseState.tier} />
+        <ActivatedView t={t} tier={licenseState.tier} inGracePeriod={inGracePeriod} />
       ) : (
         <PurchaseView t={t} />
       )}
@@ -42,15 +56,141 @@ export const SupportPackSettings = () => {
   );
 };
 
+/**
+ * Banner shown while the license is only alive thanks to the grace window, i.e.
+ * renewal keeps failing. Explains it and offers a manual retry, so the user isn't
+ * left guessing why the license eventually stops working.
+ */
+function RenewalWarning({ t }: { t: (key: string) => string }) {
+  const graceUntil = useLicenseStore((s) => s.graceUntil);
+  const [retrying, setRetrying] = useState(false);
+
+  const handleRetry = async () => {
+    setRetrying(true);
+    await renewLicenseIfNeeded({ force: true });
+    setRetrying(false);
+  };
+
+  return (
+    <div className="rounded-xl bg-amber-500/10 p-4 space-y-2">
+      <div className="flex items-start gap-2">
+        <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+        <div className="space-y-1">
+          <p className="text-sm font-medium">{t('supportPack.renewalWarningTitle')}</p>
+          <p className="text-xs text-muted-foreground">
+            {t('supportPack.renewalWarningDesc')}
+          </p>
+          {graceUntil && (
+            <p className="text-xs text-muted-foreground">
+              {t('supportPack.renewalGraceUntil')}{' '}
+              {new Date(graceUntil).toLocaleDateString()}
+            </p>
+          )}
+        </div>
+      </div>
+      <div className="flex justify-end">
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-7 text-xs gap-1.5"
+          onClick={handleRetry}
+          disabled={retrying}
+        >
+          {retrying ? (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          ) : (
+            <RefreshCw className="h-3 w-3" />
+          )}
+          {t('supportPack.retryNow')}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Banner shown when the server told us the token is no longer valid (refund,
+ * chargeback, manual revoke, or the device slot was taken). Silently reverting to
+ * the sales page would just look like a bug.
+ */
+function RenewalRejected({ t }: { t: (key: string) => string }) {
+  const { lastRenewError, token, deactivate } = useLicenseStore();
+  const [retrying, setRetrying] = useState(false);
+
+  const reasonKey =
+    lastRenewError === 'license_revoked'
+      ? 'supportPack.rejectedRevoked'
+      : lastRenewError === 'max_devices_reached'
+        ? 'supportPack.rejectedMaxDevices'
+        : 'supportPack.rejectedGeneric';
+
+  const handleRetry = async () => {
+    setRetrying(true);
+    await renewLicenseIfNeeded({ force: true });
+    setRetrying(false);
+  };
+
+  return (
+    <div className="rounded-xl bg-destructive/10 p-4 space-y-2">
+      <div className="flex items-start gap-2">
+        <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+        <div className="space-y-1">
+          <p className="text-sm font-medium">{t('supportPack.rejectedTitle')}</p>
+          <p className="text-xs text-muted-foreground">{t(reasonKey)}</p>
+          {token && (
+            <p className="text-xs font-mono text-muted-foreground">
+              {token.slice(0, 12)}...
+            </p>
+          )}
+        </div>
+      </div>
+      <div className="flex justify-end gap-2">
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-7 text-xs text-muted-foreground"
+          onClick={deactivate}
+        >
+          {t('supportPack.dismiss')}
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-7 text-xs gap-1.5"
+          onClick={handleRetry}
+          disabled={retrying}
+        >
+          {retrying ? (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          ) : (
+            <RefreshCw className="h-3 w-3" />
+          )}
+          {t('supportPack.retryNow')}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 /** View shown when the user already has an active license */
-function ActivatedView({ t, tier }: { t: (key: string) => string; tier: LicenseTier }) {
-  const { token, deactivate } = useLicenseStore();
+function ActivatedView({
+  t,
+  tier,
+  inGracePeriod,
+}: {
+  t: (key: string) => string;
+  tier: LicenseTier;
+  inGracePeriod: boolean;
+}) {
+  const token = useLicenseStore((s) => s.token);
 
   const tierLabel = tier === 'pro' ? 'Pro' : tier === 'power_pack' ? 'Power Pack' : 'Support Pack';
   const isPowerOrPro = tier === 'power_pack' || tier === 'pro';
 
   return (
     <div className="space-y-6">
+      {inGracePeriod && <RenewalWarning t={t} />}
+
       {/* Success card */}
       <div className="rounded-xl bg-primary/10 p-6">
         <div className="flex items-center gap-3 mb-3">
@@ -95,16 +235,105 @@ function ActivatedView({ t, tier }: { t: (key: string) => string; tier: LicenseT
         </div>
       )}
 
-      {/* Deactivate */}
-      <div className="flex justify-end">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-xs text-muted-foreground"
-          onClick={deactivate}
-        >
-          {t('supportPack.deactivate')}
-        </Button>
+      <ReleaseDeviceSection t={t} />
+    </div>
+  );
+}
+
+/**
+ * Self-service release of this install's activation slot.
+ *
+ * This replaces a button that only cleared local state: it looked like it freed a
+ * slot, but the server kept counting the device forever, so a user moving to a new
+ * profile still hit the limit and had no way to tell why.
+ */
+function ReleaseDeviceSection({ t }: { t: (key: string) => string }) {
+  const { token, signedPayload, deactivate } = useLicenseStore();
+  const [confirming, setConfirming] = useState(false);
+  const [releasing, setReleasing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleRelease = async () => {
+    if (!token) return;
+    setReleasing(true);
+    setError(null);
+
+    const result = await releaseLicense(token, signedPayload || '');
+    setReleasing(false);
+
+    if (result.success) {
+      // Only drop local state once the slot is actually back, so a failed call
+      // can't leave the user locked out of a slot they still occupy.
+      deactivate();
+      setConfirming(false);
+      return;
+    }
+
+    setError(
+      result.error === 'network_error'
+        ? t('supportPack.releaseNetworkError')
+        : t('supportPack.releaseFailed'),
+    );
+  };
+
+  if (!confirming) {
+    return (
+      <div className="space-y-2">
+        <Separator />
+        <div className="flex items-center justify-between gap-4 pt-2">
+          <p className="text-xs text-muted-foreground">
+            {t('supportPack.releaseHint')}
+          </p>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-xs text-muted-foreground shrink-0"
+            onClick={() => setConfirming(true)}
+          >
+            {t('supportPack.releaseDevice')}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      <Separator />
+      <div className="rounded-xl bg-accent/20 p-4 space-y-3 mt-2">
+        <p className="text-sm font-medium">{t('supportPack.releaseConfirmTitle')}</p>
+        <p className="text-xs text-muted-foreground">
+          {t('supportPack.releaseConfirmDesc')}
+        </p>
+        {error && <p className="text-xs text-destructive">{error}</p>}
+        <div className="flex justify-end gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 text-xs text-muted-foreground"
+            onClick={() => {
+              setConfirming(false);
+              setError(null);
+            }}
+            disabled={releasing}
+          >
+            {t('supportPack.cancel')}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 text-xs gap-1.5"
+            onClick={handleRelease}
+            disabled={releasing}
+          >
+            {releasing ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : (
+              <LogOut className="h-3 w-3" />
+            )}
+            {t('supportPack.releaseConfirm')}
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -113,9 +342,14 @@ function ActivatedView({ t, tier }: { t: (key: string) => string; tier: LicenseT
 /** View shown when the user hasn't purchased yet */
 function PurchaseView({ t }: { t: (key: string) => string }) {
   const links = getPurchaseLinks();
+  // A leftover token means a previously working license was rejected on renewal,
+  // rather than this being a first-time visitor.
+  const wasRejected = useLicenseStore((s) => !!s.token && !!s.lastRenewError);
 
   return (
     <div className="space-y-6">
+      {wasRejected && <RenewalRejected t={t} />}
+
       {/* Two-pack layout */}
       <div className="grid gap-4">
         {/* Support Pack Card */}

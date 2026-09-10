@@ -17,6 +17,11 @@ import {
 } from './tab-profile-map';
 import { notifyDataUpdated } from './notify';
 import { purgeExpiredTemporaryChats } from '@/shared/lib/temporary-chat-cleanup';
+import {
+  registerLicenseRenewalAlarm,
+  handleLicenseRenewalAlarm,
+  LICENSE_RENEWAL_ALARM,
+} from '@/shared/lib/license-renewal';
 import { trace } from '@/shared/lib/trace';
 
 console.log(
@@ -26,6 +31,11 @@ console.log(
 export default defineBackground(() => {
   initPegasusTransport();
   initPegasusBackendStore();
+
+  // Keeps the 14-day validation window rolling forward. Registered outside the
+  // DB-ready chain below because license renewal doesn't touch the database and
+  // must not be skipped when the DB fails to open.
+  registerLicenseRenewalAlarm();
 
   const setupUninstallUrl = async () => {
     try {
@@ -100,6 +110,15 @@ export default defineBackground(() => {
   // Handle alarm events for periodic auto-sync.
   // Respects the gdriveAutoSync setting from pegasus store.
   browser.alarms.onAlarm.addListener((alarm) => {
+    // Handled first and returned early: the auto-sync branch below bails out when
+    // gdriveAutoSync is off, which would otherwise swallow this alarm entirely.
+    if (alarm.name === LICENSE_RENEWAL_ALARM) {
+      handleLicenseRenewalAlarm(alarm).catch((err) =>
+        console.error('[Background] License renewal skipped:', err),
+      );
+      return;
+    }
+
     ensureDbReady()
       .then(() => {
         const { gdriveAutoSync } = usePegasusStore.getState();
