@@ -110,7 +110,11 @@ export default defineConfig({
     plugins: [
       viteStaticCopy({
         targets: [
-          { src: 'node_modules/pdfjs-dist/legacy/build/pdf.worker.min.mjs', dest: 'pdf' },
+          // Modern build only. The legacy build ships core-js polyfills that the
+          // Chrome Web Store review flags as obfuscated code (see the comment in
+          // src/shared/documents/pdf/read.ts). Must stay in sync with the import
+          // there — worker and main thread have to come from the same build.
+          { src: 'node_modules/pdfjs-dist/build/pdf.worker.min.mjs', dest: 'pdf' },
           { src: 'node_modules/pdfjs-dist/cmaps', dest: 'pdf' },
           { src: 'node_modules/pdfjs-dist/standard_fonts', dest: 'pdf' },
           { src: 'node_modules/pdfjs-dist/wasm', dest: 'pdf' },

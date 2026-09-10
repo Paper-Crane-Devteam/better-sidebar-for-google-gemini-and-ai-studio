@@ -406,6 +406,11 @@ src/shared/documents/client.ts           ★ 新增：content script 侧的 type
 
 - pdfjs 必须**本地打包 worker**（`pdf.worker.mjs`）并走 `web_accessible_resources`；⚠️ 从 CDN 加载
   会直接违反 MV3 远程代码政策，商店审核会挂。
+- ⚠️ 只能用 `pdfjs-dist/build/*`，**不要用 `pdfjs-dist/legacy/build/*`**。legacy 构建内联了 core-js
+  polyfill，其中 `object-create` 模块会用字符串拼接造 `javascript:` URL、`document.write()` 一个
+  `<script>` 标签、还去摸 `ActiveXObject("htmlfile")`。Chrome Web Store 的自动扫描把这一段判成
+  「obfuscated code / 隐藏功能」，2.10.0 就是因此被拒（violation ref: Red Titanium）。
+  主线程 import 和 `wxt.config.ts` 里 copy 的 worker 必须来自同一个 build。
 - 只做文字提取时不需要 canvas；一旦要渲染页面为图片就需要 `OffscreenCanvas`。
 - 高亮批注需要文字的坐标：pdfjs 的 `getTextContent({ includeMarkedContent: false })` 给每个 item
   的 transform + width/height，据此算出 QuadPoints 交给 pdf-lib。⚠️ 跨行高亮要拆成多个 quad，

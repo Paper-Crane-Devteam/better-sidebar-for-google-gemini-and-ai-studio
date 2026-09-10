@@ -1,4 +1,10 @@
-import { getDocument, GlobalWorkerOptions, type PDFDocumentProxy } from 'pdfjs-dist/legacy/build/pdf.mjs';
+// Use the modern build, NOT `pdfjs-dist/legacy/build/pdf.mjs`. The legacy build
+// inlines core-js polyfills whose `object-create` module builds a `javascript:`
+// URL by string concatenation, `document.write()`s a `<script>` tag and pokes at
+// `ActiveXObject("htmlfile")`. Chrome Web Store review flags that as obfuscated
+// code / concealed functionality (rejection "Red Titanium", v2.10.0). Nothing in
+// this extension needs those polyfills — MV3 already requires a modern Chrome.
+import { getDocument, GlobalWorkerOptions, type PDFDocumentProxy } from 'pdfjs-dist/build/pdf.mjs';
 import type { LoadedDocument } from '../storage';
 import { DocumentError, type DocReadRequest, type DocProjectionResult, type DocOutlineResult } from '../types';
 
