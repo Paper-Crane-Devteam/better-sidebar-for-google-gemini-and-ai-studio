@@ -261,7 +261,7 @@ export const SnippetNode = ({
   const snippetContent = isFile ? (node.data.data?.content || '') : '';
   const tooltipContent = isFile
     ? (isOverflowing: boolean) => (
-        <div className="max-h-[200px] overflow-y-auto">
+        <div className="max-h-[200px] overflow-y-auto custom-scrollbar-inverted">
           {isOverflowing && (
             <div className="font-medium mb-1">{node.data.name}</div>
           )}
