@@ -69,6 +69,7 @@ export default defineConfig({
           // public/ and loaded by URL so they are not inlined as base64 into
           // content-scripts/overlay.js (see ImportHistoryDialog.tsx).
           'images/*',
+          'pdf/*',
         ],
         matches: [
           'https://aistudio.google.com/*',
@@ -110,6 +111,14 @@ export default defineConfig({
     plugins: [
       viteStaticCopy({
         targets: [
+          // Modern build only. The legacy build ships core-js polyfills that the
+          // Chrome Web Store review flags as obfuscated code (see the comment in
+          // src/shared/documents/pdf/read.ts). Must stay in sync with the import
+          // there — worker and main thread have to come from the same build.
+          { src: 'node_modules/pdfjs-dist/build/pdf.worker.min.mjs', dest: 'pdf' },
+          { src: 'node_modules/pdfjs-dist/cmaps', dest: 'pdf' },
+          { src: 'node_modules/pdfjs-dist/standard_fonts', dest: 'pdf' },
+          { src: 'node_modules/pdfjs-dist/wasm', dest: 'pdf' },
           // Copy all SQLite WASM assets to assets/ (for Worker default relative path resolution)
           {
             src: 'src/assets/wa-sqlite-fts5/*',
@@ -144,6 +153,10 @@ export default defineConfig({
       '--disable-blink-features=AutomationControlled',
       '--no-default-browser-check',
       '--no-first-run',
+      // Expose a fixed CDP endpoint so chrome-devtools-mcp can attach to this
+      // dev instance (extension already loaded) instead of launching a clean
+      // browser of its own. See .kiro/settings/mcp.json --browserUrl.
+      '--remote-debugging-port=9222',
     ],
     firefoxArgs: ['--keep-profile-changes'],
     // Persist profile in a custom folder to keep login state

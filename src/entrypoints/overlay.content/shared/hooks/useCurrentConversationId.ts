@@ -30,6 +30,27 @@ const CONVERSATION_PATH_PATTERNS: Partial<Record<Platform, RegExp[]>> = {
 };
 
 /**
+ * Path segments that sit where a conversation id goes but are routes, not ids.
+ *
+ * ⚠️ These must resolve to `null`, not to themselves, and the reason is not cosmetic.
+ * A whole mechanism keys on `null` meaning "this session isn't bound to a conversation
+ * yet, adopt whatever id the platform assigns after the first message"
+ * (`attachSessionConversation` → `toolCallRecorder.claimConversation`, and
+ * `belongsToCurrent` in `AgentDock`). A *non-null* placeholder satisfies none of those
+ * checks and defeats all of them: the session binds to `'new_chat'`, AI Studio then
+ * navigates to `/prompts/{realId}`, and from that moment `belongsToCurrent` is false
+ * forever — the Dock renders nothing, so an approval has nowhere to be answered and the
+ * engine sits in `awaiting_approval` for good. Reads auto-run, so the first thing the
+ * user notices is a write that silently never asks.
+ *
+ * Gemini has no equivalent: a new chat there is `/app` with nothing after it, so the
+ * pattern simply doesn't match and `null` falls out on its own.
+ */
+export const RESERVED_CONVERSATION_SEGMENTS: Partial<Record<Platform, readonly string[]>> = {
+  [Platform.AI_STUDIO]: ['new_chat'],
+};
+
+/**
  * The same read, without React.
  *
  * `useUrl` notices router navigations through a 500ms poll, so the hook's value lags
@@ -42,10 +63,12 @@ export const readConversationIdFromPath = (
   path: string = globalThis.location?.pathname ?? '',
 ): string | null => {
   const platform = detectPlatform();
+  const reserved = RESERVED_CONVERSATION_SEGMENTS[platform] ?? [];
 
   for (const pattern of CONVERSATION_PATH_PATTERNS[platform] ?? []) {
     const match = pattern.exec(path);
-    if (match) return match[1];
+    if (!match) continue;
+    return reserved.includes(match[1]) ? null : match[1];
   }
 
   return null;

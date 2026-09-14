@@ -60,6 +60,8 @@ let captured: CapturedParams | null = null;
 let reqidSuffix = '';   // e.g. "46304"
 let reqidPrefix = 0;    // e.g. 60
 
+let lastLearnedFingerprint = '';
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -161,14 +163,17 @@ export const geminiRequestBuilder = {
 
       captured = { at, fsid, bl, hl, headers: kept };
 
-      console.log('Better Sidebar (Gemini): Request builder params updated', {
-        fsid,
-        bl,
-        hl,
-        at: at ? `${at.slice(0, 10)}…` : '(empty)',
-        reqid: `${reqidPrefix}${reqidSuffix}`,
-        headerCount: Object.keys(kept).length,
-      });
+      const fingerprint = `${fsid}|${bl}|${hl}|${at}|${Object.keys(kept).sort().join(',')}`;
+      if (fingerprint !== lastLearnedFingerprint) {
+        lastLearnedFingerprint = fingerprint;
+        console.log('Better Sidebar (Gemini): Request builder params updated', {
+          fsid,
+          bl,
+          hl,
+          at: at ? `${at.slice(0, 10)}…` : '(empty)',
+          headerCount: Object.keys(kept).length,
+        });
+      }
     } catch (e) {
       console.error(
         'Better Sidebar (Gemini): Failed to learn request params',

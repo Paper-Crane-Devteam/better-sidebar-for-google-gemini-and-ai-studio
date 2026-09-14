@@ -1,7 +1,6 @@
 import { navigate, navigateToNewChat } from '@/shared/lib/navigation';
 import { handleSearchNavigation } from '../shared/utils';
 import React, { useState, useEffect } from 'react';
-import { useSettingsStore } from '@/shared/lib/settings-store';
 import { useAppStore } from '@/shared/lib/store';
 import { NewChatButton } from './components/NewChatButton';
 import type { ModuleConfig } from '../shared/types/moduleConfig';
@@ -133,7 +132,6 @@ const useTemporaryChatToggle = () => {
 };
 
 export const useModuleConfig = (): ModuleConfig => {
-  const newChatBehavior = useSettingsStore((state) => state.newChatBehavior);
   const setOverlayOpen = useAppStore((state) => state.setOverlayOpen);
   const { toggle: toggleTempChat } = useTemporaryChatToggle();
 
@@ -150,13 +148,9 @@ export const useModuleConfig = (): ModuleConfig => {
     },
     explorer: {
       onNewChat: () => {
-        if (newChatBehavior === 'new-tab') {
-          window.open('https://gemini.google.com/app', '_blank');
-        } else {
-          navigateToNewChat();
-        }
+        navigateToNewChat();
       },
-      newChatButton: <NewChatButton onPrivateChat={toggleTempChat} />,
+      newChatButton: <NewChatButton onTemporaryChat={toggleTempChat} />,
       filterTypes: ['all', 'conversation', 'gem', 'notebook'] as const,
     },
     favorites: {

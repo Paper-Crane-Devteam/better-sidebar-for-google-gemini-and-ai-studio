@@ -39,16 +39,24 @@ body.bs-theme--cupertino-glass .cdk-global-overlay-wrapper{
   -webkit-backdrop-filter: blur(10px) saturate(1.8) !important;
 }
 
-
+`,
+  fontCss: `
 /* System font stack */
-body.bs-theme--cupertino-glass {
+body.bs-fonts--cupertino-glass {
   font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', 'Helvetica Neue', sans-serif !important;
 }
 
-body.bs-theme--cupertino-glass *:not(.material-symbols-outlined):not(.material-symbols-rounded):not(.material-symbols-sharp):not(.google-symbols):not(mat-icon):not(.mat-icon):not([class*="material-symbols"]):not([class*="google-symbols"]) {
+body.bs-fonts--cupertino-glass *:not(.material-symbols-outlined):not(.material-symbols-rounded):not(.material-symbols-sharp):not(.google-symbols):not(mat-icon):not(.mat-icon):not([class*="material-symbols"]):not([class*="google-symbols"]) {
   font-family: inherit;
 }
 `,
+  fontVariables: [
+    { property: '--mat-menu-item-label-text-font', value: '-apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", sans-serif' },
+    { property: '--mat-list-list-item-label-text-font', value: '-apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", sans-serif' },
+    { property: '--mat-list-list-item-supporting-text-font', value: '-apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", sans-serif' },
+    { property: '--mat-button-text-label-text-font', value: '-apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", sans-serif' },
+    { property: '--mat-button-filled-label-text-font', value: '-apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", sans-serif' },
+  ],
   variables: [
     // ─── Surface / Background (极度纯净) ────────────────────────────
     { property: '--gem-sys-color--surface', value: 'rgba(255,255,255,0.85)' },
@@ -191,27 +199,6 @@ body.bs-theme--cupertino-glass *:not(.material-symbols-outlined):not(.material-s
       value: '#007aff',
     },
 
-    // ─── Font override via CSS variable ─────────────────────────────
-    {
-      property: '--mat-menu-item-label-text-font',
-      value: '-apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", sans-serif',
-    },
-    {
-      property: '--mat-list-list-item-label-text-font',
-      value: '-apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", sans-serif',
-    },
-    {
-      property: '--mat-list-list-item-supporting-text-font',
-      value: '-apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", sans-serif',
-    },
-    {
-      property: '--mat-button-text-label-text-font',
-      value: '-apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", sans-serif',
-    },
-    {
-      property: '--mat-button-filled-label-text-font',
-      value: '-apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", sans-serif',
-    },
   ],
   sidebarVariables: [
     // Pure frosted glass tones

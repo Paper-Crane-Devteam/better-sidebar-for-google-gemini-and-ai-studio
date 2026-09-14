@@ -95,7 +95,7 @@ export const notebookRepo = {
 
   getConversationsByNotebookId: async (notebookId: string): Promise<any[]> => {
     return (await runQuery(
-      'SELECT * FROM conversations WHERE notebook_id = ? AND deleted_at IS NULL ORDER BY last_active_at DESC',
+      'SELECT * FROM conversations WHERE notebook_id = ? AND deleted_at IS NULL AND is_temporary = 0 ORDER BY last_active_at DESC',
       [notebookId],
     )) as any[];
   },

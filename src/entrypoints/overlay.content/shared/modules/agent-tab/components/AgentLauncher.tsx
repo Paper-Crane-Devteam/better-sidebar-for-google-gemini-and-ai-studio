@@ -1,49 +1,98 @@
 /**
- * AgentLauncher — what you see in the Agent tab before anything is running.
+ * AgentLauncher — the Agent tab before anything is running.
  *
- * Replaces the old empty state, which only told you to type `>` in the chat
- * input and offered "Configure Agent" as its most prominent action. This is a
- * launcher: pick a skill, or describe a task, and it stages the agent in the
- * chat input for you.
+ * It is no longer a launcher in the sense of a second place to start a task. It had a
+ * textarea and a list of skill cards, which made the sidebar an entry point competing
+ * with `>` in the chat input: the same action, reached two ways, with the sidebar one
+ * having to forward text into the composer and report every way that can fail. The skill
+ * list was the same duplication one level down — the `>` picker already lists skills, and
+ * the auto entry picks one for you, so choosing here bought nothing and implied the
+ * choice mattered.
+ *
+ * What is left reads top to bottom as one thought: how to start (`LauncherCta`), what to
+ * say (`LauncherExamples`), and then the two places you go that are not a task. The
+ * destinations sit last because they are only interesting once the first two have been
+ * read; workspace leads within them, because looking at files is something you do
+ * repeatedly and configuring tools is something you do once.
+ *
+ * The examples still stage into the chat input, so the entry point stays single — the
+ * sidebar fills the composer and hands it back, rather than sending on its own.
+ *
+ * ## One padding, no outlines
+ *
+ * The tab owns the horizontal padding (`px-3`) and nothing inside adds a second one.
+ * Sections are text on the panel; where a tinted surface is needed it uses `-mx-2 px-2`,
+ * so the tint bleeds outward and the content stays on the same left edge as everything
+ * above it. Before that rule, each section sat on a filled card with its own `p-3` inside
+ * the tab's, and on a panel this narrow the doubled inset cost most of a line's width and
+ * read as clutter.
+ *
+ * Nothing is outlined either — an earlier pass bordered every block and the tab became
+ * nested frames a few pixels apart. Same reason the two destinations are full-width rows
+ * instead of a two-column grid: side by side, each got about twenty characters of width
+ * and both labels wrapped.
+ *
+ * With no frames left, the sections are told apart by the space between them alone, which
+ * is why the column gap is a deliberate `gap-6` rather than the `gap-3` that looked fine
+ * while every block still had an edge to hold it in. The two content sections label
+ * themselves and keep that label tight against their own content, so the gap here always
+ * reads as "new section" rather than as air between a heading and what it introduces.
  */
 
-import React, { useState, useEffect } from 'react';
-import { isChromeBuild } from '@/shared/browser-agent/contracts';
-import { browserRequest, useBrowserAgent, initializeBrowserAgent } from '../../browser-agent/client';
-import { BrowserAgentPanel } from '../../browser-agent/BrowserAgentPanel';
-import { Bot, Keyboard, Lock, Send, Settings, ShieldCheck } from 'lucide-react';
+import React, { useState } from 'react';
+import { Bot, ChevronRight, Lock, SlidersHorizontal } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { UIcon } from '@/shared/components/ui/icon';
+import { SimpleTooltip } from '@/shared/components/ui/tooltip';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useAppStore } from '@/shared/lib/store';
 import { useLicenseStore } from '@/shared/lib/license-store';
 import { navigateToNewChat } from '@/shared/lib/navigation';
-import { getAgentEntries, AGENT_AUTO_ID, BROWSER_AUTO_ID, browserEntryNeedsPermission } from '../../agent-loop/agent-entry';
+import { getAgentEntryById } from '../../agent-loop/agent-entry';
 import { agentEventBus } from '../../agent-loop/event-bus';
 import { useAgentLoopStore } from '../../agent-loop/agent-loop-store';
 import { getActiveEngine } from '../../agent-loop/engine/engine-registry';
+import { LauncherCta } from './LauncherCta';
+import { LauncherExamples } from './LauncherExamples';
 
-
+/** A full-width destination row: icon, label, one line of explanation. */
+const DestinationRow: React.FC<{
+  icon: React.ReactNode;
+  label: string;
+  hint: string;
+  onClick: () => void;
+}> = ({ icon, label, hint, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    // Same `-mx-2 px-2` band as everything else tinted here: the surface bleeds outward
+    // rather than indenting its contents inside the tab's own padding.
+    className="-mx-2 flex w-[calc(100%+1rem)] items-center gap-2.5 rounded-lg bg-muted/40 px-2 py-2
+               text-left transition-colors hover:bg-accent/40"
+  >
+    <span className="shrink-0 text-primary">{icon}</span>
+    <span className="min-w-0 flex-1">
+      <span className="block truncate text-[13px] font-medium text-foreground">{label}</span>
+      <span className="block truncate text-xs text-muted-foreground">{hint}</span>
+    </span>
+    <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" />
+  </button>
+);
 
 export const AgentLauncher: React.FC = () => {
-  const agentKind = useBrowserAgent(s => s.selected);
-  useBrowserAgent(s => s.settings);
-  useEffect(initializeBrowserAgent, []);
   const { t } = useI18n();
   const setSettingsOpen = useAppStore((s) => s.setSettingsOpen);
   const tier = useLicenseStore((s) => s.tier);
   const canWrite = tier === 'power_pack' || tier === 'pro' || tier === 'support_pack';
 
-  const [task, setTask] = useState('');
   /** null = fine; otherwise why the last attempt didn't reach the chat input */
   const [unavailable, setUnavailable] = useState<
     'no-editor' | 'composer-busy' | 'session-busy' | null
   >(null);
 
   /**
-   * A second task cannot start while one is live — `composeAndSend` refuses to build
-   * a second engine, so a card that still looked clickable just staged a prompt the
-   * send would then reject. Inert here, with a way out, instead.
+   * Staging a second task while one is live would replace what the running task has
+   * queued in the composer, so the examples go inert rather than looking clickable.
    */
   const status = useAgentLoopStore((s) => s.status);
   const busy = status !== 'idle';
@@ -55,23 +104,28 @@ export const AgentLauncher: React.FC = () => {
     setUnavailable(null);
   };
 
-  const entries = getAgentEntries().filter(e => (e.agentKind ?? 'data') === agentKind);
-  const autoId = agentKind === 'browser' ? BROWSER_AUTO_ID : AGENT_AUTO_ID;
-  const autoEntry = entries.find((e) => e.id === autoId);
-  const skillEntries = entries.filter((e) => e.id !== autoId);
+  /**
+   * This panel belongs to the Better Sidebar agent specifically.
+   *
+   * Not "whichever agent is selected": the Workspace agent has its own panel, so the only
+   * agent that reaches this code is this one. Naming it explicitly is what makes the
+   * examples and the `>` label below correct — they have to quote the marker the user will
+   * actually type.
+   */
+  const entry = getAgentEntryById('bettersidebar');
+  const entryTitle =
+    entry?.title ?? t('agent.agents.bettersidebar.name', { defaultValue: 'Better Sidebar' });
 
   /**
-   * Ask the platform feature to stage the entry. If nothing acknowledges within
-   * a moment, the chat input isn't reachable (no chat open, or the feature is
-   * turned off) — say so instead of failing silently.
+   * Put an example in the chat input, unsent.
+   *
+   * Ask the platform feature to stage it; if nothing acknowledges within a moment the
+   * chat input isn't reachable (no chat open, or the feature is off) — say so instead of
+   * appearing to do nothing.
    */
-  const run = (entryId: string, userInput?: string, autoSend = false, onStaged?: () => void) => {
-    if (browserEntryNeedsPermission(entryId)) {
-      void browserRequest({ action: 'open-settings' });
-      return;
-    }
+  const stage = (text: string) => {
     setUnavailable(null);
-    if (busy) {
+    if (busy || !entry) {
       setUnavailable('session-busy');
       return;
     }
@@ -79,7 +133,6 @@ export const AgentLauncher: React.FC = () => {
     let settled = false;
     const offStaged = agentEventBus.once('launcher:staged', () => {
       settled = true;
-      onStaged?.();
     });
     const offFailed = agentEventBus.once('launcher:failed', ({ reason }) => {
       settled = true;
@@ -88,7 +141,11 @@ export const AgentLauncher: React.FC = () => {
       );
     });
 
-    agentEventBus.emit('launcher:run-entry', { entryId, userInput, autoSend });
+    agentEventBus.emit('launcher:run-entry', {
+      entryId: entry.id,
+      userInput: text,
+      autoSend: false,
+    });
 
     setTimeout(() => {
       offStaged();
@@ -97,141 +154,34 @@ export const AgentLauncher: React.FC = () => {
     }, 1200);
   };
 
-  const handleSubmitTask = () => {
-    if (!task.trim() || !autoEntry) return;
-    if (busy) {
-      setUnavailable('session-busy');
-      return;
-    }
-    // Only clear once the text actually reached the chat input — otherwise a
-    // failed attempt (no chat open) would throw away what the user just typed.
-    run(autoEntry.id, task, true, () => setTask(''));
-  };
-
   /**
    * The agent runs through the page's chat input, so there has to be a chat open.
-   * Offer that as a one-click action here rather than only telling the user about it.
+   * Offer that as a one-click action rather than only telling the user about it.
    */
   const handleNewChat = () => {
     setUnavailable(null);
     navigateToNewChat();
   };
 
-  const newChatButton = (
-    <Button
-      variant="outline"
-      size="sm"
-      className="h-6 gap-1 px-2 text-xs"
-      onClick={handleNewChat}
-    >
-      <UIcon icon="tabler:message-plus" className="h-3 w-3" />
-      {t('explorerHeader.newChat')}
-    </Button>
-  );
-
   return (
-    <div className="flex h-full flex-col overflow-y-auto px-4 py-4">
-      {isChromeBuild() && <label className="mb-3 flex items-center gap-2 text-xs">Agent
-        <select aria-label="Agent" value={agentKind} disabled={busy} className="rounded border border-border bg-background px-2 py-1" onChange={e => useBrowserAgent.getState().select(e.target.value as 'data' | 'browser')}>
-          <option value="data">Data Agent</option><option value="browser">Browser Agent</option>
-        </select>
-      </label>}
-      {agentKind === 'browser' && <BrowserAgentPanel />}
-      {/* Intro */}
-      <div className="mb-4 flex items-start gap-3">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10">
-          <Bot className="h-4 w-4 text-primary" />
-        </div>
-        <div className="min-w-0">
-          <h2 className="text-sm font-semibold text-foreground">
-            {t('agent.launcher.title', { defaultValue: 'Agent' })}
-          </h2>
-          <p className="text-xs leading-relaxed text-muted-foreground">
-            {agentKind === 'browser' ? '整理 Chrome 标签页、标签组与收藏夹。' : t('agent.launcher.subtitle', {
-              defaultValue: 'Team up with AI to manage your chats, prompts and data.',
-            })}
-          </p>
-        </div>
-      </div>
-
-      {/* Free-form task */}
-      <div className="mb-4">
-        <div className="relative">
-          <textarea
-            value={task}
-            onChange={(e) => setTask(e.target.value.slice(0, 500))}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmitTask();
-              }
-            }}
-            rows={2}
-            disabled={busy}
-            placeholder={t('agent.launcher.placeholder', {
-              defaultValue: 'Describe what you want to get done...',
-            })}
-            className="w-full resize-none rounded-md border border-border/60 bg-muted/30 px-3 py-2 pr-8
-                       text-xs text-foreground placeholder:text-muted-foreground
-                       focus:outline-none focus:ring-1 focus:ring-primary/50
-                       disabled:cursor-not-allowed disabled:opacity-50"
-          />
-          <button
-            type="button"
-            onClick={handleSubmitTask}
-            disabled={busy || !task.trim()}
-            aria-label={t('agent.launcher.run', { defaultValue: 'Run' })}
-            className="absolute right-2 top-2 rounded p-1 text-muted-foreground
-                       hover:bg-accent hover:text-foreground disabled:opacity-40"
-          >
-            <Send className="h-3 w-3" />
-          </button>
-        </div>
-        <div className="mt-2 flex items-center gap-2">
-          {newChatButton}
-          <span className="min-w-0 flex-1 text-xs text-muted-foreground">
-            {t('agent.launcher.newChatHint', {
-              defaultValue: 'It runs in the chat you have open. Start a fresh one to keep it clean.',
-            })}
-          </span>
-        </div>
-      </div>
-
-      {/* Skill cards */}
-      <div className="mb-4 space-y-1">
-        <span className="px-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          {t('agent.launcher.skills', { defaultValue: 'Or start with a skill' })}
-        </span>
-        <div className="space-y-1">
-          {skillEntries.map((entry) => (
-            <button
-              key={entry.id}
-              type="button"
-              onClick={() => run(entry.id)}
-              disabled={busy}
-              className="flex w-full items-start gap-3 rounded-md bg-muted/30 px-3 py-2
-                         text-left transition-colors hover:bg-accent/40
-                         disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-muted/30"
-            >
-              <div className="min-w-0 flex-1">
-                <div className="truncate text-xs font-medium text-foreground">{entry.title}</div>
-                <div className="line-clamp-2 text-xs text-muted-foreground">
-                  {entry.description}
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-        <p className="px-1 pt-1 text-xs text-muted-foreground">
-          {t('agent.launcher.stageHint', {
-            defaultValue:
-              'Optional — just describe your task and the agent picks the right skill on its own. Pick one here and it fills the chat input, so you can still add your own details before sending.',
+    <div className="flex h-full flex-col gap-6 overflow-y-auto px-3 py-3">
+      {/*
+        Title row. What this is and what it may touch both sit behind the question mark:
+        the pitch is read once, the safety note is reassurance rather than instruction, and
+        neither earns standing space above the thing they describe.
+      */}
+      <div>
+        <h2 className="text-[13px] font-medium text-foreground">
+          {t('agent.launcher.subtitle', {
+            defaultValue: 'Team up with AI to manage your chats, prompts and data.',
           })}
-        </p>
+        </h2>
       </div>
+
+      <LauncherCta entryTitle={entryTitle} />
 
       {unavailable && (
-        <div className="mb-4 space-y-2 rounded-md bg-orange-500/10 px-3 py-2">
+        <div className="-mx-2 space-y-2 rounded-lg bg-orange-500/10 px-2 py-2">
           <p className="text-xs text-muted-foreground">
             {unavailable === 'composer-busy'
               ? t('agent.launcher.composerBusy', {
@@ -248,56 +198,61 @@ export const AgentLauncher: React.FC = () => {
                   })}
           </p>
           {unavailable === 'session-busy' && (
-            <Button variant="outline" size="sm" className="h-6 text-xs" onClick={stopRunning}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 bg-background/60 px-2 text-xs hover:bg-background"
+              onClick={stopRunning}
+            >
               {t('agent.launcher.stopRunning', { defaultValue: 'Stop the running task' })}
             </Button>
           )}
-          {unavailable === 'no-editor' && newChatButton}
+          {unavailable === 'no-editor' && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 gap-1 bg-background/60 px-2 text-xs hover:bg-background"
+              onClick={handleNewChat}
+            >
+              <UIcon icon="tabler:message-plus" className="h-3 w-3" />
+              {t('explorerHeader.newChat')}
+            </Button>
+          )}
         </div>
       )}
 
-      {/* Safety / tier note */}
-      <div className="mt-auto space-y-2 pt-4">
-        <div className="flex items-start gap-2 text-xs text-muted-foreground">
-          <Keyboard className="mt-1 h-3 w-3 shrink-0" />
-          <span>
-            {t('agent.launcher.triggerHint', {
-              defaultValue: 'Typing > in the chat input starts the agent from there too.',
-            })}
-          </span>
-        </div>
+      <LauncherExamples capsuleLabel={entryTitle} onPick={stage} disabled={busy} />
 
-        <div className="flex items-start gap-2 text-xs text-muted-foreground">
-          <ShieldCheck className="mt-1 h-3 w-3 shrink-0" />
-          <span>
-            {agentKind === 'browser' ? '所有浏览器改动都需要批准，极速模式也不能跳过。' : t('agent.launcher.safety', {
-              defaultValue:
-                'Only your local database is touched. Changes are confirmed before they run.',
-            })}
-          </span>
-        </div>
-
-        {!canWrite && agentKind !== 'browser' && (
-          <div className="flex items-start gap-2 text-xs text-muted-foreground">
-            <Lock className="mt-1 h-3 w-3 shrink-0" />
-            <span>
-              {t('agent.launcher.freeTier', {
-                defaultValue: 'Free plan is read-only. Upgrade to let the agent make changes.',
-              })}
-            </span>
-          </div>
-        )}
-
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-7 gap-1 text-xs text-muted-foreground"
+      {/*
+        Settings is the only destination left here. The workspace used to be a row in this
+        list — a sub-view of this panel, reached by a click you had to know about. It is a
+        whole agent now, one tap away in the switcher above, so a row pointing at it would
+        be a second entrance to the same place with worse framing.
+      */}
+      <div className="space-y-1.5">
+        <DestinationRow
+          icon={<SlidersHorizontal className="h-4 w-4" />}
+          label={t('agent.launcher.manage', { defaultValue: 'Skills & tools' })}
+          hint={t('agent.launcher.manageHint', { defaultValue: 'What it may do, and when to ask' })}
           onClick={() => setSettingsOpen(true, 'agent')}
-        >
-          <Settings className="h-3 w-3" />
-          {t('agent.launcher.manage', { defaultValue: 'Manage skills & tools' })}
-        </Button>
+        />
       </div>
+
+      {/*
+        The read-only note stays on the panel rather than moving into the tooltip with the
+        safety copy: it is a limit the user will otherwise discover halfway through a task,
+        and it is the one line here that asks them to do something.
+      */}
+      {!canWrite && (
+        <div className="mt-auto flex items-start gap-2 pt-2 text-[11px] leading-relaxed text-muted-foreground">
+          <Lock className="mt-0.5 h-3 w-3 shrink-0" />
+          <span>
+            {t('agent.launcher.freeTier', {
+              defaultValue: 'Free plan is read-only. Upgrade to let the agent make changes.',
+            })}
+          </span>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,3 +1,5 @@
+import { trace } from '@/shared/lib/trace';
+
 /**
  * DOM Scanner for Manual Library Scan
  * 
@@ -82,7 +84,7 @@ export async function scanLibraryDom() {
   console.log('Starting library DOM scan...');
 
   // 1. Wait for the library table/wrapper
-  console.log('Waiting for library table...');
+  trace('Waiting for library table...');
   const scrollContainer = await waitForElement<HTMLElement>(
     '.page-content-wrapper',
     5000

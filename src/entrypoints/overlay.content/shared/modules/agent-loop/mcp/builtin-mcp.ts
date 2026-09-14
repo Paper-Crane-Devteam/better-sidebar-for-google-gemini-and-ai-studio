@@ -1,31 +1,29 @@
 /**
- * Built-in MCP Server definition — "Better Sidebar".
+ * Better Sidebar MCP Server — the extension's own data.
  *
- * Contains all core tools: activate_skill, execute_sql,
- * sync_conversation_messages, export, complete_task.
+ * `execute_sql`, `sync_conversation_messages` and `export`: everything that reads or writes
+ * the local database. Belongs to the Better Sidebar agent and to no other.
  *
- * `name` and `description` are English defaults; the AgentSettings UI
- * resolves localized versions via `agent.mcp.builtin.name` / `.description`.
+ * ⚠️ `activate_skill` and `complete_task` used to live here. They moved to `core-mcp.ts`
+ * when agents were split out — they are loop machinery, not this domain's tools, and the
+ * Workspace agent needs them just as much while needing none of the SQL.
+ *
+ * `name` and `description` are English defaults; the settings UI resolves localized
+ * versions via `agent.mcp.builtin.name` / `.description`.
  */
 
 import type { MCPServer } from './types';
-import { activateSkillProvider } from './providers/activate-skill-provider';
 import { sqlProvider } from './providers/sql-provider';
 import { syncProvider } from './providers/sync-provider';
 import { exportProvider } from './providers/export-provider';
-import { taskProvider } from './providers/task-provider';
+
+export const BUILTIN_MCP_ID = 'builtin-bettersidebar';
 
 export const BUILTIN_MCP: MCPServer = {
-  id: 'builtin-bettersidebar',
+  id: BUILTIN_MCP_ID,
   type: 'builtin',
   name: 'Better Sidebar',
-  description: 'Core tools for managing conversations, data, and tasks',
+  description: 'Query and change conversations, folders, tags and prompts',
   enabled: true,
-  tools: [
-    activateSkillProvider,
-    sqlProvider,
-    syncProvider,
-    exportProvider,
-    taskProvider,
-  ],
+  tools: [sqlProvider, syncProvider, exportProvider],
 };

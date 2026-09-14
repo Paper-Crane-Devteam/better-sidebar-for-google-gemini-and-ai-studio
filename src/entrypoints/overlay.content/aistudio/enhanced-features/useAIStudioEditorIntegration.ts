@@ -8,12 +8,22 @@
  * - MutationObserver to handle SPA navigation (textarea re-creation)
  * - Popup positioning relative to the textarea
  *
+ * - Send interception, for consumers that need to rewrite the message on its way out
+ *
  * No capsule support — AI Studio's textarea is plain text only.
  * Content is expanded inline immediately on selection.
+ *
+ * Used by both trigger features: `/` (snippets, plain insert) and `>` (agent entries,
+ * which also claim the send). One instance per trigger char, same as on Gemini.
  */
 
 import { useEffect, useRef, useState } from 'react';
 import type { TriggerPopupState } from '@/entrypoints/overlay.content/shared/features/trigger-popup/types';
+import {
+  installRunInterceptor,
+  registerBeforeRunHandler,
+} from '@/entrypoints/overlay.content/shared/lib/aistudio-editor';
+import { isImeComposing } from '@/entrypoints/overlay.content/shared/lib/ime';
 
 export interface PopupPosition {
   bottom: number;
@@ -37,6 +47,17 @@ export interface AIStudioEditorIntegrationConfig {
   close: () => void;
   /** Called when user confirms selection via Enter/Tab */
   onConfirmSelection: () => void;
+  /**
+   * Take over the send, both from the Run button and from the Enter key.
+   *
+   * Return true to claim it — the caller is then responsible for actually sending.
+   * Return false to let AI Studio send normally.
+   *
+   * ⚠️ Only one consumer per page can register this (`registerBeforeRunHandler` is a
+   * single module-level slot, same as the Gemini side). `/` leaves it undefined and
+   * `>` claims it.
+   */
+  onBeforeSend?: () => boolean;
 }
 
 export function useAIStudioEditorIntegration(config: AIStudioEditorIntegrationConfig) {
@@ -45,8 +66,10 @@ export function useAIStudioEditorIntegration(config: AIStudioEditorIntegrationCo
   const configRef = useRef(config);
   configRef.current = config;
 
+  /** Suppress input handling briefly after a programmatic write */
+  const suppressUntilRef = useRef(0);
+
   useEffect(() => {
-    console.log('[AIStudio SlashCommand] effect run, enabled =', configRef.current.enabled);
     if (!configRef.current.enabled) {
       configRef.current.close();
       return;
@@ -54,14 +77,20 @@ export function useAIStudioEditorIntegration(config: AIStudioEditorIntegrationCo
 
     let currentTextarea: HTMLTextAreaElement | null = null;
 
+    // Both send paths (Run button click, Enter) funnel through one handler so they
+    // cannot disagree about what a send means.
+    installRunInterceptor();
+    const unregisterBeforeRun = configRef.current.onBeforeSend
+      ? registerBeforeRunHandler(() => configRef.current.onBeforeSend?.() ?? false)
+      : null;
+
     const onInput = () => {
       const textarea = configRef.current.getTextarea();
       if (!textarea) return;
+      if (Date.now() < suppressUntilRef.current) return;
 
       const text = textarea.value;
       const cursorPos = textarea.selectionStart;
-
-      console.log('[AIStudio SlashCommand] input', { text, cursorPos });
 
       configRef.current.onInput(text, cursorPos);
 
@@ -74,6 +103,10 @@ export function useAIStudioEditorIntegration(config: AIStudioEditorIntegrationCo
     };
 
     const onKeyDown = (e: KeyboardEvent) => {
+      // While a candidate list is up, every key below belongs to the input method:
+      // Enter commits the candidate, the arrows move through it, Escape cancels it.
+      if (isImeComposing(e)) return;
+
       const state = configRef.current.getPopupState();
 
       if (!state.isOpen) return;
@@ -93,6 +126,9 @@ export function useAIStudioEditorIntegration(config: AIStudioEditorIntegrationCo
         case 'Tab':
           e.preventDefault();
           e.stopPropagation();
+          // The write that follows fires input events of its own; letting them through
+          // would immediately re-open the popup on the inserted text.
+          suppressUntilRef.current = Date.now() + 100;
           configRef.current.onConfirmSelection();
           return;
         case 'Escape':
@@ -143,7 +179,6 @@ export function useAIStudioEditorIntegration(config: AIStudioEditorIntegrationCo
 
     // Attach to existing textarea
     currentTextarea = configRef.current.getTextarea();
-    console.log('[AIStudio SlashCommand] initial textarea =', currentTextarea);
     if (currentTextarea) {
       attachListeners(currentTextarea);
     }
@@ -152,7 +187,6 @@ export function useAIStudioEditorIntegration(config: AIStudioEditorIntegrationCo
     const bodyObserver = new MutationObserver(() => {
       const textarea = configRef.current.getTextarea();
       if (textarea && textarea !== currentTextarea) {
-        console.log('[AIStudio SlashCommand] textarea changed, re-attaching', textarea);
         if (currentTextarea) detachListeners(currentTextarea);
         currentTextarea = textarea;
         attachListeners(textarea);
@@ -163,6 +197,7 @@ export function useAIStudioEditorIntegration(config: AIStudioEditorIntegrationCo
     return () => {
       if (currentTextarea) detachListeners(currentTextarea);
       bodyObserver.disconnect();
+      unregisterBeforeRun?.();
     };
   }, [config.enabled]);
 

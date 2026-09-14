@@ -38,6 +38,14 @@ export default defineContentScript({
     // Non-blocking: toast a sign-in hint if no account can be detected.
     warnIfNoAccount(platform);
 
+    // Backstop for the background renewal alarm, in case the worker was asleep or
+    // the alarm was dropped. Throttled through shared storage, so opening many
+    // tabs does not mean many requests.
+    const { scheduleRenewalCheckFromPage } = await import(
+      '@/shared/lib/license-renewal'
+    );
+    scheduleRenewalCheckFromPage();
+
     switch (platform) {
       case Platform.AI_STUDIO: {
         const { initAiStudioOverlay } = await import('./aistudio/Layout');

@@ -10,6 +10,16 @@ import { ShadowRootProvider } from '@/shared/components/ShadowRootContext';
 import { TooltipHelper } from '@/shared/lib/tooltip-helper';
 import { applyShadowStyles, waitForElement } from '@/shared/lib/utils';
 import { useAppStore } from '@/shared/lib/store';
+import { useSettingsStore } from '@/shared/lib/settings-store';
+
+/** Default sidebar width for ChatGPT (no user-facing width slider here). */
+const SIDEBAR_WIDTH = 300;
+
+/**
+ * Width of the sidebar's left icon bar. Mirrors `--sidebar-width` in
+ * _chatgpt.scss.
+ */
+const ICON_BAR_WIDTH = 56;
 
 export async function initChatGPTOverlay(mainStyles: string): Promise<void> {
   console.log('Better Sidebar: Overlay (ChatGPT) Initialized');
@@ -81,10 +91,26 @@ export async function initChatGPTOverlay(mainStyles: string): Promise<void> {
   const sidebarStyle = document.createElement('style');
   sidebarStyle.id = 'better-sidebar-for-google-ai-studio-sidebar-styles';
   
-  sidebarStyle.textContent = `
+  /**
+   * Compact mode shrinks the whole wrapper by the icon bar's width
+   * instead of letting the content area stretch into the freed space. The
+   * content area is `flex-1`, so it stays exactly as wide as it was with the
+   * icon bar visible — toggling never reflows the tree, only the sidebar's
+   * right edge moves.
+   */
+  let lastAppliedWidth: number | null = null;
+  const applySidebarWidth = () => {
+    const { compactMode } = useSettingsStore.getState();
+    const width = compactMode
+      ? Math.max(SIDEBAR_WIDTH - ICON_BAR_WIDTH, 0)
+      : SIDEBAR_WIDTH;
+    // The settings store fires on unrelated changes too; skip redundant writes.
+    if (width === lastAppliedWidth) return;
+    lastAppliedWidth = width;
+    sidebarStyle.textContent = `
     #better-sidebar-for-google-ai-studio-sidebar-wrapper {
       height: 100%;
-      width: 300px;
+      width: ${width}px;
       flex-shrink: 0;
       box-sizing: border-box;
       transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -105,6 +131,10 @@ export async function initChatGPTOverlay(mainStyles: string): Promise<void> {
       }
     }
   `;
+  };
+
+  applySidebarWidth();
+  useSettingsStore.subscribe(applySidebarWidth);
 
   document.head.appendChild(sidebarStyle);
 

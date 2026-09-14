@@ -20,6 +20,12 @@ export interface UserTheme {
   preferredMode: 'light' | 'dark';
   fonts?: string[];
   extraCss?: string;
+  /** Typography rules, keyed on `body.bs-fonts--<id>` — see ThemePreset.fontCss */
+  fontCss?: string;
+  /** Monospace stack for code — see ThemePresetMeta.fontMono */
+  fontMono?: string;
+  /** Font-related CSS variables — see ThemePreset.fontVariables */
+  fontVariables?: ThemeVariable[];
   variables: ThemeVariable[];
   sidebarVariables?: ThemeVariable[];
   sidebarStyles?: Record<string, string>;
@@ -73,6 +79,7 @@ const ALLOWED_VARIABLE_PREFIXES = [
   '--radius',
   '--sidebar-icon-color',
   '--font-sans',
+  '--font-mono',
   '--overlay-',
   '--panel-',
   '--popover-',
@@ -197,6 +204,37 @@ export function validateUserTheme(input: unknown): ValidationResult {
     errors.push('"extraCss" must be a string if provided');
   }
 
+  if (obj.fontCss !== undefined && typeof obj.fontCss !== 'string') {
+    errors.push('"fontCss" must be a string if provided');
+  }
+
+  if (obj.fontMono !== undefined && typeof obj.fontMono !== 'string') {
+    errors.push('"fontMono" must be a string if provided');
+  }
+
+  if (obj.fontVariables !== undefined) {
+    if (!Array.isArray(obj.fontVariables)) {
+      errors.push('"fontVariables" must be an array if provided');
+    } else {
+      for (const v of obj.fontVariables as unknown[]) {
+        const vObj = v as Record<string, unknown> | null;
+        if (
+          !vObj ||
+          typeof vObj !== 'object' ||
+          typeof vObj.property !== 'string' ||
+          typeof vObj.value !== 'string'
+        ) {
+          errors.push('fontVariable entries must have string "property" and "value" fields');
+          break;
+        }
+        const prop = vObj.property as string;
+        if (!ALLOWED_VARIABLE_PREFIXES.some((prefix) => prop.startsWith(prefix))) {
+          errors.push(`Font variable "${prop}" is not in the allowed list`);
+        }
+      }
+    }
+  }
+
   if (errors.length > 0) {
     return { valid: false, errors };
   }
@@ -212,6 +250,20 @@ export function validateUserTheme(input: unknown): ValidationResult {
       : undefined,
     extraCss: typeof obj.extraCss === 'string'
       ? sanitizeExtraCss(obj.extraCss)
+      : undefined,
+    fontCss: typeof obj.fontCss === 'string'
+      ? sanitizeExtraCss(obj.fontCss)
+      : undefined,
+    // A font stack goes straight into a declaration, so strip anything that
+    // could close it and start a new one.
+    fontMono: typeof obj.fontMono === 'string'
+      ? obj.fontMono.replace(/[;{}]/g, '').trim() || undefined
+      : undefined,
+    fontVariables: Array.isArray(obj.fontVariables)
+      ? (obj.fontVariables as Array<{ property: string; value: string }>).map((v) => ({
+          property: v.property.trim(),
+          value: v.value.trim(),
+        }))
       : undefined,
     variables: (obj.variables as Array<{ property: string; value: string }>).map((v) => ({
       property: v.property.trim(),

@@ -17,6 +17,11 @@ export const MAX_TOOL_CALLS = 20;
  */
 export const TOOL_TAG = 'bs_agent_tool';
 
+/** Match transport Markdown escapes without rewriting payload text or source offsets. */
+export const TOOL_OPEN_PATTERN = String.raw`\\?<bs\\?_agent\\?_tool>`;
+export const TOOL_CLOSE_PATTERN = String.raw`\\?<\/bs\\?_agent\\?_tool>`;
+export const TOOL_BLOCK_PATTERN = `${TOOL_OPEN_PATTERN}([\\s\\S]*?)${TOOL_CLOSE_PATTERN}`;
+
 /** Tool names the engine can actually execute */
 export const SUPPORTED_TOOLS = [
   ...BROWSER_TOOLS,
@@ -25,6 +30,26 @@ export const SUPPORTED_TOOLS = [
   'export',
   'complete_task',
   'activate_skill',
+  // Workspace file tools (see mcp/workspace-mcp.ts). Listed here even when the
+  // workspace server is disabled: the parser's job is to recognise the name, and
+  // availability is the registry's call — `tool-registry.ts` answers a disabled
+  // tool with CANCELLED, which tells the AI something useful. Dropping it at the
+  // parser instead produces "unknown tool", which reads as a format error and
+  // makes the model resend the whole response.
+  'read_file',
+  'write_file',
+  'edit_file',
+  'list_files',
+  'glob_files',
+  'grep_files',
+  'manage_files',
+  // Document tools (see mcp/document-mcp.ts). ⚠️ A tool missing from this list is
+  // rejected here as "Unknown tool" no matter how correctly the prompt described it —
+  // the schema reaches the model from the MCP registry, but the parser only trusts this
+  // array. Adding a tool to a provider and not to this list ships a tool that can never
+  // run.
+  'doc_read',
+  'doc_edit',
 ] as const;
 
 /** Params that must be present and non-empty, per tool */
@@ -40,6 +65,21 @@ export const REQUIRED_PARAMS: Record<string, string[]> = {
   export: ['ids'],
   complete_task: ['summary'],
   activate_skill: ['skill_id'],
+  read_file: ['path'],
+  // `content` is absent on purpose: an empty string is a legitimate file body, and
+  // requiring it here would reject `write_file` calls that create a placeholder.
+  write_file: ['path'],
+  // `new_string` likewise — empty means "delete this text", which is a normal edit.
+  edit_file: ['path', 'old_string'],
+  // `list_files` with no path lists the workspace root, which is the common first call.
+  list_files: [],
+  glob_files: ['pattern'],
+  grep_files: ['pattern'],
+  manage_files: ['action'],
+  // `mode` is absent on purpose: a path on its own means "give me the outline", which is
+  // the correct first call on any document.
+  doc_read: ['path'],
+  doc_edit: ['path', 'ops'],
 };
 
 /**
@@ -130,8 +170,8 @@ export function deliversResultToAI(name: string): boolean {
  * from the top, which wastes a round and can re-run the first half.
  */
 export function hasUnclosedToolBlock(responseText: string): boolean {
-  const opens = responseText.split(`<${TOOL_TAG}>`).length - 1;
-  const closes = responseText.split(`</${TOOL_TAG}>`).length - 1;
+  const opens = [...responseText.matchAll(new RegExp(TOOL_OPEN_PATTERN, 'g'))].length;
+  const closes = [...responseText.matchAll(new RegExp(TOOL_CLOSE_PATTERN, 'g'))].length;
   return opens > closes;
 }
 

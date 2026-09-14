@@ -25,7 +25,7 @@ export class PromptCreateScanner {
 
   constructor() {
     this.listener = async (event: Event) => {
-      const { id, title, prompt_metadata, created_at, type } =
+      const { id, title, prompt_metadata, created_at, type, is_temporary } =
         (event as CustomEvent).detail;
 
       if (!id) return;
@@ -49,6 +49,7 @@ export class PromptCreateScanner {
             folder_id: null,
             type,
             platform: 'aistudio',
+            is_temporary: is_temporary ? 1 : 0,
           },
         });
       } catch (e) {

@@ -19,8 +19,6 @@ import { SwitchItem } from '../components/SwitchItem';
 export const GeneralSettings = () => {
   const { t } = useI18n();
   const {
-    newChatBehavior,
-    setNewChatBehavior,
     shortcuts,
     setShortcutVisible,
     skipDeleteConfirm,
@@ -170,39 +168,6 @@ export const GeneralSettings = () => {
         <h3 className="text-lg font-medium">{t('settings.behavior')}</h3>
         <Separator />
         <div className="grid gap-4 py-4">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <span className="text-sm font-medium">
-                  {t('settings.newChatBehavior')}
-                </span>
-                <p className="text-xs text-muted-foreground">
-                  {t('settings.newChatBehaviorDescription')}
-                </p>
-              </div>
-              <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
-                <Button
-                  variant={
-                    newChatBehavior === 'current-tab' ? 'secondary' : 'ghost'
-                  }
-                  size="sm"
-                  className="h-7 px-3 text-xs"
-                  onClick={() => setNewChatBehavior('current-tab')}
-                >
-                  {t('settings.currentTab')}
-                </Button>
-                <Button
-                  variant={newChatBehavior === 'new-tab' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  className="h-7 px-3 text-xs"
-                  onClick={() => setNewChatBehavior('new-tab')}
-                >
-                  {t('settings.newTab')}
-                </Button>
-              </div>
-            </div>
-          </div>
-
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-4">
               <div className="space-y-0.5 min-w-0">

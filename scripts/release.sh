@@ -34,10 +34,10 @@ fi
 
 # ─── Build ─────────────────────────────────────────────────────────────────────
 echo "🔨 Building Chrome extension..."
-pnpm zip
+npm run zip
 
 echo "🔨 Building Firefox extension..."
-pnpm zip:firefox
+npm run zip:firefox
 
 # ─── Locate build artifacts ───────────────────────────────────────────────────
 CHROME_ZIP=$(ls .output/*-${VERSION}-chrome.zip 2>/dev/null | head -1)

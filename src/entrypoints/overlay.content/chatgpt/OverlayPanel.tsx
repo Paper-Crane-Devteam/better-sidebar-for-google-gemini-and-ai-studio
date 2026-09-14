@@ -35,6 +35,7 @@ import { useUrl } from '@/shared/hooks/useUrl';
 import { useModuleConfig } from './useModuleConfig';
 import { detectAccount } from '@/entrypoints/content/shared/detect-account';
 import { Platform } from '@/shared/types/platform';
+import { trace } from '@/shared/lib/trace';
 
 export const OverlayPanel = ({ className }: { className?: string }) => {
   const moduleConfig = useModuleConfig();
@@ -43,8 +44,8 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
   const { path } = useUrl();
 
   const [, setContainer] = useState<HTMLDivElement | null>(null);
-  const newChatBehavior = useSettingsStore((state) => state.newChatBehavior);
   const shortcuts = useSettingsStore((state) => state.shortcuts);
+  const compactMode = useSettingsStore((state) => state.compactMode);
   const {
     fetchData,
     ui,
@@ -65,6 +66,10 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
   } = ui.overlay;
 
   useEffect(() => {
+    if (compactMode && activeTab !== 'files') setActiveTab('files');
+  }, [compactMode, activeTab, setActiveTab]);
+
+  useEffect(() => {
     // Initial fetch
     fetchData();
 
@@ -79,7 +84,6 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
         // Only process in the active tab — background DB may belong to another profile
         if (document.visibilityState !== 'visible') return;
 
-        console.log('Received DATA_UPDATED signal, refreshing...');
         fetchData(true);
 
         // Handle specific update types with payload
@@ -107,7 +111,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
   useEffect(() => {
     const handleVisibilityChange = async () => {
       if (document.visibilityState === 'visible') {
-        console.log('Tab became visible, syncing profile and refreshing...');
+        trace('Tab became visible, syncing profile and refreshing...');
         try {
           const username = await detectAccount(Platform.CHATGPT);
           if (username) {
@@ -168,7 +172,11 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
       className={`flex bg-background text-foreground ${className || 'h-full'} relative`}
     >
       {/* Sidebar Tabs */}
-      <div className="sidebar-nav flex flex-col items-center bg-muted/20 shrink-0">
+      <div
+        className={`sidebar-nav flex flex-col items-center bg-muted/20 shrink-0 ${
+          compactMode ? 'hidden' : ''
+        }`}
+      >
         <SimpleTooltip content={t('tabs.files')}>
           <Button
             variant={activeTab === 'files' ? 'secondary' : 'ghost'}

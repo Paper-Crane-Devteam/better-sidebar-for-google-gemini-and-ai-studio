@@ -1,0 +1,83 @@
+[
+  {
+    "key": "coverFinal",
+    "name": "01-organize",
+    "width": 1280,
+    "height": 800,
+    "label": "文件夹整理 · Gemini 主封面",
+    "source": "/Users/cn-stevezhang/.codex/generated_images/01a089e1-147c-7333-bd6f-0a3b56ce72e6/exec-d9533944-f25f-4054-97e4-eb5e7e2af4ba.png",
+    "prompt": "Edit this advertisement with ONE targeted correction: remove the blue folder app icon tile next to the top-left Better Sidebar wordmark; use text-only 'Better Sidebar' there. Keep every other element, headline, actual screenshot UI, footer, proportions and colors unchanged. Do not add anything. Maintain landscape aspect ratio 8:5."
+  },
+  {
+    "key": "search",
+    "name": "02-search",
+    "width": 1280,
+    "height": 800,
+    "label": "全文搜索与筛选",
+    "source": "/Users/cn-stevezhang/.codex/generated_images/01a089e1-147c-7333-bd6f-0a3b56ce72e6/exec-e212ce72-f773-4b72-943c-fe18bae9bbf9.png",
+    "prompt": "Use case: ads-marketing. Create a finished light clean Chrome Web Store feature screenshot, exact 1280x800 landscape. Brand Better Sidebar for Gemini & AI Studio. Near-white very pale blue background, charcoal clean sans-serif typography, cobalt blue emphasis, subtle soft shadows. Left 40% whitespace-led editorial copy, right 60% authentic UI screenshot cards. Top left small 'Better Sidebar'. Headline exact 'Find the answer\\nyou already found.' with 'Find the answer' cobalt blue. Subtitle exact 'Search message content.\\nNarrow results with filters.' Footer tiny 'by PaperCraneDev'. Attached image 1 is the REAL full-text search UI: composite it large on the right, faithfully retaining the query harness, orange matches, '8 results in 3 chats', and result structure. Attached image 2 is the REAL filter UI: place a smaller overlapping card at lower right, preserve content. The search query and first result should be clearly readable. Trim lower results if needed rather than shrinking UI to illegibility. Flat front-facing cards, small rounded corners. Preserve screenshot UI and text. No invented buttons, no extra feature claims, no 3D, no neon, no big decorative icons. Entire canvas full bleed."
+  },
+  {
+    "key": "promptsFinal",
+    "name": "03-prompts",
+    "width": 1280,
+    "height": 800,
+    "label": "Prompt Library 与快捷调用",
+    "source": "/Users/cn-stevezhang/.codex/generated_images/01a089e1-147c-7333-bd6f-0a3b56ce72e6/exec-03b79de5-0fd1-4614-83a8-1a8493af00af.png",
+    "prompt": "Edit this advertisement with ONE targeted correction: remove the robot app icon tile beside the top-left Better Sidebar wordmark, leaving a clean text-only 'Better Sidebar' brand there. Keep robot icon INSIDE the actual PROMPT LIBRARY popup screenshot unchanged because that is part of authentic UI. Preserve all other text and screenshot content, colors and layout exactly. Maintain landscape 8:5."
+  },
+  {
+    "key": "themes",
+    "name": "04-themes",
+    "width": 1280,
+    "height": 800,
+    "label": "主题外观",
+    "source": "/Users/cn-stevezhang/.codex/generated_images/01a089e1-147c-7333-bd6f-0a3b56ce72e6/exec-99cf8b22-1b86-4e3f-96ec-6919558f8143.png",
+    "prompt": "Create a finished Chrome Web Store feature advertisement, landscape 1280x800, Better Sidebar campaign. Near-white pale blue background with very subtle blue edge wash, navy modern sans-serif, cobalt accent. Top left small 'Better Sidebar'. Large headline across top 'Make Gemini feel like yours.' with 'yours.' blue. Subtitle 'A theme for every kind of focus.' Lower two thirds three equal width upright screenshot cards side by side. Use attached real screenshots as precise compositing sources, in order Tokyo Night, Ocean Breeze, Ever Forest. Crop each to show its left sidebar and a narrow sliver of main workspace; retain colors and folder names accurately. Do not invent UI. Label above each card exactly 'Tokyo Night', 'Ocean Breeze', 'Ever Forest'. Flat frontal cards with small corners and soft shadows, no perspective, no stacked overlapping panes. Tiny bottom left 'by PaperCraneDev'. Do not add a theme count or pricing claims. Entire outer canvas square full bleed."
+  },
+  {
+    "key": "agentFinal",
+    "name": "05-agent",
+    "width": 1280,
+    "height": 800,
+    "label": "Agent 辅助整理",
+    "source": "/Users/cn-stevezhang/.codex/generated_images/01a089e1-147c-7333-bd6f-0a3b56ce72e6/exec-02eae1c9-c8a5-4db2-9853-6b7a8be7039c.png",
+    "prompt": "Edit with one targeted change: remove the small blue folder logo next to top-left Better Sidebar. Keep only text wordmark 'Better Sidebar'. All other pixels, text, UI cards, colors and layout should remain as close as possible. Do not add any icons. Landscape 8:5."
+  },
+  {
+    "key": "aistudio",
+    "name": "alternative-aistudio",
+    "width": 1280,
+    "height": 800,
+    "label": "AI Studio 备选封面",
+    "source": "/Users/cn-stevezhang/.codex/generated_images/01a089e1-147c-7333-bd6f-0a3b56ce72e6/exec-032d8b70-721f-4e22-8dd5-d0cf14a41bce.png",
+    "prompt": "Create a clean light Chrome Web Store cover advertisement for Better Sidebar, landscape 1280x800. Near-white pale blue background, navy modern sans-serif type, cobalt accent, subtle blue sweep, soft shadows. Top left TEXT ONLY brand 'Better Sidebar', absolutely no icon next to wordmark. Left 40% large headline 'Your AI chats. Finally organized.' with 'organized.' blue. Subtitle 'Folders, tags, and a clearer workspace.' Small line 'For Gemini & Google AI Studio'. Right 60% large actual attached AI Studio screenshot crop: prioritize expanded colorful folders sidebar, retain a narrow section of Playground to identify AI Studio. Preserve source UI exactly, no invented elements. Small label 'Google AI Studio' above card. Footer tiny 'by PaperCraneDev'. No extra bullet points, no invented product icon, no perspective. Full bleed square outer canvas. Keep UI text large enough to read."
+  },
+  {
+    "key": "small",
+    "name": "promo-small",
+    "width": 440,
+    "height": 280,
+    "label": "小型推广图",
+    "source": "/Users/cn-stevezhang/.codex/generated_images/01a089e1-147c-7333-bd6f-0a3b56ce72e6/exec-6a9127ae-1786-492f-bb04-edd68644e652.png",
+    "prompt": "Create a clean Chrome Web Store small promotional tile for Better Sidebar, aspect ratio EXACT 11:7, intended export 440x280. Bright soft light-blue field with a saturated cobalt accent area, refined modern flat product branding. Main left visual: reproduce the attached REAL Better Sidebar app icon faithfully (blue-to-purple vertical rounded bar and three gray horizontal bars), with crisp edges. To right a very large two-line dark navy brand name 'Better Sidebar'. Below it small but readable 'Gemini & AI Studio'. Abstract small colored outlined folder symbols along bottom right can hint at organization. Keep extremely simple, recognizable at thumbnail scale. No screenshots, no tiny UI, no extra slogan, no invented logo, no robots, no dark background, no watermark. Full bleed square corners. Only one actual app icon."
+  },
+  {
+    "key": "marquee",
+    "name": "promo-marquee",
+    "width": 1400,
+    "height": 560,
+    "label": "Marquee 横幅",
+    "source": "/Users/cn-stevezhang/.codex/generated_images/01a089e1-147c-7333-bd6f-0a3b56ce72e6/exec-c82afc39-c8b7-49be-af49-8f29f26d7e8d.png",
+    "prompt": "Create a refined clean Chrome Web Store marquee banner for Better Sidebar. EXACT 5:2 landscape aspect ratio intended 1400x560. Near-white/pale blue background, subtle blue sweep, modern charcoal/navy typography and cobalt accent. Left half: large REAL product icon from attached image 1 faithfully preserved (blue-purple vertical bar plus gray horizontal bars), brand text 'Better Sidebar'. Bold headline 'Your AI chats. Finally organized.' below. Small 'For Gemini & Google AI Studio'. Right half: elegant graphic composition of a few colorful folder outlines and orderly white chat rows, visually communicating organized conversations rather than detailed fake app UI. Bottom left tiny developer signature consisting of faithful crane from attached image 2 with text 'by PaperCraneDev'; remove crane white background visually so it blends. Product brand is dominant, developer signature secondary. Lots of clear space, no extra claims, no robot icons, no neon, no perspective. Full bleed."
+  },
+  {
+    "key": "logoWhite",
+    "name": "papercranedev-white",
+    "width": 1254,
+    "height": 1254,
+    "label": "PaperCraneDev 高清白底重绘",
+    "source": "/Users/cn-stevezhang/.codex/generated_images/01a089e1-147c-7333-bd6f-0a3b56ce72e6/exec-2670a16e-63f0-4f68-aa37-3b8eaf9e70d6.png",
+    "prompt": "Restore this exact origami crane logo at high resolution on a perfectly flat solid PURE WHITE (#FFFFFF) background. Match the original silhouette and fold geometry precisely. Preserve warm ivory and muted sage gray polygon faces, clean delicate charcoal outline. Crisp flat vector-like illustration. Remove all grain and texture. No checkerboard anywhere, no gray pattern, no transparency simulation, no shadow, no text. White background with a single faithful crane centered, large enough to show fine lines."
+  }
+]

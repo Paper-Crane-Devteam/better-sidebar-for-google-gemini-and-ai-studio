@@ -1,10 +1,11 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { TreeView, PendingNewFolder } from '@/shared/components/ui/tree-view';
 import { ScrollArea } from '@/shared/components/ui/scroll-area';
 import { cn } from '@/shared/lib/utils/utils';
-import { Folder, FolderPlus } from 'lucide-react';
+import { Folder, FolderPlus, Search, X } from 'lucide-react';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { Button } from '@/shared/components/ui/button';
+import { Input } from '@/shared/components/ui/input';
 
 interface FolderItem {
   id: string;
@@ -33,6 +34,10 @@ export const FolderPicker = ({
   const { t } = useI18n();
   const [selectedId, setSelectedId] = useState<string | null>(initialSelectedId);
   const [pendingParentId, setPendingParentId] = useState<string | null | undefined>(undefined);
+  const [query, setQuery] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const trimmedQuery = query.trim();
+  const isSearching = trimmedQuery.length > 0;
 
   const treeData = useMemo(() => {
     const folderMap = new Map<string, any>();
@@ -62,12 +67,43 @@ export const FolderPicker = ({
     return rootNodes;
   }, [folders, selectedIds]);
 
+  // Keep a folder when its own name matches, or when one of its descendants
+  // matches. A matching folder keeps its whole subtree so children stay pickable.
+  const filteredTreeData = useMemo(() => {
+    if (!isSearching) return treeData;
+    const term = trimmedQuery.toLowerCase();
+
+    const filterNodes = (nodes: any[]): any[] =>
+      nodes.reduce<any[]>((acc, node) => {
+        const selfMatches = (node.name || '').toLowerCase().includes(term);
+        if (selfMatches) {
+          acc.push(node);
+          return acc;
+        }
+        const children = filterNodes(node.children || []);
+        if (children.length > 0) {
+          acc.push({ ...node, children });
+        }
+        return acc;
+      }, []);
+
+    return filterNodes(treeData);
+  }, [treeData, isSearching, trimmedQuery]);
+
+  const handleClearSearch = () => {
+    setQuery('');
+    searchInputRef.current?.focus();
+  };
+
   const handleSelect = (item: any) => {
     setSelectedId(item.id);
     onSelect(item.id);
   };
 
   const handleStartCreate = () => {
+    // Clear the filter first, otherwise the inline input can land inside a
+    // branch that the current query hides.
+    setQuery('');
     // Insert pending node under selected folder, or root if nothing selected
     setPendingParentId(selectedId);
   };
@@ -94,40 +130,78 @@ export const FolderPicker = ({
 
   return (
     <div className={cn('flex flex-col gap-2', className)}>
-      {onCreateFolder && (
-        <Button
-          variant="outline"
-          size="sm"
-          className="gap-2 self-start"
-          onClick={handleStartCreate}
-          disabled={pendingParentId !== undefined}
-        >
-          <FolderPlus className="h-4 w-4" />
-          {t('moveItemsDialog.createFolder')}
-        </Button>
-      )}
-      <div className="min-h-[300px] max-h-[80vh] w-full border rounded-md">
-        <ScrollArea className="h-full w-full p-2">
-          {/* Root level option */}
-          <div
-            className={cn(
-              'flex items-center gap-2 py-1 px-2 rounded-sm hover:bg-accent cursor-pointer text-sm w-full mb-1',
-              selectedId === null && 'bg-accent',
-            )}
-            onClick={() => {
-              setSelectedId(null);
-              onSelect(null);
-            }}
+      <div className="flex items-center gap-2">
+        {onCreateFolder && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2 shrink-0"
+            onClick={handleStartCreate}
+            disabled={pendingParentId !== undefined}
           >
-            <Folder className="h-4 w-4 text-muted-foreground" />
-            <span>{t('moveItemsDialog.rootLevel')}</span>
-          </div>
-          <TreeView
-            items={treeData}
-            onSelect={handleSelect}
-            selectedId={selectedId}
-            pendingNewFolder={pendingNewFolder}
+            <FolderPlus className="h-4 w-4" />
+            {t('moveItemsDialog.createFolder')}
+          </Button>
+        )}
+        <div className="relative flex-1 min-w-0">
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+          <Input
+            ref={searchInputRef}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t('moveItemsDialog.searchFolders')}
+            className="h-8 rounded-sm pl-7 pr-7 text-xs"
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                e.preventDefault();
+                e.stopPropagation();
+                handleClearSearch();
+              }
+            }}
           />
+          {query && (
+            <button
+              type="button"
+              aria-label={t('moveItemsDialog.clearSearch')}
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-5 w-5 flex items-center justify-center text-muted-foreground hover:text-foreground rounded-sm cursor-pointer border-none bg-transparent"
+              onClick={handleClearSearch}
+            >
+              <X className="h-3 w-3" />
+            </button>
+          )}
+        </div>
+      </div>
+      <div className="min-h-[300px] max-h-[80vh] w-full rounded-md">
+        <ScrollArea className="h-full w-full p-2">
+          {/* Root level option — hidden while filtering, it never matches a query */}
+          {!isSearching && (
+            <div
+              className={cn(
+                'flex items-center gap-2 py-1 px-2 rounded-sm hover:bg-accent cursor-pointer text-sm w-full mb-1',
+                selectedId === null && 'bg-accent',
+              )}
+              onClick={() => {
+                setSelectedId(null);
+                onSelect(null);
+              }}
+            >
+              <Folder className="h-4 w-4 text-muted-foreground" />
+              <span>{t('moveItemsDialog.rootLevel')}</span>
+            </div>
+          )}
+          {isSearching && filteredTreeData.length === 0 ? (
+            <div className="py-6 text-center text-xs text-muted-foreground">
+              {t('moveItemsDialog.noMatchingFolders')}
+            </div>
+          ) : (
+            <TreeView
+              items={filteredTreeData}
+              onSelect={handleSelect}
+              selectedId={selectedId}
+              pendingNewFolder={pendingNewFolder}
+              searchQuery={trimmedQuery}
+            />
+          )}
         </ScrollArea>
       </div>
     </div>

@@ -49,14 +49,8 @@ function extractResponseData(body: any): { updated_at: number | null } {
 
 export function handleUpdatePromptResponse(response: any, url: string) {
   if (response.status === 200) {
-    console.log('Better Sidebar: Intercepted UpdatePrompt');
-
     const { id, title } = extractRequestData(response.config.body);
     const { updated_at } = extractResponseData(response.response);
-
-    if (updated_at) {
-      console.log('Extracted updated_at from response:', updated_at);
-    }
 
     if (id && (title || updated_at)) {
       console.log(

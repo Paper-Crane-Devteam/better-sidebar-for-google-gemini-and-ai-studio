@@ -16,16 +16,23 @@ export const catppuccinMocha: ThemePreset = {
   isPremium: true,
   preferredMode: 'dark',
   fonts: [],
-  extraCss: `
+  fontCss: `
 /* Catppuccin Mocha system font override */
-body.bs-theme--catppuccin-mocha {
+body.bs-fonts--catppuccin-mocha {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
 }
 
-body.bs-theme--catppuccin-mocha *:not(.material-symbols-outlined):not(.material-symbols-rounded):not(.material-symbols-sharp):not(.google-symbols):not(mat-icon):not(.mat-icon):not([class*="material-symbols"]):not([class*="google-symbols"]) {
+body.bs-fonts--catppuccin-mocha *:not(.material-symbols-outlined):not(.material-symbols-rounded):not(.material-symbols-sharp):not(.google-symbols):not(mat-icon):not(.mat-icon):not([class*="material-symbols"]):not([class*="google-symbols"]) {
   font-family: inherit;
 }
 `,
+  fontVariables: [
+    { property: '--mat-menu-item-label-text-font', value: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' },
+    { property: '--mat-list-list-item-label-text-font', value: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' },
+    { property: '--mat-list-list-item-supporting-text-font', value: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' },
+    { property: '--mat-button-text-label-text-font', value: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' },
+    { property: '--mat-button-filled-label-text-font', value: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' },
+  ],
   variables: [
     // ─── Surface / Background ───────────────────────────────────────
     { property: '--gem-sys-color--surface', value: '#1e1e2e' },
@@ -128,13 +135,6 @@ body.bs-theme--catppuccin-mocha *:not(.material-symbols-outlined):not(.material-
     // ─── Prompt Chips ───────────────────────────────────────────────
     { property: '--bard-color-zero-state-prompt-chip-background', value: '#3b3d5e' },
     { property: '--bard-color-zero-state-prompt-chip-text', value: '#b4befe' },
-
-    // ─── Font override via CSS variable ─────────────────────────────
-    { property: '--mat-menu-item-label-text-font', value: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' },
-    { property: '--mat-list-list-item-label-text-font', value: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' },
-    { property: '--mat-list-list-item-supporting-text-font', value: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' },
-    { property: '--mat-button-text-label-text-font', value: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' },
-    { property: '--mat-button-filled-label-text-font', value: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' },
 
     // ─── Shadows ────────────────────────────────────────────────────
     { property: '--mat-app-elevation-shadow-level-1', value: '0px 2px 4px rgba(0,0,0,0.25)' },

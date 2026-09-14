@@ -1,10 +1,12 @@
 import { proxy } from 'ajax-hook';
 import { handleGenerateResponse } from './interceptors/generate';
+import { observeStreamGenerate } from './interceptors/stream-generate';
 import { handleChatContentResponse } from './interceptors/chat-content';
 import { handleListChatResponse } from './interceptors/list-chat';
 import { handleDeleteResponse } from './interceptors/delete';
 import { handleCNgdBeResponse } from './interceptors/create-gem';
 import { handleRenameResponse } from './interceptors/rename';
+import { handleBranchResponse } from './interceptors/branch';
 import { handleDeleteGemResponse } from './interceptors/delete-gem';
 import { handleDeleteNotebookResponse } from './interceptors/delete-notebook';
 import { handleRenameNotebookResponse } from './interceptors/rename-notebook';
@@ -73,6 +75,20 @@ export function initGeminiInterceptors() {
         globalThis.dispatchEvent(
           new CustomEvent('BETTER_SIDEBAR_GENERATE_START'),
         );
+
+        // Read the reply as it streams, not in `onResponse`. `handleGenerateResponse`
+        // still runs there and still writes the transcript; this is the lossless copy
+        // the agent loop parses instead of the rendered DOM — see
+        // `interceptors/stream-generate.ts`.
+        if (config.xhr) {
+          try {
+            observeStreamGenerate(config.xhr, config.body);
+          } catch (e) {
+            // The live view is an improvement on the response path, not a
+            // prerequisite for it. Losing it must not cost us the transcript.
+            console.warn('Better Sidebar (Gemini): could not observe stream', e);
+          }
+        }
       }
 
       handler.next(config);
@@ -98,6 +114,8 @@ export function initGeminiInterceptors() {
             handleCNgdBeResponse(response, url);
           } else if (url.includes('rpcids=MUAZcd')) {
             handleRenameResponse(response, url);
+          } else if (url.includes('rpcids=KDNZr')) {
+            handleBranchResponse(response, url);
           } else if (url.includes('rpcids=UXcSJb')) {
             handleDeleteGemResponse(response, url);
           } else if (url.includes('rpcids=Nwkn9')) {

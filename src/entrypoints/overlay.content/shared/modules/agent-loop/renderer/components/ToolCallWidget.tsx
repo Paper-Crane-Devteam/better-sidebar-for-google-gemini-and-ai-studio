@@ -44,6 +44,7 @@ import {
 import { getToolLabel } from '../../tool-labels';
 import { isBrowserWrite } from '@/shared/browser-agent/contracts';
 import { BrowserPlanPreview } from '../../../browser-agent/BrowserPlanPreview';
+import { isImeComposing } from '@/entrypoints/overlay.content/shared/lib/ime';
 
 interface ToolCallWidgetProps {
   toolName?: string;
@@ -279,8 +280,8 @@ export const ToolCallWidget: React.FC<ToolCallWidgetProps> = ({
       >
         <span
           className={cn(
-            'flex h-5 w-5 items-center justify-center rounded',
-            isPending ? 'bg-warning/20 text-warning' : 'bg-success/20 text-success',
+            'flex h-5 w-5 shrink-0 items-center justify-center',
+            isPending ? 'text-warning' : 'text-success',
           )}
         >
           <Settings className="h-4 w-4" />
@@ -347,6 +348,8 @@ export const ToolCallWidget: React.FC<ToolCallWidgetProps> = ({
                 rows={2}
                 autoFocus
                 onKeyDown={(e) => {
+                  // Enter commits the IME candidate, not the rejection — see `isImeComposing`
+                  if (isImeComposing(e.nativeEvent)) return;
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     decide(false);

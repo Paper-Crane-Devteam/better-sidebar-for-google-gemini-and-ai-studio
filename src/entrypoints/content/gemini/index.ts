@@ -14,6 +14,7 @@ import { notebookListScanner, scanNotebooks } from './tasks/scan-notebooks';
 import { syncConversations } from './tasks/sync-conversations';
 import { initImageProcessor } from './tasks/process-images';
 import { detectAccount } from '../shared/detect-account';
+import { getExternalUrl } from '@/entrypoints/overlay.content/shared/utils';
 import i18n from '@/locale/i18n';
 
 /**
@@ -186,6 +187,51 @@ export async function initGemini() {
       });
     } catch (e) {
       console.error('Better Sidebar: Failed to handle GEMINI_NOTEBOOK_CREATED', e);
+    }
+  });
+
+  /**
+   * A branch is a brand new conversation, so it needs its own row or it stays
+   * missing from the tree until a reload.
+   *
+   * `branched_from_conversation_id` rather than a resolved folder: placement is the
+   * background's job (it already owns gem/notebook → inbox fallback), and it is the
+   * only side that can read the parent row. Passing the lineage lets it put the
+   * branch wherever the parent lives, which is where anyone would look for it.
+   *
+   * No messages here on purpose. The branch page load triggers the chat-content
+   * endpoint, and that path already captures the transcript.
+   */
+  window.addEventListener('GEMINI_CHAT_BRANCH', async (event: any) => {
+    const { id, title, createdAt, sourceConversationId, sourceTitle } = event.detail || {};
+    if (!id) return;
+
+    console.log(
+      'Better Sidebar: Content Script received GEMINI_CHAT_BRANCH',
+      id,
+      'from',
+      sourceConversationId,
+    );
+
+    try {
+      await browser.runtime.sendMessage({
+        type: 'SAVE_CONVERSATION',
+        payload: {
+          id,
+          title: title || sourceTitle || i18n.t('common.untitled'),
+          created_at: createdAt,
+          updated_at: createdAt,
+          last_active_at: createdAt,
+          external_id: id,
+          external_url: getExternalUrl(id),
+          folder_id: null,
+          messages: [],
+          platform: 'gemini',
+          branched_from_conversation_id: sourceConversationId || undefined,
+        },
+      });
+    } catch (e) {
+      console.error('Better Sidebar: Failed to handle GEMINI_CHAT_BRANCH', e);
     }
   });
 

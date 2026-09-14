@@ -24,6 +24,23 @@ import { useCurrentConversationId } from '@/entrypoints/overlay.content/shared/h
 type ViewMode = 'custom' | 'original';
 
 /**
+ * Distance from the top of the viewport to the top of this control, per platform.
+ *
+ * Gemini's conversation starts at the top of the window, so 12px sits it just inside.
+ * AI Studio puts a 56px-tall `ms-header` above the chat — the prompt title, token count and
+ * action icons — and the old shared 12px landed the switcher right on top of the title,
+ * covering the start of it. 8px below the header keeps the control in the conversation area
+ * it belongs to and leaves the title readable.
+ *
+ * A constant rather than a measurement: the header is a fixed-height toolbar, and watching
+ * it would mean a ResizeObserver on native DOM for a couple of pixels of accuracy.
+ */
+const TOP_OFFSET_PX: Partial<Record<Platform, number>> = {
+  [Platform.AI_STUDIO]: 64,
+};
+const DEFAULT_TOP_OFFSET_PX = 12;
+
+/**
  * Hook to compute dynamic left offset for elements placed beside the sidebar.
  * Derived purely from Zustand stores (usePegasusStore & useAppStore).
  */
@@ -56,6 +73,7 @@ export const ConversationViewSwitcher: React.FC = () => {
   const setViewMode = useAgentLoopStore((s) => s.setViewMode);
   const { hasAgentContent, isRunning } = useAgentViewState();
   const leftPx = useSidebarOffset(16);
+  const topPx = TOP_OFFSET_PX[detectPlatform()] ?? DEFAULT_TOP_OFFSET_PX;
   const conversationId = useCurrentConversationId();
 
   // Nothing to switch between on a plain conversation: the overlay has nothing to
@@ -165,8 +183,8 @@ export const ConversationViewSwitcher: React.FC = () => {
 
   return (
     <div
-      className="fixed top-3 z-[60] transition-[left] duration-200 ease-out"
-      style={{ left: `${leftPx}px` }}
+      className="fixed z-[60] transition-[left] duration-200 ease-out"
+      style={{ left: `${leftPx}px`, top: `${topPx}px` }}
     >
       <div
         role="group"

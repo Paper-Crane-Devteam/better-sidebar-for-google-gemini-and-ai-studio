@@ -93,7 +93,7 @@ export const gemRepo = {
 
   getConversationsByGemId: async (gemId: string): Promise<any[]> => {
     return (await runQuery(
-      'SELECT * FROM conversations WHERE gem_id = ? AND deleted_at IS NULL ORDER BY last_active_at DESC',
+      'SELECT * FROM conversations WHERE gem_id = ? AND deleted_at IS NULL AND is_temporary = 0 ORDER BY last_active_at DESC',
       [gemId],
     )) as any[];
   },

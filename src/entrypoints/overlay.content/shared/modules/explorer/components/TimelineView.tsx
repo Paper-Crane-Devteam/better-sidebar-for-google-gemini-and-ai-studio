@@ -4,6 +4,7 @@ import { useArboristTree, STORAGE_KEY } from '../hooks/useArboristTree';
 import { useAppStore } from '@/shared/lib/store';
 import { Node } from './node';
 import { FolderTintRow } from './node/FolderTintRow';
+import { getTreeDndManager } from '../../../components/folder-tree/dnd-manager';
 import { NodeData, ArboristTreeHandle } from '../types';
 import { useI18n } from '@/shared/hooks/useI18n';
 
@@ -282,6 +283,13 @@ export const TimelineView = forwardRef<ArboristTreeHandle, TimelineViewProps>(
           }
           disableDrag={true}
           disableDrop={true}
+          // The same shared manager `FolderTree` uses. `disableDrag` only makes `canDrag`
+          // return false — react-arborist still registers a drag source per row, which is
+          // enough to make react-dnd set up an HTML5 backend. Left on the default, this
+          // tree would own a second manager alongside the shared one, and whichever set up
+          // its backend second would throw "Cannot have two HTML5 backends at the same
+          // time." See `folder-tree/dnd-manager`.
+          dndManager={getTreeDndManager()}
           renderRow={FolderTintRow}
         >
           {NodeWrapper}

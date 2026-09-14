@@ -15,7 +15,9 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
 } from '@/shared/components/ui/dropdown-menu';
+import { useExclusiveContextMenuStore } from '@/entrypoints/overlay.content/shared/components/ui/exclusive-context-menu';
 import type { MenuEntryDef, MenuSubDef } from './menu-types';
+import { MenuDismissProvider } from './menu-dismiss';
 
 type Variant = 'context' | 'dropdown';
 
@@ -78,15 +80,35 @@ function ControlledSubMenu({
  * Stateful wrapper that renders a flat list of MenuEntryDef items
  * while coordinating which sub-menu (if any) is open.
  */
-function MenuItemList({ items, variant }: { items: MenuEntryDef[]; variant: Variant }) {
+function MenuItemList({
+  items,
+  variant,
+  onDismiss,
+}: {
+  items: MenuEntryDef[];
+  variant: Variant;
+  onDismiss?: () => void;
+}) {
   const [openSubKey, setOpenSubKey] = React.useState<string | null>(null);
+  const closeAllContextMenus = useExclusiveContextMenuStore((s) => s.closeAll);
+
+  /**
+   * Close the whole menu on request from custom submenu content.
+   * Context menus are all ExclusiveContextMenu instances, so the shared store
+   * can dismiss them; dropdowns own their open state and pass `onDismiss`.
+   */
+  const dismiss = React.useCallback(() => {
+    setOpenSubKey(null);
+    if (onDismiss) onDismiss();
+    else if (variant === 'context') closeAllContextMenus();
+  }, [onDismiss, variant, closeAllContextMenus]);
 
   const Item = variant === 'context' ? ContextMenuItem : DropdownMenuItem;
   const Separator = variant === 'context' ? ContextMenuSeparator : DropdownMenuSeparator;
   const CheckboxItem = variant === 'context' ? ContextMenuCheckboxItem : DropdownMenuCheckboxItem;
 
   return (
-    <>
+    <MenuDismissProvider value={dismiss}>
       {items.map((entry) => {
         switch (entry.type) {
           case 'separator':
@@ -138,10 +160,22 @@ function MenuItemList({ items, variant }: { items: MenuEntryDef[]; variant: Vari
             return null;
         }
       })}
-    </>
+    </MenuDismissProvider>
   );
 }
 
-export function renderMenuItems(items: MenuEntryDef[], variant: Variant): React.ReactNode[] {
-  return [<MenuItemList key="__menu-items" items={items} variant={variant} />];
+export function renderMenuItems(
+  items: MenuEntryDef[],
+  variant: Variant,
+  /** Optional closer, needed for dropdowns which own their open state */
+  onDismiss?: () => void,
+): React.ReactNode[] {
+  return [
+    <MenuItemList
+      key="__menu-items"
+      items={items}
+      variant={variant}
+      onDismiss={onDismiss}
+    />,
+  ];
 }

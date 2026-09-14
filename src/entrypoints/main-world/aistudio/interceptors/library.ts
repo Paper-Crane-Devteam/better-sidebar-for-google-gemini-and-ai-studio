@@ -1,7 +1,6 @@
 import { parsePromptType } from '../lib/response-parser';
 
 export function handleLibraryResponse(response: any) {
-  console.log('Better Sidebar: Intercepted ListPrompts');
   if (response.response) {
     let responseBody = response.response;
     if (typeof responseBody !== 'string') {

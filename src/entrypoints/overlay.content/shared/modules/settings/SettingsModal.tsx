@@ -17,8 +17,8 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { detectPlatform, Platform } from '@/shared/types/platform';
 import { useAppStore } from '@/shared/lib/store';
 import type { SettingsSection } from '@/shared/lib/store/types';
-import { useBadgeStore } from '@/shared/lib/badge-store';
-import { BadgeDot } from '@/shared/components/ui/badge-dot';
+import { useBadge } from '@/shared/lib/badge-store';
+import { BadgeLabel } from '@/shared/components/ui/badge-dot';
 import { Z_INDEX } from '@/shared/lib/z-index';
 
 /** Wrapper to use a fluent-color iconify icon as a NavButton icon component */
@@ -53,12 +53,11 @@ const NavButton = ({
     setActiveSection: (s: Section) => void;
 }) => {
     const badgeKey = `settings.${id}`;
-    const showBadge = useBadgeStore((s) => s.isVisible(badgeKey));
-    const dismiss = useBadgeStore((s) => s.dismiss);
+    const badge = useBadge(badgeKey);
 
     const handleClick = () => {
         setActiveSection(id);
-        if (showBadge) dismiss(badgeKey);
+        badge.dismiss();
     };
 
     return (
@@ -68,10 +67,7 @@ const NavButton = ({
             onClick={handleClick}
         >
             <Icon className="mr-2 h-4 w-4" />
-            <span className="relative">
-                {label}
-                {showBadge && <BadgeDot className="absolute -top-1 -right-2.5" />}
-            </span>
+            <BadgeLabel badgeKey={badgeKey}>{label}</BadgeLabel>
         </Button>
     );
 };

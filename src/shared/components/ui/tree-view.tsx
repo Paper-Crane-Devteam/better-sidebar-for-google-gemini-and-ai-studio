@@ -7,6 +7,7 @@ import {
   CollapsibleTrigger,
 } from "@radix-ui/react-collapsible"
 import { Button } from "./button"
+import { HighlightedText } from "../HighlightedText"
 
 interface TreeViewItem {
   id: string
@@ -32,6 +33,8 @@ interface TreeViewProps {
   selectedId?: string | null;
   /** When set, renders an inline input row for creating a new folder */
   pendingNewFolder?: PendingNewFolder | null;
+  /** Search query used to highlight matching parts of node names */
+  searchQuery?: string;
 }
 
 /**
@@ -104,18 +107,23 @@ const TreeViewNode = ({
   onSelect,
   selectedId,
   pendingNewFolder,
+  searchQuery,
 }: {
   item: TreeViewItem;
   level?: number;
   onSelect?: (item: TreeViewItem) => void;
   selectedId?: string | null;
   pendingNewFolder?: PendingNewFolder | null;
+  searchQuery?: string;
 }) => {
   const isPendingParent = pendingNewFolder?.parentId === item.id;
   // Default to true (expanded); force open if this is the pending parent
   const [isOpen, setIsOpen] = React.useState(true);
   const hasChildren = item.children && item.children.length > 0;
-  const showExpanded = isOpen || isPendingParent;
+  const isSearching = !!searchQuery?.trim();
+  // While searching, keep every branch open so matches are never hidden
+  // inside a folder the user had collapsed.
+  const showExpanded = isOpen || isPendingParent || isSearching;
 
   React.useEffect(() => {
     // Force open when a pending node targets this folder
@@ -181,7 +189,11 @@ const TreeViewNode = ({
         ) : (
           <MessageSquare className="h-4 w-4 text-muted-foreground ml-6 shrink-0" />
         )}
-        <span className="truncate">{item.name}</span>
+        <HighlightedText
+          text={item.name}
+          query={searchQuery}
+          className="truncate"
+        />
       </div>
 
       {(hasChildren || isPendingParent) && (
@@ -201,6 +213,7 @@ const TreeViewNode = ({
               onSelect={onSelect}
               selectedId={selectedId}
               pendingNewFolder={pendingNewFolder}
+              searchQuery={searchQuery}
             />
           ))}
         </CollapsibleContent>
@@ -215,6 +228,7 @@ export function TreeView({
   className,
   selectedId,
   pendingNewFolder,
+  searchQuery,
 }: TreeViewProps) {
   return (
     <div className={cn('w-full space-y-1', className)}>
@@ -233,6 +247,7 @@ export function TreeView({
           onSelect={onSelect}
           selectedId={selectedId}
           pendingNewFolder={pendingNewFolder}
+          searchQuery={searchQuery}
         />
       ))}
     </div>

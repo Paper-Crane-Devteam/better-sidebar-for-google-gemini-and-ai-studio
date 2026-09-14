@@ -70,6 +70,17 @@ class ToolCallRecorder {
     return this.sessionId;
   }
 
+  /**
+   * The conversation this session belongs to, once the platform has assigned one.
+   *
+   * Null in a brand new chat until `claimConversation` backfills it. The workspace
+   * binding reads this to scope its lock, and treats null as "not bound yet" — which is
+   * correct: a conversation with no id cannot have a row to look up.
+   */
+  get currentConversationId(): string | null {
+    return this.conversationId;
+  }
+
   startSession(session: {
     conversationId?: string | null;
     title?: string | null;

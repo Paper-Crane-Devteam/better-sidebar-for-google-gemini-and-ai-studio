@@ -16,6 +16,13 @@ import {
   setActiveTabId,
 } from './tab-profile-map';
 import { notifyDataUpdated } from './notify';
+import { purgeExpiredTemporaryChats } from '@/shared/lib/temporary-chat-cleanup';
+import {
+  registerLicenseRenewalAlarm,
+  handleLicenseRenewalAlarm,
+  LICENSE_RENEWAL_ALARM,
+} from '@/shared/lib/license-renewal';
+import { trace } from '@/shared/lib/trace';
 
 console.log(
   'Better Sidebar for Gemini & AI Studio: Background Service Worker Starting...',
@@ -24,6 +31,11 @@ console.log(
 export default defineBackground(() => {
   initPegasusTransport();
   initPegasusBackendStore();
+
+  // Keeps the 14-day validation window rolling forward. Registered outside the
+  // DB-ready chain below because license renewal doesn't touch the database and
+  // must not be skipped when the DB fails to open.
+  registerLicenseRenewalAlarm();
 
   const setupUninstallUrl = async () => {
     try {
@@ -55,7 +67,7 @@ export default defineBackground(() => {
 
   browser.runtime.onMessage.addListener(
     (message: ExtensionMessage, sender, sendResponse) => {
-      console.log(
+      trace(
         '[Background] Received message:',
         message.type,
         sender.tab ? `from tab ${sender.tab.id}` : 'from extension',
@@ -83,6 +95,13 @@ export default defineBackground(() => {
       onSyncingChange((syncing) => {
         usePegasusStore.getState().setGdriveSyncing(syncing);
       });
+
+      // Expired Gemini temporary chats are invisible rows nobody can ever reach,
+      // so they are swept here rather than on demand. The sweep self-throttles, so
+      // calling it on every worker startup is cheap.
+      return purgeExpiredTemporaryChats().catch((err) =>
+        console.error('[Background] Temporary chat purge skipped:', err),
+      );
     })
     .catch((err) =>
       console.error('[Background] Auto-sync setup skipped:', err),
@@ -91,6 +110,15 @@ export default defineBackground(() => {
   // Handle alarm events for periodic auto-sync.
   // Respects the gdriveAutoSync setting from pegasus store.
   browser.alarms.onAlarm.addListener((alarm) => {
+    // Handled first and returned early: the auto-sync branch below bails out when
+    // gdriveAutoSync is off, which would otherwise swallow this alarm entirely.
+    if (alarm.name === LICENSE_RENEWAL_ALARM) {
+      handleLicenseRenewalAlarm(alarm).catch((err) =>
+        console.error('[Background] License renewal skipped:', err),
+      );
+      return;
+    }
+
     ensureDbReady()
       .then(() => {
         const { gdriveAutoSync } = usePegasusStore.getState();

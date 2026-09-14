@@ -13,10 +13,10 @@ import { INBOX_FOLDER_ID } from '@/shared/constants/inbox';
 import type { Gem, Notebook } from '@/shared/types/db';
 
 interface NewChatButtonProps {
-  onPrivateChat?: () => void;
+  onTemporaryChat?: () => void;
 }
 
-export const NewChatButton = ({ onPrivateChat }: NewChatButtonProps) => {
+export const NewChatButton = ({ onTemporaryChat }: NewChatButtonProps) => {
   const { t } = useI18n();
   const {
     createPendingAndFocus,
@@ -26,7 +26,6 @@ export const NewChatButton = ({ onPrivateChat }: NewChatButtonProps) => {
 
   const lastSelectedGemId = useSettingsStore((s) => s.lastSelectedGemId);
   const lastSelectedNotebookId = useSettingsStore((s) => s.lastSelectedNotebookId);
-  const newChatBehavior = useSettingsStore((s) => s.newChatBehavior);
   const { gems, notebooks } = useAppStore();
 
   const lastGem = useMemo(
@@ -47,17 +46,18 @@ export const NewChatButton = ({ onPrivateChat }: NewChatButtonProps) => {
     resolveNewChatFolder?.(gemId, notebookId)
     ?? INBOX_FOLDER_ID(useAppStore.getState().ui.overlay.currentPlatform);
 
+  // Middle click: always open a new chat in a new tab
+  const handleNewChatInNewTab = () => {
+    window.open('https://gemini.google.com/app', '_blank');
+  };
+
   const handleNewChat = () => {
-    if (newChatBehavior === 'new-tab') {
-      window.open('https://gemini.google.com/app', '_blank');
+    // Use explorer's unified handler which creates pending entry,
+    // expands the target folder, and navigates
+    if (explorerNewChat) {
+      explorerNewChat();
     } else {
-      // Use explorer's unified handler which creates pending entry,
-      // expands the target folder, and navigates
-      if (explorerNewChat) {
-        explorerNewChat();
-      } else {
-        navigateToNewChat();
-      }
+      navigateToNewChat();
     }
   };
 
@@ -104,9 +104,10 @@ export const NewChatButton = ({ onPrivateChat }: NewChatButtonProps) => {
       <SplitNewChatButton
         icon={<UIcon icon="tabler:message-plus" className="h-4 w-4" />}
         label={t('explorerHeader.newChat')}
-        tooltip={onPrivateChat ? t('tooltip.newChatCta') : t('tooltip.newChat')}
+        tooltip={onTemporaryChat ? t('tooltip.newChatCta') : t('tooltip.newChat')}
         onClick={handleNewChat}
-        onContextMenu={onPrivateChat ? () => onPrivateChat() : undefined}
+        onContextMenu={onTemporaryChat ? () => onTemporaryChat() : undefined}
+        onMiddleClick={handleNewChatInNewTab}
         dropdownTooltip={t('newChatButton.dropdownTooltip')}
         dropdownItems={[
           {

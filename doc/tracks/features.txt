@@ -35,13 +35,21 @@
 36.draggable modal
 -37.default sync folder for each gem or notebook
 -38.add create time and active time on tooltip
-39. ui customization-bigger create chat modal;pin and star style optimize;
+-39. ui customization-bigger create chat modal;pin and star style optimize;
 -40. locate current chat
 -41. move to for folders
 -42. in input mode disable drag
-43. create folder when selecting folder
-44. select text and reference or ask about it
-45. auto back up mechanism
-46. sync don't udpate last active time, leave it empty
-45. auto backup mechanism
-46. 
+-43. create folder when selecting folder
+-44. select text and reference or ask about it
+-45. auto back up mechanism
+-46. sync don't udpate last active time, leave it empty
+-45. auto backup mechanism
+---
+-46. custom color in right click
+-47. search folder in folder selection modal
+-48. middle click new chat open new tab
+49. when renaming chat in current chat, refresh the chat
+50. branch new chat mess with chat history
+51. agent can open new chat
+-52. keyboard delete and rename
+54. switch timeline view mode in hover tab icon

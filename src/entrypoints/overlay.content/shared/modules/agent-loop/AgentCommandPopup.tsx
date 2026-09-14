@@ -1,18 +1,20 @@
 /**
- * AgentCommandPopup — Shows the agent entry list when `>` is typed.
+ * AgentCommandPopup — the agent list, shown when `>` is typed.
  *
- * Layout: a tree-like hierarchy.
- * - "Better Sidebar Agent" (auto entry) is the root, always shown.
- * - Skills are its children, visually indented.
+ * A flat list of agents. It used to be a two-level tree — "Better Sidebar Agent" as a root
+ * with skills indented under it — and the indentation was carrying real meaning: the child
+ * rows changed what the session would *do*, not just who ran it.
  *
- * Both levels are selectable; selecting the auto entry = let the agent decide.
+ * Skills are gone from here now. What is left is one decision, and it is the only one the
+ * user is better placed to make than the agent: **which of your things is this about.** So
+ * both rows sit at the same level and the description is what distinguishes them, which is
+ * why it is always visible instead of hiding in a tooltip.
  */
 
 import React, { useRef } from 'react';
-import { Bot } from 'lucide-react';
+import { Bot, FolderOpen } from 'lucide-react';
 import { OverflowTooltip } from '@/shared/components/ui/overflow-tooltip';
 import type { AgentEntry } from './agent-entry';
-import { AGENT_AUTO_ID } from './agent-entry';
 import { PopupFooterHints } from '@/entrypoints/overlay.content/shared/features/trigger-popup';
 
 interface AgentCommandPopupProps {
@@ -24,75 +26,58 @@ interface AgentCommandPopupProps {
   query: string;
 }
 
-interface AgentCommandItemProps {
+/**
+ * Icons, by name, for the agents that exist.
+ *
+ * A lookup rather than a dynamic import: there are two, they are in the bundle already, and
+ * `lucide-react`'s dynamic form pulls the whole icon set into a content script that is
+ * injected on every page load.
+ */
+const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  Bot,
+  FolderOpen,
+};
+
+const AgentCommandItem: React.FC<{
   entry: AgentEntry;
   isSelected: boolean;
-  isChild: boolean;
   onHighlight: () => void;
   onConfirm: () => void;
-}
-
-/**
- * One row. Auto entry renders at root level; skills are indented children.
- */
-const AgentCommandItem: React.FC<AgentCommandItemProps> = ({
-  entry,
-  isSelected,
-  isChild,
-  onHighlight,
-  onConfirm,
-}) => {
+}> = ({ entry, isSelected, onHighlight, onConfirm }) => {
   const rowRef = useRef<HTMLDivElement>(null);
-  const isAuto = entry.id === AGENT_AUTO_ID;
-  const hasDescription = !!entry.description;
+  const Icon = ICONS[entry.icon] ?? Bot;
 
   return (
     <div
       ref={rowRef}
-      className={`flex cursor-pointer items-center gap-2 py-2 transition-colors ${
-        isChild ? 'pl-8 pr-3' : 'px-3'
-      } ${isSelected ? 'bg-accent' : 'hover:bg-accent/50'}`}
+      className={`flex cursor-pointer items-start gap-2.5 px-3 py-2 transition-colors ${
+        isSelected ? 'bg-accent' : 'hover:bg-accent/50'
+      }`}
       onMouseEnter={onHighlight}
       onMouseDown={(e) => {
         e.preventDefault(); // Prevent blur
         onConfirm();
       }}
     >
-      {/* Icon */}
-      {isAuto ? (
-        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-primary/10 text-primary">
-          <Bot className="h-4 w-4" />
-        </div>
-      ) : (
-        <div className="flex h-4 w-4 shrink-0 items-center justify-center">
-          <div className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50" />
-        </div>
-      )}
+      <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded bg-primary/10 text-primary">
+        <Icon className="h-4 w-4" />
+      </div>
 
-      {/* Title */}
-      <div className="flex-1 overflow-hidden">
+      <div className="min-w-0 flex-1">
         <OverflowTooltip
-          content={(isOverflowing) =>
-            isOverflowing || !hasDescription ? (
-              <div className="flex flex-col gap-1">
-                <div className="font-medium">{entry.title}</div>
-                {hasDescription && (
-                  <div className="text-[10px] opacity-80">{entry.description}</div>
-                )}
-              </div>
-            ) : (
-              entry.description
-            )
-          }
+          content={entry.title}
           placement="right"
           offset={16}
-          className={`select-none ${isAuto ? 'text-sm font-medium text-foreground' : 'text-xs text-foreground/90'}`}
+          className="select-none text-sm font-medium text-foreground"
           hoverRef={rowRef}
           positionRef={rowRef}
-          forceShow={hasDescription}
         >
           {entry.title}
         </OverflowTooltip>
+        {/* Always shown, not a tooltip: with two rows this line *is* the choice. */}
+        <p className="mt-0.5 line-clamp-2 select-none text-[11px] leading-snug text-muted-foreground">
+          {entry.description}
+        </p>
       </div>
     </div>
   );
@@ -116,30 +101,28 @@ export const AgentCommandPopup: React.FC<AgentCommandPopupProps> = ({
         left: `${position.left}px`,
       }}
     >
-      {/* Header */}
       <div className="flex items-center gap-2 px-3 py-2">
         <Bot className="h-4 w-4 text-primary" />
         <span className="text-xs font-medium text-muted-foreground">Agent</span>
         {query && (
-          <span className="rounded bg-muted px-1 py-1 text-xs text-muted-foreground">{query}</span>
+          <span className="rounded bg-muted px-1 py-1 text-xs text-muted-foreground">
+            {query}
+          </span>
         )}
       </div>
 
-      {/* Items — tree layout */}
       <div className="max-h-[320px] overflow-y-auto py-1">
         {matches.map((entry, index) => (
           <AgentCommandItem
             key={entry.id}
             entry={entry}
             isSelected={index === selectedIndex}
-            isChild={entry.id !== AGENT_AUTO_ID}
             onHighlight={() => onHighlight(index)}
             onConfirm={() => onConfirm(index)}
           />
         ))}
       </div>
 
-      {/* Footer hint */}
       <PopupFooterHints />
     </div>
   );

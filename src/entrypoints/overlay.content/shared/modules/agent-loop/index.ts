@@ -68,28 +68,42 @@ export {
 
 // Prompts
 export { assembleFinalPrompt, assembleSkillActivation } from './prompts/prompt-assembler';
-export { getSoulPrompt } from './prompts/soul';
+export { buildInitialMessage } from './prompts/initial-message';
 /** @deprecated Use assembleFinalPrompt instead */
 export { getBasePrompt } from './prompts/base-prompt';
-/** @deprecated Use getSkillsForPopup from skills layer instead */
+/** @deprecated Use getSkillsForAgent from the skills layer instead */
 export { getBuiltInPrompts, getBuiltInPromptById } from './prompts/built-in-registry';
 
 // Hooks
 export { useAgentTrigger } from './useAgentTrigger';
 export type { AgentTriggerPopupState } from './useAgentTrigger';
 
-// Agent entries (auto entry + skills) — shared by the `>` popup and the tab launcher
+// Agent entries (one row per agent) — shared by the `>` popup and the tab launcher
 export {
   getAgentEntries,
   getAgentEntryById,
   searchAgentEntries,
+  agentIdFromEntry,
+  defaultAgentTitle,
   AGENT_AUTO_ID,
 } from './agent-entry';
 export type { AgentEntry } from './agent-entry';
 
+// Agents — who the session is running as
+export {
+  AGENTS,
+  DEFAULT_AGENT_ID,
+  getAgent,
+  listAgents,
+  localizedAgent,
+  normalizeAgentId,
+} from './agents/registry';
+export type { AgentDefinition, AgentId } from './agents/types';
+
 // Adapters
-export type { AgentPlatformAdapter } from './adapters/types';
+export type { AgentPlatformAdapter, ComposerState, ResultSection } from './adapters/types';
 export { GeminiAgentAdapter } from './adapters/gemini-adapter';
+export { AIStudioAgentAdapter } from './adapters/aistudio-adapter';
 export {
   createAdapterForCurrentPlatform,
   createAdapterForPlatform,
@@ -119,14 +133,31 @@ export {
 // Renderer
 export { ConversationOverlay, ConversationViewSwitcher, injectRendererStyles, buildPromptMarker } from './renderer';
 
+// Auto-pickup — shared by every platform's feature component
+export { useAutoPickup, planPickup } from './pickup';
+export type { PickupTurn, PickupPlan } from './pickup';
+
 // ─── New Architecture: Soul + Skill + MCP ────────────────────────────────────
 
 // MCP Layer
-export { mcpRegistry, BUILTIN_MCP, generateToolSchemaPrompt } from './mcp';
+export {
+  mcpRegistry,
+  CORE_MCP,
+  BUILTIN_MCP,
+  WORKSPACE_MCP,
+  DOCUMENT_MCP,
+  generateToolSchemaPrompt,
+} from './mcp';
 export type { MCPServer, ToolSchema, ToolDefinition } from './mcp';
 
-// Skills Layer
-export { getEnabledSkills, getSkillsForPopup, getSkillById, getAllSkills, BUILTIN_SKILLS } from './skills';
+// Skills Layer — scoped to one agent; see skills/index.ts
+export {
+  getAllSkills,
+  getSkillsForAgent,
+  getEnabledSkillsForAgent,
+  getSkillById,
+  BUILTIN_SKILLS,
+} from './skills';
 export type { Skill } from './skills';
 
 // Agent Config Store
@@ -134,4 +165,13 @@ export { useAgentConfigStore } from './agent-config-store';
 export type { AgentConfigStoreState } from './agent-config-store';
 
 // MCP Setup
-export { initMCPRegistry, syncMCPEnabledState } from './mcp/setup';
+export {
+  initMCPRegistry,
+  syncMCPEnabledState,
+  isServerEnabled,
+  setServerEnabled,
+  isWorkspaceEnabled,
+  setWorkspaceEnabled,
+  isDocumentsEnabled,
+  setDocumentsEnabled,
+} from './mcp/setup';

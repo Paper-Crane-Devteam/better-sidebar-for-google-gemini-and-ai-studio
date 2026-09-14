@@ -1,3 +1,5 @@
+import { browserRequest, initializeBrowserAgent } from '@/entrypoints/overlay.content/shared/modules/browser-agent/client';
+import { browserEntryNeedsPermission } from '@/entrypoints/overlay.content/shared/modules/agent-loop/agent-entry';
 /**
  * AgentLoopFeature — Gemini entry point for Agent Loop.
  *
@@ -10,7 +12,6 @@
  */
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { browserRequest, initializeBrowserAgent, useBrowserAgent } from '@/entrypoints/overlay.content/shared/modules/browser-agent/client';
 import { usePegasusStore } from '@/shared/lib/pegasus-store';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { showCapsuleDetailModal } from '@/entrypoints/overlay.content/shared/lib/capsule-modal';
@@ -27,31 +28,24 @@ import {
   clearActiveEngine,
   getActiveEngine,
   agentEventBus,
-  isSyncRunActive,
 } from '@/entrypoints/overlay.content/shared/modules/agent-loop';
 import { AgentDock } from '@/entrypoints/overlay.content/shared/modules/agent-dock';
 import { canUndo, runUndoFlow } from '@/entrypoints/overlay.content/shared/modules/agent-loop/undo';
 import { toast } from '@/shared/lib/toast';
-import { retireOnboardingHint } from '@/shared/lib/onboarding-store';
 import i18n from '@/locale/i18n';
-import {
-  readConversationIdFromPath,
-  useCurrentConversationId,
-} from '@/entrypoints/overlay.content/shared/hooks/useCurrentConversationId';
+import { useCurrentConversationId } from '@/entrypoints/overlay.content/shared/hooks/useCurrentConversationId';
 import { useConversationMessages } from '@/entrypoints/overlay.content/shared/modules/agent-loop/renderer/useConversationMessages';
-import { endsSession } from '@/entrypoints/overlay.content/shared/modules/agent-loop/renderer/helpers/session-end';
+import { useAutoPickup } from '@/entrypoints/overlay.content/shared/modules/agent-loop/pickup';
 import {
   createAdapterForCurrentPlatform,
   getCurrentPlatformId,
 } from '@/entrypoints/overlay.content/shared/modules/agent-loop/adapters/adapter-factory';
 import { assembleFinalPrompt } from '@/entrypoints/overlay.content/shared/modules/agent-loop/prompts/prompt-assembler';
-import { getEnabledSkills } from '@/entrypoints/overlay.content/shared/modules/agent-loop/skills/skill-registry';
+import { buildInitialMessage } from '@/entrypoints/overlay.content/shared/modules/agent-loop/prompts/initial-message';
+import type { AgentId } from '@/entrypoints/overlay.content/shared/modules/agent-loop/agents/types';
 import { initMCPRegistry } from '@/entrypoints/overlay.content/shared/modules/agent-loop/mcp/setup';
-import { getAgentEntryById, browserEntryNeedsPermission } from '@/entrypoints/overlay.content/shared/modules/agent-loop/agent-entry';
-import {
-  buildToolCallFingerprint,
-  buildToolCallKey,
-} from '@/entrypoints/overlay.content/shared/modules/agent-loop/execution-policy';
+import { resolveAgentForRecoveredSession } from '@/entrypoints/overlay.content/shared/modules/agent-loop/conversation-agent';
+import { getAgentEntryById } from '@/entrypoints/overlay.content/shared/modules/agent-loop/agent-entry';
 import { useAgentRecordStore } from '@/entrypoints/overlay.content/shared/modules/agent-loop/agent-record-store';
 import { buildOwedPayload } from '@/entrypoints/overlay.content/shared/modules/agent-loop/recovery';
 import type { AgentPlatformAdapter } from '@/entrypoints/overlay.content/shared/modules/agent-loop';
@@ -71,7 +65,10 @@ import {
   CAPSULE_ATTR_CONTENT,
 } from '@/entrypoints/overlay.content/shared/lib/quill-editor';
 
-const MAX_MESSAGE_LENGTH = 30000;
+// The opening message's size ceiling lives in `prompts/initial-message.ts`, next to the
+// logic that decides what gets cut when it is exceeded. It used to be a `30000` here and
+// an identical one in the AI Studio feature — two copies of a number that `budget.ts` had
+// already measured properly as the composer's real limit.
 
 /**
  * Whether the engine currently owns the chat input.
@@ -209,7 +206,7 @@ export const AgentLoopFeature: React.FC = () => {
   // ─── Start agent loop engine ────────────────────────────────────────
 
   const startAgentEngine = useCallback(
-    (session?: { title?: string }) => {
+    (session?: { title?: string; agentId?: AgentId }) => {
       const adapter = getAdapter();
       if (!adapter) {
         console.error('[AgentLoop] No adapter available for current platform');
@@ -224,6 +221,9 @@ export const AgentLoopFeature: React.FC = () => {
           engine.start(20, {
             conversationId: conversationIdRef.current,
             title: session?.title,
+            // Carried into the store, where the tool layer reads it to refuse tools this
+            // agent does not own. It has to be the same agent the prompt was built from.
+            agentId: session?.agentId,
           }),
         300,
       );
@@ -240,160 +240,31 @@ export const AgentLoopFeature: React.FC = () => {
 
   // ─── Auto-pickup: detect tool calls in latest response while idle ───
 
+  /**
+   * The whole decision lives in `useAutoPickup` — see `agent-loop/pickup.ts` for every
+   * guard and the incident behind it. All this side supplies is "which turn", because
+   * that is the only part that is Gemini's.
+   */
   const messages = useConversationMessages();
 
-  /**
-   * Which response we last picked up, as `conversation:turn:toolcalls`.
-   *
-   * Keyed rather than a bare "already fired" boolean, and that is the whole point: the
-   * overlay is never torn down any more (conversations are switched through Gemini's
-   * router, not a page load), so a boolean latch set once — on a response we then
-   * declined to run, or on one in some other conversation — stayed set for the life of
-   * the tab and quietly disabled pickup for every response after it. The user's next
-   * message got an answer full of tool calls that nothing ever executed.
-   *
-   * A key re-arms by itself for a genuinely different response, while still refusing to
-   * fire twice on the same one.
-   */
-  const pickedUpKeyRef = useRef<string | null>(null);
-
-  /**
-   * When the engine is idle but the newest AI response contains tool calls with no
-   * matching results (i.e. nothing was sent back), the user continued the
-   * conversation without re-triggering `>`. The AI is still talking in tool format
-   * because it remembers the system prompt from the previous session.
-   *
-   * Automatically start a new session using the existing response element, skipping
-   * the "wait for AI" stage that would never resolve (the answer is already there).
-   */
-  useEffect(() => {
-    const status = useAgentLoopStore.getState().status;
-    if (status !== 'idle') return;
-
-    // The ledger decides whether these calls already ran, so nothing may be picked up
-    // until it is here. See `recordsReady`.
-    if (!recordsReady) return;
-
-    // Find the last model turn
-    const lastModel = [...messages].reverse().find((m) => m.role === 'model');
-    if (!lastModel) return;
-    if (!lastModel.toolCalls || lastModel.toolCalls.length === 0) return;
-    // Still streaming — wait for it to finish
-    if (lastModel.isStreaming) return;
-
-    // If any outcome is already known (from the next user message), it's history
-    if (lastModel.toolOutcomes.some((o) => o !== null)) return;
-
-    /**
-     * A turn that ended its session is not unfinished business.
-     *
-     * Neither `complete_task` nor a handoff tool ever gets its result sent back, so
-     * their outcomes stay null forever and this check used to read the last turn of
-     * every finished task as "tool calls nobody ran". For `complete_task` that spun up
-     * a session which re-parsed the completion and ended again — the stray summary
-     * card. For a handoff it is worse: re-running it books the tab for the entire sync
-     * road trip a second time, which is what greeted the user on getting back from the
-     * first one.
-     */
-    if (endsSession(lastModel)) return;
-
-    /**
-     * A sync run is driving the tab — none of these conversations were opened by the
-     * user, so none of them is a follow-up.
-     *
-     * Pickup's whole premise is "the user kept talking and nobody ran the tools". A run
-     * walks the tab through up to fifty conversations, and any one of them can end with
-     * agent tool calls that were never reported back (a task the user stopped, say).
-     * Without this the run's own navigation looks like fifty follow-ups: pickup starts a
-     * session, executes the calls, and posts the results into a chat the user never
-     * opened — then the run navigates away, leaving that session parked in a
-     * conversation whose Dock won't even render (`belongsToCurrent`), so nothing on
-     * screen can stop it and the tab refuses to start any new task until a reload.
-     */
-    if (isSyncRunActive()) return;
-
-    /**
-     * Bind to the conversation the response is actually in, read from the URL now.
-     *
-     * `conversationIdRef` follows a 500ms poll (`useUrl`), and this effect is driven by
-     * the DOM — so on a router navigation the two disagree for a moment. Binding a
-     * session to the previous conversation's id hides the dock outright
-     * (`belongsToCurrent`), leaving the engine parked on an approval with no way on
-     * screen to answer it.
-     */
-    const liveConversationId = readConversationIdFromPath() ?? conversationIdRef.current;
-
-    const pickupKey = [
-      liveConversationId ?? 'unbound',
-      lastModel.id,
-      ...lastModel.toolCalls.map((tc) => buildToolCallFingerprint(tc.toolCall)),
-    ].join('|');
-    if (pickedUpKeyRef.current === pickupKey) return;
-
-    // Also skip if the ledger already knows these calls (current live session)
-    const store = useAgentLoopStore.getState();
-    const anyKnown = lastModel.toolCalls.some((tc) => {
-      const fp = buildToolCallFingerprint(tc.toolCall);
-      return store.executedCalls[fp] !== undefined;
-    });
-    if (anyKnown) return;
-
-    /**
-     * The stored ledger says these already ran. Do not run them again.
-     *
-     * This is the guard the whole ledger exists for. Everything above reads the page,
-     * and after a reload the page looks identical whether a call ran or not: the tool
-     * calls are there, no results follow them, `executedCalls` is empty. So pickup used
-     * to re-execute — and for a write, that is the same statement applied twice. Worse,
-     * the second run asks for approval again, on a statement the user just approved, so
-     * the interface actively invites the duplicate.
-     *
-     * What the results actually need is delivering, which the dock offers separately
-     * (see `owed`). Re-running is never the recovery.
-     */
-    const recorded = useAgentRecordStore.getState().records;
-    const anyRecorded = lastModel.toolCalls.some(
-      (tc) => recorded[buildToolCallKey(tc.toolCall)] !== undefined,
-    );
-    if (anyRecorded) {
-      console.log('[AgentLoop] Auto-pickup skipped: these calls are in the ledger already');
-      return;
-    }
-
-    // We need the actual DOM element to pass to the engine
-    const adapter = getAdapter();
-    if (!adapter) return;
-    const responseElement = adapter.getLastAIResponseElement();
-    if (!responseElement) return;
-
-    pickedUpKeyRef.current = pickupKey;
-
-    // The user just did the thing the end-of-task hint exists to teach — carried on
-    // talking instead of retyping `>`. Nothing left to explain, so it stops appearing.
-    retireOnboardingHint('agentContinueAfterEnd');
-
-    console.log('[AgentLoop] Auto-pickup: detected unexecuted tool calls in idle state, starting session');
-
-    const lastEntryId = [...messages].reverse().find(m => m.promptId)?.promptId;
-    const kind = lastEntryId ? getAgentEntryById(lastEntryId)?.agentKind ?? 'data' : 'data';
-    useBrowserAgent.getState().setRunning(kind);
-    useBrowserAgent.getState().select(kind);
-
-    const engine = new AgentLoopEngine(adapter);
-    engineRef.current = engine;
-    setActiveEngine(engine);
-    engine.startFromExistingResponse(responseElement, 20, {
-      conversationId: liveConversationId,
-      title: 'Follow-up task',
-    });
-  }, [messages, getAdapter, recordsReady]);
+  useAutoPickup({
+    // Referentially stable while the conversation is unchanged, because
+    // `useConversationMessages` keeps the same objects — required, see the hook.
+    turn: [...messages].reverse().find((m) => m.role === 'model'),
+    recordsReady,
+    fallbackConversationId: conversationId,
+    getAdapter,
+    onEngineStarted: (engine) => {
+      engineRef.current = engine;
+    },
+  });
 
   // ─── Capsule insertion (from the `>` popup) ─────────────────────────
 
   function handleConfirmSelection() {
     const entry = getSelectedEntryRef.current();
     if (!entry) return;
-    if (entry.agentKind === 'browser' && browserEntryNeedsPermission(entry.id)) {
+    if (browserEntryNeedsPermission(entry.id)) {
       close();
       void browserRequest({ action: 'open-settings' }).catch(e => toast.warning(e.message));
       return;
@@ -522,8 +393,10 @@ export const AgentLoopFeature: React.FC = () => {
       if (!entry) {
         return abort(`unknown entry "${entryId}"`, i18n.t('agent.send.staleCapsule'));
       }
-      if (entry.agentKind === 'browser' && browserEntryNeedsPermission(entry.id)) {
-        void browserRequest({ action: 'open-settings' }).catch(e => toast.warning(e.message));
+
+      // A capsule picked before the permission was revoked, or one the user typed by hand.
+      if (entry.agent.id === 'browser' && browserEntryNeedsPermission(entry.id)) {
+        void browserRequest({ action: 'open-settings' }).catch((e) => toast.warning(e.message));
         return abort('browser permission missing', '请先开启 Browser Agent 读取权限，然后重新发送。');
       }
 
@@ -536,10 +409,8 @@ export const AgentLoopFeature: React.FC = () => {
       let basePrompt: string;
       try {
         basePrompt = assembleFinalPrompt({
-          agentKind: entry.agentKind,
+          agentId: entry.agent.id,
           focus: entry.focus,
-          selectedSkill: entry.skill,
-          allSkills: getEnabledSkills(),
           platform: getCurrentPlatformId(),
         });
       } catch (err) {
@@ -556,14 +427,14 @@ export const AgentLoopFeature: React.FC = () => {
         ? editorText.replace(capsuleContent, '').trim()
         : editorText.trim();
 
-      let fullMessage = `${buildPromptMarker(entryId)}\n${basePrompt}`;
-      if (userInput) {
-        fullMessage += `\n\n## User Request\n\n${userInput}`;
-      }
-      if (fullMessage.length > MAX_MESSAGE_LENGTH) {
-        fullMessage = fullMessage.substring(0, MAX_MESSAGE_LENGTH);
-        console.warn(`[AgentLoop] Message truncated to ${MAX_MESSAGE_LENGTH} chars`);
-      }
+      // ⚠️ Not `substring(0, MAX)` on the assembled message. The user's request is
+      // appended last, so cutting from the end removes the task and keeps the
+      // instructions — see `prompts/initial-message.ts`.
+      const { text: fullMessage } = buildInitialMessage({
+        marker: buildPromptMarker(entryId),
+        basePrompt,
+        userInput,
+      });
 
       const title = userInput || entry.title || 'Agent task';
 
@@ -588,11 +459,7 @@ export const AgentLoopFeature: React.FC = () => {
       // engine if the message actually went out — otherwise it would sit waiting
       // for a response to a prompt that was never delivered.
       adapter.triggerSend({ humanDelay: false }).then((sent) => {
-        if (sent) {
-          useBrowserAgent.getState().setRunning(entry.agentKind ?? 'data');
-          useBrowserAgent.getState().select(entry.agentKind ?? 'data');
-          startAgentEngine({ title });
-        }
+        if (sent) startAgentEngine({ title, agentId: entry.agent.id });
         else console.warn('[AgentLoop] Initial prompt was not sent, engine not started');
       });
 
@@ -736,8 +603,6 @@ export const AgentLoopFeature: React.FC = () => {
        * presses would stage the same payload twice.
        */
       useAgentRecordStore.setState({ owed: null });
-      // Browser audit is independent and never creates SQL-ledger owed rows.
-      useBrowserAgent.getState().setRunning('data');
 
       const engine = new AgentLoopEngine(adapter);
       engineRef.current = engine;
@@ -746,6 +611,12 @@ export const AgentLoopFeature: React.FC = () => {
       const delivered = await engine.deliverOwedResults(payload, 20, {
         conversationId: owedIn,
         title: t('agent.owed.sessionTitle', { defaultValue: 'Recovered task' }),
+        // This session continues the interrupted task, so the rounds after the delivery
+        // need the tools it was using. Without it the continuation runs as the default
+        // agent and is refused its own tools.
+        agentId: resolveAgentForRecoveredSession(
+          owed.rows.flatMap((row) => (row.tool_name ? [row.tool_name] : [])),
+        ),
       });
 
       if (!delivered) {

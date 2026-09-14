@@ -1,4 +1,5 @@
 import React from 'react';
+import { GlobalPopoverPicker } from '@/shared/components/GlobalPopoverPicker';
 import { GlobalToast } from '@/shared/components/GlobalToast';
 import { PowerPackPaywall } from '@/shared/components/PowerPackPaywall';
 import { ProfilePickerDialog } from '@/entrypoints/overlay.content/shared/components/ProfilePickerDialog';
@@ -14,6 +15,7 @@ export const ChatGPTEnhancedFeatures = () => {
       <ProfilePickerDialog />
       <RatingPromptDialog />
       <PowerPackPaywall />
+      <GlobalPopoverPicker />
       <GlobalToast />
     </>
   );

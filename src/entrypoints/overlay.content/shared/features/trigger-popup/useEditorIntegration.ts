@@ -31,6 +31,7 @@ import {
   triggerSend,
   registerBeforeSendHandler,
 } from '@/entrypoints/overlay.content/shared/lib/quill-editor';
+import { isImeComposing } from '@/entrypoints/overlay.content/shared/lib/ime';
 
 export interface PopupPosition {
   bottom: number;
@@ -92,6 +93,16 @@ export function useEditorIntegration(config: EditorIntegrationConfig) {
     };
 
     const onKeyDown = (e: KeyboardEvent) => {
+      /**
+       * Nothing below is ours while an IME is composing: Enter commits the candidate,
+       * Backspace edits the composition, the arrows move through the candidate list.
+       *
+       * Same bug as AI Studio's — see `isImeComposing`. It bit there first only because
+       * that platform's interceptor is the one that owns the send; here it would have
+       * expanded a capsule and sent mid-composition just as readily.
+       */
+      if (isImeComposing(e)) return;
+
       const state = configRef.current.getPopupState();
       const capsuleClass = configRef.current.capsuleClass || CAPSULE_CLASS;
 

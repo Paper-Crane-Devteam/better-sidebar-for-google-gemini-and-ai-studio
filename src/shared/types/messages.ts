@@ -40,6 +40,22 @@ export type ExtensionMessage = (
         notebook_id?: string | null;
         /** When set, delete all messages after this ID before inserting the new ones (regeneration) */
         replaceAfterMessageId?: string;
+        /**
+         * 1 when this is a temporary chat, which is hidden from every list and from
+         * search. Only meaningful on the save that creates the row — the flag is
+         * sticky in the database, so later saves for the same conversation can leave
+         * it out (and do, since they have no way of knowing it).
+         */
+        is_temporary?: number;
+        /**
+         * Source conversation when this row is a branch (fork) of another chat.
+         *
+         * Two effects, and both apply only on first save: the new row inherits the
+         * parent's folder and gem/notebook membership, and the tree is told to
+         * refresh. The refresh is not redundant — a branch is the one case where a
+         * conversation appears without the user navigating anywhere.
+         */
+        branched_from_conversation_id?: string;
         messages: {
           id?: string;
           role: 'user' | 'model';
@@ -125,6 +141,8 @@ export type ExtensionMessage = (
         | { op: 'sessionCreate'; session: { id: string; conversationId: string | null; title: string | null; skillId?: string | null } }
         | { op: 'sessionClaim'; sessionId: string; conversationId: string }
         | { op: 'sessionEnd'; sessionId: string; endReason: string; rounds: number }
+        | { op: 'sessionBindWorkspace'; sessionId: string; workspaceId: string }
+        | { op: 'boundWorkspace'; conversationId: string }
         | {
             op: 'callBegin';
             call: {
@@ -524,6 +542,77 @@ export type ExtensionMessage = (
   | {
       type: 'REMOVE_HOST_PERMISSION';
       payload: { origin: string };
+    }
+  /**
+   * Agent workspace filesystem, from the content script.
+   *
+   * Routed through the background because OPFS is origin-scoped: a content script's
+   * `navigator.storage` belongs to gemini.google.com, so calling it there would put
+   * the workspace in Google's quota and give each platform a separate one. The
+   * background runs at the extension origin, which is the only place the workspace
+   * can live and be shared across platforms.
+   */
+  | {
+      type: 'WORKSPACE_FS';
+      /**
+       * Which workspace to operate in.
+       *
+       * Sent per call rather than remembered by the background: the selection lives in
+       * a content-script store, and a background copy could lag behind a switch —
+       * landing the next tool call in the workspace the user just left.
+       */
+      workspaceId: string;
+      payload:
+        | { op: 'read'; path: string; offset?: number; limit?: number }
+        | { op: 'write'; path: string; content: string }
+        /**
+         * Raw bytes, base64-encoded, for upload and download.
+         *
+         * Separate ops rather than a flag on `read`/`write` because the encoding is
+         * not an option the caller picks — it follows from who is asking. The agent
+         * reads text and gets a string; a download needs the exact bytes and cannot
+         * survive a UTF-8 round trip. Base64 is what `runtime.sendMessage` will carry
+         * intact (see `workspace/base64.ts`).
+         */
+        | { op: 'readBytes'; path: string }
+        | { op: 'writeBytes'; path: string; base64: string }
+        | {
+            op: 'edit';
+            path: string;
+            oldString: string;
+            newString: string;
+            replaceAll?: boolean;
+          }
+        | { op: 'list'; path?: string; recursive?: boolean }
+        | { op: 'glob'; pattern: string; base?: string }
+        | {
+            op: 'grep';
+            pattern: string;
+            path?: string;
+            include?: string;
+            caseSensitive?: boolean;
+          }
+        | { op: 'delete'; path: string; recursive?: boolean }
+        | { op: 'mkdir'; path: string }
+        | { op: 'move'; from: string; to: string }
+        | { op: 'stat'; path: string }
+        | { op: 'stats' }
+        | { op: 'clear' };
+    }
+  /**
+   * Office / PDF / subtitle document operations, from the content script.
+   *
+   * Routed to the background for the same origin reason as `WORKSPACE_FS`, and then on
+   * to a worker in the offscreen document — which is where the parsing actually happens.
+   *
+   * ⚠️ Note what is *not* in this payload: bytes. The engine opens the file out of OPFS
+   * itself, so a 20 MB workbook never gets base64-encoded onto the message channel. Only
+   * the request and the projection text travel. See `.kiro/docs/document-formats.md` §4.
+   */
+  | {
+      type: 'DOCUMENT_OP';
+      workspaceId: string;
+      payload: import('@/shared/documents/types').DocRequest;
     }
 ) & { platform?: string };
 

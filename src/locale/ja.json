@@ -76,10 +76,6 @@
     "bottomLeft": "左下",
     "bottomRight": "右下",
     "behavior": "動作",
-    "newChatBehavior": "新しいチャットの動作",
-    "newChatBehaviorDescription": "新しい会話を開く場所",
-    "currentTab": "現在のタブ",
-    "newTab": "新しいタブ",
     "skipDeleteConfirm": "確認なしで会話を削除する",
     "skipDeleteConfirmDescription": "危険: 単一の会話は確認ダイアログなしで即座に完全に削除され、元に戻すことはできません。この拡張機能とプラットフォームの両方から削除されます。一括削除では引き続き確認を求めます。",
     "defaultSyncFolder": "デフォルト同期フォルダ",
@@ -124,7 +120,8 @@
     "importAiStudioSystemSuccess": "AI Studioから{{count}}件のシステム指示をインポートしました",
     "importAiStudioSystemNoData": "このページにAI Studioのシステム指示が見つかりません",
     "importAiStudioSystemInvalid": "AI Studioのシステム指示データが無効です",
-    "importAiStudioSystemFailed": "AI Studioのシステム指示のインポートに失敗しました"
+    "importAiStudioSystemFailed": "AI Studioのシステム指示のインポートに失敗しました",
+    "compactModeTitleHint": "「ライブラリ」の見出しをクリックしても切り替えられますよ 😉"
   },
   "prompts": {
     "inbox": "受信トレイ",
@@ -206,6 +203,8 @@
     "scanChatList": "チャットリストをインポート",
     "scanning": "スキャン中...",
     "sqlQuery": "SQL クエリ",
+    "enterCompactMode": "コンパクトモードにする",
+    "exitCompactMode": "コンパクトモードを終了",
     "settings": "設定"
   },
   "about": {
@@ -218,7 +217,8 @@
     "license": "ライセンス",
     "sourceCode": "ソースコード",
     "githubRepository": "GitHub リポジトリ",
-    "viewChangelog": "更新履歴を見る"
+    "viewChangelog": "更新履歴を見る",
+    "userGuide": "使い方ガイド"
   },
   "sponsor": {
     "title": "友達にシェア",
@@ -337,7 +337,13 @@
     "switchToOriginalUI": "元のサイドバーに切り替え",
     "temporaryChat": "一時チャット",
     "toggleMenu": "メニューを切り替え",
-    "newChatCta": "クリック：新しいチャット · 右クリック：プライベートチャット"
+    "collapseSidebar": "サイドバーを閉じる",
+    "account": "アカウント",
+    "signIn": "ログイン",
+    "enterCompactMode": "クリックしてコンパクトモードにする",
+    "exitCompactMode": "クリックしてコンパクトモードを終了",
+    "newChatCta": "クリック：新しいチャット · 右クリック：一時チャット · 中クリック：新しいタブで開く",
+    "newChatCtaAiStudio": "クリック：新しいチャット · 右クリック：一時チャット · 中クリック：新しいタブで開く"
   },
   "newChatButton": {
     "dropdownTooltip": "その他のチャットオプション",
@@ -423,7 +429,10 @@
     "name": "名前",
     "color": "アイコンの色",
     "defaultColor": "デフォルト",
-    "customColor": "カスタム:",
+    "customColor": "カスタム",
+    "customColorArea": "彩度と明度",
+    "customColorHue": "色相",
+    "customColorHex": "16進数カラーコード",
     "defaultTargets": "デフォルト保存先として設定中",
     "defaultTargetsHint": "これらの Gem または Notebook から始めた新しいチャットは、このフォルダーに保存されます。",
     "addGemTarget": "Gem",
@@ -546,6 +555,9 @@
     "selectColor": "色を選択"
   },
   "moveItemsDialog": {
+    "searchFolders": "フォルダーを検索...",
+    "noMatchingFolders": "一致するフォルダーがありません",
+    "clearSearch": "検索をクリア",
     "rootLevel": "ルート（トップレベル）",
     "createFolder": "新しいフォルダー"
   },
@@ -680,7 +692,30 @@
     "openSourceNote": "無料かつオープンソース、個人開発者が制作・メンテナンスしています。ご支援ありがとうございます！",
     "loginRequired": "まず AI プラットフォームにログインしてください。ログイン後、プラットフォームのページでサイドバーが有効になります。",
     "uiUpdateNote": "サイドバーが動作しなくなった場合、プラットフォームの UI 更新が原因の可能性があります。拡張機能を更新するか、修正をお待ちください。できるだけ早く対応します！",
-    "feedbackNote": "バグを見つけましたか？内蔵のフィードバック機能からいつでもお知らせください。すぐに対応します。ご連絡いただく前に低評価を付けないでいただけると助かります！"
+    "feedbackNote": "バグを見つけましたか？内蔵のフィードバック機能からいつでもお知らせください。すぐに対応します。ご連絡いただく前に低評価を付けないでいただけると助かります！",
+    "ready": "準備完了",
+    "headline": "会話をすっきり。",
+    "headlineAccent": "アイデアを自由に。",
+    "intro": "Gemini と AI Studio の会話を整理。大切な内容をすばやく見つけ、お気に入りのプロンプトをいつでも使えます。",
+    "watch": "使い方を見る",
+    "previewAlt": "Gemini 上の Better Sidebar の実際の画面",
+    "previewCaption": "会話を、心地よく整理",
+    "basics": "基本機能から始めましょう",
+    "organizeTitle": "会話に居場所を",
+    "organizeBody": "フォルダとタグで、プロジェクトごとに会話を整理できます。",
+    "findTitle": "アイデアをすぐに発見",
+    "findBody": "過去の会話を検索して、残しておきたいアイデアに戻れます。",
+    "reuseTitle": "プロンプトを手元に",
+    "reuseBody": "便利なプロンプトをライブラリに保存し、必要なときに再利用できます。",
+    "startLabel": "ここからスタート",
+    "choose": "使うプラットフォームを選択",
+    "firstStep": "ログイン後、プラットフォーム上で Better Sidebar を開きましょう。まずは会話用のフォルダを作ってみてください。",
+    "tutorialTitle": "動画で、はじめの一歩。",
+    "tutorialBody": "Better Sidebar の使い方を見ながら、自分のページで試してみましょう。いつでも一時停止して見返せます。",
+    "openYoutube": "YouTube で開く",
+    "videoNote": "クリックするとプレーヤーが読み込まれます。再生できない場合は YouTube でご覧ください。",
+    "help": "お困りですか？",
+    "footerNote": "AI との会話を、もっと快適に。"
   },
   "guidedTour": {
     "next": "次へ",
@@ -949,8 +984,6 @@
     "customThemesDescription": "Gemini インターフェースにカスタムビジュアルテーマを適用します。これらのテーマはデフォルトの配色を上書きします。",
     "default": "デフォルト",
     "defaultDescription": "デフォルトテーマ、ライト/ダークモード対応",
-    "classic": "Gemini クラシック",
-    "classicDescription": "クラシック Gemini、クールブルーのサーフェス",
     "cupertinoGlassName": "Cupertino Glass",
     "cupertinoGlassDescription": "すりガラスの美学、システムフォント、ミニマルなカラーパレット",
     "grimoireName": "The Grimoire",
@@ -977,6 +1010,18 @@
     "oceanBreezeDescription": "オーシャンブルーとコーラルのアクセントが爽やかなライトテーマ",
     "midnightPurpleName": "Midnight Purple",
     "midnightPurpleDescription": "ディープブラックに紫とインディゴのグラデーションアクセント",
+    "gruvboxName": "Gruvbox",
+    "gruvboxDescription": "ろうそくの灯でコードを読むような、温かみのある土の色調のレトロダークテーマ",
+    "everforestName": "Everforest",
+    "everforestDescription": "深い森をイメージしたダークテーマ — 落ち着いたグリーンにウォームアンバーの差し色",
+    "highContrastName": "High Contrast",
+    "highContrastDescription": "白黒にアンバーを一点だけ — とにかく「見やすさ」を最優先にしたテーマ",
+    "solarizedLightName": "Solarized Light",
+    "solarizedLightDescription": "みんな大好き Solarized のライト版 — 目にやさしく、使い込むほど馴染む",
+    "sakuraName": "Sakura",
+    "sakuraDescription": "春の昼下がりのような、淡いピンクとセージグリーンが溶け合う柔らかなライトテーマ",
+    "graphiteName": "Graphite",
+    "graphiteDescription": "余分な色を削ぎ落としたグレースケールのライトテーマ — 構造だけが際立つ",
     "previewBannerText": "プレビューモード — 5分後にデフォルトに戻ります。購入すると永続的に使用できます。",
     "buyNow": "購入する",
     "aiGeneratorTitle": "お探しのテーマが見つかりませんか？",
@@ -1009,7 +1054,7 @@
     "spFeature1": "すべてのプレミアムテーマを永久にアンロック",
     "spFeature2": "今後追加されるテーマも追加料金なし",
     "spFeature3": "AI で生成したカスタムテーマを作成",
-    "spFeature4": "最大3台のデバイスでアクティベート可能",
+    "spFeature4": "最大10回のアクティベーション。複数のブラウザプロファイルやパソコンで使えます",
     "getSupportPack": "Support Pack を入手",
     "powerPackTitle": "Power Pack",
     "powerPackTagline": "AI アシスタントの全ポテンシャルを解放",
@@ -1036,10 +1081,10 @@
   "supportPack": {
     "title": "サポートパック",
     "heroTitle": "プレミアムテーマをアンロック",
-    "heroDescription": "美しくデザインされたテーマで AI ワークスペースを変身させましょう。一度の購入で最大3台のデバイスで永久に使用できます。",
+    "heroDescription": "美しくデザインされたテーマで AI ワークスペースを変身させましょう。一度の購入で最大10回のアクティベーション、永久に使用できます。",
     "feature1": "すべてのプレミアムテーマを永久にアンロック",
     "feature2": "今後追加されるテーマも追加料金なし",
-    "feature3": "最大3台のデバイスでアクティベート可能",
+    "feature3": "最大10回のアクティベーション。複数のブラウザプロファイルや複数のパソコンで使えます",
     "feature4": "独立したオープンソース開発を支援",
     "feature5": "AI で生成したカスタムテーマを作成",
     "buyButton": "サポートパックを入手",
@@ -1051,12 +1096,29 @@
     "activate": "アクティベート",
     "invalidToken": "形式が無効です。BS-SP-XXXXXXXX または Gumroad ライセンスキーを入力してください。",
     "networkError": "ネットワークエラーです。接続を確認して再試行してください。",
-    "maxDevices": "デバイス上限に達しました（3台）。他のデバイスで無効化してください。",
+    "maxDevices": "10個のアクティベーション枠がすべて使用中です。使わなくなったブラウザプロファイルで設定を開き、「このアクティベーションを解放」を選んでから、もう一度お試しください。",
     "activationFailed": "アクティベーションに失敗しました。トークンを確認して再試行してください。",
     "activationSuccess": "アクティベーション成功！すべてのプレミアムテーマがアンロックされました。",
     "activatedTitle": "サポートパック有効",
     "activatedDescription": "すべてのプレミアムテーマがアンロックされています。Better Sidebar をご支援いただきありがとうございます！",
-    "deactivate": "無効化"
+    "deactivate": "無効化",
+    "releaseDevice": "このアクティベーションを解放",
+    "releaseHint": "ブラウザプロファイルごとにアクティベーション枠を1つ使用します。解放すると別の場所で使えます。",
+    "releaseConfirmTitle": "このアクティベーションを解放しますか？",
+    "releaseConfirmDesc": "このブラウザプロファイルではプレミアム機能がオフになり、枠が別のプロファイルやパソコンのために解放されます。同じトークンでいつでもここで再アクティベートできます。",
+    "releaseConfirm": "解放",
+    "cancel": "キャンセル",
+    "releaseNetworkError": "ライセンスサーバーに接続できず、枠は解放されませんでした。接続を確認してもう一度お試しください。",
+    "releaseFailed": "解放できませんでした。もう一度お試しいただくか、サポートまでご連絡ください。",
+    "renewalWarningTitle": "ライセンスサーバーに接続できません",
+    "renewalWarningDesc": "ライセンスは有効なままで、バックグラウンドで再試行を続けます。この状態が続く場合は、インターネット接続や VPN / プロキシの設定を確認してください。",
+    "renewalGraceUntil": "有効期限",
+    "retryNow": "今すぐ再試行",
+    "dismiss": "閉じる",
+    "rejectedTitle": "このライセンスは無効になりました",
+    "rejectedRevoked": "ライセンスが取り消されました。通常は返金またはチャージバックの後に起こります。心当たりがない場合はサポートまでご連絡ください。",
+    "rejectedMaxDevices": "アクティベーション枠がすべて使用中で、この枠はもうリストに含まれていません。別のブラウザプロファイルで枠を解放するか、サポートまでご連絡ください。",
+    "rejectedGeneric": "ライセンスサーバーがこのトークンを認識できません。心当たりがない場合はサポートまでご連絡ください。"
   },
   "hotkeys": {
     "title": "キーボードショートカット",
@@ -1103,19 +1165,60 @@
     "launcher": {
       "title": "エージェント",
       "subtitle": "AI と一緒にチャット・プロンプト・データを管理しましょう。",
-      "placeholder": "実行したい内容を入力してください…",
-      "run": "実行",
-      "skills": "またはスキルから始める",
-      "stageHint": "任意です。タスクを書くだけで、エージェントが適したスキルを自分で選びます。ここで選ぶと入力欄に追加されるので、送信前に詳細を追記できます。",
+      "about": "エージェントについて",
       "noEditor": "まずチャットを開いてください。エージェントは入力欄経由で動作します。",
       "composerBusy": "実行中のタスクの結果が入力欄で待っています。先にそれを送信してから、もう一度お試しください。",
       "sessionBusy": "すでにタスクが実行中です。完了させるか停止してから、新しいタスクを始めてください。",
       "stopRunning": "実行中のタスクを停止",
       "safety": "操作対象はローカルデータベースのみです。変更前に必ず確認します。",
       "freeTier": "無料プランは読み取り専用です。アップグレードするとエージェントが変更できるようになります。",
-      "manage": "スキルとツールを管理",
-      "newChatHint": "開いているチャットで実行されます。きれいに保つには新しいチャットを開いてください。",
-      "triggerHint": "チャット入力欄で > と入力してもエージェントを起動できます。"
+      "manage": "スキルとツール",
+      "stepsTitle": "使い方",
+      "step1": "任意のチャット画面を開きます。",
+      "step2": "入力欄に > と入力し、エージェントを選択します。",
+      "step3": "依頼したい内容を記述し、Enter を押して送信します。",
+      "examplesTitle": "入力例",
+      "examplesHint": "クリックで入力欄に反映され、送信前に編集できます。具体的に指示するほど精度が上がります。",
+      "examplesHintLabel": "使い方のヒント",
+      "examplePick": "入力欄に反映",
+      "workspaceHint": "エージェントのファイル読み書き領域",
+      "manageHint": "エージェントの権限と確認のタイミングを設定",
+      "examplePrev": "前の例",
+      "exampleNext": "次の例",
+      "examples": {
+        "classify": {
+          "label": "会話履歴を整理する",
+          "text": "未分類の会話履歴を整理して。まずテーマ別にグループ分けした案を見せてほしい。既存フォルダに合わないものは新規作成して移動して。最後に内容に応じたタグ付けをお願い。その際、似たタグが増えないように、なるべく既存のタグを使い回して。"
+        },
+        "search": {
+          "label": "詳細な検索",
+          "text": "「Docker のデプロイ」に言及しているものをすべて探して。タイトルだけでなく、会話、メッセージ本文、コードスニペットも対象。最新順に並べて、各項目に1行の要約と保存先フォルダ名を添えて。"
+        },
+        "export": {
+          "label": "一括エクスポート",
+          "text": "「仕事」フォルダにある3月以降の会話をすべて Markdown でエクスポートして。会話ごとに1ファイルにして zip でまとめて。もしメッセージが未同期の会話があれば、エクスポートの前に教えて。"
+        },
+        "sync": {
+          "label": "欠落した履歴の同期",
+          "text": "タイトルだけでメッセージ本文が保存されていない会話がいくつあるか調べて。まず総数を教えて、新しい順に並べた上で、最近の20件を同期して。検索やエクスポートの対象に含めたいから。"
+        },
+        "prompts": {
+          "label": "プロンプトの整理",
+          "text": "プロンプトライブラリを整理して。/ で検索しづらいものは、検索しそうなキーワードをタイトルの先頭に移動して。また、複数のプロンプトで重複している「役割設定＋出力形式」を共通のプロンプトとして切り出し、他から参照するようにして。選択肢が固定の変数は、自由入力ではなくドロップダウンにして。"
+        },
+        "snippets": {
+          "label": "スニペットの整理",
+          "text": "スニペットの受信トレイを整理して。テーマ別にフォルダを作って移動し、質問文がそのままのタイトルは簡潔な説明に書き換えて。重複して保存されている内容は、一番古いものだけを残して。削除を実行する前に、必ず確認用のリストを見せて。"
+        },
+        "workspace": {
+          "label": "決定事項の記録",
+          "text": "今回の会話での決定事項を要点リストにまとめ、ワークスペースの notes/decisions.md に保存して。最後に未確認の論点も添えて。ファイルがすでに存在する場合は上書きせず、今日の日付を付けて末尾に追記して。"
+        },
+        "stats": {
+          "label": "統計データの分析",
+          "text": "統計表を作成して。フォルダごとの会話数、直近1か月の新規追加数、3か月以上更新がないフォルダをリストアップして。そのデータに基づいて、統合したほうがいいフォルダを提案して。"
+        }
+      }
     },
     "send": {
       "sessionBusy": "すでにタスクが実行中のため、これは送信されませんでした。停止してから、もう一度 Enter を押してください。",
@@ -1205,6 +1308,15 @@
       "export": "エクスポートしています",
       "complete": "仕上げています",
       "generic": "ステップを実行しています",
+      "readFile": "ファイルを読んでいます",
+      "writeFile": "ファイルを書き込んでいます",
+      "editFile": "ファイルを編集しています",
+      "listFiles": "ワークスペースを確認しています",
+      "globFiles": "ファイルを探しています",
+      "grepFiles": "ファイルの中を検索しています",
+      "manageFiles": "ファイルを整理しています",
+      "docRead": "ドキュメントを読んでいます",
+      "docEdit": "ドキュメントに変更履歴を記録しています",
       "nameLabel": "操作",
       "statement": "実行文",
       "waiting": "あなたの操作を待っています",
@@ -1255,6 +1367,7 @@
       "noToolCallDesc": "エージェントの最後の返答では何も実行されませんでした。チャットで内容を確認し、まだ必要ならもう一度実行してください。",
       "ended": "セッション終了",
       "paywallDesc": "無料プランではエージェントはデータの読み取りのみ可能です。書き込みを許可するにはアップグレードしてください。",
+      "paywallWorkspaceDesc": "無料プランでは 1 つのワークスペース（最大 {{max}} ファイル）を利用できます。アップグレードして無制限に。",
       "paywallFeature": "エージェントのデータベース書き込み",
       "steps_one": "{{count}} ステップ実行",
       "steps_other": "{{count}} ステップ実行",
@@ -1327,7 +1440,12 @@
       "maxSkills": "カスタムスキルの上限（20個）に達しました。",
       "mcpTitle": "MCP サーバー",
       "mcpDescription": "MCP サーバーはエージェントが使用できるツールを提供します。",
-      "mcpToolCount": "{{count}} ツール"
+      "mcpToolCount": "{{count}} ツール",
+      "agentsTitle": "エージェント",
+      "agentsDesc": "エージェントごとに扱う対象とツールが異なります。入力欄で > と打つと起動します。",
+      "noTools": "任意ツールはありません。",
+      "noSkills": "スキルはまだありません。このエージェントは自身の指示だけで動きます。",
+      "builtinSkillNote": "組み込みスキルはオフにできますが編集はできません。"
     },
     "skills": {
       "autoClassify": {
@@ -1349,6 +1467,18 @@
       "manageSnippets": {
         "title": "スニペットを管理",
         "description": "保存済みスニペットの整理・重複排除・検索 — 全文を含む"
+      },
+      "workspace": {
+        "title": "ワークスペースアシスタント",
+        "description": "プライベートなワークスペース内でファイルを読み書き・編集・検索します"
+      },
+      "docxReview": {
+        "title": "Word 文書をレビュー",
+        "description": ".docx を章ごとに読み進めます — 問題点にコメントを付け、修正案は変更履歴として提案します"
+      },
+      "spreadsheetAnalysis": {
+        "title": "スプレッドシートを読み解く",
+        "description": ".xlsx はまず構造から読み、そのうえで計算します — 元のデータは変えず、列やシートを追加する形で進めます"
       }
     },
     "mcp": {
@@ -1361,12 +1491,62 @@
         "execute_sql": "ローカルデータベースで SQL クエリを実行",
         "sync_conversation_messages": "メッセージ履歴のない会話の内容を記録",
         "export": "会話をファイルとしてダウンロード",
-        "complete_task": "エージェントループを終了して結果を報告"
+        "complete_task": "エージェントループを終了して結果を報告",
+        "doc_read": "Word 文書を読む：アウトライン、セクション、検索",
+        "read_file": "テキストファイルを行番号付きで読む",
+        "write_file": "ファイルを新規作成、または全置換",
+        "edit_file": "ファイル内の指定テキストを置換",
+        "list_files": "フォルダの中身を一覧表示",
+        "glob_files": "名前のパターンでファイルを探す",
+        "grep_files": "正規表現でファイル内容を検索",
+        "manage_files": "削除・移動・フォルダ作成"
+      },
+      "documents": {
+        "name": "ドキュメント",
+        "description": "Word 文書をアウトラインとセクション単位で読む"
+      },
+      "core": {
+        "name": "コア",
+        "description": "すべてのエージェントで共通、常に有効です。"
+      },
+      "bettersidebar": {
+        "name": "Better Sidebar のデータ",
+        "description": "会話・フォルダ・タグ・プロンプトの照会と変更"
+      },
+      "workspace": {
+        "name": "ファイル",
+        "description": "テキストファイルの読み書き・編集・検索"
       }
     },
     "entry": {
       "autoTitle": "Better Sidebar エージェント",
       "autoDescription": "タスクを説明すると、エージェントが適切なツールを選びます"
+    },
+    "workspace": {
+      "paywallWorkspaces": "複数のワークスペース",
+      "paywallFiles": "ワークスペースあたり {{max}} 件を超えるファイル",
+      "paywallFilesSkipped": "{{files}} 件のファイルをスキップしました — 無料プランはワークスペースごとに最大 {{max}} 件です"
+    },
+    "agents": {
+      "bettersidebar": {
+        "name": "Better Sidebar",
+        "description": "会話・フォルダ・タグ・プロンプト・スニペットを整理"
+      },
+      "workspace": {
+        "name": "ワークスペース",
+        "description": "ワークスペース内のファイルや文書を読み書き・編集"
+      }
+    },
+    "switcher": {
+      "label": "エージェントを選択"
+    },
+    "workspaceIntro": {
+      "title": "AI と一緒にワークスペース文書を操作",
+      "body": "ここのファイルは会話をまたいで残り、Gemini と AI Studio で共有されます。入力欄で > Workspace と打つとこのエージェントが動き出します。",
+      "detail": "テキストファイルは直接読み書きし、Word 文書はアウトラインとセクション単位で読み取ります。会話やワークスペース外のものは一切見えず、変更は必ず事前に確認されます。",
+      "about": "ワークスペースについて",
+      "howToUseTitle": "Workspace の使い方",
+      "howToUseContent": "Workspace は専用のファイル作業エリアです。AI がドキュメントやコードを直接読み取り、編集し、ゼロから新規作成することもできます。\n\n使い方：\nチャット入力欄に >Workspace と入力するとエージェントが起動します。手元のファイルをワークスペースにドラッグ＆ドロップして処理させることも、ゼロから AI にファイルを作成させること（フロントエンドプロジェクトの新規作成など）も可能です。\n\n対応形式と機能：\n- プレーンテキスト＆コード（.html, .js, .ts, .py, .md, .txt など）：ゼロからの新規作成と高精度な編集に完全対応！フロントエンドプロジェクトのゼロからの立ち上げ、スクリプト作成、Markdown メモの執筆、既存コードのリファクタリングなどを依頼できます。\n- Word 文書 (.docx)：章ごとの論文レビュー、変更履歴（校閲）モードでの段落リライト、コメントの追加（既存ファイルのアップロードが必要）。\n- Excel スプレッドシート (.xlsx/.csv)：データ分析、数式の入力、列の追加（既存ファイルの書式やグラフを崩さずに編集可能）。\n- PDF 文書：文献やレポートの閲覧、テキスト抽出、ページの結合、ハイライトや注釈の追加。\n- プレゼンテーション (.pptx)：スライドのテキストや発表者ノートの読み取り・編集。\n- 字幕ファイル (.srt/.vtt)：タイムスタンプを維持したまま字幕を翻訳・推敲。\n\n💡 ヒント：テキストやコードファイルはゼロから新規作成および自由な編集が可能です。Word、Excel、PPT、PDF などの特殊フォーマットは、元のレイアウトを保持するため、既存ファイルの読み取り・注釈・ピンポイント編集に対応しています。"
     }
   },
   "backup": {

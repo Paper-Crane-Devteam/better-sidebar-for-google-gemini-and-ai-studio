@@ -9,6 +9,7 @@
 
 import type { AgentPlatformAdapter } from './types';
 import { GeminiAgentAdapter } from './gemini-adapter';
+import { AIStudioAgentAdapter } from './aistudio-adapter';
 
 // ─── Platform Types ──────────────────────────────────────────────────────────
 
@@ -42,9 +43,7 @@ const ADAPTER_REGISTRY: PlatformInfo[] = [
     id: 'aistudio',
     displayName: 'Google AI Studio',
     hostnames: ['aistudio.google.com'],
-    // TODO: Implement AIStudioAgentAdapter
-    // For now falls back to Gemini adapter (similar Quill-based editor)
-    createAdapter: () => new GeminiAgentAdapter(),
+    createAdapter: () => new AIStudioAgentAdapter(),
   },
   // Future platforms:
   // {

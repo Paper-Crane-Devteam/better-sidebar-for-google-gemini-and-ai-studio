@@ -16,6 +16,10 @@
  * accident rather than a decision, so the breaker grants one retry per session.
  */
 
+import {
+  selectSettledAnswer,
+  useModelStreamStore,
+} from '@/shared/lib/model-stream-store';
 import type { ParsedToolCall } from '../../types';
 import type { LoopContext } from '../context';
 import { parseToolCalls, hasUnclosedToolBlock } from '../parser';
@@ -31,10 +35,13 @@ export type ParseOutcome =
 export function parseResponse(ctx: LoopContext, responseElement: HTMLElement): ParseOutcome {
   ctx.setStatus('parsing');
 
-  const responseText = ctx.adapter.extractResponseText(responseElement);
+  const { text: responseText, source } = readResponseText(ctx, responseElement);
   const { toolCalls, errors } = parseToolCalls(responseText);
 
-  console.log('[AgentLoop] Parsing response, length:', responseText.length);
+  console.log(
+    `[AgentLoop] Parsing response from ${source}, length:`,
+    responseText.length,
+  );
   console.log(`[AgentLoop] Found ${toolCalls.length} tool calls, ${errors.length} errors`);
 
   ctx.events.emit('ai:response-received', {
@@ -73,4 +80,63 @@ export function parseResponse(ctx: LoopContext, responseElement: HTMLElement): P
   console.log('[AgentLoop] No tool calls in the response, ending session');
   ctx.finish('no_tool_call');
   return { kind: 'stalled' };
+}
+
+/**
+ * The model's reply — from the API stream when we can have it, from the DOM when we
+ * can't.
+ *
+ * ## Why the stream is preferred
+ *
+ * Both platforms run the reply through a CommonMark renderer before it reaches the
+ * document, and a renderer consumes its own syntax. Measured on live captures: `\"`
+ * arrives as `"`, `\\` as `\`, `*a*` as `a`; on Gemini raw HTML tags are dropped
+ * outright and URLs are swapped for link components. A `write_file` whose content is
+ * itself JSON therefore fails `JSON.parse` — 11 of 15 calls in one real session — and
+ * the ones that still parse can be silently corrupted, which is worse: a
+ * `tailwind.config.js` arrived with the asterisk closing its block comment eaten, and a
+ * glob of `**` + `/` + `*.{js,ts}` reduced to `**` + `/` + `.{js,ts}`. Both were written
+ * to disk that way.
+ *
+ * It is not only about parsing. `buildToolCallKey` digests a call's params, and the card
+ * in the chat computes it independently from the *store's* copy of the same turn. While
+ * the engine read the DOM the two digests disagreed, so a call could run and still
+ * report "Not run". Reading one source fixes the cards as a side effect.
+ *
+ * ## Why the DOM stays
+ *
+ * The stream formats are Google's private wire protocols, addressed by array index.
+ * They change. If a reader stops recognising its payload the answer here is a degraded
+ * agent, not a dead one — so `extractLiteralResponseText` and the escape tolerance in
+ * the parser are still in place, just no longer on the default path.
+ *
+ * The element is still what stage ① hands over and still what proves *which* turn
+ * finished; the stream only supplies better bytes for it.
+ */
+function readResponseText(
+  ctx: LoopContext,
+  responseElement: HTMLElement,
+): { text: string; source: 'api stream' | 'DOM' } {
+  const stream = useModelStreamStore.getState();
+  const streamed = selectSettledAnswer(stream, ctx.streamBoundary);
+
+  if (streamed) {
+    // Enough to tell a bad read from a bad response in one line. A stream shorter than
+    // the DOM copy means the reader is losing tail, which looks identical to the model
+    // truncating its own answer — and the two want opposite fixes.
+    const domLength = ctx.adapter.extractResponseText(responseElement).length;
+    console.log(
+      `[AgentLoop] Response source=api stream chars=${streamed.length} ` +
+        `domChars=${domLength} unclosedBlock=${hasUnclosedToolBlock(streamed)}`,
+    );
+    return { text: streamed, source: 'api stream' };
+  }
+
+  console.warn(
+    '[AgentLoop] No settled stream for this turn — falling back to the rendered DOM, ' +
+      'which loses backslash escapes and markdown delimiters. ' +
+      `streamId=${stream.streamId} boundary=${ctx.streamBoundary} ` +
+      `finished=${stream.finished} answerChars=${stream.answer.length}`,
+  );
+  return { text: ctx.adapter.extractResponseText(responseElement), source: 'DOM' };
 }

@@ -9,7 +9,7 @@
 | 位置 | 角色 | 内容 |
 |------|------|------|
 | 设置 → Agent | 装备库 | Skills CRUD、MCP 开关（低频、跨会话） |
-| Agent Tab（侧边栏） | 起点 | **只有**「怎么开始一个任务」：技能卡 + 自由描述 |
+| Agent Tab（侧边栏） | 教学 | **只有**「怎么开始一个任务」：三步说明 + 范例句 + 工作区/设置入口 |
 | Agent Dock（贴输入框） | 决策 | 状态一行 + Stop、批准、继续、check-in、中断、结束卡 |
 | 聊天流内（renderer） | 内容 | 工具卡片、结果详情、Agent 定制视图 |
 
@@ -19,7 +19,12 @@
 于是所有决策都藏在两个前提后面：侧边栏是开的 **且** 停在 Agent tab 上。侧边栏一关，
 批准请求压根没有可见的出口，引擎就在后台永远挂着等一个用户看不见的按钮。
 
-Tab 唯一对运行中的让步是**启动器变灰**：`start()` 会清空 store，再点一张技能卡等于
+⚠️ **Tab 里没有输入框。** 唯一入口是聊天输入框打 `>`；Tab 只负责把这件事说清楚，
+并给出足够细的范例句。以前 Tab 自带 textarea + 技能卡，等于同一个动作有两个入口，
+侧边栏那个还得自己实现转发、清空和各种失败提示。范例句点击后只是**填进**输入框
+（不自动发送），入口依旧只有一个。
+
+Tab 唯一对运行中的让步是**范例变灰**：`start()` 会清空 store，运行中再填一条等于
 把正在跑的会话无声顶掉。以前靠「整个面板被状态面板替换」挡住了，现在必须显式拒绝。
 
 ```
@@ -80,9 +85,12 @@ src/entrypoints/overlay.content/shared/
 │   │   ├── mcp/                   # MCP registry + providers（工具真正的注册处）
 │   │   └── tools/                 # execute-sql / export / sync / complete-task
 │   ├── agent-tab/                 # 侧边栏 Agent Tab —— 只有启动器，永不变样
-│   │   ├── AgentTab.tsx           # 就是 <AgentLauncher />
+│   │   ├── AgentTab.tsx           # <AgentLauncher /> ⇆ <WorkspaceView />
 │   │   └── components/
-│   │       └── AgentLauncher.tsx          # 技能卡 + 自由描述任务（运行中变灰）
+│   │       ├── AgentLauncher.tsx          # 布局 + 工作区/设置入口 + 不可用提示
+│   │       ├── LauncherCta.tsx            # 「输入框打 > 」三步图示（唯一入口）
+│   │       ├── LauncherExamples.tsx       # 范例句轮播（7s 自动轮换，hover 暂停+出箭头）
+│   │       └── agent-examples.ts          # 范例句数据：每个模块一条，故意写得很细
 │   ├── agent-dock/                # ★ 贴在输入框右上角的决策浮层（页面级）
 │   │   ├── AgentDock.tsx          # 可见性 / 自动展开 / 会话与对话绑定
 │   │   ├── useComposerAnchor.ts   # 轮询输入框 rect（Angular 会换掉节点）
@@ -126,12 +134,13 @@ src/entrypoints/overlay.content/gemini/OverlayPanel.tsx   # 渲染 <AgentTab />
 ## 核心执行流程
 
 ```
-两个启动入口：
+唯一启动入口是聊天输入框：
   A. 用户输入 ">" → useAgentTrigger → AgentCommandPopup → 选择条目
-  B. Agent Tab 点技能卡 → emit('launcher:run-entry') → AgentLoopFeature 监听
+  B. Agent Tab 点范例句 → emit('launcher:run-entry', { autoSend: false })
+     → AgentLoopFeature 监听 → 只是替用户把 capsule + 句子填进同一个输入框
        ↓
 capsule 写入编辑器（insertCapsuleAtRange 或 appendCapsule）
-       ↓ 用户按 Enter / 点发送按钮（入口 B 可 autoSend）
+       ↓ 用户按 Enter / 点发送按钮（autoSend 目前只有恢复流程用）
 composeAndSend():
   读 capsule 的 data-prompt-id → getAgentEntryById()
   assembleFinalPrompt(soul + skill + tool schemas) → adapter.triggerSend()
@@ -144,6 +153,8 @@ AgentLoopEngine.start(20, { conversationId, title })
   adapter.observeAIResponseComplete(30s 静默)              │
        ↓ AI 回复完成（静默超时 → pause + return）           │
 ② stages/parse-response.ts                                │
+  取文：selectSettledAnswer(model-stream-store)            │
+        ← API 流原文；为空才回落 DOM（有 warn）             │
   status = parsing → parseToolCalls()                     │
   无 tool call：                                           │
     标签未闭合 / JSON 解析失败                              │
@@ -244,6 +255,35 @@ Gemini 是被动的：不给它发消息，它永远不会再说话。而 ④ �
 `ResultHandoff` 是唯一有状态的阶段：它记着「已 staged 但还没确认发出」的 payload。
 `resume()` 靠这个决定是先补发上一轮结果还是直接进下一轮 —— 少了它，Retry 会去等一个
 根本没发出去的消息的回复，表现为卡到 60s 超时。
+
+### 模型回复从哪读：API 流，不是 DOM
+
+两个平台都把模型输出先过一遍 CommonMark 渲染器再进文档，而渲染器会吃掉自己的语法。
+实测：`\"` 变成 `"`（ASCII 标点的反斜杠转义被消费），`\\` 变成 `\`，`*a*` 变成 `a`；
+Gemini 上裸 HTML 标签直接消失、URL 被换成链接组件。所以 `write_file` 的 content 本身
+是 JSON 时，`JSON.parse` 会失败 —— 一个真实会话里 15 个调用挂了 11 个。**能解析的那些
+也可能已经被静默改坏**：`tailwind.config.js` 的 `*/` 丢了一个 `*`，照那样写进了磁盘。
+
+所以 stage ② 读 `selectSettledAnswer(model-stream-store)`，也就是拦截器抓的原文，
+只在它为空时才回落 DOM（并打 warn）。两个平台的原文都验证过与模型输出逐字一致。
+
+喂这个 store 的是两个读取器，线格式完全不同，差异在读取器里就被吸收掉了：
+
+| | 端点 | 文本语义 | 完成信号 |
+|---|---|---|---|
+| AI Studio | `GenerateContent` | **增量**，要累加 | payload 里的 `finishReason` |
+| Gemini | `StreamGenerate` | **全量快照**，要替换 | `readyState 4`（线上没有等价字段） |
+
+⚠️ **这不只是解析问题，还是身份问题。** `buildToolCallKey` / `buildToolCallFingerprint`
+是对 params 做的摘要，而引擎和渲染卡片的组件**各自独立算一遍**。两边读到的字节不同，
+摘要就不同，后果是：审批时引擎 publish 的 fingerprint 对不上任何卡片，**审批按钮不会
+出现在任何地方**，引擎在等一个用户从没被询问过的决定；`records[joinKey]` 同样查不到，
+跑过的调用显示成 Not run。所以渲染层必须和引擎同源 —— 见
+`renderer/useConversationMessages.ts` 的 `verbatimModelText`。
+
+DOM 那条路**刻意保留**：这些是 Google 的私有格式、按数组下标寻址，会变。下标一旦对不上，
+代价应该是「降级的 agent」而不是「死掉的 agent」，所以 `response-text.ts` 和 parser 里的
+转义容忍都还在，只是不在默认路径上了。
 
 ### 怎么判断「AI 回复完了」
 
@@ -835,7 +875,53 @@ desired = override ?? (hasAgentContent || isRunning ? 'custom' : 'original')
 
 ---
 
-## 消息发送的两条路径
+## AI Studio 上的 `>`：没有 capsule，标记自描述
+
+textarea 装不了节点，所以选中条目后写进输入框的就是纯文本 `>条目标题 `。
+关键决定是**条目 id 从文本本身反推**（`matchAgentEntryInText`），不存在任何配套 state：
+
+⚠️ 用 React state 存 id 的话，组件一重挂载 state 就没了，而标记还在输入框里 ——
+下一次发送会把 `>条目标题 用户那句话` 当普通消息发出去。这个失败**用户完全看不见**，
+表现就是「这个技能坏了」。文本自描述顺带还让用户手打标记也能用。
+
+两个配套机制，缺一个都会出问题：
+
+| 机制 | 没有它会怎样 |
+|------|-------------|
+| `maskEntryMarker()`（喂给触发检测前把标记打成零宽空格） | 标记自己的 `>` 会在后面每敲一个字时重新弹出选择框。Gemini 靠 capsule 元素 + `getTextExcludingCapsules` 绕开，textarea 只能在字符串上做同一件事。用零宽空格而不是删掉，是为了标记后面的偏移量还对得上光标 |
+| `composeAndSend` 里先查 `RESULT_OPEN_TAG` 再找标记 | 引擎的结果在 AI Studio 上是纯文本躺在输入框里，正文里完全可能出现一行像标记的东西（markdown 引用了一个标题）。先匹配到标记就会走进「已有会话在跑」分支，**拦掉运行中的循环正在等的那次发送** |
+
+### 发送拦截：按钮 + 键盘，两个都要
+
+`aistudio-editor.ts` 的 `installRunInterceptor()`，document capture：
+
+- **Run 按钮点击** —— 主路径。选择器要经 `footer` 收窄，因为 `ms-run-button`
+  在每个 chat turn 上也有一个（单轮重跑），抓错了「发送」会变成静默重跑一轮旧的。
+- **Enter 键** —— 不可省。AI Studio 允许用户自己选 Enter 还是 Ctrl/Cmd+Enter 发送，
+  而这个偏好我们读不到，所以只拦按钮的话另一半按键会把原始 `>标题` 直接发出去。
+  于是**有待发送标记时，带不带 modifier 的 Enter 都拦**，代价是那期间非配置的那个键
+  插不了换行。Shift+Enter 不碰（任何设置下都是换行）。
+
+⚠️ document capture 的 keydown 比输入框上的 popup handler **先**执行，
+所以 `composeAndSend` 第一件事是「弹窗开着就返回 false」——那一下 Enter 的语义是
+「确认选中项」不是「发送」。返回 false 不 preventDefault，popup 自己的 handler 接着跑。
+
+⚠️ `registerBeforeRunHandler` 和 Gemini 侧一样是**模块级单槽**：`/` 不注册，`>` 注册。
+
+### `<textarea>` 的内容变化 MutationObserver 看不见
+
+`send-watcher` 的第①步（等 payload 离开输入框）在 AI Studio 上**必须靠轮询**：
+textarea 的内容在 `value` 属性里，属性写入不产生任何 mutation record。
+只用 observer 的话，一次完全成功的发送会在那儿干等满 5 分钟，然后报「结果没送出去」。
+现在 observer 和 200ms 轮询并存，Gemini 走 observer，AI Studio 走轮询，不分平台。
+
+⚠️ 同理，`setValue` 必须走 `HTMLTextAreaElement.prototype` 的**原生 setter**：
+Angular 在元素上覆盖了 `value`，直接赋值写进错误的地方，模型不更新 ——
+症状是输入框看着有内容而 Run 按钮一直 disabled。
+
+---
+
+## 消息发送的两条路径（Gemini）
 
 ### 路径 1: Enter 键
 
@@ -871,13 +957,37 @@ Gemini 就把那段原文发出去了。
 
 ## 关键组件详解
 
-### GeminiAgentAdapter
+### 平台适配层
 
-位于 `adapters/gemini-adapter.ts`。调用 `quill-editor.ts` 的方法：
-- `getEditor()` → `quillGetEditor()`
-- `insertText(text)` → `replaceAllContent(editor, text)`
-- `triggerSend()` → `quillTriggerSend()`
-- `getCursorPosition()` → `quillGetCursorPosition(editor)`
+`adapters/types.ts` 的 `AgentPlatformAdapter` 是引擎看世界的唯一窗口。
+**引擎里不许再直接 import `quill-editor`**（或 `aistudio-editor`）——这条以前破了三个口子，
+所以 AI Studio 无论适配器写成什么样都跑不起来：
+
+| 原来 | 现在 |
+|------|------|
+| `send-watcher` import `getSendButtonState` | `adapter.getComposerState()` |
+| `handoff/index` import `triggerSend` | `adapter.triggerSend()` |
+| `staging.ts` import 一堆 capsule helper | `adapter.stageResultCapsules?()` / `hasStagedCapsules?()` |
+
+`getComposerState()` 返回 `ComposerState`（`send` / `stop` / `absent` / `unknown`）。
+⚠️ **`absent` 是语义而不是「元素不存在」**：Gemini 输入框空的时候把按钮整个删掉，
+AI Studio 留着按钮但打上 `aria-disabled="true"`。两种 DOM，同一个权威事实
+（没在生成 + 没人在输入），所以都映射到 `absent`——① 靠它区分「答案静默了」和
+「消息压根没送出去」，映射错会让 `not_delivered` 那一档失效。
+
+`stageResultCapsules?` 是**可选**的，而「没有」是一个正常答案不是待填的坑：
+它需要能容纳非文本节点的编辑器。AI Studio 是纯 `<textarea>`，所以 `staging.ts`
+退到纯文本，`<bs_agent_result>` 那段payload 就明晃晃躺在输入框里。这在 AI Studio 上
+是**常规路径**，不是降级。
+
+`response-settle.ts` 是「AI 回复完了没」的唯一实现，两个适配器共用，
+平台差异只有三个读取函数（`ResponseSettleProbe`）。原来这段 100 行带满注释的逻辑
+长在 gemini-adapter 里，抄第二份等于把里面每一个历史坑再学一遍。
+
+| 适配器 | 编辑器 | 结果暂存 | 送出 |
+|--------|--------|----------|------|
+| `gemini-adapter` | Quill contenteditable | capsule | 发送按钮（send/stop 同一个） |
+| `aistudio-adapter` | `<textarea>` | 纯文本 | Run 按钮（Run/Stop 同一个） |
 
 ### useEditorIntegration
 
@@ -994,6 +1104,107 @@ ROUND_BUDGET        = 29998
 
 ⚠️ **instruction 和 errors 不裁只算**。它们本来就短，而且是 AI 最需要完整看到的部分；
 但它们占掉的字符会计入 `reserved`，所以工具输出会自动让位。
+
+### 开场那条消息也受同一个上限，而且它以前砍错了一头
+
+`>` 送出去的第一条消息是 `marker + system prompt + '\n\n## User Request\n\n' + 用户输入`，
+走的是同一个输入框，所以同一个 ~30k 上限。两个平台的 feature 里原本都是这么兜的：
+
+```ts
+if (full.length > MAX_MESSAGE_LENGTH) full = full.substring(0, MAX_MESSAGE_LENGTH);
+```
+
+⚠️ **用户输入拼在最后，从尾巴砍就是精准砍掉用户的活儿、留下一整套指令。** 而且是静默的：
+消息照常发出、`user-query` 照常出现、send-watcher 判送达、引擎照常开始跑一个没人交代过的任务。
+用户看到的现象是「命令没发出去，只有系统指令」，控制台里只有一行 `console.warn`。
+
+触发它只需要 prompt 长一点：实测 system prompt 已经在 **28.7k–29.9k**，占掉上限的 96% 以上，
+加一个 1249 字符的 tool schema（`doc_read` 的初版）就顶过线了。
+
+现在这段逻辑收在 `prompts/initial-message.ts`，policy 是三条：
+
+| 规则 | 为什么 |
+|------|------|
+| 用户输入永不为了指令让位 | 被截的指令还描述着大部分工具；被截的任务就是没人提过的任务 |
+| 指令最多让出 `USER_RESERVE = 8000` 字符 | 再往下让会砍掉「怎么结束循环」那段；超过这个长度的输入是粘贴的材料，该进工作区文件 |
+| 两种截断都在正文里留话 | 只说「有内容被删」模型会照跑；说「你需要的工具可能没写在上面，别猜」它才会问 |
+
+上限从两个文件里各写一遍的 `30000` 改成 import `budget.ts` 的 `ROUND_BUDGET`
+（= `COMPOSER_CHAR_LIMIT - SAFETY_MARGIN` = 29998）。同一个输入框，同一个实测数字，
+以前是三处真相。
+
+⚠️ **如果正常使用中看到了截断提示，要修的不是上限而是 prompt。** 现在的构成里
+`## Database Schema` 一段就 7636 字符（占 1/4），是最该动的地方。新增 tool schema 前
+先想清楚：schema 是**每一轮**都进 prompt 的，而放进 skill 的内容是按需加载的。
+
+## 两个 agent：Better Sidebar 与 Workspace
+
+`>` 弹出的列表现在**一行一个 agent**，不再有 skill。
+
+| agent | 操作对象 | MCP | Agent tab 显示 |
+|------|------|------|------|
+| `bettersidebar` | 扩展自己的数据（对话/文件夹/标签/提示词/片段） | `builtin-bettersidebar`（sql/sync/export） | launcher |
+| `workspace` | 工作区里的文件与文档 | `builtin-workspace`（Files）+ `builtin-documents` | 简介 + 文件树 |
+
+两者都拿到 `builtin-core`（`complete_task` + `activate_skill`）。⚠️ **core 不可关、也不按 agent 列**
+—— 少了它的 agent 不是「能力弱一点」，是一个只能靠 Stop 退出的死循环。
+
+### agent 不是 skill
+
+以前工作区是个 skill（`builtin-workspace-agent`）。后果是数据库 schema 和文件协议同时在每一轮
+prompt 里，模型经常抓错那一套。现在的分界：
+
+- **skill** 是任务中途按需拉进来的细节，`activate_skill` 加载，属于某一个 agent。
+- **agent** 是整个会话的上下文，第一条消息之前就定了，会话期间不变。
+
+⚠️ **`activeAgentId` 是会话级不变量。** prompt 是按它组装的，工具层也按它判权限；跑到一半改掉
+就会出现「模型手里是 A 的说明书，工具层按 B 收权限」。Agent tab 上的切换器只换**面板**，不换
+正在跑的会话，正在跑的那一行会显示 spinner 把这个区别说清楚。
+
+### 权限是两个独立问题
+
+`mcp/registry.ts` 分开存：
+
+| 问题 | 谁决定 | 存在哪 |
+|------|------|------|
+| **归属** —— 这个 server 属于哪个 agent | 代码（`agents/registry.ts` 的 `mcpServerIds`） | `registry` 的 `ownership` map |
+| **开关** —— 用户要不要它进 prompt | 用户 | `agent-config-store.disabledMcpServers` |
+
+两个都点头才能调用。归属检查放在前面，而且**拒绝话术故意不一样**：
+
+- `other-agent` → `ERROR: 不属于这个 agent，别绕，告诉用户该换哪个 agent 然后结束`
+- `disabled` → `CANCELLED: 用户关掉了`
+
+合并成一句的后果是模型会反复重试一个永远拿不到的工具。⚠️ 这不只是整洁问题：Workspace agent 的
+prompt 里没有 schema，它写出来的任何 SQL 都是对着没见过的表猜的——挡在这里，最坏结果是浪费一轮，
+不挡就是写坏用户数据。
+
+### soul 拆成三块
+
+```
+prompts/souls/shared.ts              ← 协议：工具格式 / 结果怎么回来 / 一轮怎么结束 / 预算
+prompts/souls/bettersidebar-soul.ts  ← schema + 平台过滤 + inbox id + SQL 规则
+prompts/souls/workspace-soul.ts      ← 工作区是什么 + 8 条防静默出错的规则
+```
+
+判断一段该放哪的准则：**提到表、文件、工具名或领域概念的，就是 agent 自己的**。
+「`complete_task` 必须单独一轮」是协议；「先 SELECT 再改」是 Better Sidebar 的规矩。
+
+⚠️ `skillsBlock()` 在没有 skill 时返回空串，不是空列表。Workspace agent 现在就是这个情况——
+给模型看一个空列表，它会用编出来的 id 调 `activate_skill`，白烧一轮。
+
+### 旧 id 必须继续解析
+
+`[#bs-agent:__agent_auto__#]` 写在每一条历史 agent 消息里，`builtin-workspace-agent` 也一样。
+`normalizeAgentId` 把它们映射到真 agent（分别是 bettersidebar / workspace），
+⚠️ 不这么做的话所有历史 agent 轮次都会变成无法识别的条目、卡片全部丢失。
+
+### 「没调用工具」不再弹卡
+
+`no_tool_call` 是最普通的一种结束方式（模型说完话了），而它以前会弹一张只有 Dismiss 按钮的
+结束卡——内容等于「点我把我关掉」，读起来像报错。现在这种情况直接不渲染。
+
+⚠️ 唯一的例外是**还有 Undo 可点**：那时卡必须留着，否则快照就没有入口了，改动也没人解释。
 
 ### prompt 那一层是「劝」，故意说得宽松
 
@@ -1161,6 +1372,70 @@ export function shouldAutoSend(toolCalls: ParsedToolCall[]): boolean {
 | 静止（没在生成、输入框空） | 发送按钮**整个不在 DOM 里** → `getSendButtonState() === 'absent'` |
 | 暗色主题 | `localStorage: Bard-Color-Theme === 'Bard-Dark-Theme'` |
 
+## AI Studio 的对话从哪读
+
+`renderer/useConversationMessages.ts` 是**两个 reader 加一个平台分派**，解析那半边（marker / tool call / 结果 / outcome 对齐）抽到了 `renderer/turn-assembly.ts` 两边共用。
+
+| 平台 | 数据源 | 理由 |
+|------|--------|------|
+| Gemini | DOM | 每一轮都在文档里，而且没有 API 侧的捕获 |
+| AI Studio | `conversation-messages-store` | 它的对话是**虚拟滚动**的 |
+
+**实测数字**（devtools MCP，一个 16 轮的 agent 对话）：
+
+```
+16 个 ms-chat-turn，停在底部时只有 5 个的 .turn-content 有内容
+滚到最顶 → 只有 1 个
+滚回底部 → 6 个
+scrollHeight 9478 → 30698   ← 高度是在滚过去的时候才被量出来的
+```
+
+所以在 AI Studio 上读 DOM 不是「拿到不完整的对话」，是**拿到一个自信的错答案**。而 store 在这里也不是退而求其次：它由 API 拦截器喂，文本是模型的原始输出而不是「渲染完再刮回来」，`<bs_agent_tool>` 块一字不差。
+
+⚠️ **store 落后一轮，而且这是接受的取舍。** 拦截器每次生成结束**才**派发一次（实测：切换对话时一次，"hi" 生成完之后 12 秒又一次），带的是**全量**对话不是增量。所以流式过程中用户那条和模型那条都还没进 store。
+
+不去用 DOM 补这个尾巴，理由是时序刚好够：stream 一关 store 就追上，而那时引擎自己的 settle 判定还要再等两个采样（约 800ms）才认定回复结束——**工具卡片在它需要承接批准之前就已经到位了**。中间那几秒 Dock 在报状态。
+
+⚠️ **而且 DOM 补尾巴这条路是不成立的，别再试。** DOM 的 turn 和 store 的消息对不齐：AI Studio 给「思考」单独一个 `ms-chat-turn`（实测 `domRoles` 是 `User/Model/Model/User/Model` 而 store 过滤掉 thought 后只有 4 条），而一个**被虚拟化掉的** thought 轮里连 `ms-thought-chunk` 都没有——内容没渲染，认不出来。任何按下标对齐的方案都会在最需要它的那些对话上悄悄错位。
+
+### 遮盖原生 + portal 宿主挂哪
+
+| 用途 | Gemini | AI Studio |
+|------|--------|-----------|
+| 遮盖原生（`HIDE_NATIVE_CSS`） | `.conversation-container` 逐轮 | `ms-autoscroll-container .chat-session-content` 一个元素管全部 |
+| portal 宿主（`findOverlayHost`） | 滚动容器本身 | **`ms-chat-session`** |
+| 钉住原生滚动位置 | 要 | **不要** |
+
+⚠️ **`findOverlayHost` 存在的唯一原因就是最后那一行。** 宿主是 `position:absolute; inset:0`，挂在滚动元素上就是「内容锚定」——它待在 scrollTop 0 的位置，跟着被替换掉的那些轮次一起滑出视野。Gemini 的解法是「overlay 开着期间把原生滚动容器钉在顶部」。
+
+那个解法在 AI Studio 上**有害**：钉在顶部会让虚拟滚动器**卸载最新那一轮的内容**，而最新那一轮正是 `useAIStudioLastModelTurn` 读的、也是引擎 `startFromExistingResponse` 要重放的。照抄的话，overlay 一激活就会静默废掉这个对话里的 auto-pickup。
+
+`ms-chat-session` 绕开了整件事（实测）：它和滚动容器**同一个盒子**（top 68 / 676×823）、本来就是 `position: relative`、而且自己不滚。所以 overlay 视口稳定、不用钉任何东西、原生滚动位置不变、最新轮次保持水合。三次滚动测试里 overlay 的 `top/height` 一动没动。
+
+副产品：宿主的宽度就是原生 turn 的宽度（823 of 863），所以内容区写 `width: 100%` 就自动对齐，不需要给 AI Studio 造一个 `chatWidth` 设置。
+
+⚠️ **AI Studio 强制 Trusted Types。** `shadow.innerHTML = '...'` 会直接抛
+`This document requires 'TrustedHTML' assignment`。`applyShadowStyles` 走
+`adoptedStyleSheets`、降级走 `style.textContent`，两条都安全；但在这个平台上任何
+`innerHTML` / `insertAdjacentHTML` 赋值都是运行时炸弹。
+
+## AI Studio DOM 选择器（可能过时）
+
+| 用途 | 选择器 / 判据 |
+|------|--------------|
+| 编辑器 | `ms-chunk-editor ms-prompt-box .prompt-box-container textarea` |
+| Run / Stop 按钮 | `ms-chunk-editor footer ms-prompt-box ms-run-button button`（⚠️ 必须经 `footer` 收窄，turn 上还有重跑按钮） |
+| 生成中 | 按钮里有 `span.spin`，或 `type="button"`（空闲时是 `type="submit"`） |
+| 输入框空 | 按钮 `aria-disabled="true"` → 映射成 `absent`（⚠️ 不是 `.disabled` 属性，那个恒为 false） |
+| 用户消息轮次 | `ms-chat-turn [data-turn-role="User"]`（送达证据） |
+| AI 回复容器 | `ms-chat-turn [data-turn-role="Model"] .turn-content`（⚠️ 不要取整个 turn：`turn-footer` 里的耗时 pill 秒数在跳，文本永远稳定不下来） |
+| 思考过程 | `ms-thought-chunk`，读正文前必须剔掉，否则模型「打算调用」的草稿会被当成真调用解析 |
+| 对话容器（滚动） | `ms-autoscroll-container` → `div` → `div.chat-session-content` → `ms-chat-turn` × N |
+| overlay 宿主（不滚动） | `ms-chat-session`，和滚动容器同盒子、已是 `position: relative` |
+| 轮次虚拟化 | `.virtual-scroll-container` + 一个带固定 height 的占位 div；离开视口后 `.turn-content` 是空的。`scrollHeight` 在内容被渲染过之前也是假的（实测 9478 → 30698） |
+| 思考轮次 | 独占一个 `ms-chat-turn`，里面是 `ms-thought-chunk`；store 侧 `message_type === 'thought'` 会被过滤掉，所以两边条数**不相等** |
+| 暗色 | `document.body.classList.contains('dark-theme')`，和 Gemini 同名（`prefers-color-scheme` 不可信，AI Studio 显式写 class） |
+
 ---
 
 ## 开发常见操作
@@ -1195,7 +1470,9 @@ Prompt 里的工具文档由 `mcp/schema-generator.ts` 自动生成，不用手�
 ### 新增一个内置 Skill
 
 1. 在 `skills/builtin-skills.ts` 追加一条 `Skill`
-2. 自动出现在 `>` 弹窗、Agent Tab 启动器卡片、设置里的 Skills 列表
+2. 自动出现在 `>` 弹窗和设置里的 Skills 列表（Agent Tab 不再列技能卡）
+3. 顺手在 `agent-tab/components/agent-examples.ts` 加一条范例句 —— Tab 靠范例句
+   而不是技能列表告诉用户「这个模块能干什么」，新技能不写范例等于没人知道
 
 ### 新增一个启动入口
 
@@ -1230,11 +1507,25 @@ agentEventBus.emit('launcher:run-entry', { entryId, userInput, autoSend });
 
 ### 修改编辑器交互逻辑
 
-**只改 `quill-editor.ts`**。所有消费者（adapter、engine、renderer、useEditorIntegration）都通过它操作编辑器。
+一个平台一个文件，改那一个就够：`quill-editor.ts`（Gemini）/ `aistudio-editor.ts`（AI Studio）。
+所有消费者都经由它操作编辑器。⚠️ **引擎里不要直接 import 这两个文件**，走
+`AgentPlatformAdapter`——见「平台适配层」，那三个口子就是 AI Studio 一直跑不通的原因。
 
 ### 修改发送按钮选择器
 
-改 `quill-editor.ts` 里的 `SEND_BUTTON_SELECTOR` 常量。`triggerSend()` 和 `installSendButtonInterceptor()` 都引用它。
+Gemini 改 `quill-editor.ts` 的 `SEND_BUTTON_SELECTOR`（`triggerSend()` 和
+`installSendButtonInterceptor()` 都引用它）；AI Studio 改 `aistudio-editor.ts` 的
+`RUN_BUTTON_SELECTOR`。
+
+### 新增一个平台
+
+1. `shared/lib/<platform>-editor.ts`：编辑器读写 + 发送按钮状态 + 发送拦截
+2. `adapters/<platform>-adapter.ts`：实现 `AgentPlatformAdapter`，
+   `observeAIResponseComplete` 直接转给 `waitForResponseToSettle`，别重写那套判定
+3. `adapters/adapter-factory.ts` 的 `ADAPTER_REGISTRY` 注册
+4. `<platform>/enhanced-features/AgentLoopFeature.tsx`：`>` 弹窗 + `composeAndSend` + `<AgentDock />`
+5. `agent-dock/useComposerAnchor.ts` 的 `COMPOSER_BOX_SELECTORS` 加一条
+6. 渲染层（`renderer/`）单独评估——它的 DOM 假设是 Gemini 的，见 TODO 表
 
 ---
 
@@ -1264,9 +1555,11 @@ agentEventBus.emit('launcher:run-entry', { entryId, userInput, autoSend });
 | sync_conversation_messages | 已做 | `tools/sync/`：对话间走 Gemini 自己的路由（`shared/lib/navigation`，同 explorer），整个 run 活在一个 JS 上下文里，所以有常驻进度 toast（`sync-progress.ts`）和即时生效的 Stop。job 仍存 `chrome.storage.local`，供路由打不开时的整页兜底和关标签后 `resumeSyncRun()` 续跑（续跑同样先立进度条，可中断）。到站判据是「message 列表指纹变了」而不是「有没有 message」——旧对话的 DOM 会滞留一拍。滚动目标是 `chat-window infinite-scroller`（同 SmartScrollbar），往上滚到高度不再变为止；选不到该元素时降级为 `no-scroller`，只录打开时那一页，entry 记 `partial`。未在真实长对话上验证过 |
 | handoff 工具 | 已做 | `HANDOFF_TOOLS`（目前只有 sync）：调用成功即结束 session，因为页面会被导航走。approval 强制要问一次，见 `requiresApproval()`。**它的 tool 结果永远不会回传**，所以 `toolOutcomes` 恒为 null——任何扫「有没有没人执行的 tool call」的地方都必须用 `renderer/helpers/session-end.ts` 的 `endsSession()` 排除它，否则每次回到该对话都会把 sync 整趟重跑一遍 |
 | tool call 落盘 + 补发 | 已做 | `agent_sessions` / `agent_tool_calls` 两张表，见「落盘的是我们干了什么」和「跑了但没送出去怎么恢复」。不进 `SYNC_TABLES` |
-| auto-pickup（idle 时接手 tool call） | 已做 | `AgentLoopFeature.tsx`：session 结束后用户直接追问，AI 仍用 tool 格式回答，这里起一个新 session（`startFromExistingResponse`）。⚠️ **第三个坑最贵**：刷新后页面看起来和「没跑过」一模一样，所以它会把已经执行过的写操作再跑一遍 —— 现在靠 `recordsReady` + 查账本的 `anyRecorded` 守卫挡住，改这个 effect 前先读那两段。另外两个坑：① 闩锁必须按「对话 + turn + tool call 指纹」做 key，不能用 per-mount 布尔——SPA 跳转后组件永不卸载，布尔一旦置上就把整个标签页后续的 pickup 全废了；② session 绑的 conversationId 要用 `readConversationIdFromPath()` 现读 URL，不能用 `useCurrentConversationId()`（走 500ms 轮询，路由跳转瞬间是旧值），绑错了 Dock 的 `belongsToCurrent` 会判定不属于当前对话，approval 直接没地方显示 |
+| auto-pickup（idle 时接手 tool call） | 已做 | `agent-loop/pickup.ts`（`planPickup` 判定 + `useAutoPickup` 钩子），两个平台共用；平台只提供「最新那条 model 轮」。AI Studio 侧是 `useAIStudioLastModelTurn`——虚拟滚动让 `useConversationMessages` 读不到东西，但 pickup 只看最新一轮，而那一轮正是自动滚动留在屏上的。⚠️ AI Studio 的判据是「整个对话的最后一轮是 model 轮」，比 Gemini 的「最后一条 model 轮」更严：后者依赖能看到紧跟其后的 user 轮里有没有结果，而那个证据可能已经被虚拟化丢掉了。场景：session 结束后用户直接追问，AI 仍用 tool 格式回答，这里起一个新 session（`startFromExistingResponse`）。⚠️ **第三个坑最贵**：刷新后页面看起来和「没跑过」一模一样，所以它会把已经执行过的写操作再跑一遍 —— 现在靠 `recordsReady` + 查账本的 `anyRecorded` 守卫挡住，改这个 effect 前先读那两段。另外两个坑：① 闩锁必须按「对话 + turn + tool call 指纹」做 key，不能用 per-mount 布尔——SPA 跳转后组件永不卸载，布尔一旦置上就把整个标签页后续的 pickup 全废了；② session 绑的 conversationId 要用 `readConversationIdFromPath()` 现读 URL，不能用 `useCurrentConversationId()`（走 500ms 轮询，路由跳转瞬间是旧值），绑错了 Dock 的 `belongsToCurrent` 会判定不属于当前对话，approval 直接没地方显示 |
 | settings UI | 未做 | 需在设置面板加 agentLoop 独立开关（现复用 slashCommand）；`AgentPolicyControls` 那三个持久开关按理也该搬过去，现在暂居 Dock 的齿轮里 |
-| AI Studio 支持 | 未做 | 需写 adapter + entry component |
+| AI Studio：输入 + 引擎 | 已做 | `adapters/aistudio-adapter.ts` + `shared/lib/aistudio-editor.ts` + `aistudio/enhanced-features/AgentLoopFeature.tsx`。`>` 触发、发送拦截、Dock 都在，见「AI Studio 上的 `>`」 |
+| AI Studio：对话渲染 | 已做 | 数据源是 `conversation-messages-store` 而不是 DOM，见「AI Studio 的对话从哪读」。⚠️ 流式过程中落后一轮（生成结束才入库），这是接受的取舍不是遗漏 |
+| AI Studio：Agent Tab | 未做 | `launcher:run-entry` 的落地端已经写好了，缺 OverlayPanel 里的 tab 入口 |
 | 自动继续 | 已做 | `autoContinue` 开关（默认开）∩ 本轮批准情况，见 `shouldAutoSend()` |
 | `awaiting_send` 期间发普通消息 | 未处理 | capsule 消失 + 出现新的 user 轮次即视为已发送，用户此时另发消息会被当成继续 |
 | 送达确认 | 已做 | 两步：离开输入框 + `stop` 按钮或 `user-query` 增加，见上文 |

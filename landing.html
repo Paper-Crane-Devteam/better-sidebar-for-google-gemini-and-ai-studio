@@ -7,254 +7,126 @@
   <title data-gumroad-field="name">Better Sidebar: Power Pack</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = { darkMode: 'class', theme: { extend: { colors: { brand: '#6366f1', brandDark: '#818cf8', surface: '#ffffff', surfaceDark: '#0f172a', muted: '#f8fafc', mutedDark: '#1e293b' } } } }
+    tailwind.config = { theme: { extend: {
+      colors: { paper: 'var(--paper-0)', canvas: 'var(--paper-1)', muted: 'var(--paper-2)', ink: 'var(--ink-1)', secondary: 'var(--ink-2)', brand: 'var(--brand-indigo)', tint: 'var(--brand-tint)', crease: 'var(--crease)', success: '#416b55' },
+      fontFamily: { mono: ['var(--font-mono)'] },
+      maxWidth: { '6xl': 'var(--content-max)' },
+      borderRadius: { full: '8px', xl: '8px', '2xl': '16px' }
+    } } }
   </script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Literata:wght@400;500;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box
+    /* Standalone copy of BetterSidebar landing theme/styles/tokens.css,
+       with the current landing-refresh.css palette and component radii.
+       Keep inline so the Gumroad page does not depend on the sibling project. */
+    :root {
+      color-scheme: light;
+      --font-display: 'Playfair Display', 'Noto Serif SC', Georgia, serif;
+      --font-text: 'Literata', 'Noto Serif SC', Georgia, serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+      --paper-0: #fffdfa;
+      --paper-1: #fdfbf7;
+      --paper-2: #f4f1eb;
+      --paper-3: #eae5dc;
+      --ink-1: #4a4238;
+      --ink-2: #655f68;
+      --ink-3: #79717f;
+      --brand-indigo: #5553b7;
+      --brand-tint: #eeeaf7;
+      --agent-paper: #eaf1ee;
+      --crease: #e3ded8;
+      --space-sm: 16px;
+      --space-md: 32px;
+      --space-lg: 64px;
+      --space-xl: 120px;
+      --content-max: 1200px;
+      --grain-opacity: .025;
+      --ease: cubic-bezier(.4, 0, .2, 1);
+      --shadow-paper: 0 16px 40px -24px #39304c66;
     }
-
-    html {
-      scroll-behavior: smooth
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 96px; -webkit-font-smoothing: antialiased; }
+    body { margin: 0; font-family: var(--font-text); background: var(--paper-1); color: var(--ink-1); line-height: 1.75; }
+    body::before {
+      content: ''; position: fixed; inset: 0; z-index: 60; pointer-events: none; opacity: var(--grain-opacity);
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23000' filter='url(%23grain)' opacity='.5' d='M0 0h180v180H0z'/%3E%3C/svg%3E");
     }
-
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-      background: #ffffff;
-      color: #1e293b;
-      overflow-x: hidden
+    h1, h2 { font-family: var(--font-display); letter-spacing: -.025em; }
+    h1 { font-size: clamp(2.4rem, 4.6vw, 4.1rem) !important; line-height: 1.08 !important; font-weight: 700 !important; }
+    h2 { line-height: 1.15 !important; }
+    h3, nav, footer, summary, table, a[role='button'], a[href='#agents'], .text-xs {
+      font-family: var(--font-mono);
     }
-
-    .dark body {
-      background: #0f172a;
-      color: #e2e8f0
+    h3 { font-size: .95rem !important; font-weight: 500 !important; line-height: 1.5; }
+    nav { background: var(--paper-1); border-bottom: 1px solid var(--crease); }
+    nav > div { min-height: 76px; }
+    nav .font-bold { font-weight: 500; letter-spacing: -.04em; }
+    section { padding-block: var(--space-xl) !important; }
+    .hero-gradient { background: linear-gradient(115deg, var(--paper-1) 35%, #edeaff 100%); }
+    section:first-of-type { padding-top: 160px !important; padding-bottom: var(--space-lg) !important; }
+    section:first-of-type .grid { gap: 40px; }
+    section:first-of-type .grid > * { min-width: 0; }
+    section:first-of-type p.text-lg { font-size: 1.02rem; line-height: 1.8; }
+    section:first-of-type .flex-col.sm\:flex-row { flex-wrap: wrap; }
+    section:nth-of-type(2) { padding-block: 40px !important; }
+    section:nth-of-type(2) .text-3xl { font-family: var(--font-display); }
+    section:nth-of-type(2) .text-sm { font-family: var(--font-mono); font-size: .7rem; letter-spacing: .04em; }
+    #workspace { background: var(--agent-paper); }
+    #features { background: var(--brand-tint); }
+    .feature-card { border: 1px solid transparent; background: var(--paper-0); transition: border-color .3s var(--ease), box-shadow .3s var(--ease); }
+    .feature-card:hover { border-color: #d4cee5; box-shadow: var(--shadow-paper); }
+    .feature-card p { line-height: 1.85; }
+    .feature-card > .w-12 { background: var(--brand-tint); color: var(--brand-indigo); }
+    #workspace .feature-card { background: #f7faf7; }
+    .cta-btn { gap: .35em; display: inline-flex; align-items: center; justify-content: center; background: var(--brand-indigo); color: white; border-radius: 8px; font-weight: 500; font-size: .8rem; line-height: 1.5; transition: background .3s var(--ease), box-shadow .3s var(--ease); }
+    .cta-btn:hover { background: #46449c; box-shadow: 0 8px 24px -12px #5553b780; }
+    a[href='#agents'] { font-size: .75rem; background: var(--paper-0); }
+    a:focus-visible, summary:focus-visible { outline: 3px solid var(--brand-indigo); outline-offset: 4px; }
+    .product-img { border: 1px solid #dedbe8; border-radius: 16px; box-shadow: var(--shadow-paper); background: var(--paper-0); }
+    .animate-float { transform: rotate(-1deg); }
+    .w-16.h-16 { background: var(--brand-tint); border-radius: 8px; }
+    .w-16.h-16 > span { font-family: var(--font-display); color: var(--brand-indigo); }
+    table { line-height: 1.6; }
+    thead { background: var(--paper-2); }
+    tbody tr:nth-child(even) { background: var(--paper-1); }
+    .comparison-row:hover { background: var(--brand-tint); }
+    th:last-child, td:last-child { background: #eeeaf74d; }
+    details { background: var(--paper-2); border-color: transparent; }
+    details[open] { background: var(--paper-0); border-color: var(--crease); }
+    summary { gap: 16px; font-size: .8rem; min-height: 64px; }
+    summary svg { flex-shrink: 0; }
+    footer { font-size: .75rem; }
+    @media (max-width: 1023px) { .animate-float { transform: none; } }
+    @media (max-width: 640px) {
+      section { padding-block: var(--space-lg) !important; }
+      section:first-of-type { padding-top: 124px !important; }
+      nav > div { min-height: 68px; gap: 8px; }
+      nav .text-lg { font-size: .85rem; }
+      nav .cta-btn { padding: 12px; font-size: .65rem; }
+      table { font-size: .7rem !important; table-layout: fixed; }
+      th:first-child { width: 44%; }
+      td, th { padding: 12px 8px !important; overflow-wrap: anywhere; }
+      .cta-btn { max-width: 100%; }
     }
-
-    /* Animations */
-    @keyframes float {
-
-      0%,
-      100% {
-        transform: translateY(0)
-      }
-
-      50% {
-        transform: translateY(-10px)
-      }
-    }
-
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px)
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0)
-      }
-    }
-
-    @keyframes pulse-glow {
-
-      0%,
-      100% {
-        box-shadow: 0 0 20px rgba(99, 102, 241, 0.3)
-      }
-
-      50% {
-        box-shadow: 0 0 40px rgba(99, 102, 241, 0.6)
-      }
-    }
-
-    @keyframes shimmer {
-      0% {
-        background-position: -200% 0
-      }
-
-      100% {
-        background-position: 200% 0
-      }
-    }
-
-    @keyframes gradient-shift {
-      0% {
-        background-position: 0% 50%
-      }
-
-      50% {
-        background-position: 100% 50%
-      }
-
-      100% {
-        background-position: 0% 50%
-      }
-    }
-
-    .animate-float {
-      animation: float 3s ease-in-out infinite
-    }
-
-    .animate-fade-up {
-      animation: fadeUp 0.6s ease-out forwards;
-      opacity: 0
-    }
-
-    .animate-pulse-glow {
-      animation: pulse-glow 2s ease-in-out infinite
-    }
-
-    .animate-shimmer {
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
-      background-size: 200% 100%;
-      animation: shimmer 2s infinite
-    }
-
-    .delay-100 {
-      animation-delay: 0.1s
-    }
-
-    .delay-200 {
-      animation-delay: 0.2s
-    }
-
-    .delay-300 {
-      animation-delay: 0.3s
-    }
-
-    .delay-400 {
-      animation-delay: 0.4s
-    }
-
-    .delay-500 {
-      animation-delay: 0.5s
-    }
-
-    /* Gradient bg */
-    .hero-gradient {
-      background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 25%, #c7d2fe 50%, #e0e7ff 75%, #eef2ff 100%);
-      background-size: 400% 400%;
-      animation: gradient-shift 8s ease infinite
-    }
-
-    .dark .hero-gradient {
-      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #1e293b 50%, #1e1b4b 75%, #0f172a 100%);
-      background-size: 400% 400%;
-      animation: gradient-shift 8s ease infinite
-    }
-
-    /* Feature cards */
-    .feature-card {
-      transition: all 0.3s ease;
-      border: 1px solid #e2e8f0
-    }
-
-    .feature-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 20px 40px -12px rgba(99, 102, 241, 0.15);
-      border-color: #a5b4fc
-    }
-
-    .dark .feature-card {
-      border-color: #334155
-    }
-
-    .dark .feature-card:hover {
-      border-color: #6366f1;
-      box-shadow: 0 20px 40px -12px rgba(99, 102, 241, 0.3)
-    }
-
-    /* CTA button */
-    .cta-btn {
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden
-    }
-
-    .cta-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 28px -6px rgba(99, 102, 241, 0.5)
-    }
-
-    .cta-btn::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transition: left 0.5s
-    }
-
-    .cta-btn:hover::after {
-      left: 100%
-    }
-
-    /* Scroll reveal */
-    .reveal {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.6s ease
-    }
-
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0)
-    }
-
-    /* Product image */
-    .product-img {
-      border-radius: 12px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15)
-    }
-
-    .dark .product-img {
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5)
-    }
-
-    /* Comparison table */
-    .comparison-row {
-      transition: background 0.2s
-    }
-
-    .comparison-row:hover {
-      background: #f8fafc
-    }
-
-    .dark .comparison-row:hover {
-      background: #1e293b
-    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before { transition: none !important; } }
   </style>
 </head>
 
 <body>
-  <script>
-      (function () {
-        var dm = window.matchMedia('(prefers-color-scheme:dark)');
-        function apply(e) { document.documentElement.classList.toggle('dark', e.matches) }
-        apply(dm); dm.addEventListener('change', apply);
-      })();
-  </script>
-
-  <!-- Nav -->
+<!-- Nav -->
   <nav
-    class="fixed top-0 w-full z-50 backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-700/50">
+    class="fixed top-0 w-full z-50 bg-paper border-b border-crease">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <svg class="w-7 h-7 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+        <svg class="w-7 h-7 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
           aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" />
         </svg>
-        <span class="font-bold text-lg text-slate-900 dark:text-white">Better Sidebar</span>
+        <span class="font-bold text-lg text-ink">Better Sidebar</span>
       </div>
       <div class="flex items-center gap-3">
-        <span class="hidden sm:inline text-sm text-slate-500 dark:text-slate-400"
+        <span class="hidden sm:inline text-sm text-secondary"
           data-gumroad-field="price">$19.99</span>
         <a data-gumroad-action="buy"
           class="cta-btn text-white text-sm font-semibold px-5 py-2.5 rounded-full cursor-pointer" role="button"
@@ -267,34 +139,34 @@
   <section class="hero-gradient pt-28 pb-20 sm:pt-36 sm:pb-28 relative overflow-hidden">
     <div class="max-w-6xl mx-auto px-4 sm:px-6">
       <div class="grid lg:grid-cols-2 gap-12 items-center">
-        <div class="animate-fade-up">
+        <div class="">
           <div
-            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs font-semibold mb-6">
+            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-tint text-brand text-xs font-semibold mb-6">
             <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
               <path
                 d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
             </svg>
-            Power Pack — AI Agent is Live 🚀
+            Two agents · Two different jobs
           </div>
-          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white leading-tight mb-6"
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-ink leading-tight mb-6"
             data-gumroad-field="name">
             Better Sidebar: Power Pack
           </h1>
-          <p class="text-lg sm:text-xl text-slate-600 dark:text-slate-300 mb-8 max-w-xl leading-relaxed">
-            Your sidebar now has an <strong class="text-indigo-600 dark:text-indigo-400">autonomous AI
-              operator</strong>. Type <code
-              class="bg-indigo-100 dark:bg-indigo-900/40 px-1.5 py-0.5 rounded text-indigo-600 dark:text-indigo-300 font-mono text-base">&gt;</code>
-            and describe what you want — it reads your data, makes decisions, and executes multi-step tasks. No API
-            keys. No data leaves your browser.
+          <p class="text-lg sm:text-xl text-secondary mb-8 max-w-xl leading-relaxed">
+            <strong class="text-brand">Manage your library. Create and edit your files.</strong>
+            Better Sidebar Agent organizes your conversations, folders, tags, prompts, and snippets.
+            Workspace Agent creates and edits files in a separate workspace.
+            Power Pack unlocks changes to your plugin data and unlimited workspaces and files.
+            Both use your existing Gemini or AI Studio session — no API keys required.
           </p>
           <div class="flex flex-col sm:flex-row gap-4">
             <a data-gumroad-action="buy"
-              class="cta-btn animate-pulse-glow text-white text-base font-bold px-8 py-4 rounded-full cursor-pointer text-center"
+              class="cta-btn text-white text-base font-bold px-8 py-4 rounded-full cursor-pointer text-center"
               role="button" tabindex="0" aria-label="Buy Power Pack for $19.99">
               Get Power Pack — <span data-gumroad-field="price">$19.99</span>
             </a>
-            <a href="#features"
-              class="inline-flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 font-medium px-6 py-4 rounded-full border border-slate-300 dark:border-slate-600 hover:border-indigo-400 dark:hover:border-indigo-500 transition-colors">
+            <a href="#agents"
+              class="inline-flex items-center justify-center gap-2 text-secondary font-medium px-6 py-4 rounded-full border border-crease hover:border-brand transition-colors">
               See what's included
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
                 aria-hidden="true">
@@ -302,287 +174,380 @@
               </svg>
             </a>
           </div>
-          <p class="mt-5 text-sm text-slate-500 dark:text-slate-400">One-time purchase · 3-device license · Instant
-            delivery</p>
+          <p class="mt-5 text-sm text-secondary">One-time purchase · 10 activations · 7-day refund
+          </p>
         </div>
-        <div class="animate-fade-up delay-200 flex justify-center">
+        <div class="flex justify-center">
           <div class="animate-float">
             <img src="https://public-files.gumroad.com/btgcgbb4feworqg251y7tn6ybll8"
-              alt="Better Sidebar Power Pack — AI Agent organizing conversations automatically"
+              alt="Better Sidebar Power Pack — premium features for Gemini"
               class="product-img w-full max-w-lg" width="670" height="376" loading="eager" />
           </div>
         </div>
       </div>
     </div>
-    <!-- Decorative blobs -->
-    <div
-      class="absolute -top-24 -right-24 w-96 h-96 bg-indigo-200 dark:bg-indigo-900/30 rounded-full blur-3xl opacity-50 pointer-events-none"
+<div
+      class="absolute -top-24 -right-24 w-96 h-96 bg-tint rounded-full blur-3xl opacity-50 pointer-events-none"
       aria-hidden="true"></div>
-    <div
-      class="absolute -bottom-24 -left-24 w-80 h-80 bg-purple-200 dark:bg-purple-900/30 rounded-full blur-3xl opacity-40 pointer-events-none"
-      aria-hidden="true"></div>
-  </section>
+</section>
 
   <!-- Social proof -->
-  <section class="py-12 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
+  <section class="py-12 bg-paper border-b border-crease">
     <div class="max-w-6xl mx-auto px-4 sm:px-6">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-        <div class="reveal">
-          <div class="text-3xl font-bold text-indigo-600 dark:text-indigo-400">10k+</div>
-          <div class="text-sm text-slate-500 dark:text-slate-400 mt-1">Active Users</div>
+        <div class="">
+          <div class="text-3xl font-bold text-brand">10k+</div>
+          <div class="text-sm text-secondary mt-1">Active Users</div>
         </div>
-        <div class="reveal delay-100">
-          <div class="text-3xl font-bold text-indigo-600 dark:text-indigo-400">4.9★</div>
-          <div class="text-sm text-slate-500 dark:text-slate-400 mt-1">Chrome Web Store</div>
+        <div class="">
+          <div class="text-3xl font-bold text-brand">4.9★</div>
+          <div class="text-sm text-secondary mt-1">Chrome Web Store</div>
         </div>
-        <div class="reveal delay-200">
-          <div class="text-3xl font-bold text-indigo-600 dark:text-indigo-400">100%</div>
-          <div class="text-sm text-slate-500 dark:text-slate-400 mt-1">Privacy-First</div>
+        <div class="">
+          <div class="text-3xl font-bold text-brand">100%</div>
+          <div class="text-sm text-secondary mt-1">Privacy-First</div>
         </div>
-        <div class="reveal delay-300">
-          <div class="text-3xl font-bold text-indigo-600 dark:text-indigo-400">3</div>
-          <div class="text-sm text-slate-500 dark:text-slate-400 mt-1">Devices Included</div>
+        <div class="">
+          <div class="text-3xl font-bold text-brand">10</div>
+          <div class="text-sm text-secondary mt-1">Activations Included</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Two agents: equal prominence, separate scopes -->
+  <section id="agents" class="py-20 sm:py-28 bg-paper">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="text-center mb-12">
+        <p class="text-xs font-semibold tracking-widest uppercase text-brand mb-3">Two agents, different jobs</p>
+        <h2 class="text-3xl sm:text-4xl font-bold text-ink mb-4">Your library. Your files. An agent for each.</h2>
+        <p class="text-lg text-secondary max-w-2xl mx-auto">Choose the agent for the task: manage data inside
+          Better Sidebar, or work on files in Workspace. Each has its own tools and data.</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6">
+        <article class="feature-card rounded-2xl p-8">
+          <p class="text-xs font-semibold tracking-widest uppercase text-brand mb-3">01 · Plugin data</p>
+          <h3 class="text-ink mb-4">Better Sidebar Agent</h3>
+          <p class="text-secondary mb-4">Manage your conversations, folders, tags, prompts, and snippets
+            with natural-language instructions. Search your library, find what matters, and organize it.</p>
+          <ul class="text-sm text-secondary space-y-2 mb-6 list-disc pl-5">
+            <li>Search and analyze your saved conversations.</li>
+            <li>File chats into folders, apply tags, rename, move, and merge.</li>
+            <li>Manage prompts and snippets alongside your conversation library.</li>
+          </ul>
+          <p class="text-sm text-secondary"><strong class="text-ink">With Power Pack:</strong>
+            apply changes to your plugin data after approval. Searching and reading stay free.</p>
+        </article>
+        <article class="feature-card rounded-2xl p-8" style="background: var(--agent-paper)">
+          <p class="text-xs font-semibold tracking-widest uppercase text-brand mb-3">02 · Files · Beta</p>
+          <h3 class="text-ink mb-4">Workspace Agent</h3>
+          <p class="text-secondary mb-4">Create and modify files in a dedicated workspace.
+            Start text and code from scratch, or bring existing documents for focused edits.</p>
+          <ul class="text-sm text-secondary space-y-2 mb-6 list-disc pl-5">
+            <li>Create and edit Markdown, text, HTML, and code files.</li>
+            <li>Edit imported Word, Excel, PDF, and PowerPoint files.</li>
+            <li>Review proposed changes, then download your files.</li>
+          </ul>
+          <p class="text-sm text-secondary"><strong class="text-ink">With Power Pack:</strong>
+            unlimited workspaces and files. Free includes 1 workspace and 5 files.</p>
+        </article>
+      </div>
+      <p class="text-sm text-secondary text-center mt-8">Type <code class="font-mono">&gt;</code> in the chat input,
+        then choose <strong>Better Sidebar</strong> for plugin data or <strong>Workspace</strong> for files.
+        The two agents do not access each other's data.</p>
+    </div>
+  </section>
+
+  <!-- Workspace Agent -->
+  <section id="workspace" class="py-20 sm:py-28 bg-paper">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="text-center mb-16 ">
+        <p class="text-xs font-semibold tracking-widest uppercase text-brand mb-3">Inside Workspace · File editing · Beta</p>
+        <h2 class="text-3xl sm:text-4xl font-bold text-ink mb-4">Create and edit files with Workspace Agent</h2>
+        <p class="text-lg text-secondary max-w-2xl mx-auto">A separate file area inside the extension. Create text and code from scratch, or import Word, Excel,
+          PDF, and PowerPoint files to edit them. Review changes before they run, then download the result.
+          Free gets 1 workspace and 5 files. Power Pack removes those limits.</p>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="feature-card bg-muted rounded-2xl p-6 ">
+          <h3 class="text-lg font-bold text-ink mb-2">Word review</h3>
+          <p class="text-secondary text-sm leading-relaxed">Chapter-by-chapter comments and
+            <strong>tracked changes</strong>. Open the file in Word and accept or reject — not a rewritten dump you
+            have to diff by hand.</p>
+        </div>
+        <div class="feature-card bg-muted rounded-2xl p-6 ">
+          <h3 class="text-lg font-bold text-ink mb-2">Excel that computes</h3>
+          <p class="text-secondary text-sm leading-relaxed">Reads headers first, then adds columns
+            and sheets with <strong>real Excel formulas</strong>. Existing data, charts, and conditional formatting
+            survive.</p>
+        </div>
+        <div class="feature-card bg-muted rounded-2xl p-6 ">
+          <h3 class="text-lg font-bold text-ink mb-2">PDF annotation</h3>
+          <p class="text-secondary text-sm leading-relaxed">Highlight claims, sticky notes, form
+            fields, watermarks, extract and merge pages. Body text stays as-is — that's a format limit, not a missing
+            rewrite button.</p>
+        </div>
+        <div class="feature-card bg-muted rounded-2xl p-6 ">
+          <h3 class="text-lg font-bold text-ink mb-2">Code from nothing</h3>
+          <p class="text-secondary text-sm leading-relaxed">You don't have to upload first. For
+            <code class="font-mono text-xs">.md</code>, HTML, JS/TS, Python and the rest, it scaffolds a project into
+            the workspace and keeps editing conversationally.</p>
+        </div>
+        <div class="feature-card bg-muted rounded-2xl p-6 ">
+          <h3 class="text-lg font-bold text-ink mb-2">Subtitles &amp; slides</h3>
+          <p class="text-secondary text-sm leading-relaxed">Translate <code
+              class="font-mono text-xs">.srt</code> without shifting a millisecond of timeline. Edit PowerPoint text,
+            speaker notes, shapes, and slide order.</p>
+        </div>
+        <div class="feature-card bg-muted rounded-2xl p-6 ">
+          <h3 class="text-lg font-bold text-ink mb-2">Persists across chats</h3>
+          <p class="text-secondary text-sm leading-relaxed">Files survive conversations
+            <strong>and both platforms</strong> — write from Gemini, open from AI Studio. Every change asks before it
+            runs.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Features -->
-  <section id="features" class="py-20 sm:py-28 bg-slate-50 dark:bg-slate-900/50">
+  <section id="features" class="py-20 sm:py-28 bg-muted">
     <div class="max-w-6xl mx-auto px-4 sm:px-6">
-      <div class="text-center mb-16 reveal">
-        <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">Everything in Power Pack</h2>
-        <p class="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">The AI Agent is live. From autonomous
-          workflows to custom Skills to premium themes — unlock the full potential of your sidebar.</p>
+      <div class="text-center mb-16 ">
+        <h2 class="text-3xl sm:text-4xl font-bold text-ink mb-4">Everything in Power Pack</h2>
+        <p class="text-lg text-secondary max-w-2xl mx-auto">Better Sidebar Agent writes, unlimited Workspace files and workspaces, Obsidian and Notion export, and every premium theme — plus everything in Support Pack.</p>
       </div>
       <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <!-- Card 1 -->
-        <div class="feature-card bg-white dark:bg-slate-800 rounded-2xl p-6 reveal">
-          <div class="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24"
+        <div class="feature-card bg-paper rounded-2xl p-6 ">
+          <div class="w-12 h-12 rounded-xl bg-tint flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-brand" fill="none" viewBox="0 0 24 24"
               stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
             </svg>
           </div>
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">AI Agent Loop</h3>
-          <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">Not a chatbot — an operator. It reads
-            your data, writes queries, makes decisions, and executes multi-step workflows autonomously. All inside your
-            browser.</p>
+          <h3 class="text-lg font-bold text-ink mb-2">Unlimited Workspaces</h3>
+          <p class="text-secondary text-sm leading-relaxed">Free is 1 workspace and 5 files — enough
+            to try a real review. Power Pack removes the cap. Named workspaces, file tree, version history on
+            documents.</p>
         </div>
         <!-- Card 2 -->
-        <div class="feature-card bg-white dark:bg-slate-800 rounded-2xl p-6 reveal delay-100">
-          <div class="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24"
+        <div class="feature-card bg-paper rounded-2xl p-6 ">
+          <div class="w-12 h-12 rounded-xl bg-tint flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-brand" fill="none" viewBox="0 0 24 24"
               stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
             </svg>
           </div>
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Write Access</h3>
-          <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">AI renames, moves, merges, tags, and
-            deletes conversations on your behalf. "Sort my 200 chats by topic" — done in one pass.</p>
+          <h3 class="text-lg font-bold text-ink mb-2">Better Sidebar Agent writes</h3>
+          <p class="text-secondary text-sm leading-relaxed">The Better Sidebar agent files, tags,
+            renames, moves, and merges chats. Free is read-only: it tells you the plan. Power Pack is the button that
+            does it.</p>
         </div>
         <!-- Card 3 -->
-        <div class="feature-card bg-white dark:bg-slate-800 rounded-2xl p-6 reveal delay-200">
-          <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+        <div class="feature-card bg-paper rounded-2xl p-6 ">
+          <div class="w-12 h-12 rounded-xl bg-tint flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor"
               stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Full History Analysis</h3>
-          <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">Query your entire conversation history
-            like a database. "Which topics do I keep coming back to?" "Summarize what I worked on last quarter." It
-            knows.</p>
+          <h3 class="text-lg font-bold text-ink mb-2">Gemini &amp; AI Studio</h3>
+          <p class="text-secondary text-sm leading-relaxed">Both agents run through the session
+            you're already in. Workspace files written on Gemini open on AI Studio. Same licence, both sites.</p>
         </div>
         <!-- Card 4 -->
-        <div class="feature-card bg-white dark:bg-slate-800 rounded-2xl p-6 reveal delay-300">
-          <div class="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/40 flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24"
+        <div class="feature-card bg-paper rounded-2xl p-6 ">
+          <div class="w-12 h-12 rounded-xl bg-tint flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-success" fill="none" viewBox="0 0 24 24"
               stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M11.42 15.17l-5.384 3.183a.75.75 0 01-1.094-.79l1.028-5.993-4.354-4.243a.75.75 0 01.416-1.28l6.017-.874L10.73 0a.75.75 0 011.34 0l2.69 5.453 6.016.874a.75.75 0 01.416 1.28l-4.354 4.243 1.028 5.993a.75.75 0 01-1.094.79l-5.384-3.183z" />
             </svg>
           </div>
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Custom Skills</h3>
-          <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">Define your own Agent Skills in
+          <h3 class="text-lg font-bold text-ink mb-2">Custom Skills</h3>
+          <p class="text-secondary text-sm leading-relaxed">Define your own Agent Skills in
             Settings. If you can describe a repeatable workflow, the Agent can learn it — and it becomes a permanent
             one-click card.</p>
         </div>
         <!-- Card 5 -->
-        <div class="feature-card bg-white dark:bg-slate-800 rounded-2xl p-6 reveal delay-400">
-          <div class="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/40 flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24"
+        <div class="feature-card bg-paper rounded-2xl p-6 ">
+          <div class="w-12 h-12 rounded-xl bg-tint flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-success" fill="none" viewBox="0 0 24 24"
               stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
             </svg>
           </div>
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Advanced Export</h3>
-          <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">Export conversations and snippets
+          <h3 class="text-lg font-bold text-ink mb-2">Advanced Export</h3>
+          <p class="text-secondary text-sm leading-relaxed">Export conversations and snippets
             directly to Obsidian and Notion. Your AI knowledge, flowing into your existing tools.</p>
         </div>
         <!-- Card 6 -->
-        <div class="feature-card bg-white dark:bg-slate-800 rounded-2xl p-6 reveal delay-500">
-          <div class="w-12 h-12 rounded-xl bg-pink-100 dark:bg-pink-900/40 flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-pink-600 dark:text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+        <div class="feature-card bg-paper rounded-2xl p-6 ">
+          <div class="w-12 h-12 rounded-xl bg-tint flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor"
               stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
             </svg>
           </div>
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">All Premium Themes</h3>
-          <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">Every current and future theme included.
+          <h3 class="text-lg font-bold text-ink mb-2">All Premium Themes</h3>
+          <p class="text-secondary text-sm leading-relaxed">Every current and future theme included.
             Plus AI-generated custom themes — describe your style and get a unique look.</p>
         </div>
         <!-- Card 7 -->
-        <div class="feature-card bg-white dark:bg-slate-800 rounded-2xl p-6 reveal">
-          <div class="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/40 flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+        <div class="feature-card bg-paper rounded-2xl p-6 ">
+          <div class="w-12 h-12 rounded-xl bg-tint flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor"
               stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
             </svg>
           </div>
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Safety Rails Built In</h3>
-          <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">Write operations ask for approval. Speed
-            Mode for when you trust it. Circuit breakers stop runaway loops. You're always in control.</p>
+          <h3 class="text-lg font-bold text-ink mb-2">Approval, then version history</h3>
+          <p class="text-secondary text-sm leading-relaxed">Writes wait for a yes. Documents keep a
+            version history so an overwrite isn't automatically final. Keep a copy of anything you can't afford to
+            lose.</p>
         </div>
         <!-- Card 8 -->
-        <div class="feature-card bg-white dark:bg-slate-800 rounded-2xl p-6 reveal delay-100">
-          <div class="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24"
+        <div class="feature-card bg-paper rounded-2xl p-6 ">
+          <div class="w-12 h-12 rounded-xl bg-tint flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-brand" fill="none" viewBox="0 0 24 24"
               stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
             </svg>
           </div>
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">3-Device License</h3>
-          <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">Use across your home, work, and laptop
-            setups. One purchase covers your entire workflow.</p>
+          <h3 class="text-lg font-bold text-ink mb-2">10 Activations</h3>
+          <p class="text-secondary text-sm leading-relaxed">One licence covers 10 browser profiles
+            across computers. Release a slot from Settings when you change machines — no ticket required.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- How it works -->
-  <section class="py-20 sm:py-28 bg-white dark:bg-slate-900">
+  <section class="py-20 sm:py-28 bg-paper">
     <div class="max-w-6xl mx-auto px-4 sm:px-6">
-      <div class="text-center mb-16 reveal">
-        <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">How the AI Agent Works</h2>
-        <p class="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">Type a command. Watch the AI do the
-          rest.</p>
+      <div class="text-center mb-16 ">
+        <h2 class="text-3xl sm:text-4xl font-bold text-ink mb-4">How the agents work</h2>
+        <p class="text-lg text-secondary max-w-2xl mx-auto">Two agents, deliberately separate. One
+          sees your chats. The other sees your files. Neither can see the other's world.</p>
       </div>
       <div class="grid md:grid-cols-3 gap-8">
-        <div class="text-center reveal">
+        <div class="text-center ">
           <div
-            class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mb-5">
+            class="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-5">
             <span class="text-2xl font-bold text-white">1</span>
           </div>
-          <h3 class="font-bold text-slate-900 dark:text-white mb-2">Type <code class="font-mono">&gt;</code></h3>
-          <p class="text-sm text-slate-600 dark:text-slate-300">In Gemini's input box, type <code
-              class="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-indigo-600 dark:text-indigo-300 font-mono text-xs">&gt;</code>
-            to open the Agent. Pick a Skill or let the AI choose for you.</p>
+          <h3 class="font-bold text-ink mb-2">Type <code class="font-mono">&gt;</code></h3>
+          <p class="text-sm text-secondary">In the chat input on Gemini or AI Studio, type <code
+              class="bg-muted px-2 py-0.5 rounded text-brand font-mono text-xs">&gt;</code>
+            and pick <strong>Workspace</strong> or <strong>Better Sidebar</strong>.</p>
         </div>
-        <div class="text-center reveal delay-200">
+        <div class="text-center ">
           <div
-            class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center mb-5">
+            class="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-5">
             <span class="text-2xl font-bold text-white">2</span>
           </div>
-          <h3 class="font-bold text-slate-900 dark:text-white mb-2">Describe in Plain English</h3>
-          <p class="text-sm text-slate-600 dark:text-slate-300">"Sort my last 200 chats into folders by topic and tag
-            them." Natural language, no syntax to learn.</p>
+          <h3 class="font-bold text-ink mb-2">Describe the task</h3>
+          <p class="text-sm text-secondary"><strong>Better Sidebar:</strong> ask it to find chats, organize folders, or update tags.
+            <strong>Workspace:</strong> ask it to create text or code, or import a document to edit.</p>
         </div>
-        <div class="text-center reveal delay-400">
+        <div class="text-center ">
           <div
-            class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center mb-5">
+            class="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-5">
             <span class="text-2xl font-bold text-white">3</span>
           </div>
-          <h3 class="font-bold text-slate-900 dark:text-white mb-2">Watch It Work</h3>
-          <p class="text-sm text-slate-600 dark:text-slate-300">The AI queries your data, creates folders, moves chats,
-            tags them, and reports back — multi-turn, multi-step, fully autonomous.</p>
+          <h3 class="font-bold text-ink mb-2">Review and approve changes</h3>
+          <p class="text-sm text-secondary">Both agents ask before making changes. Better Sidebar Agent updates your plugin data;
+            Workspace Agent saves changes to your files, ready to download.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Comparison -->
-  <section class="py-20 sm:py-28 bg-slate-50 dark:bg-slate-900/50">
+  <section class="py-20 sm:py-28 bg-muted">
     <div class="max-w-4xl mx-auto px-4 sm:px-6">
-      <div class="text-center mb-12 reveal">
-        <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">Free vs Power Pack</h2>
-        <p class="text-lg text-slate-600 dark:text-slate-300">All core features stay free forever. Power Pack is for
-          those who want more.</p>
+      <div class="text-center mb-12 ">
+        <h2 class="text-3xl sm:text-4xl font-bold text-ink mb-4">Free vs Power Pack</h2>
+        <p class="text-lg text-secondary">Core tools stay free. Power Pack is the writes, the extra
+          workspaces, and the destinations outside the browser.</p>
       </div>
       <div
-        class="bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 reveal">
+        class="bg-paper rounded-2xl overflow-hidden border border-crease ">
         <table class="w-full text-sm" role="table">
           <thead>
-            <tr class="border-b border-slate-200 dark:border-slate-700">
-              <th class="text-left px-6 py-4 font-semibold text-slate-900 dark:text-white">Feature</th>
-              <th class="px-6 py-4 font-semibold text-slate-500 dark:text-slate-400 text-center">Free</th>
-              <th class="px-6 py-4 font-semibold text-indigo-600 dark:text-indigo-400 text-center">Power Pack</th>
+            <tr class="border-b border-crease">
+              <th class="text-left px-6 py-4 font-semibold text-ink">Feature</th>
+              <th class="px-6 py-4 font-semibold text-secondary text-center">Free</th>
+              <th class="px-6 py-4 font-semibold text-brand text-center">Power Pack</th>
             </tr>
           </thead>
           <tbody>
-            <tr class="comparison-row border-b border-slate-100 dark:border-slate-700/50">
-              <td class="px-6 py-3.5 text-slate-700 dark:text-slate-300">Folders, tags, search</td>
-              <td class="px-6 py-3.5 text-center text-green-600 dark:text-green-400">✓</td>
-              <td class="px-6 py-3.5 text-center text-green-600 dark:text-green-400">✓</td>
+            <tr class="comparison-row border-b border-crease">
+              <td class="px-6 py-3.5 text-ink">Folders, tags, search</td>
+              <td class="px-6 py-3.5 text-center text-success">✓</td>
+              <td class="px-6 py-3.5 text-center text-success">✓</td>
             </tr>
-            <tr class="comparison-row border-b border-slate-100 dark:border-slate-700/50">
-              <td class="px-6 py-3.5 text-slate-700 dark:text-slate-300">Prompt library &amp; Gems</td>
-              <td class="px-6 py-3.5 text-center text-green-600 dark:text-green-400">✓</td>
-              <td class="px-6 py-3.5 text-center text-green-600 dark:text-green-400">✓</td>
+            <tr class="comparison-row border-b border-crease">
+              <td class="px-6 py-3.5 text-ink">Prompt library &amp; Gems</td>
+              <td class="px-6 py-3.5 text-center text-success">✓</td>
+              <td class="px-6 py-3.5 text-center text-success">✓</td>
             </tr>
-            <tr class="comparison-row border-b border-slate-100 dark:border-slate-700/50">
-              <td class="px-6 py-3.5 text-slate-700 dark:text-slate-300">Google Drive sync</td>
-              <td class="px-6 py-3.5 text-center text-green-600 dark:text-green-400">✓</td>
-              <td class="px-6 py-3.5 text-center text-green-600 dark:text-green-400">✓</td>
+            <tr class="comparison-row border-b border-crease">
+              <td class="px-6 py-3.5 text-ink">Google Drive sync</td>
+              <td class="px-6 py-3.5 text-center text-success">✓</td>
+              <td class="px-6 py-3.5 text-center text-success">✓</td>
             </tr>
-            <tr class="comparison-row border-b border-slate-100 dark:border-slate-700/50">
-              <td class="px-6 py-3.5 text-slate-700 dark:text-slate-300">Basic export (MD/JSON)</td>
-              <td class="px-6 py-3.5 text-center text-green-600 dark:text-green-400">✓</td>
-              <td class="px-6 py-3.5 text-center text-green-600 dark:text-green-400">✓</td>
+            <tr class="comparison-row border-b border-crease">
+              <td class="px-6 py-3.5 text-ink">Basic export (MD/JSON)</td>
+              <td class="px-6 py-3.5 text-center text-success">✓</td>
+              <td class="px-6 py-3.5 text-center text-success">✓</td>
             </tr>
-            <tr class="comparison-row border-b border-slate-100 dark:border-slate-700/50">
-              <td class="px-6 py-3.5 text-slate-700 dark:text-slate-300 font-medium">AI Agent (autonomous tasks)</td>
-              <td class="px-6 py-3.5 text-center text-slate-400">—</td>
-              <td class="px-6 py-3.5 text-center text-green-600 dark:text-green-400">✓</td>
+            <tr class="comparison-row border-b border-crease">
+              <td class="px-6 py-3.5 text-ink font-medium">Better Sidebar Agent: search &amp; analyze</td>
+              <td class="px-6 py-3.5 text-center text-success">✓</td>
+              <td class="px-6 py-3.5 text-center text-success">✓</td>
             </tr>
-            <tr class="comparison-row border-b border-slate-100 dark:border-slate-700/50">
-              <td class="px-6 py-3.5 text-slate-700 dark:text-slate-300 font-medium">Write access (AI edits chats)</td>
-              <td class="px-6 py-3.5 text-center text-slate-400">—</td>
-              <td class="px-6 py-3.5 text-center text-green-600 dark:text-green-400">✓</td>
+            <tr class="comparison-row border-b border-crease">
+              <td class="px-6 py-3.5 text-ink font-medium">Workspace Agent: workspaces &amp; files</td>
+              <td class="px-6 py-3.5 text-center text-secondary text-xs">1 workspace, 5 files</td>
+              <td class="px-6 py-3.5 text-center text-success font-medium">Unlimited</td>
             </tr>
-            <tr class="comparison-row border-b border-slate-100 dark:border-slate-700/50">
-              <td class="px-6 py-3.5 text-slate-700 dark:text-slate-300 font-medium">Custom Skills (teach the Agent)
+            <tr class="comparison-row border-b border-crease">
+              <td class="px-6 py-3.5 text-ink font-medium">Better Sidebar Agent: organize &amp; update data</td>
+              <td class="px-6 py-3.5 text-center text-secondary">—</td>
+              <td class="px-6 py-3.5 text-center text-success">✓</td>
+            </tr>
+            <tr class="comparison-row border-b border-crease">
+              <td class="px-6 py-3.5 text-ink font-medium">Custom Skills</td>
+              <td class="px-6 py-3.5 text-center text-success">✓</td>
+              <td class="px-6 py-3.5 text-center text-success">✓</td>
+            </tr>
+            <tr class="comparison-row border-b border-crease">
+              <td class="px-6 py-3.5 text-ink font-medium">Works on Gemini &amp; AI Studio</td>
+              <td class="px-6 py-3.5 text-center text-success">✓</td>
+              <td class="px-6 py-3.5 text-center text-success">✓</td>
+            </tr>
+            <tr class="comparison-row border-b border-crease">
+              <td class="px-6 py-3.5 text-ink font-medium">Export to Obsidian &amp; Notion
               </td>
-              <td class="px-6 py-3.5 text-center text-slate-400">—</td>
-              <td class="px-6 py-3.5 text-center text-green-600 dark:text-green-400">✓</td>
+              <td class="px-6 py-3.5 text-center text-secondary">—</td>
+              <td class="px-6 py-3.5 text-center text-success">✓</td>
             </tr>
-            <tr class="comparison-row border-b border-slate-100 dark:border-slate-700/50">
-              <td class="px-6 py-3.5 text-slate-700 dark:text-slate-300 font-medium">Full history query &amp; analysis
-              </td>
-              <td class="px-6 py-3.5 text-center text-slate-400">—</td>
-              <td class="px-6 py-3.5 text-center text-green-600 dark:text-green-400">✓</td>
-            </tr>
-            <tr class="comparison-row border-b border-slate-100 dark:border-slate-700/50">
-              <td class="px-6 py-3.5 text-slate-700 dark:text-slate-300 font-medium">Export to Obsidian &amp; Notion
-              </td>
-              <td class="px-6 py-3.5 text-center text-slate-400">—</td>
-              <td class="px-6 py-3.5 text-center text-green-600 dark:text-green-400">✓</td>
-            </tr>
-            <tr class="comparison-row border-b border-slate-100 dark:border-slate-700/50">
-              <td class="px-6 py-3.5 text-slate-700 dark:text-slate-300 font-medium">All premium themes + AI themes</td>
-              <td class="px-6 py-3.5 text-center text-slate-400">—</td>
-              <td class="px-6 py-3.5 text-center text-green-600 dark:text-green-400">✓</td>
+            <tr class="comparison-row border-b border-crease">
+              <td class="px-6 py-3.5 text-ink font-medium">All premium themes + AI themes</td>
+              <td class="px-6 py-3.5 text-center text-secondary">—</td>
+              <td class="px-6 py-3.5 text-center text-success">✓</td>
             </tr>
             <tr class="comparison-row">
-              <td class="px-6 py-3.5 text-slate-700 dark:text-slate-300 font-medium">Safety rails &amp; Speed Mode</td>
-              <td class="px-6 py-3.5 text-center text-slate-400">—</td>
-              <td class="px-6 py-3.5 text-center text-green-600 dark:text-green-400">✓</td>
+              <td class="px-6 py-3.5 text-ink font-medium">Writes ask before they run</td>
+              <td class="px-6 py-3.5 text-center text-success">✓</td>
+              <td class="px-6 py-3.5 text-center text-success">✓</td>
             </tr>
           </tbody>
         </table>
@@ -591,100 +556,131 @@
   </section>
 
   <!-- FAQ -->
-  <section class="py-20 sm:py-28 bg-white dark:bg-slate-900">
+  <section class="py-20 sm:py-28 bg-paper">
     <div class="max-w-3xl mx-auto px-4 sm:px-6">
-      <div class="text-center mb-12 reveal">
-        <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">Questions &amp; Answers</h2>
+      <div class="text-center mb-12 ">
+        <h2 class="text-3xl sm:text-4xl font-bold text-ink mb-4">Questions &amp; Answers</h2>
       </div>
-      <div class="space-y-4 reveal">
-        <details class="group bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+      <div class="space-y-4 ">
+        <details class="group bg-muted rounded-xl border border-crease">
           <summary
-            class="flex items-center justify-between px-6 py-4 cursor-pointer font-medium text-slate-900 dark:text-white">
+            class="flex items-center justify-between px-6 py-4 cursor-pointer font-medium text-ink">
             Does the free version stay free?
-            <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none"
+            <svg class="w-5 h-5 text-secondary group-open:rotate-180 transition-transform" fill="none"
               viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
           </summary>
-          <div class="px-6 pb-4 text-sm text-slate-600 dark:text-slate-300">Yes. All core features — folders, tags,
-            search, prompts, Drive sync, export — remain 100% free forever. Power Pack is purely for power users who
-            want AI automation and premium customization.</div>
+          <div class="px-6 pb-4 text-sm text-secondary">Yes. Folders, tags, search, prompts, Drive
+            sync, Markdown/JSON export, and the read-only agent stay free. Workspace Agent is usable on the free plan
+            too — 1 workspace, 5 files. Power Pack is unlimited files, agent writes, and Obsidian/Notion.</div>
         </details>
-        <details class="group bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+        <details class="group bg-muted rounded-xl border border-crease">
           <summary
-            class="flex items-center justify-between px-6 py-4 cursor-pointer font-medium text-slate-900 dark:text-white">
+            class="flex items-center justify-between px-6 py-4 cursor-pointer font-medium text-ink">
             How do I activate after purchase?
-            <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none"
+            <svg class="w-5 h-5 text-secondary group-open:rotate-180 transition-transform" fill="none"
               viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
           </summary>
-          <div class="px-6 pb-4 text-sm text-slate-600 dark:text-slate-300">You'll receive a license key instantly. Open
+          <div class="px-6 pb-4 text-sm text-secondary">You'll receive a license key instantly. Open
             Better Sidebar → Settings → Packs → paste your key → click Activate. Takes 10 seconds.</div>
         </details>
-        <details class="group bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+        <details class="group bg-muted rounded-xl border border-crease">
           <summary
-            class="flex items-center justify-between px-6 py-4 cursor-pointer font-medium text-slate-900 dark:text-white">
-            What if I hit the device limit?
-            <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none"
+            class="flex items-center justify-between px-6 py-4 cursor-pointer font-medium text-ink">
+            What if I hit the activation limit?
+            <svg class="w-5 h-5 text-secondary group-open:rotate-180 transition-transform" fill="none"
               viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
           </summary>
-          <div class="px-6 pb-4 text-sm text-slate-600 dark:text-slate-300">You can deactivate any device from Settings
-            → Packs → Deactivate, then activate your new device. No support ticket needed.</div>
+          <div class="px-6 pb-4 text-sm text-secondary">One licence is 10 activations (browser
+            profiles, not Better Sidebar's own multi-account profiles). Release a slot from Settings → Packs before you
+            wipe a machine, then activate the new one. Same token.</div>
         </details>
-        <details class="group bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+        <details class="group bg-muted rounded-xl border border-crease">
           <summary
-            class="flex items-center justify-between px-6 py-4 cursor-pointer font-medium text-slate-900 dark:text-white">
+            class="flex items-center justify-between px-6 py-4 cursor-pointer font-medium text-ink">
             Is my data safe?
-            <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none"
+            <svg class="w-5 h-5 text-secondary group-open:rotate-180 transition-transform" fill="none"
               viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
           </summary>
-          <div class="px-6 pb-4 text-sm text-slate-600 dark:text-slate-300">100% local. We use an embedded SQLite
-            database that runs entirely in your browser. No data is ever sent to our servers. The AI agent uses your own
-            Gemini session — we never see your conversations.</div>
+          <div class="px-6 pb-4 text-sm text-secondary">The agent runs through your existing Gemini
+            or AI Studio session. Queries hit a local SQLite database in the browser. Better Sidebar has no server that
+            sees your chats or workspace files. What reaches Google is the same as any message you type: the prompt,
+            including whatever the agent read in order to answer you.</div>
         </details>
-        <details class="group bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+        <details class="group bg-muted rounded-xl border border-crease">
           <summary
-            class="flex items-center justify-between px-6 py-4 cursor-pointer font-medium text-slate-900 dark:text-white">
-            Does the AI agent work on AI Studio too?
-            <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none"
+            class="flex items-center justify-between px-6 py-4 cursor-pointer font-medium text-ink">
+            Does this work on AI Studio too?
+            <svg class="w-5 h-5 text-secondary group-open:rotate-180 transition-transform" fill="none"
               viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
           </summary>
-          <div class="px-6 pb-4 text-sm text-slate-600 dark:text-slate-300">The AI Agent is currently Gemini-only.
-            Premium themes and advanced export work on both Gemini and AI Studio.</div>
+          <div class="px-6 pb-4 text-sm text-secondary">Yes. Both agents work on Gemini and AI
+            Studio. Workspace files persist across platforms — a file written from Gemini is readable from AI Studio.
+          </div>
         </details>
-        <details class="group bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+        <details class="group bg-muted rounded-xl border border-crease">
           <summary
-            class="flex items-center justify-between px-6 py-4 cursor-pointer font-medium text-slate-900 dark:text-white">
-            What can the AI Agent actually do?
-            <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none"
+            class="flex items-center justify-between px-6 py-4 cursor-pointer font-medium text-ink">
+            What can the agents actually do?
+            <svg class="w-5 h-5 text-secondary group-open:rotate-180 transition-transform" fill="none"
               viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
           </summary>
-          <div class="px-6 pb-4 text-sm text-slate-600 dark:text-slate-300">It has full query access to your extension's
-            database — conversations, messages, folders, tags, prompts, snippets. It writes its own queries, analyzes
-            results, and takes action. Built-in Skills include Auto-Organize, Backfill Search Index, Query Your Data,
-            and Manage Prompts. You can also write your own custom Skills.</div>
+          <div class="px-6 pb-4 text-sm text-secondary"><strong>Better Sidebar agent</strong> —
+            query and (with Power Pack) change conversations, folders, tags, prompts, snippets. <strong>Workspace
+              agent</strong> — create and edit text/code from scratch; read and precisely edit existing Word (tracked
+            changes, comments), Excel (formulas, new sheets), PDF (highlights, sticky notes, page ops), and PowerPoint.
+            They cannot see each other's data. That split is the point.</div>
         </details>
-        <details class="group bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+        <details class="group bg-muted rounded-xl border border-crease">
           <summary
-            class="flex items-center justify-between px-6 py-4 cursor-pointer font-medium text-slate-900 dark:text-white">
+            class="flex items-center justify-between px-6 py-4 cursor-pointer font-medium text-ink">
+            Do I have to upload a file first?
+            <svg class="w-5 h-5 text-secondary group-open:rotate-180 transition-transform" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 pb-4 text-sm text-secondary">For text and code, no. Ask it to build the
+            files. Word, Excel, PDF, and PowerPoint have to be dragged in — a browser extension can't open those from
+            disk on request, and generating brand-new binary files from scratch isn't supported yet.</div>
+        </details>
+        <details class="group bg-muted rounded-xl border border-crease">
+          <summary
+            class="flex items-center justify-between px-6 py-4 cursor-pointer font-medium text-ink">
+            Why buy during beta?
+            <svg class="w-5 h-5 text-secondary group-open:rotate-180 transition-transform" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 pb-4 text-sm text-secondary">Workspace Agent is in beta: it works, it's
+            careful with files, and you'll find rough edges. Bug reports get fast fixes. The current Power Pack price is
+            the beta price — it goes up once the feature is out of beta. 7-day no-questions refund if it isn't useful.
+          </div>
+        </details>
+        <details class="group bg-muted rounded-xl border border-crease">
+          <summary
+            class="flex items-center justify-between px-6 py-4 cursor-pointer font-medium text-ink">
             Does it use my API keys or tokens?
-            <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none"
+            <svg class="w-5 h-5 text-secondary group-open:rotate-180 transition-transform" fill="none"
               viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
           </summary>
-          <div class="px-6 pb-4 text-sm text-slate-600 dark:text-slate-300">No. The Agent uses your existing Gemini
-            session — no API keys, no extra tokens, no data leaving your machine. Everything runs locally in your
-            browser.</div>
+          <div class="px-6 pb-4 text-sm text-secondary">No. Both agents use your existing Gemini or
+            AI Studio session — no API keys, no extra tokens, no Better Sidebar server. The model you're already talking
+            to is the one doing the work.</div>
         </details>
       </div>
     </div>
@@ -693,13 +689,13 @@
   <!-- Final CTA -->
   <section class="py-20 sm:py-28 hero-gradient relative overflow-hidden">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center relative z-10">
-      <div class="reveal">
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-6">Ready to supercharge
-          your workflow?</h2>
-        <p class="text-lg text-slate-600 dark:text-slate-300 mb-8 max-w-xl mx-auto">One-time purchase. Instant delivery.
-          3-device license. No subscription.</p>
+      <div class="">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-ink mb-6">Organize your library.
+          Create and edit your files.</h2>
+        <p class="text-lg text-secondary mb-8 max-w-xl mx-auto">Better Sidebar Agent writes and unlimited Workspace files — one payment.
+          10 activations. 7-day refund. Beta price — it rises when Workspace Agent leaves beta.</p>
         <a data-gumroad-action="buy"
-          class="cta-btn animate-pulse-glow inline-flex items-center gap-3 text-white text-lg font-bold px-10 py-5 rounded-full cursor-pointer"
+          class="cta-btn inline-flex items-center gap-3 text-white text-lg font-bold px-10 py-5 rounded-full cursor-pointer"
           role="button" tabindex="0" aria-label="Buy Power Pack now">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
             aria-hidden="true">
@@ -708,47 +704,35 @@
           </svg>
           Get Power Pack — <span data-gumroad-field="price">$19.99</span>
         </a>
-        <p class="mt-6 text-sm text-slate-500 dark:text-slate-400">Join thousands of Gemini &amp; AI Studio power users
+        <p class="mt-6 text-sm text-secondary">Join thousands of Gemini &amp; AI Studio power users
         </p>
       </div>
     </div>
-    <div
-      class="absolute -top-20 -right-20 w-80 h-80 bg-indigo-200 dark:bg-indigo-900/20 rounded-full blur-3xl opacity-50 pointer-events-none"
-      aria-hidden="true"></div>
-    <div
-      class="absolute -bottom-20 -left-20 w-64 h-64 bg-purple-200 dark:bg-purple-900/20 rounded-full blur-3xl opacity-40 pointer-events-none"
+<div
+      class="absolute -bottom-20 -left-20 w-64 h-64 bg-tint rounded-full blur-3xl opacity-40 pointer-events-none"
       aria-hidden="true"></div>
   </section>
 
   <!-- Footer -->
-  <footer class="py-8 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+  <footer class="py-8 bg-paper border-t border-crease">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-        <svg class="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+      <div class="flex items-center gap-2 text-sm text-secondary">
+        <svg class="w-5 h-5 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
           aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" />
         </svg>
         Better Sidebar · Paper Crane Dev
       </div>
-      <div class="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
+      <div class="flex items-center gap-4 text-sm text-secondary">
         <a href="https://github.com/Paper-Crane-Devteam/better-sidebar-for-google-gemini-and-ai-studio"
-          class="hover:text-indigo-500 transition-colors" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a href="https://discord.gg/FRzesxaGAx" class="hover:text-indigo-500 transition-colors" target="_blank"
+          class="hover:text-brand transition-colors" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://discord.gg/FRzesxaGAx" class="hover:text-brand transition-colors" target="_blank"
           rel="noopener noreferrer">Discord</a>
       </div>
     </div>
   </footer>
 
-  <!-- Scroll reveal script -->
-  <script>
-    (function () {
-      var els = document.querySelectorAll('.reveal');
-      var io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
-      }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-      els.forEach(function (el) { io.observe(el); });
-    })();
-  </script>
+
 </body>
 
 </html>

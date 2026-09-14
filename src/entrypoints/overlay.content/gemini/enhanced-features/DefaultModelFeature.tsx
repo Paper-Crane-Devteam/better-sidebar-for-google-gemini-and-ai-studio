@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { useUrl } from '@/shared/hooks/useUrl';
 import { usePegasusStore } from '@/shared/lib/pegasus-store';
-import { useSettingsStore } from '@/shared/lib/settings-store';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { waitForElement, applyShadowStyles } from '@/shared/lib/utils';
 import { useI18n } from '@/shared/hooks/useI18n';
@@ -201,8 +200,7 @@ export const DefaultModelFeature = () => {
           applyShadowStyles(shadow, mainStyles);
           
           const shadowBody = document.createElement('div');
-          shadowBody.classList.add('shadow-body');
-          shadowBody.classList.add(useSettingsStore.getState().geminiStyle === 'classic' ? 'theme-gemini-classic' : 'theme-gemini');
+          shadowBody.classList.add('shadow-body', 'theme-gemini');
           if (document.body.classList.contains('dark-theme') || document.body.getAttribute('data-theme') === 'dark') {
             shadowBody.classList.add('dark');
           }

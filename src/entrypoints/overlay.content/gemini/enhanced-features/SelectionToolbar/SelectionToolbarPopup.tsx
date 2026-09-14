@@ -89,8 +89,19 @@ export const SelectionToolbarPopup = ({
   if (actions.length === 0) return null;
 
   return (
+    /*
+      No entrance animation.
+
+      It used to carry `animate-in fade-in zoom-in-95`, which read as the toolbar
+      sliding in sideways rather than fading. The cause is the `translateX(-50%)`
+      below: tailwindcss-animate's `enter` keyframes write the whole `transform`
+      property, so the animation started the element at `translate3d(0,0,0)` and
+      only landed on the centring offset at the end — half its own width of
+      horizontal travel, every time. Centring by transform and animating by
+      transform cannot both be true, and the centring is the part that has to be.
+    */
     <div
-      className="fixed pointer-events-auto animate-in fade-in zoom-in-95 duration-150"
+      className="fixed pointer-events-auto"
       style={{
         top: `${position.top}px`,
         left: `${position.left}px`,

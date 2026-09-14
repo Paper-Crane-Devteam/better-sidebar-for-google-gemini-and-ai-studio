@@ -16,8 +16,9 @@
  * runs before this is ever called.
  */
 
-import { useLicenseStore } from '@/shared/lib/license-store';
+import { isPowerPackUser } from '@/shared/lib/license-store';
 import { captureBeforeWrite } from '../undo';
+import { paywallResult } from './paywall-signal';
 
 /** Blocked SQL patterns (DDL and dangerous operations) */
 const BLOCKED_PATTERN = /^\s*(DROP|ALTER|CREATE|PRAGMA|ATTACH|DETACH|VACUUM|REINDEX)\b/i;
@@ -27,21 +28,6 @@ const SELECT_PATTERN = /^\s*SELECT\b/i;
 
 /** Maximum rows returned for SELECT queries */
 const MAX_RESULT_ROWS = 1000;
-
-/**
- * How a licence block is reported, and how the engine recognises it.
- *
- * A prefix rather than a word anywhere in the text, and exported rather than retyped,
- * because the engine ends the session on seeing it. It used to test
- * `result.includes('PAYWALL')`, which reads the *whole* result — so a plain SELECT
- * whose rows happened to contain the word (dumping `messages.content` is routine, and
- * a conversation about subscriptions will contain it) ended the session and showed the
- * upgrade card, for a query that was never blocked.
- *
- * Same reasoning as `ERROR:` / `CANCELLED:` elsewhere: only the first line is the
- * verdict, the rest is data.
- */
-export const PAYWALL_SIGNAL = 'ERROR: PAYWALL';
 
 /**
  * Placeholder the AI uses instead of inventing random UUIDs.
@@ -100,15 +86,20 @@ export async function executeSql(params: ExecuteSqlParams): Promise<string> {
 
   const isSelect = SELECT_PATTERN.test(query);
 
-  // 2. Non-SELECT: paywall check
-  if (!isSelect) {
-    const license = useLicenseStore.getState();
-    const hasPowerPack =
-      license.tier === 'power_pack' || license.tier === 'pro' || license.tier === 'support_pack';
-
-    if (!hasPowerPack) {
-      return `${PAYWALL_SIGNAL} - Writing to database requires Power Pack subscription. The user has been shown an upgrade prompt.`;
-    }
+  /**
+   * 2. Non-SELECT: paywall check.
+   *
+   * Delegated to `isPowerPackUser()` rather than reading `tier` here, which is what this
+   * used to do — and got wrong twice in the same expression. It accepted `support_pack`,
+   * the cheaper tier whose whole pitch is that it does *not* include write access, and it
+   * never consulted `isLicenseValid`, so an expired cache still passed. Every other gate
+   * in the app goes through that helper; this one, the only gate that actually mutates
+   * user data, was the one that did not.
+   */
+  if (!isSelect && !isPowerPackUser()) {
+    return paywallResult(
+      'Writing to the database requires Power Pack. The user has been shown an upgrade prompt.',
+    );
   }
 
   // 3. Hydrate UUID placeholders

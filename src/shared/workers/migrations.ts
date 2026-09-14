@@ -2,6 +2,8 @@
  * Database migrations — executed once per DB open inside the web worker.
  */
 
+import { MESSAGES_FTS_OBJECTS } from '@/shared/db/schema';
+
 export const runMigrations = async (db: any) => {
   console.log('Worker: Checking for migrations...');
 
@@ -283,6 +285,18 @@ export const runMigrations = async (db: any) => {
       }
     });
 
+    // Migration: Add is_temporary to conversations if missing.
+    // Existing rows default to 0 — temporary chats recorded before this feature
+    // existed are indistinguishable from normal ones, so they stay visible.
+    await step('add is_temporary to conversations', async () => {
+      if (!(await hasColumn('conversations', 'is_temporary'))) {
+        console.log('Worker: Migrating conversations table - adding is_temporary');
+        await db.run(
+          'ALTER TABLE conversations ADD COLUMN is_temporary INTEGER DEFAULT 0',
+        );
+      }
+    });
+
     // Migration: Add is_pinned to folders if missing
     await step('add is_pinned to folders', async () => {
       if (!(await hasColumn('folders', 'is_pinned'))) {
@@ -545,6 +559,24 @@ export const runMigrations = async (db: any) => {
       );
     });
 
+    /**
+     * Which workspace a conversation is bound to.
+     *
+     * A conversation picks a workspace once — on its first successful workspace tool
+     * call — and is locked to it from then on. The lock has to survive a reload and
+     * still be there tomorrow, which rules out memory; and it is keyed by conversation,
+     * which rules out a plain preference: `chrome.storage` would need its own
+     * conversation → workspace map, i.e. this column with extra steps.
+     *
+     * Nullable, and null is the common case — only conversations that actually touched
+     * a file carry a value. `hasColumn` makes the step safe to re-run.
+     */
+    await step('add workspace_id to agent_sessions', async () => {
+      if (await hasColumn('agent_sessions', 'workspace_id')) return;
+      console.log('Worker: Migrating agent_sessions - adding workspace_id');
+      await db.run('ALTER TABLE agent_sessions ADD COLUMN workspace_id TEXT');
+    });
+
     // ── One-time data fix (v2.9.0): fix conversation created_at from first message ──
     // A previous bug caused conversations.created_at to be incorrect.
     // For existing users: set created_at = first message's timestamp (MIN(timestamp)).
@@ -582,6 +614,129 @@ export const runMigrations = async (db: any) => {
 
       await markMigrationDone('fix_conversation_created_at_v2.9.0');
       console.log('Worker: Conversation created_at fix completed.');
+    });
+
+    /**
+     * Migration: `messages` primary key becomes (conversation_id, id).
+     *
+     * `messages.id` holds the platform's own id, and that id is only unique inside
+     * a conversation — Gemini's branch feature copies a conversation and reuses the
+     * response ids verbatim. Under a global `id TEXT PRIMARY KEY` the copies were
+     * not merely unstorable: `messageRepo.upsert` looked existence up by id alone,
+     * classified them as "already present", and UPDATEd the *original* conversation's
+     * rows with the branch's values. Silent cross-conversation corruption, which is
+     * what makes this worth a table rebuild.
+     *
+     * SQLite cannot alter a primary key, so the table is recreated and copied. No id
+     * is rewritten — only the constraint changes — which keeps the migration a plain
+     * copy rather than a data transformation, and leaves every existing id valid for
+     * DOM lookups.
+     *
+     * The FTS index is deliberately *not* rebuilt. Re-tokenizing every message with
+     * the trigram tokenizer is the one genuinely expensive thing here, and it is
+     * avoidable: the triggers in MESSAGES_FTS_OBJECTS make a single FTS row shared by
+     * all copies of an id instead of keying it per row. See the comment there.
+     *
+     * Runs after the legacy column steps on purpose — it copies `message_type` and
+     * `order_index`, which those steps add to very old databases.
+     */
+    await step('messages: composite primary key (conversation_id, id)', async () => {
+      const KEY = 'messages_composite_pk_v1';
+      await ensureMigrationsTable();
+      if (await hasMigrationRun(KEY)) return;
+
+      const tableRows = await db.run(
+        "SELECT sql FROM sqlite_master WHERE type='table' AND name='messages'",
+      );
+      const tableSql: string = tableRows[0]?.sql ?? '';
+
+      // Second gate, independent of _migrations: a fresh install already created
+      // the table from SCHEMA, and a lost bookkeeping row must not trigger a
+      // pointless rebuild.
+      if (!tableSql || /primary\s+key\s*\(\s*conversation_id/i.test(tableSql)) {
+        await markMigrationDone(KEY);
+        return;
+      }
+
+      const countRows = await db.run('SELECT COUNT(*) AS n FROM messages');
+      const rowCount = countRows[0]?.n ?? 0;
+      const startedAt = Date.now();
+      console.log(
+        `Worker: rebuilding messages table for composite primary key (${rowCount} rows)...`,
+      );
+
+      // Enforcement has to be off *outside* the transaction (PRAGMA is a no-op
+      // inside one). Nothing references `messages`, so this is belt-and-braces
+      // around DROP/RENAME rather than a hard requirement.
+      await db.run('PRAGMA foreign_keys = OFF');
+      try {
+        await db.run('BEGIN');
+        try {
+          // A previous attempt may have died between CREATE and RENAME.
+          await db.run('DROP TABLE IF EXISTS messages_new');
+
+          // Must go before DROP TABLE: a trigger body referencing a table that no
+          // longer exists makes the subsequent RENAME fail.
+          await db.run('DROP TRIGGER IF EXISTS messages_ai');
+          await db.run('DROP TRIGGER IF EXISTS messages_ad');
+          await db.run('DROP TRIGGER IF EXISTS messages_au');
+
+          await db.run(`
+            CREATE TABLE messages_new (
+              id TEXT NOT NULL,
+              conversation_id TEXT NOT NULL,
+              role TEXT NOT NULL,
+              content TEXT,
+              message_type TEXT DEFAULT 'text',
+              order_index INTEGER DEFAULT 0,
+              timestamp INTEGER DEFAULT (unixepoch()),
+              PRIMARY KEY (conversation_id, id),
+              FOREIGN KEY(conversation_id) REFERENCES conversations(id) ON DELETE CASCADE
+            )
+          `);
+
+          // COALESCE on id: SQLite does not enforce NOT NULL on a non-INTEGER
+          // PRIMARY KEY column, so old databases can hold rows whose id never
+          // arrived (a parse miss on the interceptor side). They are unaddressable
+          // either way; giving them an id keeps the content instead of failing the
+          // whole migration on the new NOT NULL.
+          //
+          // No de-duplication needed: the old key made `id` globally unique, so
+          // (conversation_id, id) cannot collide.
+          await db.run(`
+            INSERT INTO messages_new (id, conversation_id, role, content, message_type, order_index, timestamp)
+            SELECT COALESCE(id, hex(randomblob(16))), conversation_id, role, content,
+                   message_type, order_index, timestamp
+            FROM messages
+          `);
+
+          await db.run('DROP TABLE messages');
+          await db.run('ALTER TABLE messages_new RENAME TO messages');
+
+          // Fully covered by the primary key index now.
+          await db.run('DROP INDEX IF EXISTS idx_messages_conversation');
+
+          await db.run(MESSAGES_FTS_OBJECTS);
+
+          await db.run('COMMIT');
+        } catch (e) {
+          // Mandatory: an open transaction would break every later query on this
+          // connection, including the rest of the migrations.
+          await db.run('ROLLBACK').catch((rollbackError: unknown) => {
+            console.error('Worker: messages rebuild rollback failed:', rollbackError);
+          });
+          throw e;
+        }
+      } finally {
+        await db.run('PRAGMA foreign_keys = ON').catch((e: unknown) => {
+          console.error('Worker: failed to re-enable foreign keys:', e);
+        });
+      }
+
+      await markMigrationDone(KEY);
+      console.log(
+        `Worker: messages table rebuilt in ${Date.now() - startedAt}ms (${rowCount} rows)`,
+      );
     });
 
   } catch (err) {

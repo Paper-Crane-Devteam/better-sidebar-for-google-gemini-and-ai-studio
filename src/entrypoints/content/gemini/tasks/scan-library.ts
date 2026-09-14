@@ -2,6 +2,7 @@ import { Platform } from '@/shared/types/platform';
 import { apiScanner } from './scan-api';
 import { scrollHistoryToEnd, waitForHistoryScroller } from './history-scroller';
 import i18n from '@/locale/i18n';
+import { trace } from '@/shared/lib/trace';
 
 /**
  * Full library scan for Gemini.
@@ -43,7 +44,7 @@ async function runScan() {
       await scrollHistoryToEnd(scroller, {
         logPrefix: 'Gemini Scan',
         onBatchLoaded: () => {
-          console.log(
+          trace(
             `Gemini Scan: captured ${apiScanner.getItems().length} raw items so far`,
           );
         },

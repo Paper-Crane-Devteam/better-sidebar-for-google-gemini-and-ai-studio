@@ -4,6 +4,8 @@ import {
 } from '../lib/response-parser';
 import { parseBatchExecuteRequest } from '../lib/request-parser';
 import { detectGeminiContext } from '@/shared/lib/gemini-context';
+import { isGeminiTemporaryChat } from '@/shared/lib/dom-selectors';
+import { trace } from '@/shared/lib/trace';
 
 export function handleGenerateResponse(response: any, url: string) {
   if (response.status === 200) {
@@ -58,16 +60,6 @@ export function handleGenerateResponse(response: any, url: string) {
         } catch (e) {
           // ignore
         }
-
-        if (prompt) {
-          console.log('Better Sidebar (Gemini): Parsed User Prompt:', prompt);
-        }
-        if (requestNotebookId) {
-          console.log('Better Sidebar (Gemini): Detected notebook from request:', requestNotebookId);
-        }
-        if (previousModelResponseId) {
-          console.log('Better Sidebar (Gemini): Previous model response (regeneration context):', previousModelResponseId);
-        }
       }
     } catch (e) {
       console.error(
@@ -93,11 +85,6 @@ export function handleGenerateResponse(response: any, url: string) {
 
     try {
       const retChunks = parseStreamingResponse(responseBody);
-
-      console.log(
-        'Better Sidebar (Gemini): Parsed StreamGenerate chunks:',
-        retChunks,
-      );
       const chunks = retChunks.map((chunk) => chunk[0]);
       if (chunks.length > 0) {
         // Use common helper to extract payloads
@@ -105,7 +92,6 @@ export function handleGenerateResponse(response: any, url: string) {
 
         if (payloads.length > 0) {
           let targetPayload: any = null;
-          let targetPayloadIndex = -1;
 
           // 倒着找，找到第一个[4]?.[0]?.[1]?.[0]有内容的
           for (let i = payloads.length - 1; i >= 0; i--) {
@@ -114,7 +100,6 @@ export function handleGenerateResponse(response: any, url: string) {
               const content = p?.[4]?.[0]?.[1]?.[0];
               if (content) {
                 targetPayload = p;
-                targetPayloadIndex = i;
                 break;
               }
             } catch (e) {
@@ -122,11 +107,11 @@ export function handleGenerateResponse(response: any, url: string) {
             }
           }
 
-          console.log(
-            'Better Sidebar (Gemini): Parsed Payload:',
-            targetPayloadIndex,
-            targetPayload,
-          );
+          if (!targetPayload) {
+            trace(
+              `Better Sidebar (Gemini): No content payload found (${payloads.length} payloads scanned)`,
+            );
+          }
 
           if (targetPayload) {
             try {
@@ -137,21 +122,7 @@ export function handleGenerateResponse(response: any, url: string) {
               );
               const responseMessageId = targetPayload?.[1]?.[1];
 
-              console.log(
-                'Better Sidebar (Gemini): Response Message ID from payload[1][1]:',
-                responseMessageId,
-              );
-
               if (contentCandidate && conversationId) {
-                console.log(
-                  'Better Sidebar (Gemini): Target Content:',
-                  contentCandidate,
-                );
-                console.log(
-                  'Better Sidebar (Gemini): Conversation ID:',
-                  conversationId,
-                );
-
                 // 找标题: 倒着找 payload[10][0] 有内容
                 let title: string | undefined;
                 for (let i = payloads.length - 1; i >= 0; i--) {
@@ -173,18 +144,8 @@ export function handleGenerateResponse(response: any, url: string) {
                 // User Message — ID from payload[1][1] (r_xxx format)
                 const userMessageId = responseMessageId;
 
-                console.log(
-                  'Better Sidebar (Gemini): User Message ID:',
-                  userMessageId,
-                );
-
                 // Model Message — ID from payload[4][0][0] (rc_xxx format)
                 const modelMessageId = targetPayload?.[4]?.[0]?.[0];
-
-                console.log(
-                  'Better Sidebar (Gemini): Model Message ID:',
-                  modelMessageId,
-                );
 
                 // Always pass replaceAfterMessageId when we have a previous
                 // context rc_. This handles both normal messages (no-op delete
@@ -192,13 +153,18 @@ export function handleGenerateResponse(response: any, url: string) {
                 // (deletes the old messages that were after rc_).
                 const replaceAfterMessageId = previousModelResponseId ?? undefined;
 
-                if (replaceAfterMessageId) {
-                  console.log(
-                    'Better Sidebar (Gemini): Will delete messages after:',
-                    replaceAfterMessageId,
-                    'before inserting new ones',
-                  );
-                }
+                console.log(
+                  'Better Sidebar (Gemini): Captured turn',
+                  {
+                    conversationId,
+                    userMessageId,
+                    modelMessageId,
+                    promptChars: prompt?.length ?? 0,
+                    replyChars: contentCandidate.length,
+                    ...(requestNotebookId ? { notebookId: requestNotebookId } : {}),
+                    ...(replaceAfterMessageId ? { replacesAfter: replaceAfterMessageId } : {}),
+                  },
+                );
 
                 if (prompt) {
                   messages.push({
@@ -229,6 +195,17 @@ export function handleGenerateResponse(response: any, url: string) {
                     requestNotebookId,
                   );
 
+                  // Only the row-creating event needs this. Later turns arrive as
+                  // GEMINI_CHAT_CONTENT_RESPONSE and attach to a row that is
+                  // already marked, so they carry no flag of their own.
+                  const isTemporary = isGeminiTemporaryChat();
+                  if (isTemporary) {
+                    console.log(
+                      'Better Sidebar (Gemini): Temporary chat detected, marking as hidden:',
+                      conversationId,
+                    );
+                  }
+
                   globalThis.dispatchEvent(
                     new CustomEvent('BETTER_SIDEBAR_PROMPT_CREATE', {
                       detail: {
@@ -240,6 +217,7 @@ export function handleGenerateResponse(response: any, url: string) {
                         gem_id: ctx.gemId ?? undefined,
                         notebook_id: ctx.notebookId ?? undefined,
                         replaceAfterMessageId,
+                        is_temporary: isTemporary,
                       },
                     }),
                   );

@@ -22,7 +22,15 @@ Output ONLY a valid JSON object (no markdown code fences, no explanation) with t
   "description": "Brief description of the theme aesthetic",
   "preferredMode": "light" or "dark",
   "fonts": ["GoogleFontName:wght@400;500;700"],
-  "extraCss": "body.bs-theme--{id} { /* optional extra CSS */ }",
+  "extraCss": "body.bs-theme--{id} { /* optional non-font CSS: textures, radius, effects */ }",
+  "fontCss": "body.bs-fonts--{id} { font-family: 'GoogleFontName', sans-serif !important; }",
+  "fontVariables": [
+    { "property": "--mat-menu-item-label-text-font", "value": "'GoogleFontName', sans-serif" },
+    { "property": "--mat-list-list-item-label-text-font", "value": "'GoogleFontName', sans-serif" },
+    { "property": "--mat-list-list-item-supporting-text-font", "value": "'GoogleFontName', sans-serif" },
+    { "property": "--mat-button-text-label-text-font", "value": "'GoogleFontName', sans-serif" },
+    { "property": "--mat-button-filled-label-text-font", "value": "'GoogleFontName', sans-serif" }
+  ],
   "variables": [
     // ─── Surface / Background (REQUIRED) ───
     { "property": "--gem-sys-color--surface", "value": "#hex" },
@@ -140,6 +148,9 @@ Output ONLY a valid JSON object (no markdown code fences, no explanation) with t
     { "property": "--sidebar-icon-color", "value": "R G B" },
     { "property": "--highlight", "value": "R G B" },
     { "property": "--highlight-foreground", "value": "R G B" },
+    // Sidebar font stack — a plain CSS font-family value, not a color.
+    // Include it only when "fontCss" is present, and keep the two in sync.
+    { "property": "--font-sans", "value": "'FontName', -apple-system, 'Microsoft YaHei', 'PingFang SC', sans-serif" },
     // These two use hex format (not RGB triplet):
     { "property": "--gem-sys-color--primary-container", "value": "#hex" },
     { "property": "--gem-sys-color--on-primary-container", "value": "#hex" }
@@ -148,11 +159,18 @@ Output ONLY a valid JSON object (no markdown code fences, no explanation) with t
 
 ## Rules
 - All color values in "variables" must be valid CSS color values (hex #rrggbb preferred, rgba() also acceptable)
-- All color values in "sidebarVariables" must be RGB triplets "R G B" (e.g. "255 255 255") EXCEPT --gem-sys-color--* which use hex
+- All color values in "sidebarVariables" must be RGB triplets "R G B" (e.g. "255 255 255") EXCEPT --gem-sys-color--* which use hex and --font-sans which is a font stack
+- "--font-sans" in "sidebarVariables" is what the sidebar UI uses. It is applied at the same moment as "fontCss", so the sidebar and the page change typeface together — list the same family there
 - Ensure sufficient contrast between text and background (WCAG AA: 4.5:1 for normal text)
 - "preferredMode" should match the overall brightness ("light" for bright backgrounds, "dark" for dark backgrounds)
 - "fonts" uses Google Fonts format: "FontName:wght@300;400;500;700" (omit if using system fonts)
-- "extraCss" must scope all rules with body.bs-theme--{id} selector. Can include font-family overrides, textures, or visual effects
+- "extraCss" must scope all rules with body.bs-theme--{id}. Use it for textures, border-radius, shadows, visual effects — anything EXCEPT typography
+- "fontCss" holds every font-family rule, and must scope them with body.bs-fonts--{id} (note: bs-fonts, not bs-theme). This class is added only after the theme switch animation finishes and the webfont has downloaded, which keeps the animation smooth and prevents text from reflowing twice. Never put font-family in "extraCss"
+- A typical "fontCss" sets the base family on body.bs-fonts--{id}, then makes descendants inherit it while leaving icon fonts alone:
+  body.bs-fonts--{id} { font-family: 'FontName', sans-serif !important; }
+  body.bs-fonts--{id} *:not(.material-symbols-outlined):not(.material-symbols-rounded):not(.material-symbols-sharp):not(.google-symbols):not(mat-icon):not(.mat-icon):not([class*="material-symbols"]):not([class*="google-symbols"]) { font-family: inherit; }
+- "fontVariables" holds every font-related CSS variable (the --mat-*-font tokens Material components read). They go here, NOT in "variables", for the same reason: a token pointing at a webfont makes the page reflow the moment that font arrives. Use the same family as "fontCss"
+- If the theme keeps the page's default typeface, omit "fontCss" and "fontVariables" entirely
 - "id" must be kebab-case (lowercase, hyphens only), unique, and descriptive
 - Replace all "R G B" and "#hex" placeholders with actual color values
 - Design a cohesive color palette — all colors should work harmoniously together

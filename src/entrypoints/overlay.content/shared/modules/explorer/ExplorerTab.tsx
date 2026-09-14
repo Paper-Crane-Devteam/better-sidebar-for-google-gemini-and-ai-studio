@@ -249,10 +249,24 @@ export const ExplorerTab = ({
   // If no pendingEntry (user deleted it) → fall back to selectedNode (legacy behavior).
   useEffect(() => {
     const handleCreate = async (event: any) => {
-      const { id, title: apiTitle } = event.detail;
+      const { id, title: apiTitle, is_temporary: isTemporary } = event.detail;
 
       // Clear legacy loading state
       setPendingNewChatFolderId(null);
+
+      // A temporary chat is never listed, so there is nothing to file, rename or
+      // scroll to. Bail out before any of that — moving it into a folder would
+      // leave it sitting there visibly if the flag were ever lost, and a rename
+      // would apply a title nobody can see.
+      //
+      // The pending entry is still cleared: the user may have clicked New Chat and
+      // then switched to a temporary chat, and leaving the placeholder in the tree
+      // would make it look like a chat is still on its way.
+      if (isTemporary) {
+        if (pendingEntryRef.current) removePendingEntry();
+        return;
+      }
+
       // The folder is already in view; don't scroll the tree when auto-selecting this id
       skipScrollForIdRef.current = id;
 
@@ -341,7 +355,7 @@ export const ExplorerTab = ({
         'BETTER_SIDEBAR_PROMPT_CREATE',
         handleCreate,
       );
-  }, [fetchData, finalizePendingEntry]);
+  }, [fetchData, finalizePendingEntry, removePendingEntry]);
 
   // Handle URL changes to auto-select prompt
   useEffect(() => {

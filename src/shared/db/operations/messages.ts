@@ -1,4 +1,5 @@
 import { runQuery, runCommand, runBatch } from '../index';
+import { trace } from '@/shared/lib/trace';
 import type { Message } from '../../types/db';
 
 export const messageRepo = {
@@ -67,8 +68,18 @@ export const messageRepo = {
     )) as Message[];
   },
 
-  delete: async (id: string): Promise<void> => {
-    await runCommand('DELETE FROM messages WHERE id = ?', [id]);
+  /**
+   * Delete one message.
+   *
+   * Takes the conversation as well because `id` alone no longer identifies a row:
+   * the platform reuses message ids across branched conversations, so an unscoped
+   * delete would take the copies with it.
+   */
+  delete: async (conversationId: string, id: string): Promise<void> => {
+    await runCommand(
+      'DELETE FROM messages WHERE conversation_id = ? AND id = ?',
+      [conversationId, id],
+    );
   },
 
   deleteByConversationId: async (conversationId: string): Promise<void> => {
@@ -173,15 +184,26 @@ export const messageRepo = {
   ): Promise<void> => {
     if (messages.length === 0) return;
 
-    // 1. Check which messages already exist
+    // 1. Check which messages already exist.
+    //
+    // Scoped to the conversation, and that scope is the whole point: platform
+    // message ids repeat across branched conversations, so an unscoped lookup
+    // matched the *original* conversation's rows and turned every insert into an
+    // UPDATE of somebody else's data.
     const incomingIds = messages.map((m) => m.id);
     const existingRows = await runQuery(
-      `SELECT id FROM messages WHERE id IN (${incomingIds.map(() => '?').join(',')})`,
-      incomingIds,
+      `SELECT id FROM messages
+       WHERE conversation_id = ?
+         AND id IN (${incomingIds.map(() => '?').join(',')})`,
+      [conversationId, ...incomingIds],
     );
     const existingIds = new Set(existingRows.map((r: any) => r.id));
 
-    const newMessages = messages.filter((m) => !existingIds.has(m.id));
+    // Incoming order is the tie-breaker for inserts below, so it has to be
+    // captured before filtering splits the array.
+    const newMessages = messages
+      .map((msg, incomingIndex) => ({ msg, incomingIndex }))
+      .filter(({ msg }) => !existingIds.has(msg.id));
     const updateMessages = messages.filter((m) => existingIds.has(m.id));
 
     const operations: { sql: string; bind: any[] }[] = [];
@@ -195,13 +217,14 @@ export const messageRepo = {
                   role = ?, 
                   message_type = ?, 
                   timestamp = CASE WHEN ? IS NOT NULL THEN ? ELSE timestamp END
-                WHERE id = ?`,
+                WHERE conversation_id = ? AND id = ?`,
           bind: [
             msg.content,
             msg.role,
             msg.message_type || 'text',
             msg.created_at,
             msg.created_at,
+            conversationId,
             msg.id,
           ],
         });
@@ -210,11 +233,24 @@ export const messageRepo = {
 
     // 3. Prepare Inserts
     if (newMessages.length > 0) {
-      // Sort new messages by timestamp (asc).
-      // Treat missing timestamps as Infinity so they go to the end
-      newMessages.sort(
-        (a, b) => (a.created_at ?? Infinity) - (b.created_at ?? Infinity),
-      );
+      // Chronological, falling back to the order the caller handed them over.
+      //
+      // Timestamps here are unix *seconds*, so a question and its answer routinely
+      // tie; whichever way the platform happened to list them then survived into
+      // order_index. The incoming order is the better signal in that case — callers
+      // sort with whatever precision they actually have.
+      //
+      // The previous comparator also returned NaN whenever both timestamps were
+      // absent (Infinity - Infinity), which leaves the result up to the sort
+      // implementation rather than defined.
+      newMessages.sort((a, b) => {
+        const at = a.msg.created_at;
+        const bt = b.msg.created_at;
+        if (at != null && bt != null && at !== bt) return at - bt;
+        if (at == null && bt != null) return 1; // undated goes last
+        if (at != null && bt == null) return -1;
+        return a.incomingIndex - b.incomingIndex;
+      });
 
       // Get DB stats to determine insertion point
       const stats = await runQuery(
@@ -227,7 +263,7 @@ export const messageRepo = {
       const dbMinIdx = stats[0]?.min_idx ?? 0;
       const dbMaxIdx = stats[0]?.max_idx ?? -1;
 
-      const firstNewTs = newMessages[0].created_at;
+      const firstNewTs = newMessages[0].msg.created_at;
 
       let startIdx = 0;
 
@@ -238,7 +274,7 @@ export const messageRepo = {
         startIdx = dbMaxIdx + 1;
       }
 
-      newMessages.forEach((msg, i) => {
+      newMessages.forEach(({ msg }, i) => {
         operations.push({
           sql: `INSERT INTO messages (id, conversation_id, role, content, message_type, timestamp, order_index) 
                 VALUES (?, ?, ?, ?, ?, COALESCE(?, unixepoch()), ?)`,
@@ -326,8 +362,12 @@ export const messageRepo = {
       // We always treat it as a phrase match in FTS to reduce noise before filtering
       matchQuery = `"${query.replace(/"/g, '""')}"`;
 
-      console.log('[DB] FTS Search:', matchQuery);
+      trace('[DB] FTS Search:', matchQuery);
 
+      // The join is on id alone by design. One FTS row is shared by every copy of
+      // a message id (branched conversations reuse them), so a single index hit
+      // fans out to one result row per conversation that holds the text — which is
+      // exactly what a search should report.
       sql += `
         SELECT m.*, c.title as conversation_title, c.folder_id, f.name as folder_name, c.external_url, c.platform
         FROM messages_fts fts
@@ -337,10 +377,11 @@ export const messageRepo = {
         WHERE messages_fts MATCH ?
         AND m.message_type != 'thought'
         AND c.deleted_at IS NULL
+        AND c.is_temporary = 0
       `;
       params.push(matchQuery);
     } else {
-      console.log('[DB] Short query, fallback to LIKE:', query);
+      trace('[DB] Short query, fallback to LIKE:', query);
 
       sql += `
         SELECT m.*, c.title as conversation_title, c.folder_id, f.name as folder_name, c.external_url, c.platform
@@ -350,6 +391,7 @@ export const messageRepo = {
         WHERE m.content LIKE ?
         AND m.message_type != 'thought'
         AND c.deleted_at IS NULL
+        AND c.is_temporary = 0
       `;
       params.push(`%${query}%`);
     }
@@ -421,8 +463,11 @@ export const messageRepo = {
        WHERE m.conversation_id = ?
          AND m.role = 'model'
          AND m.message_type != 'thought'
-         AND m.order_index < (SELECT order_index FROM messages WHERE id = ?)`,
-      [conversationId, messageId],
+         AND m.order_index < (
+           SELECT order_index FROM messages
+           WHERE conversation_id = ? AND id = ?
+         )`,
+      [conversationId, conversationId, messageId],
     );
     return result[0]?.scroll_index ?? 0;
   },
@@ -444,10 +489,13 @@ export const messageRepo = {
          WHERE m.conversation_id = ?
            AND m.role = 'model'
            AND m.message_type != 'thought'
-           AND m.order_index > (SELECT order_index FROM messages WHERE id = ?)
+           AND m.order_index > (
+             SELECT order_index FROM messages
+             WHERE conversation_id = ? AND id = ?
+           )
          ORDER BY m.order_index ASC
          LIMIT 1`,
-        [conversationId, messageId],
+        [conversationId, conversationId, messageId],
       );
       return result[0] || null;
     } else {
@@ -457,10 +505,13 @@ export const messageRepo = {
          WHERE m.conversation_id = ?
            AND m.role = 'user'
            AND m.message_type != 'thought'
-           AND m.order_index < (SELECT order_index FROM messages WHERE id = ?)
+           AND m.order_index < (
+             SELECT order_index FROM messages
+             WHERE conversation_id = ? AND id = ?
+           )
          ORDER BY m.order_index DESC
          LIMIT 1`,
-        [conversationId, messageId],
+        [conversationId, conversationId, messageId],
       );
       return result[0] || null;
     }

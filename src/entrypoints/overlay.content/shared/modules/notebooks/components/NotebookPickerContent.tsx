@@ -147,7 +147,7 @@ export const NotebookPickerContent = ({
 
   return (
     <div className="-mx-6 -my-4" onKeyDown={handleKeyDown}>
-      <div className="px-3 pb-2 pt-1">
+      <div className="px-3 pb-2 pt-3">
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
           <input

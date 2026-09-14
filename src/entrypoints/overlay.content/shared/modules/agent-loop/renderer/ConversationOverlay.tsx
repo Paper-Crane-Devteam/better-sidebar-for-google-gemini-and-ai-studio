@@ -9,16 +9,14 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useAgentLoopStore } from '../agent-loop-store';
-import { findConversationScroller } from './constants';
-import { useAgentViewState } from './useAgentViewState';
 import {
-  readSessionEnd,
-  weighSession,
-  isLightSession,
-  type SessionEnd,
-  type SessionWeight,
-} from './helpers/session-end';
-import { useUndoAvailable } from '../undo';
+  AI_STUDIO_OVERLAY_PADDING_X,
+  findConversationScroller,
+  findOverlayHost,
+} from './constants';
+import { useAgentViewState } from './useAgentViewState';
+import { readSessionEnd, type SessionEnd } from './helpers/session-end';
+import { hasOwnProse } from './helpers/model-prose';
 import { CustomUserMessage } from './components/CustomUserMessage';
 import { CustomModelResponse } from './components/CustomModelResponse';
 import { SessionEndCard } from './components/SessionEndCard';
@@ -27,35 +25,59 @@ import mainStyles from '@/index.scss?inline';
 import { applyShadowStyles } from '@/shared/lib/utils';
 import { bindShadowRootToTheme, bindAiStudioShadowRootToTheme } from '@/themes';
 import { usePegasusStore } from '@/shared/lib/pegasus-store';
-import { useSettingsStore } from '@/shared/lib/settings-store';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { detectPlatform, Platform } from '@/shared/types/platform';
+
+/**
+ * What to blank out while we cover the native conversation, per platform.
+ *
+ * `visibility` rather than `display`, so the element keeps its box: the native scroller's
+ * height comes from these turns, and collapsing them would resize the very container this
+ * overlay is measured against.
+ *
+ * AI Studio gets one element for the whole transcript (`.chat-session-content` holds every
+ * `ms-chat-turn`), which is both simpler and safer than Gemini's per-turn rule.
+ */
+const HIDE_NATIVE_CSS: Partial<Record<Platform, string>> = {
+  [Platform.GEMINI]: `
+    .conversation-container {
+      visibility: hidden !important;
+    }
+  `,
+  [Platform.AI_STUDIO]: `
+    ms-autoscroll-container .chat-session-content {
+      visibility: hidden !important;
+    }
+  `,
+};
 
 export const ConversationOverlay: React.FC = () => {
   const { t } = useI18n();
   const { messages, isActive: isCustomActive } = useAgentViewState();
   const setAgentViewActive = useAgentLoopStore((s) => s.setAgentViewActive);
   const chatWidth = usePegasusStore((s) => s.enhancedFeatures.gemini?.chatWidth ?? 46);
-  // Only feeds the end marker's size: a session with an undo offer is never "light",
-  // or the compact form would swallow the button.
-  const undoAvailable = useUndoAvailable();
+  const platform = detectPlatform();
 
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
   const [nativeScroller, setNativeScroller] = useState<HTMLElement | null>(null);
+  /** Whether the host we attached to is itself the scrolling element — see findOverlayHost */
+  const [hostScrolls, setHostScrolls] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showScrollBottomBtn, setShowScrollBottomBtn] = useState(false);
 
   // Find scroller container element and set up shadow DOM host with extension styles
   useEffect(() => {
     const findAndSetupTarget = () => {
-      const el = findConversationScroller();
+      const scroller = findConversationScroller();
+      setNativeScroller((prev) => (prev === scroller ? prev : scroller));
+
+      const el = findOverlayHost();
       if (!el) {
         setPortalTarget(null);
-        setNativeScroller(null);
         return;
       }
 
-      setNativeScroller((prev) => (prev === el ? prev : el));
+      setHostScrolls(el === scroller);
 
       if (window.getComputedStyle(el).position === 'static') {
         el.style.position = 'relative';
@@ -87,15 +109,11 @@ export const ConversationOverlay: React.FC = () => {
         // ever ends up inside a hidden container, opt back in explicitly.
         shadowBody.style.visibility = 'visible';
 
-        const platform = detectPlatform();
-        if (platform === Platform.AI_STUDIO) {
+        if (detectPlatform() === Platform.AI_STUDIO) {
           shadowBody.classList.add('theme-aistudio');
           bindAiStudioShadowRootToTheme(shadowBody);
         } else {
-          const style = useSettingsStore.getState().geminiStyle;
-          shadowBody.classList.add(
-            style === 'classic' ? 'theme-gemini-classic' : 'theme-gemini',
-          );
+          shadowBody.classList.add('theme-gemini');
           bindShadowRootToTheme(shadowBody);
         }
 
@@ -147,12 +165,13 @@ export const ConversationOverlay: React.FC = () => {
    * the only thing standing in for it.
    */
   const sessionEnds = useMemo(() => {
-    const ends = new Map<string, SessionEnd & { weight: SessionWeight }>();
-    messages.forEach((message, index) => {
+    const ends = new Map<string, SessionEnd & { hasOwnText: boolean }>();
+    messages.forEach((message) => {
       const end = readSessionEnd(message);
-      // Weighed here rather than in the card: it takes the surrounding messages, which
-      // only this component has, and the marker's size depends on the answer.
-      if (end) ends.set(message.id, { ...end, weight: weighSession(messages, index) });
+      // Whether the turn already spoke decides whether the marker shows itself at all,
+      // and answering that means splitting the turn's content — so it is answered once
+      // here rather than inside the marker.
+      if (end) ends.set(message.id, { ...end, hasOwnText: hasOwnProse(message) });
     });
     return ends;
   }, [messages]);
@@ -195,6 +214,18 @@ export const ConversationOverlay: React.FC = () => {
     // still visible they have to stay scrollable.
     if (!canReplaceNative || !nativeScroller) return;
 
+    /**
+     * Only when the overlay is parked *inside* the scroller, i.e. when it would otherwise
+     * slide away with the content.
+     *
+     * ⚠️ Doing this unconditionally is what would break AI Studio: its transcript is
+     * virtualised, so parking the scroller at the top unmounts the newest turn's content —
+     * and that turn is what auto-pickup reads and what the engine replays. See
+     * `findOverlayHost`, which sidesteps the whole thing by attaching to a non-scrolling
+     * element of the same size.
+     */
+    if (!hostScrolls) return;
+
     const previousScrollTop = nativeScroller.scrollTop;
     const wasAtBottom =
       nativeScroller.scrollHeight - previousScrollTop - nativeScroller.clientHeight < 80;
@@ -215,7 +246,7 @@ export const ConversationOverlay: React.FC = () => {
         ? nativeScroller.scrollHeight
         : previousScrollTop;
     };
-  }, [canReplaceNative, nativeScroller]);
+  }, [canReplaceNative, nativeScroller, hostScrolls]);
 
   // Manage inner shadowBody display & hide native conversation elements during custom view mode
   useEffect(() => {
@@ -233,11 +264,8 @@ export const ConversationOverlay: React.FC = () => {
         styleEl.id = styleId;
         document.head.appendChild(styleEl);
       }
-      styleEl.textContent = `
-        .conversation-container {
-          visibility: hidden !important;
-        }
-      `;
+      styleEl.textContent =
+        HIDE_NATIVE_CSS[platform] ?? HIDE_NATIVE_CSS[Platform.GEMINI] ?? '';
     } else {
       if (styleEl) {
         styleEl.remove();
@@ -299,76 +327,102 @@ export const ConversationOverlay: React.FC = () => {
   }
 
   return createPortal(
-    <div
-      ref={scrollRef}
-      onScroll={handleScroll}
-      // bs-agent-conversation carries the native surface color + Google Sans Flex
-      // axes so this panel matches the turns it replaces (see _agent-conversation.scss).
-      className="bs-agent-conversation absolute inset-0 z-40 overflow-y-auto p-4 pt-14 text-foreground shadow-inner transition-opacity duration-200"
-      // overscrollBehavior: reaching our end must not hand the wheel to the native
-      // scroller underneath, which would drag this panel off screen.
-      style={{ height: '100%', overscrollBehavior: 'contain' }}
-    >
-      {/* List Content */}
-      <div className="mx-auto pb-16" style={{ maxWidth: `${chatWidth}%`, minWidth: '724px' }}>
-        {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center text-muted-foreground">
-            <p className="text-sm font-medium">
-              {t('agent.overlay.emptyTitle', { defaultValue: 'Agent view' })}
-            </p>
-            <p className="text-xs text-muted-foreground/70 mt-1">
-              {t('agent.overlay.emptyHint', {
-                defaultValue: 'Type below, or pick an agent prompt to get started',
-              })}
-            </p>
-          </div>
-        ) : (
-          messages.map((msg) =>
-            msg.role === 'user' ? (
-              <CustomUserMessage key={msg.id} message={msg} />
-            ) : (
-              <React.Fragment key={msg.id}>
-                <CustomModelResponse
-                  message={msg}
-                  isLatestResponse={msg.id === latestModelMessageId}
-                />
-                {/* Session end indicator, drawn where the task actually ended, so a
-                    conversation holding several sessions reads correctly. */}
-                {sessionEnds.has(msg.id) &&
-                  (() => {
-                    const end = sessionEnds.get(msg.id)!;
-                    const isLatest = msg.id === lastEndedMessageId;
-                    return (
-                      <SessionEndCard
-                        outcome={end.outcome}
-                        summary={end.summary}
-                        isLatest={isLatest}
-                        light={isLightSession(
-                          end.outcome,
-                          end.weight,
-                          undoAvailable && isLatest,
-                        )}
-                      />
-                    );
-                  })()}
-              </React.Fragment>
-            ),
-          )
-        )}
+    <>
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        // bs-agent-conversation carries the native surface color + Google Sans Flex
+        // axes so this panel matches the turns it replaces (see _agent-conversation.scss).
+        className="bs-agent-conversation absolute inset-0 z-40 overflow-y-auto p-4 pt-14 text-foreground shadow-inner transition-opacity duration-200"
+        // overscrollBehavior: reaching our end must not hand the wheel to the native
+        // scroller underneath, which would drag this panel off screen.
+        //
+        // The AI Studio padding override keeps our turns aligned with the native ones: the
+        // host covers the chat column's outer box, which is 20px wider on each side than the
+        // area AI Studio lays turns out in.
+        style={{
+          height: '100%',
+          overscrollBehavior: 'contain',
+          ...(platform === Platform.AI_STUDIO
+            ? {
+                paddingLeft: AI_STUDIO_OVERLAY_PADDING_X,
+                paddingRight: AI_STUDIO_OVERLAY_PADDING_X,
+              }
+            : null),
+        }}
+      >
+        {/* List Content — Gemini follows its chat-width setting, AI Studio follows its own
+            native turn width (see measureNativeTurnWidth). The px fallback is for the frame
+            before the first measurement lands. */}
+        <div
+          className="mx-auto pb-16"
+          style={
+            platform === Platform.AI_STUDIO
+              ? // Once AI_STUDIO_OVERLAY_PADDING_X is taken off, what's left is exactly the
+                // width of a native turn — so alignment is free and there is no chat-width
+                // setting to invent.
+                { width: '100%' }
+              : { maxWidth: `${chatWidth}%`, minWidth: '724px' }
+          }
+        >
+          {messages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center text-muted-foreground">
+              <p className="text-sm font-medium">
+                {t('agent.overlay.emptyTitle', { defaultValue: 'Agent view' })}
+              </p>
+              <p className="text-xs text-muted-foreground/70 mt-1">
+                {t('agent.overlay.emptyHint', {
+                  defaultValue: 'Type below, or pick an agent prompt to get started',
+                })}
+              </p>
+            </div>
+          ) : (
+            messages.map((msg) =>
+              msg.role === 'user' ? (
+                <CustomUserMessage key={msg.id} message={msg} />
+              ) : (
+                <React.Fragment key={msg.id}>
+                  <CustomModelResponse
+                    message={msg}
+                    isLatestResponse={msg.id === latestModelMessageId}
+                  />
+                  {/* Session end indicator, drawn where the task actually ended, so a
+                      conversation holding several sessions reads correctly. */}
+                  {sessionEnds.has(msg.id) &&
+                    (() => {
+                      const end = sessionEnds.get(msg.id)!;
+                      return (
+                        <SessionEndCard
+                          outcome={end.outcome}
+                          summary={end.summary}
+                          isLatest={msg.id === lastEndedMessageId}
+                          hasOwnText={end.hasOwnText}
+                        />
+                      );
+                    })()}
+                </React.Fragment>
+              ),
+            )
+          )}
+        </div>
       </div>
 
-      {/* Floating Scroll to Bottom button */}
+      {/* Scroll to bottom — a *sibling* of the scroll container, not a child.
+          Inside it, `absolute` would anchor to the scrolled content and drift away with it;
+          `fixed` avoided that but anchored to the viewport instead, which on AI Studio put
+          the button on top of the run-settings panel. Out here it resolves against the
+          portal host, i.e. the bottom-right of the conversation area itself. */}
       {showScrollBottomBtn && (
         <button
           type="button"
           onClick={scrollToBottom}
-          className="fixed bottom-24 right-8 z-50 flex h-9 w-9 items-center justify-center rounded-full bg-[rgb(var(--primary))] text-[rgb(var(--primary-foreground))] shadow-lg transition-transform hover:scale-105 active:scale-95 cursor-pointer"
+          className="absolute bottom-4 right-4 z-50 flex h-9 w-9 items-center justify-center rounded-full bg-[rgb(var(--primary))] text-[rgb(var(--primary-foreground))] shadow-lg transition-transform hover:scale-105 active:scale-95 cursor-pointer"
           title={t('agent.overlay.scrollToBottom', { defaultValue: 'Back to bottom' })}
         >
           <ArrowDown className="h-4 w-4" />
         </button>
       )}
-    </div>,
+    </>,
     portalTarget,
   );
 };

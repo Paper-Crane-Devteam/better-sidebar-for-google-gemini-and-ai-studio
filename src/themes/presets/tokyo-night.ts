@@ -17,16 +17,24 @@ export const tokyoNight: ThemePreset = {
   isPremium: true,
   preferredMode: 'dark',
   fonts: ['JetBrains+Mono:wght@300;400;500;600'],
-  extraCss: `
+  fontMono: `'JetBrains Mono', 'SF Mono', 'Fira Code', monospace`,
+  fontCss: `
 /* Tokyo Night monospace font override */
-body.bs-theme--tokyo-night {
+body.bs-fonts--tokyo-night {
   font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace !important;
 }
 
-body.bs-theme--tokyo-night *:not(.material-symbols-outlined):not(.material-symbols-rounded):not(.material-symbols-sharp):not(.google-symbols):not(mat-icon):not(.mat-icon):not([class*="material-symbols"]):not([class*="google-symbols"]) {
+body.bs-fonts--tokyo-night *:not(.material-symbols-outlined):not(.material-symbols-rounded):not(.material-symbols-sharp):not(.google-symbols):not(mat-icon):not(.mat-icon):not([class*="material-symbols"]):not([class*="google-symbols"]) {
   font-family: inherit;
 }
 `,
+  fontVariables: [
+    { property: '--mat-menu-item-label-text-font', value: '"JetBrains Mono", "SF Mono", "Fira Code", monospace' },
+    { property: '--mat-list-list-item-label-text-font', value: '"JetBrains Mono", "SF Mono", "Fira Code", monospace' },
+    { property: '--mat-list-list-item-supporting-text-font', value: '"JetBrains Mono", "SF Mono", "Fira Code", monospace' },
+    { property: '--mat-button-text-label-text-font', value: '"JetBrains Mono", "SF Mono", "Fira Code", monospace' },
+    { property: '--mat-button-filled-label-text-font', value: '"JetBrains Mono", "SF Mono", "Fira Code", monospace' },
+  ],
   variables: [
     // ─── Surface / Background ───────────────────────────────────────
     { property: '--gem-sys-color--surface', value: '#1a1b26' },
@@ -129,13 +137,6 @@ body.bs-theme--tokyo-night *:not(.material-symbols-outlined):not(.material-symbo
     // ─── Prompt Chips ───────────────────────────────────────────────
     { property: '--bard-color-zero-state-prompt-chip-background', value: '#283457' },
     { property: '--bard-color-zero-state-prompt-chip-text', value: '#7aa2f7' },
-
-    // ─── Font override via CSS variable ─────────────────────────────
-    { property: '--mat-menu-item-label-text-font', value: '"JetBrains Mono", "SF Mono", "Fira Code", monospace' },
-    { property: '--mat-list-list-item-label-text-font', value: '"JetBrains Mono", "SF Mono", "Fira Code", monospace' },
-    { property: '--mat-list-list-item-supporting-text-font', value: '"JetBrains Mono", "SF Mono", "Fira Code", monospace' },
-    { property: '--mat-button-text-label-text-font', value: '"JetBrains Mono", "SF Mono", "Fira Code", monospace' },
-    { property: '--mat-button-filled-label-text-font', value: '"JetBrains Mono", "SF Mono", "Fira Code", monospace' },
 
     // ─── Shadows ────────────────────────────────────────────────────
     { property: '--mat-app-elevation-shadow-level-1', value: '0px 2px 4px rgba(0,0,0,0.3)' },

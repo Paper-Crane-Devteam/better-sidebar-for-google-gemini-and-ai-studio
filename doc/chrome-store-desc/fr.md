@@ -5,50 +5,28 @@ BETTER SIDEBAR FOR GEMINI & AI STUDIO — l'accélérateur ultime pour les déve
 
 Nous transformons l'interface par défaut en une base de connaissances puissante et organisée. Arrêtez de faire défiler sans fin l'historique et commencez à travailler efficacement.
 
-🔥 NOUVEAUTÉS (v2.9.0)
+🔥 NOUVEAUTÉS (v2.10.0)
 
-🤖 AI Agent — La star :
-• Tapez « > » dans la zone de saisie Gemini et décrivez ce que vous voulez. L'IA lit vos données, prend des décisions, exécute des tâches multi-étapes et vous fait un rapport.
-• Skills intégrés : tri auto des chats en dossiers, remplissage de l'index de recherche (sync des anciens messages), requêtes sur vos données, gestion en lot des Prompts et Snippets.
-• Créez vos propres Skills dans Paramètres → Agent.
-• Pas limité aux presets — l'Agent interroge toute votre base et fait tout ce que vous pouvez décrire.
-• Conversation multi-tours : approfondissez tour après tour, le contexte se conserve.
-• Sécurité : les écritures nécessitent approbation, les lectures sont libres. Mode Vitesse. Disjoncteurs contre les boucles infinies.
-• Agent Dock flotte au-dessus de la zone de saisie, même sidebar fermée.
-• Les acheteurs Early Bird du Powerpack obtiennent l'Agent gratuitement.
+💼 Workspace Agent (Laissez l'IA éditer des fichiers pour vous) :
+• La révolution est là ! Tapez « > » pour invoquer le Workspace Agent, glissez-déposez vos fichiers (Word, Excel, PDF, sous-titres, Markdown, code), et laissez l'IA les analyser et les éditer.
+• Le meilleur ? Il préserve strictement votre mise en forme. En utilisant le suivi des modifications et des remplacements précis plutôt que des écrasements brutaux, vos formules Excel, styles Word et horodatages de sous-titres restent intacts.
+• Actuellement en Bêta. Le Powerpack débloque une capacité illimitée.
 
-⚡ Intégration Gemini Spark :
-• Si Spark est actif sur votre compte, il apparaît comme onglet natif automatiquement.
-
-🎨 UI plus propre & animations de thème :
-• Espacement resserré, meilleur contraste, thèmes affinés. Transition animée fluide au changement de thème.
-
-🎛️ Panneau de réglages via l'icône :
-• Clic sur l'icône de la barre d'outils pour ouvrir un vrai panneau de contrôle. Sans menus.
-
-⌨️ Commandes slash dans AI Studio :
-• Le raccourci « / » pour la bibliothèque de Prompts fonctionne maintenant dans AI Studio.
-
-💾 Sauvegardes locales automatiques :
-• Données sauvegardées selon un planning. Snapshots manuels. Rollback disponible.
-
-📜 Smart Scrollbar extensible :
-• Clic pour déplier en liste complète de messages.
-
-📁 Créer un dossier dans le dialogue de déplacement :
-• Le dialogue « Déplacer dans un dossier » a un bouton Nouveau Dossier.
-
-🐛 Corrections importantes :
-• Google Drive ne réécrit plus les données locales — la restauration est maintenant un téléchargement manuel uniquement.
-• Corrigé : scan des conversations Gemini, sidebar zombie après veille, saut de mise en page, espace annulant le renommage, horodatages incorrects, détection Gem/Notebook, points morts du scrollbar.
+✨ Améliorations de l'expérience :
+• Mode Compact : Masquez complètement la barre d'icônes latérale pour une interface ultra-épurée sans distraction.
+• Chats temporaires pour AI Studio : Une expérience simulée de chat temporaire qui ne laisse aucune trace. Correction du bug où les chats temporaires Gemini créaient des entrées fantômes.
+• Actions plus rapides : Clic du milieu sur le bouton « New Chat » pour l'ouvrir dans un nouvel onglet. Ajout de raccourcis clavier : F2 pour renommer, Suppr pour supprimer.
+• Recherche de dossiers : Barre de recherche ajoutée à la popup de sélection de dossiers.
+• Améliorations de l'UI : Correction de l'ordre de la smart scrollbar, correction du fond de la barre pour le thème AI Studio, et ajout de l'avatar du compte pour changer facilement de profil.
+• Nouveaux thèmes : 6 superbes nouveaux thèmes (dans le Supportpack) et sélection de couleurs personnalisées plus pratique depuis le menu déroulant.
 
 ---
 
 🚀 FONCTIONNALITÉS PRINCIPALES
 
-🤖 AI AGENT (NOUVEAU)
+🤖 AI AGENT & WORKSPACE
 
-Tapez « > » pour invoquer l'Agent. Décrivez des tâches en langage naturel et il les exécute — tri auto, requêtes, gestion de prompts, synchronisation de messages manquants. Skills personnalisés, multi-tours, approbations, mode vitesse, disjoncteurs. Fonctionne via Agent Dock même sidebar fermée.
+Tapez « > » pour invoquer l'Agent. Décrivez vos tâches et il vous aidera à les exécuter. Avec le nouveau Workspace Agent, vous pouvez glisser-déposer des documents (Word, Excel, PDF, code, etc.) et laisser l'IA les analyser ou les éditer tout en préservant strictement votre mise en forme originale. Supporte aussi l'organisation auto des chats, les requêtes de données, les Skills personnalisés et le contexte multi-tours. Fonctionne même sidebar fermée via l'Agent Dock.
 
 📂 SIDEBAR & ORGANISATION
 

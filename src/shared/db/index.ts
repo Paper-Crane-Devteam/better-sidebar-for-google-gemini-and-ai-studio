@@ -1,16 +1,9 @@
 import { NO_DB_OPEN } from './protocol';
+import { ensureOffscreenDocument } from '@/shared/offscreen-host';
+import { trace } from '@/shared/lib/trace';
 
 const pendingRequests = new Map<string, { resolve: (val: any) => void; reject: (err: any) => void }>();
 let localWorker: Worker | null = null;
-
-/**
- * In-flight `offscreen.createDocument()` call, shared by every caller.
- *
- * Creation is not instant and `createDocument` rejects if a document already
- * exists, so concurrent callers must await the *same* attempt instead of each
- * probing and creating on their own.
- */
-let offscreenCreation: Promise<void> | null = null;
 
 /**
  * A request that never reached the worker (host torn down, message dropped,
@@ -200,56 +193,16 @@ async function ensureWorker() {
     return;
   }
 
-  // Method 2: Use Offscreen API (Chrome)
-  if (await hasOffscreenDocument()) return;
+  // Method 2: Use Offscreen API (Chrome).
+  //
+  // Creation is delegated to `offscreen-host.ts` because the document engine needs the
+  // same document, and two subsystems each probing-and-creating is a race where the
+  // loser sees "Only a single offscreen document may be created".
+  const status = await ensureOffscreenDocument();
 
-  // Only one attempt at a time; everyone else waits for it.
-  if (!offscreenCreation) {
-    offscreenCreation = createOffscreenDocument().finally(() => {
-      offscreenCreation = null;
-    });
-  }
-  await offscreenCreation;
-}
-
-async function hasOffscreenDocument(): Promise<boolean> {
-  // @ts-ignore - getContexts is missing from older type definitions
-  if (!browser.runtime.getContexts) return false;
-  try {
-    // @ts-ignore
-    const contexts = await browser.runtime.getContexts({
-      contextTypes: ['OFFSCREEN_DOCUMENT' as any],
-    });
-    return contexts.length > 0;
-  } catch (e) {
-    // Treat an unusable check as "not there" and let createDocument decide;
-    // it reports an existing document by throwing.
-    console.warn('getContexts check failed', e);
-    return false;
-  }
-}
-
-async function createOffscreenDocument(): Promise<void> {
-  try {
-    // @ts-ignore
-    await browser.offscreen.createDocument({
-      url: 'offscreen.html',
-      // @ts-ignore
-      reasons: [browser.offscreen.Reason.WORKERS],
-      justification: 'Run SQLite WASM in a Web Worker',
-    });
-    // Brand new document → its worker has no dbName yet
-    workerNeedsInit = true;
-  } catch (err: any) {
-    if (err?.message?.startsWith('Only a single offscreen')) {
-      // Someone beat us to it. A document exists, which is all we needed, but
-      // we cannot tell whether it is the one we know — assume it is fresh.
-      workerNeedsInit = true;
-      return;
-    }
-    console.error('Failed to create offscreen document:', err);
-    throw err;
-  }
+  // A brand new document's DB worker has no database open, and the bridge would
+  // otherwise assume the connection is live because the document exists.
+  if (status.created) workerNeedsInit = true;
 }
 
 export const initDB = async (dbName?: string) =>
@@ -461,17 +414,17 @@ export const getDB = () => {
 };
 
 export const runQuery = async (sql: string, bind?: any[]) => {
-  console.log('[DB Query]', sql, bind);
+  trace('[DB Query]', sql, bind);
   return sendWorkerMessage('EXEC', { sql, bind });
 };
 
 export const runCommand = async (sql: string, bind?: any[]) => {
-  console.log('[DB Command]', sql, bind);
+  trace('[DB Command]', sql, bind);
   return sendWorkerMessage('RUN', { sql, bind });
 };
 
 export const runBatch = async (operations: { sql: string; bind?: any[] }[]) => {
-  console.log('[DB Batch]', operations.length, 'operations');
+  trace('[DB Batch]', operations.length, 'operations');
   return sendWorkerMessage('RUN_BATCH', { operations });
 };
 

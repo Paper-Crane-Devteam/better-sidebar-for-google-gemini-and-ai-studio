@@ -53,14 +53,27 @@ export async function dedupModelMessages(messages: any[]): Promise<string[]> {
   }
 
   if (idsToDelete.length > 0) {
+    // Callers pass the rows of a single conversation, so any row carries the id.
+    const conversationId = messages.find((m) => m.conversation_id)?.conversation_id;
+    if (!conversationId) {
+      console.warn('ConversationMessages: no conversation_id on rows, skipping dedup');
+      return [];
+    }
+
     console.log('ConversationMessages: Cleaning duplicate messages:', idsToDelete);
-    const placeholders = idsToDelete.map((id) => `'${id}'`).join(',');
-    await browser.runtime.sendMessage({
-      type: 'EXECUTE_SQL',
-      payload: {
-        sql: `DELETE FROM messages WHERE id IN (${placeholders})`,
-      },
+
+    // DELETE_MESSAGES_BY_IDS rather than raw SQL: it binds parameters and scopes
+    // the statement to one conversation. Both matter now that message ids repeat
+    // across branched conversations — an unscoped `id IN (...)` would delete the
+    // copies living in other conversations too.
+    const response = await browser.runtime.sendMessage({
+      type: 'DELETE_MESSAGES_BY_IDS',
+      payload: { conversationId, ids: idsToDelete },
     });
+    if (!response?.success) {
+      console.error('ConversationMessages: dedup delete failed', response?.error);
+      return [];
+    }
   }
 
   return idsToDelete;

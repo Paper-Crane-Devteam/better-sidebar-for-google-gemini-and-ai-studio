@@ -1,5 +1,6 @@
 import { Platform } from '@/shared/types/platform';
 import { apiScanner } from './scan-api';
+import { trace } from '@/shared/lib/trace';
 
 function waitForElement(selector: string, timeout = 10000): Promise<Element | null> {
   return new Promise((resolve) => {
@@ -60,7 +61,7 @@ export async function scanConversations() {
 
   try {
     // Wait for the scroll container
-    console.log('Waiting for scroll container: #stage-slideover-sidebar .group\\/scrollport');
+    trace('Waiting for scroll container: #stage-slideover-sidebar .group\\/scrollport');
     const container = (await waitForElement(
       '#stage-slideover-sidebar .group\\/scrollport',
       10000
@@ -70,7 +71,7 @@ export async function scanConversations() {
       console.error('ChatGPT Scan: Could not find scroll container');
       // Even if we can't scroll, we might have captured some initial items if the page loaded them.
     } else {
-      console.log('Found scroll container, starting scroll loop...');
+      trace('Found scroll container, starting scroll loop...');
       
       let previousScrollHeight = 0;
       let noChangeCount = 0;
@@ -90,7 +91,7 @@ export async function scanConversations() {
         const loadingElement = document.querySelector('#history .mb-5');
         
         if (loadingElement) {
-          console.log('ChatGPT Scan: Loading element exists, waiting for it to disappear...');
+          trace('ChatGPT Scan: Loading element exists, waiting for it to disappear...');
           // Wait for loading element to disappear
           await waitForNoLoadingElement('#history .mb-5', 10000);
           
@@ -107,7 +108,7 @@ export async function scanConversations() {
           if (currentScrollHeight === previousScrollHeight) {
             // Height didn't change and not loading
             noChangeCount++;
-            console.log(`ChatGPT Scan: Not loading and no height change (count: ${noChangeCount})`);
+            trace(`ChatGPT Scan: Not loading and no height change (count: ${noChangeCount})`);
             
             if (noChangeCount >= 2) {
               // Double check with a longer delay
@@ -123,7 +124,7 @@ export async function scanConversations() {
           } else {
             // Height changed (content loaded fast?)
             noChangeCount = 0;
-            console.log('ChatGPT Scan: Height changed, continuing...');
+            trace('ChatGPT Scan: Height changed, continuing...');
           }
           
           previousScrollHeight = currentScrollHeight;

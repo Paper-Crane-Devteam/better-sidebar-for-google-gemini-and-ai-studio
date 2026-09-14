@@ -1,21 +1,18 @@
 import React from 'react';
 import { UIcon } from '@/shared/components/ui/icon';
 import { useI18n } from '@/shared/hooks/useI18n';
-import { useSettingsStore } from '@/shared/lib/settings-store';
-import { navigate } from '@/shared/lib/navigation';
 import { SplitNewChatButton } from '@/shared/components/ui/split-new-chat-button';
+import { navigateToAiStudioNewChat } from '../lib/temporary-chat';
 
-export const NewChatButton = () => {
+interface NewChatButtonProps {
+  onTemporaryChat?: () => void;
+}
+
+export const NewChatButton = ({ onTemporaryChat }: NewChatButtonProps) => {
   const { t } = useI18n();
-  const newChatBehavior = useSettingsStore((s) => s.newChatBehavior);
 
-  const handleNewChat = () => {
-    const url = 'https://aistudio.google.com/prompts/new_chat';
-    if (newChatBehavior === 'new-tab') {
-      window.open(url, '_blank');
-    } else {
-      navigate(url);
-    }
+  const handleNewChatInNewTab = () => {
+    window.open('https://aistudio.google.com/prompts/new_chat', '_blank');
   };
 
   return (
@@ -23,8 +20,12 @@ export const NewChatButton = () => {
       <SplitNewChatButton
         icon={<UIcon icon="tabler:message-plus" className="h-4 w-4" />}
         label={t('explorerHeader.newChat')}
-        tooltip={t('tooltip.newChat')}
-        onClick={handleNewChat}
+        tooltip={
+          onTemporaryChat ? t('tooltip.newChatCtaAiStudio') : t('tooltip.newChat')
+        }
+        onClick={navigateToAiStudioNewChat}
+        onContextMenu={onTemporaryChat ? () => onTemporaryChat() : undefined}
+        onMiddleClick={handleNewChatInNewTab}
       />
     </div>
   );

@@ -21,10 +21,10 @@ import type { LoopContext } from '../context';
  * 60s routinely.
  *
  * A timeout is still needed, because the completion signal can genuinely never
- * arrive: Gemini erroring out or rate-limiting means no turn ever completes, and
- * `getSendButtonState()` can degrade to `'unknown'` if Gemini renames its classes.
- * Without this the engine would sit in `waiting_ai` forever with only Stop as a way
- * out, and no explanation.
+ * arrive: the platform erroring out or rate-limiting means no turn ever completes, and
+ * `adapter.getComposerState()` can degrade to `'unknown'` if the platform renames its
+ * classes. Without this the engine would sit in `waiting_ai` forever with only Stop as
+ * a way out, and no explanation.
  */
 export const RESPONSE_IDLE_TIMEOUT_MS = 30000;
 

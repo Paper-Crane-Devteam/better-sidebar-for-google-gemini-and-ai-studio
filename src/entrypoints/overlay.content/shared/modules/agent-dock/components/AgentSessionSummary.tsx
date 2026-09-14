@@ -13,14 +13,15 @@ import { Button } from '@/shared/components/ui/button';
 import { cn } from '@/shared/lib/utils/utils';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { usePaywallStore } from '@/shared/lib/powerpack-paywall';
+import { FREE_MAX_FILES } from '@/shared/workspace/limits';
+import { PAYWALL_SIGNAL } from '../../agent-loop/tools/paywall-signal';
 import { useAgentLoopStore } from '../../agent-loop/agent-loop-store';
 import {
   discardSnapshots,
-  useUndoAvailable,
   useUndoBlockedReason,
-  useUndoWasUndone,
   useUndoAction,
 } from '../../agent-loop/undo';
+import { useSessionSummary } from '../useSessionSummary';
 
 export const AgentSessionSummary: React.FC = () => {
   const { t } = useI18n();
@@ -30,9 +31,9 @@ export const AgentSessionSummary: React.FC = () => {
   const sessionTitle = useAgentLoopStore((s) => s.sessionTitle);
   const showPaywall = usePaywallStore((s) => s.show);
 
-  const undoAvailable = useUndoAvailable();
+  // Shared with `AgentDock`, which uses `worthShowing` to decide whether to open at all.
+  const { failedSteps: failed, undoAvailable, undone, worthShowing } = useSessionSummary();
   const undoBlocked = useUndoBlockedReason();
-  const undone = useUndoWasUndone();
   const { undoing, runUndo } = useUndoAction();
 
   /**
@@ -47,15 +48,44 @@ export const AgentSessionSummary: React.FC = () => {
 
   if (status !== 'idle') return null;
 
+  /**
+   * Nothing on offer, nothing rendered — the rule itself lives in `useSessionSummary`,
+   * because `AgentDock` decides whether to open around this card and the two answers
+   * have to be the same one. When they were computed separately, suppressing the card
+   * here left the dock opening on an empty body.
+   *
+   * The case it exists for: a session that ended because the model wrote prose instead
+   * of a tool call. The reply is right there in the chat and the only control would be
+   * Dismiss — a notification whose entire content is "click to remove this
+   * notification" — and it fired on the most ordinary ending there is, so it read as an
+   * error report for something that was not an error.
+   */
+  if (!worthShowing) return null;
+
   const steps = history.reduce((sum, h) => sum + h.results.length, 0);
-  const failed = history.reduce(
-    (sum, h) => sum + h.results.filter((r) => !r.success).length,
-    0,
-  );
 
   const isPaywall = endReason === 'paywall';
   // A reverted run is not a green "all done" — the work it reported no longer exists.
   const isClean = endReason === 'complete' && failed === 0 && !undone;
+
+  /**
+   * Which limit stopped the run.
+   *
+   * Read back off the blocked result rather than carried on `endReason`, which is a bare
+   * enum shared with five other outcomes. There is exactly one consumer — this card — so
+   * widening the store and the engine's `finish()` signature to transport a string that
+   * is already sitting in the result would be plumbing for its own sake.
+   *
+   * It matters because the copy used to name the database unconditionally. Once the
+   * workspace had a free-tier cap of its own, a run blocked on the sixth file explained
+   * itself as a restriction on changing your data — for an operation that touches none.
+   */
+  const isWorkspacePaywall =
+    isPaywall &&
+    [...history]
+      .reverse()
+      .flatMap((h) => [...h.results].reverse())
+      .find((r) => r.result?.startsWith(PAYWALL_SIGNAL))?.toolName === 'write_file';
 
   const finalNote =
     endReason === 'infeasible'
@@ -135,10 +165,15 @@ export const AgentSessionSummary: React.FC = () => {
 
       {isPaywall ? (
         <p className="text-xs leading-relaxed text-muted-foreground">
-          {t('agent.summary.paywallDesc', {
-            defaultValue:
-              'The free plan lets the agent read your data but not change it. Upgrade to allow writes.',
-          })}
+          {isWorkspacePaywall
+            ? t('agent.summary.paywallWorkspaceDesc', {
+                defaultValue: `The free plan keeps one workspace with up to ${FREE_MAX_FILES} files. Upgrade for as many as you need.`,
+                max: FREE_MAX_FILES,
+              })
+            : t('agent.summary.paywallDesc', {
+                defaultValue:
+                  'The free plan lets the agent read your data but not change it. Upgrade to allow writes.',
+              })}
         </p>
       ) : (
         <p className="text-xs text-muted-foreground">
@@ -168,7 +203,14 @@ export const AgentSessionSummary: React.FC = () => {
             className="h-7 text-xs"
             onClick={() =>
               showPaywall(
-                t('agent.summary.paywallFeature', { defaultValue: 'Agent database writes' }),
+                isWorkspacePaywall
+                  ? t('agent.workspace.paywallFiles', {
+                      defaultValue: `More than ${FREE_MAX_FILES} files in a workspace`,
+                      max: FREE_MAX_FILES,
+                    })
+                  : t('agent.summary.paywallFeature', {
+                      defaultValue: 'Agent database writes',
+                    }),
               )
             }
           >

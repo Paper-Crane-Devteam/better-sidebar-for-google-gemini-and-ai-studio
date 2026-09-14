@@ -82,10 +82,6 @@
     "bottomLeft": "Bottom Left",
     "bottomRight": "Bottom Right",
     "behavior": "Behavior",
-    "newChatBehavior": "New Chat Behavior",
-    "newChatBehaviorDescription": "Where to open new chats",
-    "currentTab": "Current Tab",
-    "newTab": "New Tab",
     "skipDeleteConfirm": "Delete conversations without confirmation",
     "skipDeleteConfirmDescription": "Danger: a single conversation is deleted immediately and permanently, with no confirmation dialog and no way to undo. It is removed here and on the platform. Batch delete still asks for confirmation.",
     "defaultSyncFolder": "Default Sync Folder",
@@ -130,7 +126,8 @@
     "importAiStudioSystemSuccess": "Imported {{count}} system prompt(s) from AI Studio",
     "importAiStudioSystemNoData": "No AI Studio system instructions found in this page",
     "importAiStudioSystemInvalid": "Invalid AI Studio system instructions data",
-    "importAiStudioSystemFailed": "Failed to import AI Studio system instructions"
+    "importAiStudioSystemFailed": "Failed to import AI Studio system instructions",
+    "compactModeTitleHint": "You can also click the LIBRARY title to toggle compact mode anytime 😉"
   },
   "prompts": {
     "inbox": "Inbox",
@@ -212,6 +209,8 @@
     "scanChatList": "Import Chat List",
     "scanning": "Scanning...",
     "sqlQuery": "SQL Query",
+    "enterCompactMode": "Enter Compact Mode",
+    "exitCompactMode": "Exit Compact Mode",
     "settings": "Settings"
   },
   "about": {
@@ -224,7 +223,8 @@
     "license": "License",
     "sourceCode": "Source Code",
     "githubRepository": "GitHub Repository",
-    "viewChangelog": "View Changelog"
+    "viewChangelog": "View Changelog",
+    "userGuide": "Getting started guide"
   },
   "sponsor": {
     "title": "Share with Friends",
@@ -343,7 +343,13 @@
     "switchToOriginalUI": "Switch to Original Sidebar",
     "temporaryChat": "Temporary chat",
     "toggleMenu": "Toggle Menu",
-    "newChatCta": "Click: New chat · Right-click: Private chat"
+    "collapseSidebar": "Collapse sidebar",
+    "account": "Account",
+    "signIn": "Sign in",
+    "enterCompactMode": "Click to enter compact mode",
+    "exitCompactMode": "Click to exit compact mode",
+    "newChatCta": "Click: New chat · Right-click: Temporary chat · Middle-click: New chat in new tab",
+    "newChatCtaAiStudio": "Click: New chat · Right-click: Temporary chat · Middle-click: New chat in new tab"
   },
   "newChatButton": {
     "dropdownTooltip": "More chat options",
@@ -410,7 +416,10 @@
     "name": "Name",
     "color": "Icon Color",
     "defaultColor": "Default",
-    "customColor": "Custom:",
+    "customColor": "Custom",
+    "customColorArea": "Saturation and brightness",
+    "customColorHue": "Hue",
+    "customColorHex": "Hex color value",
     "defaultTargets": "Default target for",
     "defaultTargetsHint": "New chats started from these Gems or Notebooks are saved into this folder.",
     "addGemTarget": "Gem",
@@ -533,6 +542,9 @@
     "selectColor": "Select Color"
   },
   "moveItemsDialog": {
+    "searchFolders": "Search folders...",
+    "noMatchingFolders": "No matching folders",
+    "clearSearch": "Clear search",
     "rootLevel": "Root (Top Level)",
     "createFolder": "New Folder"
   },
@@ -666,7 +678,30 @@
     "openSourceNote": "Free & open-source, built and maintained by a solo developer. Thank you for your support!",
     "loginRequired": "Please log in to the AI platform first — the sidebar activates on the platform page after you sign in.",
     "uiUpdateNote": "If the sidebar stops working, it's likely due to a platform UI update. Please update the extension or wait for a fix — I'll patch it ASAP!",
-    "feedbackNote": "Run into a bug? Use the built-in feedback feature anytime — I'll get on it right away. Please don't leave a bad review before reaching out!"
+    "feedbackNote": "Run into a bug? Use the built-in feedback feature anytime — I'll get on it right away. Please don't leave a bad review before reaching out!",
+    "ready": "Ready to explore",
+    "headline": "Less clutter.",
+    "headlineAccent": "More possibility.",
+    "intro": "A calmer home for your Gemini and AI Studio conversations. Organize what matters, find it faster, and keep your best prompts close.",
+    "watch": "Watch the tutorial",
+    "previewAlt": "Better Sidebar running alongside Gemini",
+    "previewCaption": "Your conversations, beautifully organized",
+    "basics": "Start with the essentials",
+    "organizeTitle": "Give every chat a home",
+    "organizeBody": "Group conversations into folders and add tags to keep projects together.",
+    "findTitle": "Find the good stuff",
+    "findBody": "Search your conversation history and return to the ideas you want to keep.",
+    "reuseTitle": "Keep your best prompts",
+    "reuseBody": "Save useful prompts in your library and reuse them when inspiration strikes.",
+    "startLabel": "Start here",
+    "choose": "Choose where to begin",
+    "firstStep": "Once signed in, open Better Sidebar on the platform page. Start by creating a folder for your chats.",
+    "tutorialTitle": "A little tour. A head start.",
+    "tutorialBody": "See Better Sidebar in action, then follow along in your own workspace. Pause and come back whenever you need.",
+    "openYoutube": "Open on YouTube",
+    "videoNote": "The player loads only when you click. If playback is unavailable here, open the tutorial on YouTube.",
+    "help": "Need a hand?",
+    "footerNote": "Made for a more thoughtful workflow."
   },
   "guidedTour": {
     "next": "Next",
@@ -954,8 +989,6 @@
     "customThemesDescription": "Apply a custom visual theme to the Gemini interface. These themes override the default color scheme.",
     "default": "Default",
     "defaultDescription": "Default theme with light/dark mode support",
-    "classic": "Gemini Classic",
-    "classicDescription": "Classic Gemini look with cool blue-tinted surfaces",
     "cupertinoGlassName": "Cupertino Glass",
     "cupertinoGlassDescription": "Frosted glass aesthetic with system fonts and minimal color palette",
     "grimoireName": "The Grimoire",
@@ -982,6 +1015,18 @@
     "oceanBreezeDescription": "Fresh light theme with ocean blue and coral accents",
     "midnightPurpleName": "Midnight Purple",
     "midnightPurpleDescription": "Deep black with purple and indigo gradient accents",
+    "gruvboxName": "Gruvbox",
+    "gruvboxDescription": "Retro dark theme with warm earthy tones, like reading code by candlelight",
+    "everforestName": "Everforest",
+    "everforestDescription": "Dark theme inspired by deep forests — muted greens with a touch of warm amber",
+    "highContrastName": "High Contrast",
+    "highContrastDescription": "Stark black and white with one amber accent — built for clarity above all else",
+    "solarizedLightName": "Solarized Light",
+    "solarizedLightDescription": "The beloved light side of Solarized — easy on the eyes, familiar and timeless",
+    "sakuraName": "Sakura",
+    "sakuraDescription": "A gentle light theme with soft pinks and sage greens, like a spring afternoon",
+    "graphiteName": "Graphite",
+    "graphiteDescription": "Clean grayscale light theme — pure structure, no color distractions",
     "previewBannerText": "Preview mode — theme will revert to default in 5 minutes. Purchase to keep it permanently.",
     "buyNow": "Buy Now",
     "aiGeneratorTitle": "Can't find what you want?",
@@ -1014,7 +1059,7 @@
     "spFeature1": "All premium themes unlocked permanently",
     "spFeature2": "Future themes included at no extra cost",
     "spFeature3": "Create custom AI-generated themes",
-    "spFeature4": "Activate on up to 3 devices",
+    "spFeature4": "Up to 10 activations, across profiles and computers",
     "getSupportPack": "Get Support Pack",
     "powerPackTitle": "Power Pack",
     "powerPackTagline": "Unlock the full potential of your AI assistant",
@@ -1041,10 +1086,10 @@
   "supportPack": {
     "title": "Support Pack",
     "heroTitle": "Unlock Premium Themes",
-    "heroDescription": "Beautiful, handcrafted themes that transform your AI workspace. One purchase, permanent access on up to 3 devices.",
+    "heroDescription": "Beautiful, handcrafted themes that transform your AI workspace. One purchase, permanent access on up to 10 activations.",
     "feature1": "All premium themes unlocked permanently",
     "feature2": "Future themes included at no extra cost",
-    "feature3": "Activate on up to 3 devices",
+    "feature3": "Up to 10 activations, across browser profiles and computers",
     "feature4": "Support independent open-source development",
     "feature5": "Create custom AI-generated themes",
     "buyButton": "Get Support Pack",
@@ -1056,12 +1101,29 @@
     "activate": "Activate",
     "invalidToken": "Invalid format. Expected BS-SP-XXXXXXXX or Gumroad license key.",
     "networkError": "Network error. Please check your connection and try again.",
-    "maxDevices": "Maximum device limit reached (3 devices). Please deactivate another device first.",
+    "maxDevices": "All 10 activation slots are in use. Open settings on a browser profile you no longer use and choose \"Release this activation\", then try again.",
     "activationFailed": "Activation failed. Please check your token and try again.",
     "activationSuccess": "Activated! All premium themes are now unlocked.",
     "activatedTitle": "Support Pack Active",
     "activatedDescription": "All premium themes are unlocked. Thank you for supporting Better Sidebar!",
-    "deactivate": "Deactivate"
+    "deactivate": "Deactivate",
+    "releaseDevice": "Release this activation",
+    "releaseHint": "Each browser profile uses one activation slot. Release it to use the license somewhere else.",
+    "releaseConfirmTitle": "Release this activation?",
+    "releaseConfirmDesc": "Premium features turn off in this browser profile and the slot is freed for another profile or computer. You can activate here again any time with the same token.",
+    "releaseConfirm": "Release",
+    "cancel": "Cancel",
+    "releaseNetworkError": "Couldn't reach the license server, so the slot was not released. Check your connection and try again.",
+    "releaseFailed": "Couldn't release this activation. Please try again, or contact support.",
+    "renewalWarningTitle": "Couldn't reach the license server",
+    "renewalWarningDesc": "Your license is still active and we'll keep retrying in the background. Check your internet connection or any VPN/proxy if this persists.",
+    "renewalGraceUntil": "Stays active until",
+    "retryNow": "Retry now",
+    "dismiss": "Dismiss",
+    "rejectedTitle": "This license is no longer active",
+    "rejectedRevoked": "The license was revoked, usually after a refund or a chargeback. Contact support if you think this is wrong.",
+    "rejectedMaxDevices": "All activation slots are in use and this one is no longer among them. Release a slot from another browser profile, or contact support.",
+    "rejectedGeneric": "The license server no longer recognises this token. Contact support if you think this is wrong."
   },
   "hotkeys": {
     "title": "Keyboard Shortcuts",
@@ -1108,19 +1170,61 @@
     "launcher": {
       "title": "Agent",
       "subtitle": "Team up with AI to manage your chats, prompts and data.",
-      "placeholder": "Describe what you want to get done...",
-      "newChatHint": "It runs in the chat you have open. Start a fresh one to keep it clean.",
-      "run": "Run",
-      "skills": "Or start with a skill",
-      "stageHint": "Optional — just describe your task and the agent picks the right skill on its own. Pick one here and it fills the chat input, so you can still add your own details before sending.",
+      "about": "About the agent",
       "noEditor": "Open a chat first — the agent runs through the chat input.",
       "composerBusy": "The running task has results waiting in the chat input. Send those first, then try again.",
       "sessionBusy": "A task is already running. Finish it, or stop it, before starting another.",
       "stopRunning": "Stop the running task",
-      "triggerHint": "Typing > in the chat input starts the agent from there too.",
       "safety": "Only your local database is touched. Changes are confirmed before they run.",
       "freeTier": "Free plan is read-only. Upgrade to let the agent make changes.",
-      "manage": "Manage skills & tools"
+      "manage": "Skills & tools",
+      "workspace": "Workspace",
+      "stepsTitle": "How to use",
+      "step1": "Open any chat window.",
+      "step2": "Type > in the input box and select the Agent.",
+      "step3": "Write your request and press Enter.",
+      "examplesTitle": "Try asking this",
+      "examplesHint": "Click to fill the input box; you can edit it before sending. The more specific you are, the better the results.",
+      "examplesHintLabel": "How to use examples",
+      "examplePick": "Insert into chat",
+      "workspaceHint": "Agent's workspace for reading and saving files",
+      "manageHint": "Configure Agent permissions and confirmations",
+      "examplePrev": "Previous",
+      "exampleNext": "Next",
+      "examples": {
+        "classify": {
+          "label": "Organize history",
+          "text": "Organize my unfiled chats: group them by topic and show me the plan first. If current folders don't fit, create new ones and move the chats there. Finally, tag each chat based on its content, reusing my existing tags to avoid duplicates."
+        },
+        "search": {
+          "label": "Deep search",
+          "text": "Find all mentions of 'Docker deployment'. Search thoroughly across chats, message bodies, and code snippets, not just titles. Order them from newest to oldest, providing a one-line summary for each and indicating which folder it's in."
+        },
+        "export": {
+          "label": "Batch export & archive",
+          "text": "Export all chats in my 'Work' folder from March onwards to Markdown format, one file per chat, and pack them in a zip. If any chat doesn't have its messages synced yet, let me know before exporting."
+        },
+        "sync": {
+          "label": "Sync missing records",
+          "text": "Check how many chats only have a title with no saved messages. Give me the total first, ordered by most recent, and then sync the contents of the latest 20 chats so they appear in searches and exports."
+        },
+        "prompts": {
+          "label": "Refactor prompt library",
+          "text": "Clean up my prompt library: rename the ones that are hard to find via / by putting the keyword at the beginning. Extract the repeated 'role + output format' block into a shared prompt and import it into the others. If a variable only has a few fixed options, change it to a dropdown menu."
+        },
+        "snippets": {
+          "label": "Clean up snippets",
+          "text": "My snippet inbox is a mess. Group them into folders by topic, and shorten titles that are still my original question into a brief summary. If the same content is saved twice, keep only the oldest one. Show me the list before deleting anything."
+        },
+        "workspace": {
+          "label": "Record decisions",
+          "text": "Summarize our conclusions from this chat as a bulleted list and save it to notes/decisions.md in the workspace. Append any unresolved questions at the end. If the file already exists, append the content at the end with today's date instead of overwriting."
+        },
+        "stats": {
+          "label": "Analyze statistics",
+          "text": "Create a stats table for me: how many chats are in each folder, how many new chats were created last month, and which folders haven't been active for over three months. Based on this data, suggest which folders I should merge."
+        }
+      }
     },
     "send": {
       "sessionBusy": "A task is already running, so this one was not sent. Stop it, then press Enter again.",
@@ -1242,7 +1346,16 @@
       "viewPrompt": "Click to see the full prompt",
       "systemPrompt": "System prompt",
       "resultsTitle": "Tool results",
-      "promptTitle": "Prompt content"
+      "promptTitle": "Prompt content",
+      "readFile": "Reading a file",
+      "writeFile": "Writing a file",
+      "editFile": "Editing a file",
+      "listFiles": "Looking through the workspace",
+      "globFiles": "Finding files",
+      "grepFiles": "Searching in files",
+      "manageFiles": "Reorganizing files",
+      "docRead": "Reading a document",
+      "docEdit": "Marking up a document"
     },
     "sync": {
       "progress": "Fetching conversation content — {{current}}/{{total}}",
@@ -1274,6 +1387,7 @@
       "noToolCallDesc": "The agent's last reply didn't run anything. Read it in the chat — if the task still needs doing, start it again.",
       "ended": "Session ended",
       "paywallDesc": "The free plan lets the agent read your data but not change it. Upgrade to allow writes.",
+      "paywallWorkspaceDesc": "The free plan includes 1 workspace with up to {{max}} files. Upgrade for unlimited access.",
       "paywallFeature": "Agent database writes",
       "steps_one": "{{count}} step run",
       "steps_other": "{{count}} steps run",
@@ -1324,7 +1438,12 @@
       "discard": "Discard",
       "deleteSkillTitle": "Delete skill",
       "deleteSkillContent": "\"{{title}}\" will be removed for good. This cannot be undone.",
-      "alwaysOn": "Always on"
+      "alwaysOn": "Always on",
+      "agentsTitle": "Agents",
+      "agentsDesc": "Each agent works on different things and has its own tools. Start one by typing > in the chat input.",
+      "noTools": "No optional tools.",
+      "noSkills": "No skills yet. This agent works from its own instructions.",
+      "builtinSkillNote": "Built-in skills can be switched off but not edited."
     },
     "skills": {
       "autoClassify": {
@@ -1346,6 +1465,18 @@
       "manageSnippets": {
         "title": "Manage Snippets",
         "description": "Organize, dedupe and search saved snippets — including their full text"
+      },
+      "workspace": {
+        "title": "Workspace Agent",
+        "description": "Read, write, edit, and search files in your private workspace"
+      },
+      "docxReview": {
+        "title": "Review a Word Document",
+        "description": "Work through a .docx chapter by chapter — comment on problems, suggest fixes as tracked changes"
+      },
+      "spreadsheetAnalysis": {
+        "title": "Work Through a Spreadsheet",
+        "description": "Read an .xlsx by schema first, then compute — adding columns and sheets rather than changing the data"
       }
     },
     "mcp": {
@@ -1358,12 +1489,75 @@
         "execute_sql": "Run SQL queries on the local database",
         "sync_conversation_messages": "Record message history for conversations that have none",
         "export": "Download conversations as files",
-        "complete_task": "End the agent loop and report results"
+        "complete_task": "End the agent loop and report results",
+        "doc_read": "Read Word documents: outline, sections and search",
+        "read_file": "Read a text file, with line numbers",
+        "write_file": "Create a file or replace one entirely",
+        "edit_file": "Replace exact text inside a file",
+        "list_files": "List what is in a folder",
+        "glob_files": "Find files by name pattern",
+        "grep_files": "Search file contents by regex",
+        "manage_files": "Delete, move or create folders"
+      },
+      "workspace": {
+        "name": "Files",
+        "description": "Read, write, edit and search text files"
+      },
+      "documents": {
+        "name": "Documents",
+        "description": "Read Word documents by outline and section"
+      },
+      "core": {
+        "name": "Core",
+        "description": "Available to every agent, and always on."
+      },
+      "bettersidebar": {
+        "name": "Better Sidebar data",
+        "description": "Query and change conversations, folders, tags and prompts"
       }
     },
     "entry": {
       "autoTitle": "Better Sidebar Agent",
       "autoDescription": "Describe a task and let the agent pick the right tools"
+    },
+    "workspace": {
+      "title": "Workspace",
+      "create": "New workspace",
+      "delete": "Delete this workspace",
+      "clearAll": "Clear all files",
+      "clearTitle": "Clear workspace",
+      "deleteTitle": "Delete workspace",
+      "namePlaceholder": "Workspace name",
+      "empty": "No files yet. Ask the agent to write something and it will show up here.",
+      "emptyFile": "This file is empty.",
+      "lockedHint": "This conversation is using \"{name}\". Start a new chat to switch.",
+      "busyHint": "A task is running. Finish or stop it before switching.",
+      "paywallWorkspaces": "Multiple workspaces",
+      "paywallFiles": "More than {{max}} files per workspace",
+      "paywallFilesSkipped": "{{files}} file(s) skipped — the free limit is {{max}} per workspace",
+      "clearWarning": "Delete all {fileCount} file(s) in \"{name}\"? This cannot be undone.",
+      "deleteWarning": "Delete \"{name}\" and all {fileCount} file(s) in it? Conversations that already used this workspace will no longer be able to read or write files. This cannot be undone."
+    },
+    "agents": {
+      "bettersidebar": {
+        "name": "Better Sidebar",
+        "description": "Organize conversations, folders, tags, prompts and snippets"
+      },
+      "workspace": {
+        "name": "Workspace",
+        "description": "Read, write and edit files and documents in your workspace"
+      }
+    },
+    "switcher": {
+      "label": "Choose an agent"
+    },
+    "workspaceIntro": {
+      "title": "Collaborate with AI on your Workspace documents",
+      "body": "Files here persist across chats and are shared between Gemini and AI Studio. Type > Workspace in the chat input to put this agent to work on them.",
+      "detail": "Text files are read and edited directly. Word documents are read by outline and section. It cannot see your conversations or anything outside this workspace, and every change is confirmed before it runs.",
+      "about": "About the workspace",
+      "howToUseTitle": "How to Use Workspace",
+      "howToUseContent": "Workspace is your dedicated file environment where AI can directly read, write, edit, and create documents and code from scratch.\n\nHow to use:\nType >Workspace in the chat input to activate the agent. You can drag and drop existing files into the workspace, or simply ask the AI to generate new files from scratch (e.g. building a frontend project from the ground up).\n\nSupported Formats & Capabilities:\n- Plain Text & Code (.html, .js, .ts, .py, .md, .txt, etc.): Full support for creation from scratch and precise editing! Ask AI to scaffold an entire frontend project, write scripts, draft Markdown notes, or refactor existing code.\n- Word (.docx): Review papers chapter by chapter, rewrite paragraphs with tracked changes, and add reviewer comments (requires uploading existing files).\n- Excel (.xlsx/.csv): Analyze data, write formulas, and add columns without altering original formats or charts (requires uploading existing files).\n- PDF: Read papers and reports, extract text, merge pages, and add annotations.\n- PowerPoint (.pptx): Read and edit slide content and speaker notes.\n- Subtitles (.srt/.vtt): Translate and polish subtitles while preserving timestamps.\n\n💡 Tip: Text and code files can be created from scratch and freely edited. Special formats (Word, Excel, PPT, PDF) currently focus on reading, annotating, and precisely editing existing files while preserving their original formatting."
     }
   },
   "backup": {

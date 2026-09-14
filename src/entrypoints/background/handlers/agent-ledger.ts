@@ -42,6 +42,16 @@ export async function handleAgentLedger(
         await agentSessionRepo.end(payload.sessionId, payload.endReason, payload.rounds);
         return { success: true };
 
+      case 'sessionBindWorkspace':
+        await agentSessionRepo.bindWorkspace(payload.sessionId, payload.workspaceId);
+        return { success: true };
+
+      case 'boundWorkspace':
+        return {
+          success: true,
+          data: await agentSessionRepo.boundWorkspace(payload.conversationId),
+        };
+
       case 'callBegin':
         await agentToolCallRepo.begin(payload.call);
         return { success: true };

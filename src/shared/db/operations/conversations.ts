@@ -1,6 +1,17 @@
 import { runQuery, runCommand, runBatch } from '../index';
 import type { Conversation } from '../../types/db';
 
+/**
+ * What every browse surface has to exclude.
+ *
+ * Temporary chats are filtered here rather than in the sidebar's own filter code
+ * so the rule cannot be forgotten by a new consumer — the tree, the timeline,
+ * favourites, export and stats all read through these queries. `getById` is
+ * deliberately *not* filtered: features that act on the conversation the user is
+ * currently looking at still need to resolve it while they sit inside one.
+ */
+const VISIBLE = 'deleted_at IS NULL AND is_temporary = 0';
+
 export const conversationRepo = {
   save: async (
     c: Partial<Conversation> & Pick<Conversation, 'id'>
@@ -9,8 +20,8 @@ export const conversationRepo = {
     const updatedAt = c.updated_at ?? Math.floor(Date.now() / 1000);
     await runCommand(
       `
-      INSERT INTO conversations (id, title, description, folder_id, external_id, external_url, model_name, type, platform, updated_at, created_at, last_active_at, prompt_metadata, deleted_at, gem_id, notebook_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?)
+      INSERT INTO conversations (id, title, description, folder_id, external_id, external_url, model_name, type, platform, updated_at, created_at, last_active_at, prompt_metadata, deleted_at, gem_id, notebook_id, is_temporary)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         title = excluded.title,
         description = COALESCE(excluded.description, conversations.description),
@@ -25,6 +36,11 @@ export const conversationRepo = {
         prompt_metadata = COALESCE(excluded.prompt_metadata, conversations.prompt_metadata),
         gem_id = COALESCE(excluded.gem_id, conversations.gem_id),
         notebook_id = COALESCE(excluded.notebook_id, conversations.notebook_id),
+        -- Sticky, not overwritten: only the create interceptor knows a chat is
+        -- temporary, and it only knows it once. Every later write to this row
+        -- (AI Studio's full-data save, a library scan) passes 0 simply because it
+        -- has no opinion, and COALESCE would let those un-hide the conversation.
+        is_temporary = MAX(conversations.is_temporary, excluded.is_temporary),
         deleted_at = NULL
     `,
       [
@@ -43,6 +59,7 @@ export const conversationRepo = {
         c.prompt_metadata ? JSON.stringify(c.prompt_metadata) : null,
         c.gem_id ?? null,
         c.notebook_id ?? null,
+        c.is_temporary ? 1 : 0,
       ]
     );
   },
@@ -59,11 +76,11 @@ export const conversationRepo = {
   getByFolderId: async (folderId: string | null): Promise<Conversation[]> => {
     if (folderId === null) {
       return (await runQuery(
-        'SELECT * FROM conversations WHERE folder_id IS NULL AND deleted_at IS NULL ORDER BY last_active_at DESC'
+        `SELECT * FROM conversations WHERE folder_id IS NULL AND ${VISIBLE} ORDER BY last_active_at DESC`
       )) as Conversation[];
     } else {
       return (await runQuery(
-        'SELECT * FROM conversations WHERE folder_id = ? AND deleted_at IS NULL ORDER BY last_active_at DESC',
+        `SELECT * FROM conversations WHERE folder_id = ? AND ${VISIBLE} ORDER BY last_active_at DESC`,
         [folderId]
       )) as Conversation[];
     }
@@ -72,12 +89,12 @@ export const conversationRepo = {
   getAll: async (platform?: string): Promise<Conversation[]> => {
     if (platform) {
       return (await runQuery(
-        'SELECT * FROM conversations WHERE platform = ? AND deleted_at IS NULL ORDER BY last_active_at DESC',
+        `SELECT * FROM conversations WHERE platform = ? AND ${VISIBLE} ORDER BY last_active_at DESC`,
         [platform]
       )) as Conversation[];
     }
     return (await runQuery(
-      'SELECT * FROM conversations WHERE deleted_at IS NULL ORDER BY last_active_at DESC'
+      `SELECT * FROM conversations WHERE ${VISIBLE} ORDER BY last_active_at DESC`
     )) as Conversation[];
   },
 
@@ -149,8 +166,8 @@ export const conversationRepo = {
       const updatedAt = c.updated_at ?? Math.floor(Date.now() / 1000);
       return {
         sql: `
-      INSERT INTO conversations (id, title, description, folder_id, external_id, external_url, model_name, type, platform, updated_at, created_at, last_active_at, prompt_metadata, deleted_at, gem_id, notebook_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?)
+      INSERT INTO conversations (id, title, description, folder_id, external_id, external_url, model_name, type, platform, updated_at, created_at, last_active_at, prompt_metadata, deleted_at, gem_id, notebook_id, is_temporary)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         title = excluded.title,
         description = COALESCE(excluded.description, conversations.description),
@@ -171,6 +188,10 @@ export const conversationRepo = {
         prompt_metadata = COALESCE(excluded.prompt_metadata, conversations.prompt_metadata),
         gem_id = COALESCE(excluded.gem_id, conversations.gem_id),
         notebook_id = COALESCE(excluded.notebook_id, conversations.notebook_id),
+        -- Sticky — see conversationRepo.save. This path is the library scan, the
+        -- one most likely to re-save a temporary chat with no knowledge of it
+        -- (AI Studio lists them like any other prompt).
+        is_temporary = MAX(conversations.is_temporary, excluded.is_temporary),
         deleted_at = NULL
     `,
         bind: [
@@ -189,6 +210,7 @@ export const conversationRepo = {
           c.prompt_metadata ? JSON.stringify(c.prompt_metadata) : null,
           c.gem_id ?? null,
           c.notebook_id ?? null,
+          c.is_temporary ? 1 : 0,
         ],
       };
     });
@@ -196,6 +218,12 @@ export const conversationRepo = {
     await runBatch(operations);
   },
 
+  /**
+   * Intentionally includes temporary chats: this is "what do we already know
+   * about", used by the library scan to skip rows it has seen. Hiding them here
+   * would make AI Studio's scan treat every temporary chat as a new prompt and
+   * re-import it on every run.
+   */
   getAllIds: async (): Promise<string[]> => {
     const result = await runQuery('SELECT id FROM conversations WHERE deleted_at IS NULL');
     return result.map((r: any) => r.id);

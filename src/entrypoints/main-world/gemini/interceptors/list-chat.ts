@@ -1,6 +1,7 @@
 import { parseStreamingResponse, extractWrbFrPayloads } from '../lib/response-parser';
 import { parseBatchExecuteRequest } from '../lib/request-parser';
 import { classifyChatParentId } from '@/shared/lib/gemini-context';
+import { trace } from '@/shared/lib/trace';
 
 export function handleListChatResponse(response: any, url: string) {
   if (response.status === 200) {
@@ -10,7 +11,7 @@ export function handleListChatResponse(response: any, url: string) {
         const requestData = requestBody || response.config?.data;
         if (requestData && typeof requestData === 'string') {
             const parsedBody = parseBatchExecuteRequest(requestData);
-            console.log('Better Sidebar (Gemini): Parsed List Chat Request:', parsedBody);
+            trace('Better Sidebar (Gemini): Parsed List Chat Request:', parsedBody);
         }
     } catch (e) {
         console.error('Better Sidebar (Gemini): Error handling list chat request', e);
@@ -31,14 +32,14 @@ export function handleListChatResponse(response: any, url: string) {
       const retChunks = parseStreamingResponse(responseBody);
       const chunks = retChunks.map(chunk => chunk[0]);
       
-      console.log('Better Sidebar (Gemini): List Chat chunks:', chunks);
+      trace('Better Sidebar (Gemini): List Chat chunks:', chunks);
 
       if (chunks.length > 0) {
         const items: any[] = [];
         
         // Use common helper to extract payloads
         const payloads = extractWrbFrPayloads(chunks);
-        console.log('Better Sidebar (Gemini): WrbFrPayloads:', payloads)
+        trace('Better Sidebar (Gemini): WrbFrPayloads:', payloads)
         for (const payload of payloads) {
             try {
                 // User says: payload[2] is the list
@@ -93,7 +94,8 @@ export function handleListChatResponse(response: any, url: string) {
         }
         
         if (items.length > 0) {
-            console.log(`Better Sidebar (Gemini): Parsed ${items.length} chats`, items);
+            console.log(`Better Sidebar (Gemini): Parsed ${items.length} chats`);
+            trace('Better Sidebar (Gemini): Parsed chats:', items);
         }
 
         globalThis.dispatchEvent(

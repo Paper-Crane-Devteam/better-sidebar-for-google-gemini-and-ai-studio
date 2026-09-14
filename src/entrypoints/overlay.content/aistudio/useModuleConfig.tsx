@@ -1,9 +1,12 @@
 import { navigate } from '@/shared/lib/navigation';
 import type { ExplorerTypeFilter } from '../shared/types/filter';
 import React from 'react';
-import { useSettingsStore } from '@/shared/lib/settings-store';
 import { useAppStore } from '@/shared/lib/store';
 import { NewChatButton } from './components/NewChatButton';
+import {
+  navigateToAiStudioNewChat,
+  startAiStudioTemporaryChat,
+} from './lib/temporary-chat';
 import { ImportHistoryDialog } from './modules/search/components/ImportHistoryDialog';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
 import { Upload } from 'lucide-react';
@@ -42,7 +45,6 @@ interface AiStudioSystemItem {
 }
 
 export const useModuleConfig = (): ModuleConfig => {
-  const newChatBehavior = useSettingsStore((state) => state.newChatBehavior);
   const { setOverlayOpen, createPrompt, createPromptFolder, promptFolders } = useAppStore();
   const { t } = useI18n();
 
@@ -103,15 +105,10 @@ export const useModuleConfig = (): ModuleConfig => {
       },
     },
     explorer: {
-      onNewChat: () => {
-        const url = 'https://aistudio.google.com/prompts/new_chat';
-        if (newChatBehavior === 'new-tab') {
-          window.open(url, '_blank');
-        } else {
-          navigate(url);
-        }
-      },
-      newChatButton: <NewChatButton />,
+      onNewChat: navigateToAiStudioNewChat,
+      newChatButton: (
+        <NewChatButton onTemporaryChat={startAiStudioTemporaryChat} />
+      ),
       filterTypes: ['all', 'conversation', 'text-to-image'],
     },
     favorites: {},

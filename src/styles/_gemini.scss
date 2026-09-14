@@ -9,6 +9,7 @@
     --sidebar-icon-size: 20px;
     --sidebar-gap: 8px;
     --sidebar-padding-y: 8px;
+    --sidebar-icon-stroke: 1.75;
     --sidebar-icon-color: 68 71 70;
 
     --background: 253 253 253; /* #fdfdfd - lighter surface */
@@ -59,6 +60,11 @@
     --font-sans:
       'Google Sans Flex', 'Google Sans', 'Helvetica Neue', 'Microsoft YaHei',
       'PingFang SC', sans-serif;
+
+    /* Code face. Themes may override via `fontMono`; see ThemePresetMeta. */
+    --font-mono:
+      ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas,
+      'Liberation Mono', monospace;
   }
 
   .theme-gemini.dark,

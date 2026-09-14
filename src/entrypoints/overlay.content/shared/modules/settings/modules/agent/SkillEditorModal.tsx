@@ -37,8 +37,10 @@ const inputClass =
 
 const SkillEditorForm: React.FC<{
   skill?: Skill;
+  /** Owning agent for a new skill. Ignored when editing — a skill does not change hands. */
+  agentId?: string;
   handleRef: { current: SkillFormHandle | null };
-}> = ({ skill, handleRef }) => {
+}> = ({ skill, agentId, handleRef }) => {
   const [form, setForm] = useState<FormData>({
     title: skill?.title || '',
     description: skill?.description || '',
@@ -72,7 +74,10 @@ const SkillEditorForm: React.FC<{
     if (skill) {
       store.updateCustomSkill(skill.id, payload);
     } else {
-      store.addCustomSkill(payload);
+      // The owner comes from which agent's section the button was pressed in. ⚠️ A skill
+      // with no owner would be filtered out of every agent's list and become invisible the
+      // moment it was saved, so the fallback matters more than it looks.
+      store.addCustomSkill({ ...payload, agentId: agentId ?? 'bettersidebar' });
     }
     return true;
   };
@@ -143,17 +148,28 @@ const SkillEditorForm: React.FC<{
   );
 };
 
+export interface SkillEditorOptions {
+  /** Edit this skill. Omit to create a new one. */
+  skill?: Skill;
+  /** Which agent a new skill belongs to. Comes from the settings section it was opened in. */
+  agentId?: string;
+}
+
 /**
  * Open the skill editor in the global modal.
- * Pass a skill to edit it, or nothing to create a new one.
+ *
+ * Takes an options object rather than a bare skill because a new skill needs to know its
+ * owning agent, and a positional second argument next to an optional first one is the kind
+ * of signature that gets called wrong.
  */
-export function openSkillEditorModal(skill?: Skill): void {
+export function openSkillEditorModal(options: SkillEditorOptions = {}): void {
+  const { skill, agentId } = options;
   const handleRef: { current: SkillFormHandle | null } = { current: null };
 
   useModalStore.getState().open({
     type: 'confirm',
     title: skill ? i18n.t('agent.settings.editSkill') : i18n.t('agent.settings.newSkill'),
-    content: <SkillEditorForm skill={skill} handleRef={handleRef} />,
+    content: <SkillEditorForm skill={skill} agentId={agentId} handleRef={handleRef} />,
     confirmText: i18n.t('common.save'),
     cancelText: i18n.t('common.cancel'),
     modalClassName: 'max-w-2xl',

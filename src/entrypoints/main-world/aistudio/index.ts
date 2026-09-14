@@ -7,6 +7,7 @@ import { handleLibraryResponse } from './interceptors/library';
 import { handleUpdatePromptResponse } from './interceptors/update';
 import { handleCreatePromptResponse } from './interceptors/create';
 import { handleDeletePromptResponse } from './interceptors/delete';
+import { observeGenerateContentStream } from './interceptors/generate-content';
 import { aiStudioRequestBuilder } from './lib/request-builder';
 import i18n from '@/locale/i18n';
 
@@ -91,6 +92,23 @@ export function initAiStudioInterceptors() {
   globalThis.addEventListener('BETTER_SIDEBAR_SET_PENDING_TITLE', (e: Event) => {
     pendingCreateTitle = (e as CustomEvent).detail?.title || '';
   });
+
+  // AI Studio has no native temporary chat, so the intent has to come from our
+  // sidebar. Same channel as the pending title above: the overlay dispatches
+  // BETTER_SIDEBAR_SET_TEMP_CHAT when the user asks for a temporary chat, and it
+  // is consumed by the next CreatePrompt.
+  //
+  // One-shot rather than a sticky mode: it is cleared the moment a prompt is
+  // created, so a stale intent cannot silently hide a later, unrelated chat.
+  let pendingTemporaryChat = false;
+  globalThis.addEventListener('BETTER_SIDEBAR_SET_TEMP_CHAT', (e: Event) => {
+    pendingTemporaryChat = !!(e as CustomEvent).detail?.temporary;
+  });
+  const consumePendingTemporaryChat = (): boolean => {
+    const value = pendingTemporaryChat;
+    pendingTemporaryChat = false;
+    return value;
+  };
 
   // Expose request builder for content script via custom events
   globalThis.addEventListener('AISTUDIO_API_EXECUTE', async (e: Event) => {
@@ -190,6 +208,20 @@ export function initAiStudioInterceptors() {
           // non-critical
         }
 
+        // The one streaming endpoint. Attached here rather than in `onResponse`
+        // because by then the whole generation has already arrived — see
+        // `interceptors/generate-content.ts`.
+        if (config.url.includes('GenerateContent') && config.xhr) {
+          try {
+            observeGenerateContentStream(config.xhr, config.body);
+          } catch (e) {
+            // The live view is an improvement on the response path, not a
+            // replacement for it. If this fails the transcript still lands via
+            // UpdatePrompt, so never let it break the request itself.
+            console.warn('Better Sidebar: failed to observe GenerateContent stream', e);
+          }
+        }
+
         // Notify overlay that a new chat generation has started
         if (config.url?.includes('CreatePrompt')) {
           // If a custom title is pending, inject it into the CreatePrompt request body
@@ -231,7 +263,7 @@ export function initAiStudioInterceptors() {
         } else if (url.includes('UpdatePrompt')) {
           handleUpdatePromptResponse(response, url);
         } else if (url.includes('CreatePrompt')) {
-          handleCreatePromptResponse(response, url);
+          handleCreatePromptResponse(response, url, consumePendingTemporaryChat());
         } else if (url.includes('DeletePrompt')) {
           handleDeletePromptResponse(response, url);
         }

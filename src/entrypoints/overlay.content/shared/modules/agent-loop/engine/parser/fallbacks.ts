@@ -12,16 +12,6 @@ import type { ParsedToolCall } from '../../types';
 import { SUPPORTED_TOOLS } from './tool-schema';
 
 /**
- * Whether `position` sits inside a fenced code block, i.e. after an odd number of
- * ``` markers. Tool calls quoted in a fence are documentation, not instructions.
- */
-export function isInsideCodeBlock(text: string, position: number): boolean {
-  const before = text.substring(0, position);
-  const fenceMatches = before.match(/```/g);
-  return (fenceMatches?.length ?? 0) % 2 !== 0;
-}
-
-/**
  * Primary format: a JSON object.
  * Returns null when the block isn't valid JSON with a `name`.
  */
@@ -38,9 +28,21 @@ export function tryParseJson(block: string): ParsedToolCall | null {
   return repaired === trimmed ? null : buildCall(repaired);
 }
 
-/** Every repair, applied in turn. Order doesn't matter — they touch different faults. */
+/** Only protocol identifiers may lose Markdown escapes, never paths or operation text. */
+function repairEscapedIdentifiers(json: string): string {
+  const paramsStart = json.indexOf('"params"');
+  const prefix = paramsStart < 0 ? json : json.slice(0, paramsStart);
+  const repaired = prefix.replace(/("name"\s*:\s*)"((?:[a-z]+\\_)+[a-z]+)"/, (whole, key: string, value: string) => {
+    const plain = value.replaceAll('\\_', '_');
+    return (SUPPORTED_TOOLS as readonly string[]).includes(plain) ? key + JSON.stringify(plain) : whole;
+  });
+  return (repaired + (paramsStart < 0 ? '' : json.slice(paramsStart)))
+    .replace(/"change\\_summary"(\s*:)/g, '"change_summary"$1');
+}
+
+/** Repair protocol identifiers and arrays before inspecting the final prose field. */
 function repairJson(json: string): string {
-  return escapeRawControlChars(unquoteJsonArrays(json));
+  return escapeRawControlChars(repairFinalProse(unquoteJsonArrays(repairEscapedIdentifiers(json))));
 }
 
 function buildCall(json: string): ParsedToolCall | null {
@@ -88,7 +90,48 @@ function asParamValue(value: unknown): string {
  * array parses as itself.
  */
 function unquoteJsonArrays(json: string): string {
-  return json.replace(/"\s*(\[[\s\S]*?\])\s*"/g, '$1');
+  // Only unwrap a property value whose entire contents form a valid array.
+  // Counting brackets outside strings handles nested arrays and "]" in comments.
+  const opening = /"(?:ops|ids|conversation_ids)"\s*:\s*"(?=\[)/g;
+  let match: RegExpExecArray | null;
+  while ((match = opening.exec(json))) {
+    const quote = opening.lastIndex - 1;
+    let depth = 0, inString = false;
+    for (let i = quote + 1; i < json.length; i++) {
+      const ch = json[i];
+      if (inString && ch === '\\') { i++; continue; }
+      if (ch === '"') { inString = !inString; continue; }
+      if (inString) continue;
+      if (ch === '[') depth++;
+      if (ch !== ']') continue;
+      if (--depth !== 0) continue;
+      const suffix = /^\s*"(?=\s*[,}])/.exec(json.slice(i + 1));
+      if (!suffix) break;
+      const array = json.slice(quote + 1, i + 1);
+      try { if (!Array.isArray(JSON.parse(array))) break; } catch { break; }
+      json = json.slice(0, quote) + array + json.slice(i + 1 + suffix[0].length);
+      opening.lastIndex = quote + array.length;
+      break;
+    }
+  }
+  return json;
+}
+
+/** Repair quotes only in the final, display-only summary; never guess executable values. */
+function repairFinalProse(json: string): string {
+  const match = /("(?:change_summary|summary)"\s*:\s*)"([\s\S]*)"(\s*}\s*}\s*)$/.exec(json);
+  if (!match) return json;
+  // summary is display prose only on complete_task; never repair another tool's payload.
+  if (match[1].startsWith('"summary"') && !/^\s*\{\s*"name"\s*:\s*"complete_task"\s*[,}]/.test(json)) return json;
+  const value = match[2];
+  // Do not swallow another JSON property or container into prose.
+  if (/"\s*[:,}\]]/.test(value)) return json;
+  let escaped = '';
+  for (let i = 0; i < value.length; i++) {
+    if (value[i] === '\\') { escaped += value[i] + (value[++i] ?? ''); }
+    else escaped += value[i] === '"' ? '\\"' : value[i];
+  }
+  return json.slice(0, match.index) + match[1] + '"' + escaped + '"' + match[3];
 }
 
 /**

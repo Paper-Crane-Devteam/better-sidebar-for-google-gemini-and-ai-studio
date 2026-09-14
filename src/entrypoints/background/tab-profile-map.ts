@@ -37,8 +37,9 @@ let activeTabId: number | null = null;
  * Register which DB a tab is associated with.
  */
 export function setTabDb(tabId: number, dbName: string) {
+  const changed = tabDbMap.get(tabId) !== dbName;
   tabDbMap.set(tabId, dbName);
-  console.log(`[TabProfileMap] Tab ${tabId} → ${dbName}`);
+  if (changed) console.log(`[TabProfileMap] Tab ${tabId} → ${dbName}`);
 }
 
 /**

@@ -13,7 +13,6 @@ import { TooltipHelper } from '@/shared/lib/tooltip-helper';
 import { applyShadowStyles, waitForElement } from '@/shared/lib/utils';
 import { bindShadowRootToTheme } from '@/themes/platforms/gemini';
 import { useAppStore } from '@/shared/lib/store';
-import { useSettingsStore } from '@/shared/lib/settings-store';
 import { useExclusiveContextMenuStore } from '../shared/components/ui/exclusive-context-menu';
 
 const MOBILE_WRAPPER_ID =
@@ -85,24 +84,6 @@ export async function mountMobileLayout(
     const rootContainer = document.createElement('div');
     rootContainer.classList.add('shadow-body', 'theme-gemini');
     rootContainer.style.height = '100%';
-
-    // Gemini style sync (default v2 vs classic)
-    const syncGeminiStyle = () => {
-      const style = useSettingsStore.getState().geminiStyle;
-      if (style === 'classic') {
-        rootContainer.classList.remove('theme-gemini');
-        rootContainer.classList.add('theme-gemini-classic');
-      } else {
-        rootContainer.classList.remove('theme-gemini-classic');
-        rootContainer.classList.add('theme-gemini');
-      }
-    };
-    syncGeminiStyle();
-    const unsubGeminiStyle = useSettingsStore.subscribe((state, prevState) => {
-      if (state.geminiStyle !== prevState.geminiStyle) {
-        syncGeminiStyle();
-      }
-    });
 
     // Theme sync
     const syncTheme = () => {
@@ -200,7 +181,6 @@ export async function mountMobileLayout(
       destroy: () => {
         console.log('Better Sidebar: Destroying mobile layout');
         unsubscribe();
-        unsubGeminiStyle();
         unsubSidebarTheme();
         window.removeEventListener('storage', onStorage);
         mediaQuery.removeEventListener('change', syncTheme);

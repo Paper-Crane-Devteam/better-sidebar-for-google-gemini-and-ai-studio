@@ -172,7 +172,7 @@ export const NodeActionBar = ({
             onClick={(e) => e.stopPropagation()}
             onPointerDown={(e) => e.stopPropagation()}
           >
-            {renderMenuItems(menuItems, 'dropdown')}
+            {renderMenuItems(menuItems, 'dropdown', () => handleOpenChange(false))}
           </DropdownMenuContent>
         </DropdownMenu>
       )}

@@ -127,3 +127,81 @@ browser.runtime.onMessage.addListener((message, _sender, _sendResponse) => {
     });
   }
 });
+
+// ─── Document worker ─────────────────────────────────────────────────────────
+//
+// A second worker, deliberately not the DB one. `db-worker` serialises everything it is
+// given, so a 20-second parse of a large workbook would sit in front of every SQL request
+// queued behind it — and the agent's own ledger writes are SQL. Two workers, two queues.
+//
+// Same URL trick as above (`runtime.getURL`) and for the same reason: a `?worker` import
+// resolves to the dev server's origin in development, which Chrome refuses to load from a
+// chrome-extension:// page.
+//
+// Responses are never chunked. A document result is a projection capped at a couple of
+// tens of KB by `docx/project.ts` — the size limit that matters is the agent's round
+// budget, which is far below anything `sendMessage` struggles with.
+
+let docWorker: Worker | null = null;
+
+const createDocWorker = (): Worker => {
+  const workerUrl = browser.runtime.getURL('assets/doc-worker.js');
+  const created = new Worker(workerUrl);
+
+  created.onmessage = (e: MessageEvent) => {
+    const { id, success, data, error } = e.data;
+    browser.runtime.sendMessage({
+      type: 'DOC_RESPONSE',
+      payload: { id, success, data, error },
+    });
+  };
+
+  // A worker that died cannot be revived, and every later request posted into it would
+  // simply never be answered — which reads as "documents stopped working" with no error.
+  // Dropping the reference makes the next request build a fresh one.
+  created.onerror = (event) => {
+    console.error('[Offscreen] Doc Worker error, discarding it:', event.message);
+    try {
+      created.terminate();
+    } catch {
+      // Already gone.
+    }
+    if (docWorker === created) docWorker = null;
+  };
+
+  console.log('[Offscreen] Doc Worker created via extension URL:', workerUrl);
+  return created;
+};
+
+// Built on first use rather than at startup: most sessions never open a document, and
+// this saves parsing the worker bundle for all of them.
+const getDocWorker = (): Worker => {
+  if (!docWorker) docWorker = createDocWorker();
+  return docWorker;
+};
+
+browser.runtime.onMessage.addListener((message, _sender, _sendResponse) => {
+  if (message.type !== 'DOC_REQUEST') return;
+
+  const { id, workerType, payload } = message.payload;
+  if (/\.pdf$/i.test(payload?.request?.path ?? '')) {
+    void import('./shared/documents/pdf-host').then(({ dispatchPdf }) => dispatchPdf(id, payload)).catch(error => {
+      void browser.runtime.sendMessage({ type: 'DOC_RESPONSE', payload: { id, success: false, error: `PDF host failed: ${error.message}` } });
+    });
+    return;
+  }
+  try {
+    getDocWorker().postMessage({ id, type: workerType, payload });
+  } catch (e: any) {
+    console.error('[Offscreen] Failed to forward document request:', e);
+    docWorker = null;
+    browser.runtime.sendMessage({
+      type: 'DOC_RESPONSE',
+      payload: {
+        id,
+        success: false,
+        error: `The document engine could not be started: ${e?.message ?? e}`,
+      },
+    });
+  }
+});

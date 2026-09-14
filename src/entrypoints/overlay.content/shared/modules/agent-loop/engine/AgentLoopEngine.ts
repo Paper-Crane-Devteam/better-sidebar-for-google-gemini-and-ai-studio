@@ -31,6 +31,22 @@ import { awaitAIResponse } from './stages/await-response';
 import { parseResponse } from './stages/parse-response';
 import { executeTools } from './stages/execute-tools';
 import { formatResults, ResultHandoff } from './stages/handoff';
+import type { AgentId } from '../agents/types';
+
+/**
+ * What a starting session is told about itself.
+ *
+ * ⚠️ `agentId` is required reading for every entry point, not just `start`. It is what
+ * the tool layer checks a call against, so a session that omits it runs as the default
+ * agent — which is how a recovered Workspace task ended up being told its own file tools
+ * belonged to another agent. The recovery paths derive it from the calls they are
+ * replaying; see `mcpRegistry.agentForTools`.
+ */
+export interface SessionInfo {
+  conversationId?: string | null;
+  title?: string;
+  agentId?: AgentId;
+}
 
 export class AgentLoopEngine {
   private readonly ctx: LoopContext;
@@ -63,14 +79,14 @@ export class AgentLoopEngine {
    * Start a session. Call this once the initial prompt has been sent — round 1
    * begins by waiting for the answer to it.
    */
-  async start(
-    maxRounds: number = 20,
-    session?: { conversationId?: string | null; title?: string },
-  ): Promise<void> {
+  async start(maxRounds: number = 20, session?: SessionInfo): Promise<void> {
     this.ctx.abort.renew();
     this.ctx.breaker.reset();
     this.handoff.reset();
     this.unattendedStreak = 0;
+    // Round 1 follows a prompt that has *already* been sent, so its generation is
+    // in flight before the engine exists — no boundary to draw, and none wanted.
+    this.ctx.streamBoundary = null;
     // Undo covers one task: the previous session's snapshot is no longer something
     // the user could meaningfully revert to once a new task starts changing things.
     resetSnapshots();
@@ -98,12 +114,23 @@ export class AgentLoopEngine {
   async startFromExistingResponse(
     responseElement: HTMLElement,
     maxRounds: number = 20,
-    session?: { conversationId?: string | null; title?: string },
+    session?: SessionInfo,
   ): Promise<void> {
     this.ctx.abort.renew();
     this.ctx.breaker.reset();
     this.handoff.reset();
     this.unattendedStreak = 0;
+    /**
+     * No send of ours precedes this round, so there is no boundary to compare against
+     * and stage ② takes whatever finished generation the store holds.
+     *
+     * Sound because both sides mean "the newest": this path is entered with
+     * `getLastAIResponseElement()`, and the stream store only ever holds the newest
+     * generation. When the page was reloaded the store is empty instead, and stage ②
+     * falls back to the DOM — a degraded read of the right turn, which is the correct
+     * trade against a lossless read of the wrong one.
+     */
+    this.ctx.streamBoundary = null;
     resetSnapshots();
     this.ctx.store.start(maxRounds, session);
     toolCallRecorder.startSession({
@@ -138,7 +165,7 @@ export class AgentLoopEngine {
   async deliverOwedResults(
     payload: string,
     maxRounds: number = 20,
-    session?: { conversationId?: string | null; title?: string },
+    session?: SessionInfo,
   ): Promise<boolean> {
     this.ctx.abort.renew();
     this.ctx.breaker.reset();

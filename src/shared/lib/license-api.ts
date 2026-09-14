@@ -126,3 +126,87 @@ export async function revalidateLicense(
 ): Promise<ActivationResult> {
   return activateLicense(token, deviceId);
 }
+
+/**
+ * How a failed validation should be treated.
+ *
+ * - `unreachable` — we never got a verdict (offline, DNS, 5xx, rate limited).
+ *   The license must survive this; retry later.
+ * - `rejected` — the server gave a verdict and it was "no" (refund, revoke,
+ *   unknown token). The entitlement should end.
+ */
+export interface ReleaseResult {
+  success: boolean;
+  /** True when a slot was actually freed (false means it was already free). */
+  released: boolean;
+  error?: string;
+}
+
+/**
+ * Release this device's activation slot on the server.
+ *
+ * Sends the signed payload from activation as proof, so the server can confirm
+ * this caller really owns the slot it's giving up. Without it, anyone holding a
+ * shared token could kick other people off.
+ */
+export async function releaseLicense(
+  token: string,
+  signedPayload: string,
+): Promise<ReleaseResult> {
+  if (!signedPayload) {
+    return { success: false, released: false, error: 'missing_signed_payload' };
+  }
+
+  try {
+    const response = await fetch(`${LICENSE_API_URL}/deactivate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token: token.trim().toUpperCase(),
+        signed_payload: signedPayload,
+      }),
+    });
+
+    const data = (await response.json().catch(() => ({}))) as {
+      ok?: boolean;
+      released?: boolean;
+      error?: string;
+    };
+
+    if (!response.ok || !data.ok) {
+      return {
+        success: false,
+        released: false,
+        error: data.error || `http_${response.status}`,
+      };
+    }
+
+    return { success: true, released: !!data.released };
+  } catch {
+    return { success: false, released: false, error: 'network_error' };
+  }
+}
+
+export type ValidationFailure = 'unreachable' | 'rejected';
+
+/**
+ * Error codes that mean "the server answered, and the answer is no".
+ * Anything not listed is treated as `unreachable`, which is the safe default:
+ * a bug or a new error code should never silently strip a paying user's license.
+ */
+const REJECTION_CODES = new Set([
+  'token_not_found',
+  'license_revoked',
+  'gumroad_rejected',
+  'gumroad_invalid',
+  'invalid_token_format',
+  'invalid_source',
+  'missing_token',
+  'unknown_source',
+  'max_devices_reached',
+]);
+
+export function classifyValidationFailure(error: string | undefined): ValidationFailure {
+  if (!error) return 'unreachable';
+  return REJECTION_CODES.has(error) ? 'rejected' : 'unreachable';
+}

@@ -28,22 +28,31 @@ body.bs-theme--grimoire::before {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
 
+`,
+  fontCss: `
 /* Serif font override for main content */
-body.bs-theme--grimoire {
+body.bs-fonts--grimoire {
   font-family: 'STKaiti', 'KaiTi', 'Noto Serif SC', 'Source Han Serif SC', 'Merriweather', Georgia, 'Times New Roman', serif !important;
 }
 
-body.bs-theme--grimoire *:not(.material-symbols-outlined):not(.material-symbols-rounded):not(.material-symbols-sharp):not(.google-symbols):not(mat-icon):not(.mat-icon):not([class*="material-symbols"]):not([class*="google-symbols"]) {
+body.bs-fonts--grimoire *:not(.material-symbols-outlined):not(.material-symbols-rounded):not(.material-symbols-sharp):not(.google-symbols):not(mat-icon):not(.mat-icon):not([class*="material-symbols"]):not([class*="google-symbols"]) {
   font-family: inherit;
 }
 
 /* Headings use display font */
-body.bs-theme--grimoire h1,
-body.bs-theme--grimoire h2,
-body.bs-theme--grimoire h3 {
+body.bs-fonts--grimoire h1,
+body.bs-fonts--grimoire h2,
+body.bs-fonts--grimoire h3 {
   font-family: 'STKaiti', 'KaiTi', 'Noto Serif SC', 'Source Han Serif SC', 'Playfair Display', Georgia, serif !important;
 }
 `,
+  fontVariables: [
+    { property: '--mat-menu-item-label-text-font', value: '"Merriweather", Georgia, serif' },
+    { property: '--mat-list-list-item-label-text-font', value: '"Merriweather", Georgia, serif' },
+    { property: '--mat-list-list-item-supporting-text-font', value: '"Merriweather", Georgia, serif' },
+    { property: '--mat-button-text-label-text-font', value: '"Merriweather", Georgia, serif' },
+    { property: '--mat-button-filled-label-text-font', value: '"Merriweather", Georgia, serif' },
+  ],
   variables: [
     // ─── Surface / Background ───────────────────────────────────────
     { property: '--gem-sys-color--surface', value: '#f5f0e8' },
@@ -182,27 +191,6 @@ body.bs-theme--grimoire h3 {
       value: '#5c4400',
     },
 
-    // ─── Font override via CSS variable ─────────────────────────────
-    {
-      property: '--mat-menu-item-label-text-font',
-      value: '"Merriweather", Georgia, serif',
-    },
-    {
-      property: '--mat-list-list-item-label-text-font',
-      value: '"Merriweather", Georgia, serif',
-    },
-    {
-      property: '--mat-list-list-item-supporting-text-font',
-      value: '"Merriweather", Georgia, serif',
-    },
-    {
-      property: '--mat-button-text-label-text-font',
-      value: '"Merriweather", Georgia, serif',
-    },
-    {
-      property: '--mat-button-filled-label-text-font',
-      value: '"Merriweather", Georgia, serif',
-    },
   ],
   sidebarVariables: [
     // Parchment tones for sidebar

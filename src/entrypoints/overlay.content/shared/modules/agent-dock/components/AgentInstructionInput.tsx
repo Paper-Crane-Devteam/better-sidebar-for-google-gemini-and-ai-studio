@@ -7,6 +7,7 @@
 import React, { useState } from 'react';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useAgentLoopStore } from '../../agent-loop/agent-loop-store';
+import { isImeComposing } from '@/entrypoints/overlay.content/shared/lib/ime';
 
 const MAX_LENGTH = 2000;
 
@@ -27,6 +28,8 @@ export const AgentInstructionInput: React.FC = () => {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Enter commits the IME candidate, not the instruction — see `isImeComposing`.
+    if (isImeComposing(e.nativeEvent)) return;
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();

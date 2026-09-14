@@ -9,6 +9,7 @@
     --sidebar-icon-size: 20px;
     --sidebar-gap: 8px;
     --sidebar-padding-y: 8px;
+    --sidebar-icon-stroke: 1.75;
     --sidebar-icon-color: 13 13 13; /* #0d0d0d */
 
     /* Base Colors - Mapping ChatGPT's --bg-* and --text-* */
@@ -61,6 +62,11 @@
     /* ChatGPT Font */
     --font-sans:
       'Söhne', 'ui-sans-serif', 'system-ui', 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+
+    /* Code face. Themes may override via `fontMono`; see ThemePresetMeta. */
+    --font-mono:
+      ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas,
+      'Liberation Mono', monospace;
   }
 
   .theme-chatgpt.dark,

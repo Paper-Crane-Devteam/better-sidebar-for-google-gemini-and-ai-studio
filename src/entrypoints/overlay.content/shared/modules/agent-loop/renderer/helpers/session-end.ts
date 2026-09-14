@@ -3,7 +3,7 @@
  *
  * The end marker used to be drawn from the runtime store's `endReason`, which a
  * reload wipes, the next `start()` clears, and which isn't scoped to a conversation
- * at all — so the divider vanished while the transcript still plainly ended with a
+ * at all — so the marker vanished while the transcript still plainly ended with a
  * `complete_task` call, and followed the user onto other chats that happened to have
  * agent content.
  *
@@ -16,8 +16,7 @@
  * task into a failed one.
  */
 
-import { isControlTool, getToolRisk } from '../../execution-policy';
-import { isHandoffTool } from '../../engine/parser/tool-schema';
+import { deliversResultToAI, isHandoffTool } from '../../engine/parser/tool-schema';
 import type { DisplayMessageTurn } from '../useConversationMessages';
 
 /** The tool whose presence in a turn means the session ended there */
@@ -84,107 +83,37 @@ export function readSessionEnd(message: DisplayMessageTurn): SessionEnd | null {
 }
 
 /**
- * Whether this turn was the last one of its session, however it got there.
+ * Whether this turn is holding tool calls that still want running.
  *
- * Wider than `readSessionEnd` on purpose, and the distinction matters: that one
- * answers "what did the AI say the verdict was", which only `complete_task` can
- * report. This one answers "is there still a session behind this turn", and a handoff
- * tool ends one just as firmly without reporting anything — it takes the page away
- * (see `HANDOFF_TOOLS`), so its result is never sent back and its outcome stays `null`
- * for good.
+ * The question auto-pickup asks of the newest response, and it is narrower than "did
+ * this turn end a session", which is what it used to ask. The two come apart on the
+ * shape the AI produces most often of all: work *and* `complete_task` in one response
+ * (see the completion branch in `engine/stages/execute-tools.ts`, which exists because
+ * of exactly this habit). Read as a session ending, that turn was skipped whole — so a
+ * follow-up question after a finished task got an answer whose statements nothing ever
+ * executed, no results, and a tick saying the task was done. Judging it per call
+ * instead, the completion is ignored and the work underneath it still gets picked up.
  *
- * That permanent `null` is a trap for anything scanning for "tool calls nobody ran":
- * the sync run's own call looks exactly like unfinished business every time the user
- * returns to the conversation, and acting on it re-books the tab for the whole road
- * trip. Hence one predicate, used by every such scan.
+ * Two kinds of call are not work:
+ *
+ * `complete_task` is bookkeeping. Its result is never sent back, so its outcome stays
+ * `null` for good — which reads as "nobody ran this" forever. A turn that is nothing
+ * but a completion therefore used to spin up a session that re-parsed the completion
+ * and immediately ended again, leaving a stray summary card behind.
+ *
+ * A handoff tool is worse than not-work: it navigated the tab away (see
+ * `HANDOFF_TOOLS`), so its outcome is permanently `null` for the same reason, and
+ * running it again re-books the tab for the entire sync road trip — which is what
+ * greeted the user on getting back from the first one. One anywhere in the turn
+ * disqualifies the whole turn, because pickup re-executes a response as a unit and
+ * cannot take the statements without the handoff.
  */
-export function endsSession(message: DisplayMessageTurn): boolean {
-  if (message.role !== 'model') return false;
-  if (readSessionEnd(message) !== null) return true;
-  return message.toolCalls.some((call) => isHandoffTool(call.toolCall.name));
-}
-
-/**
- * How much a finished session actually did, read back out of the transcript.
- *
- * Exists so the end marker can match its weight to the work. "Ask what's in my
- * database" is one SELECT and five seconds, and drawing a full-width divider
- * announcing "Task finished" across it overstates both the event and the word
- * "task" — first-time users read it as the feature having closed on them.
- *
- * Counted from the messages rather than the runtime store for the same reason
- * `deriveToolOutcomes` is: the store knows only the session running in this tab, and
- * these markers have to be right on a conversation reopened days later.
- */
-export interface SessionWeight {
-  /** Tool calls in the session, `complete_task` and friends excluded */
-  steps: number;
-  /** Whether anything modified the database */
-  hadWrites: boolean;
-  /** Whether any call failed or was refused */
-  hadFailures: boolean;
-}
-
-/**
- * Weigh the session that ends at `endIndex`.
- *
- * Walks backwards to the previous ending, so a conversation holding several sessions
- * weighs each one separately instead of accumulating.
- */
-export function weighSession(
-  messages: DisplayMessageTurn[],
-  endIndex: number,
-): SessionWeight {
-  const weight: SessionWeight = { steps: 0, hadWrites: false, hadFailures: false };
-
-  for (let i = endIndex; i >= 0; i--) {
-    const message = messages[i];
-    // Stop at the previous session's end — but not at this one's own turn.
-    if (i !== endIndex && endsSession(message)) break;
-    if (message.role !== 'model') continue;
-
-    message.toolCalls.forEach((call, index) => {
-      // Control tools steer the loop; counting them would make every session look
-      // like it did one thing more than it did.
-      if (isControlTool(call.toolCall.name)) return;
-
-      weight.steps += 1;
-      if (getToolRisk(call.toolCall) === 'write') weight.hadWrites = true;
-
-      // `null` is "no result came back", which is normal for the turn still in flight
-      // and permanent for a handoff — neither is a failure.
-      const outcome = message.toolOutcomes[index];
-      if (outcome && !outcome.success) weight.hadFailures = true;
-    });
-  }
-
-  return weight;
-}
-
-/**
- * Whether this session is too small for a full-width divider.
- *
- * The threshold is "is there anything here worth marking": a couple of queries that
- * all worked and changed nothing needs no ceremony, and — the part that makes this
- * safe — has no undo to offer either, so the compact marker isn't hiding a control.
- *
- * Only a plain success qualifies. "Partly done" and "couldn't be done" are verdicts the
- * user has to notice before they walk away believing the work happened, and a line of
- * small grey text is exactly how you fail to notice something.
- */
-export function isLightSession(
-  outcome: SessionOutcome,
-  weight: SessionWeight,
-  undoAvailable: boolean,
+export function hasUnrunToolWork(
+  // Narrowed to what it reads, so a platform that can only see one turn (AI Studio
+  // virtualises the rest away) can still ask this question.
+  message: Pick<DisplayMessageTurn, 'role' | 'toolCalls'>,
 ): boolean {
-  return (
-    outcome === 'complete' &&
-    !undoAvailable &&
-    !weight.hadWrites &&
-    !weight.hadFailures &&
-    weight.steps <= LIGHT_STEP_LIMIT
-  );
+  if (message.role !== 'model') return false;
+  if (message.toolCalls.some((call) => isHandoffTool(call.toolCall.name))) return false;
+  return message.toolCalls.some((call) => deliversResultToAI(call.toolCall.name));
 }
-
-/** Read-only sessions up to this many steps count as light */
-const LIGHT_STEP_LIMIT = 3;

@@ -65,6 +65,20 @@ export default {
           foreground: "rgb(var(--warning-foreground) / <alpha-value>)",
         },
       },
+      fontFamily: {
+        // Only `mono` is overridden. `font-sans` is intentionally left on
+        // Tailwind's default: the sidebar body font comes from
+        // `html { font-family: var(--font-sans) }` in _common.scss and is
+        // inherited, so redefining it here would add nothing.
+        mono: [
+          "var(--font-mono, ui-monospace)",
+          "SFMono-Regular",
+          "Menlo",
+          "Consolas",
+          "Liberation Mono",
+          "monospace",
+        ],
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

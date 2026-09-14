@@ -1,4 +1,37 @@
 /**
+ * One tool result, as it will be shown to the user while it waits in the composer.
+ *
+ * Imported from the formatter rather than redeclared here, even though that points from
+ * the adapter layer down into the engine: the formatter owns the result wire format, and
+ * a second same-shaped definition is the kind that quietly drifts. Type-only, so nothing
+ * links at runtime.
+ */
+import type { ResultSection } from '../engine/stages/handoff/formatter';
+
+/**
+ * What the composer's send control is currently saying.
+ *
+ * The four values are not four shades of the same thing — `absent` and `unknown`
+ * mean opposite things and must not be merged:
+ *
+ * - `stop` — a turn is in flight. Authoritative.
+ * - `send` — there is content and it can go out. Authoritative.
+ * - `absent` — the platform is telling us nothing is generating *and* nobody is
+ *   typing. Gemini removes the button entirely in that state; AI Studio keeps it but
+ *   marks it `aria-disabled`. Different DOM, same authoritative fact, so both map
+ *   here — stage ① uses it to tell "went quiet" from "never got sent".
+ * - `unknown` — a control was found but none of the fallbacks could classify it,
+ *   i.e. our selectors are lost. Nothing about it can be trusted.
+ *
+ * Collapsing `absent` into `unknown` is what once made a provably idle page look
+ * identical to a broken selector, and the loop reported "the AI went silent" for
+ * messages that had never left the composer.
+ */
+export type ComposerState = 'send' | 'stop' | 'absent' | 'unknown';
+
+export type { ResultSection };
+
+/**
  * Platform Adapter Interface.
  * Each supported platform implements this to allow the AgentLoopEngine
  * to interact with platform-specific DOM (editor, send button, AI responses).
@@ -64,4 +97,29 @@ export interface AgentPlatformAdapter {
 
   /** Get the last AI response DOM container element */
   getLastAIResponseElement(): HTMLElement | null;
+
+  /**
+   * Read the composer's send control.
+   *
+   * On the interface rather than imported from a platform module because two things
+   * outside the adapter depend on it and neither knows which platform it is on:
+   * stage ① reads it to decide whether a turn is running, and the send watcher reads
+   * it as proof of delivery. Both used to import Gemini's `getSendButtonState`
+   * directly, which is why AI Studio could never work no matter what the adapter did.
+   */
+  getComposerState(): ComposerState;
+
+  /**
+   * Stage tool results as collapsed chips, one per section, and report whether they
+   * landed.
+   *
+   * Optional, and absence is a normal answer rather than a gap to fill: it needs a
+   * rich editor that can hold non-text nodes. AI Studio's composer is a plain
+   * `<textarea>`, so there is nothing to implement and the caller falls back to
+   * writing the wrapped payload as text.
+   */
+  stageResultCapsules?(sections: ResultSection[]): Promise<boolean>;
+
+  /** Whether capsules staged by `stageResultCapsules` are still in the composer */
+  hasStagedCapsules?(): boolean;
 }

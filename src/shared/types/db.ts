@@ -31,6 +31,12 @@ export interface Conversation {
   deleted_at: number | null; // Unix timestamp in seconds, NULL = active (not deleted)
   gem_id: string | null;
   notebook_id: string | null;
+  /**
+   * 1 for a temporary chat. Stored so follow-up messages have a row to attach
+   * to, but excluded from every list and from search — a temporary chat is never
+   * meant to surface in the sidebar.
+   */
+  is_temporary: number;
 }
 
 export interface Gem {

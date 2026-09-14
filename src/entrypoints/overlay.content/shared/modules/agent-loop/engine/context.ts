@@ -14,6 +14,7 @@
 
 import type { AgentPlatformAdapter } from '../adapters/types';
 import type { AgentEndReason, AgentLoopStatus } from '../types';
+import { currentStreamId } from '@/shared/lib/model-stream-store';
 import { useAgentLoopStore } from '../agent-loop-store';
 import { agentEventBus } from '../event-bus';
 import { toolCallRecorder } from '../records';
@@ -30,7 +31,33 @@ export class LoopContext {
   /** Cancellation for the current run */
   readonly abort = new AbortToken();
 
+  /**
+   * The generation that was in flight when we last pressed send.
+   *
+   * Stage ② reads the model's reply out of the API stream rather than the rendered DOM
+   * (see `parse-response`), and this is how it knows the reply is *ours*. Without it, a
+   * send that never reached the model would be answered with the previous turn's text —
+   * which parses perfectly, so nothing looks wrong, and the round re-runs tools that
+   * already ran.
+   *
+   * `null` means "nothing was in flight", which any real stream is newer than. That is
+   * also the correct value for round 1: `start()` is called *after* the prompt has gone
+   * out, so that generation is already streaming and is exactly the one we want.
+   */
+  streamBoundary: string | null = null;
+
   constructor(readonly adapter: AgentPlatformAdapter) {}
+
+  /**
+   * Record the stream boundary immediately before a send.
+   *
+   * Must be called *before* the send, not when stage ① starts waiting: by then the
+   * generation has already begun and the store already holds its id, so the boundary
+   * would match the very answer it is meant to admit.
+   */
+  markSendBoundary(): void {
+    this.streamBoundary = currentStreamId();
+  }
 
   // ── Store access ───────────────────────────────────────────────────────────
 
@@ -53,10 +80,6 @@ export class LoopContext {
 
   setStatus(status: AgentLoopStatus): void {
     this.store.setStatus(status);
-  }
-
-  editor(): HTMLElement | null {
-    return this.adapter.getEditor();
   }
 
   /** Read and clear the instruction the user typed while the loop was running */

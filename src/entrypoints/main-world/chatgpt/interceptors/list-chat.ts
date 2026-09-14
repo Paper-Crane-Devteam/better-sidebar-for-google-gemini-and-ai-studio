@@ -1,4 +1,6 @@
 import i18n from '@/locale/i18n';
+import { trace } from '@/shared/lib/trace';
+
 
 export function handleListChatResponse(response: any, url: string) {
   if (response.status === 200) {
@@ -15,7 +17,7 @@ export function handleListChatResponse(response: any, url: string) {
         }
       }
 
-      console.log('Better Sidebar (ChatGPT): List Chat Response:', responseBody);
+      trace('Better Sidebar (ChatGPT): List Chat Response:', responseBody);
 
       // Extract chat items from response
       if (responseBody?.items && Array.isArray(responseBody.items)) {

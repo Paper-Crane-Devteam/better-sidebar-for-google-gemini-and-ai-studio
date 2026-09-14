@@ -15,6 +15,8 @@ import {
   LogOut,
   Search,
   ScrollText,
+  Bot,
+  Menu,
 } from 'lucide-react';
 import { UIcon } from '@/shared/components/ui/icon';
 import { SqlExecutor } from '../shared/components/menu/SqlExecutor';
@@ -25,6 +27,7 @@ import { FavoritesTab } from '../shared/modules/favorites/FavoritesTab';
 import { TagsTab } from '../shared/modules/tags/TagsTab';
 import { FeedbackTab } from '../shared/modules/feedback/FeedbackTab';
 import { SnippetsTab } from '../shared/modules/snippets/SnippetsTab';
+import { AgentTab } from '../shared/modules/agent-tab';
 import '@/index.scss';
 import { useAppInit } from '../shared/hooks/useAppInit';
 import { OverlayToggle } from '../shared/components/OverlayToggle';
@@ -35,10 +38,18 @@ import { useUrl } from '@/shared/hooks/useUrl';
 import { useModuleConfig } from './useModuleConfig';
 import { detectAccount } from '@/entrypoints/content/shared/detect-account';
 import { Platform } from '@/shared/types/platform';
-import { useBadgeStore } from '@/shared/lib/badge-store';
-import { BadgeDot } from '@/shared/components/ui/badge-dot';
+import { trace } from '@/shared/lib/trace';
+import { useBadge } from '@/shared/lib/badge-store';
+import { FeatureBadge } from '@/shared/components/ui/badge-dot';
 import { useHotkeyListener } from '@/shared/hooks/useHotkeyListener';
-
+import {
+  AccountButton,
+  AISTUDIO_ACCOUNT,
+} from '../shared/components/AccountButton';
+import {
+  AISTUDIO_SELECTORS,
+  collapseAIStudioNavbar,
+} from '@/shared/lib/dom-selectors';
 
 export const OverlayPanel = ({ className }: { className?: string }) => {
   const moduleConfig = useModuleConfig();
@@ -48,9 +59,9 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
   const { path } = useUrl();
 
   const [, setContainer] = useState<HTMLDivElement | null>(null);
-  const newChatBehavior = useSettingsStore((state) => state.newChatBehavior);
   const shortcuts = useSettingsStore((state) => state.shortcuts);
-  const hasSettingsBadge = useBadgeStore((s) => s.isGroupVisible('settings.'));
+  const compactMode = useSettingsStore((state) => state.compactMode);
+  const agentBadge = useBadge('tab.agent');
   const {
     fetchData,
     ui,
@@ -74,6 +85,10 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
     isSettingsOpen,
   } = ui.overlay;
 
+  useEffect(() => {
+    if (compactMode && activeTab !== 'files') setActiveTab('files');
+  }, [compactMode, activeTab, setActiveTab]);
+
   // Handle auto-switching UI based on URL
   useEffect(() => {
     // If returning to main chat area (new chat or root) and we have a hidden token,
@@ -93,7 +108,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
       'better-sidebar-for-google-ai-studio-navbar-hider',
     ) as HTMLStyleElement;
     const navbars = Array.from(
-      document.querySelectorAll('ms-navbar, ms-navbar-v2'),
+      document.querySelectorAll(AISTUDIO_SELECTORS.navbar),
     ) as HTMLElement[];
     const wrapper = document.getElementById(
       'better-sidebar-for-google-ai-studio-sidebar-wrapper',
@@ -135,7 +150,6 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
         // Only process in the active tab — background DB may belong to another profile
         if (document.visibilityState !== 'visible') return;
 
-        console.log('Received DATA_UPDATED signal, refreshing...');
         fetchData(true);
 
         // Handle specific update types with payload
@@ -163,7 +177,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
   useEffect(() => {
     const handleVisibilityChange = async () => {
       if (document.visibilityState === 'visible') {
-        console.log('Tab became visible, syncing profile and refreshing...');
+        trace('Tab became visible, syncing profile and refreshing...');
         // Re-detect account to ensure background DB matches this tab's profile
         try {
           const username = await detectAccount(Platform.AI_STUDIO);
@@ -195,12 +209,14 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
       | 'settings'
       | 'search'
       | 'prompts'
-      | 'snippets',
+      | 'snippets'
+      | 'agent',
   ) => {
     if (tab === 'settings') {
       setIsSettingsOpen(true);
       return;
     }
+    if (tab === 'agent') agentBadge.dismiss();
     setActiveTab(tab);
   };
 
@@ -228,7 +244,38 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
       className={`flex bg-background text-foreground ${className || 'h-full'} relative`}
     >
       {/* Sidebar Tabs */}
-      <div className="sidebar-nav flex flex-col items-center bg-muted/20 shrink-0">
+      <div
+        className={`sidebar-nav flex flex-col items-center bg-muted/20 shrink-0 ${
+          compactMode ? 'hidden' : ''
+        }`}
+      >
+        {/*
+          Collapse, at the top where AI Studio's own collapse button now lives.
+          One-way on purpose: collapsing takes this rail off screen along with the
+          native navbar, so there is never a moment where this button is visible and
+          the navbar is already collapsed. Expanding is the toolbar's job, and the
+          hotkey's — see `toggleAIStudioSidebar`.
+        */}
+        <SimpleTooltip
+          content={t('tooltip.collapseSidebar', {
+            defaultValue: 'Collapse sidebar',
+          })}
+        >
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => collapseAIStudioNavbar()}
+            className="sidebar-btn transition-all"
+          >
+            {/* Same hamburger as Gemini's toggle, in the same top-of-rail slot.
+                The two platforms differ in what the click does — this one only
+                collapses — but that is not worth a different icon: someone using
+                both should not have to relearn where the button is. */}
+            <Menu className="sidebar-icon" />
+          </Button>
+        </SimpleTooltip>
+        <div className="h-2" />
+
         <SimpleTooltip content={t('tabs.files')}>
           <Button
             variant={activeTab === 'files' ? 'secondary' : 'ghost'}
@@ -257,6 +304,17 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
             className="sidebar-btn transition-all"
           >
             <UIcon icon="tabler:blockquote" className="sidebar-icon" />
+          </Button>
+        </SimpleTooltip>
+        <SimpleTooltip content="Agent">
+          <Button
+            variant={activeTab === 'agent' ? 'secondary' : 'ghost'}
+            size="icon"
+            onClick={() => handleTabChange('agent')}
+            className="sidebar-btn transition-all relative"
+          >
+            <Bot className="sidebar-icon" />
+            <FeatureBadge badgeKey="tab.agent" />
           </Button>
         </SimpleTooltip>
         {shortcuts?.favorites && (
@@ -370,9 +428,10 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
             className="sidebar-btn transition-all relative"
           >
             <Settings className="sidebar-icon" />
-            <BadgeDot visible={hasSettingsBadge} className="absolute top-1.5 right-1.5" />
+            <FeatureBadge badgeKey="settings." group />
           </Button>
         </SimpleTooltip>
+        <AccountButton config={AISTUDIO_ACCOUNT} />
       </div>
 
       {/* Main Content Area */}
@@ -401,6 +460,8 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
           <FavoritesTab menuActions={moduleConfig.general.menuActions} />
         ) : activeTab === 'snippets' ? (
           <SnippetsTab menuActions={moduleConfig.general.menuActions} />
+        ) : activeTab === 'agent' ? (
+          <AgentTab />
         ) : activeTab === 'tags' ? (
           <TagsTab menuActions={moduleConfig.general.menuActions} />
         ) : activeTab === 'feedback' ? (

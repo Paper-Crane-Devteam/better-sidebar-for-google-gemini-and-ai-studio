@@ -14,10 +14,12 @@ import { GlobalModal } from '@/shared/components/GlobalModal';
 import { GlobalPopoverPicker } from '@/shared/components/GlobalPopoverPicker';
 import { GlobalToast } from '@/shared/components/GlobalToast';
 import { SnippetReaderDrawer } from '@/entrypoints/overlay.content/shared/modules/snippets/components/SnippetReaderDrawer';
+import { WorkspaceFileDrawer } from '@/entrypoints/overlay.content/shared/modules/agent-tab/workspace/WorkspaceFileDrawer';
 import { SettingsModal } from '@/entrypoints/overlay.content/shared/modules/settings/SettingsModal';
 import { WhatsNewDialog } from '@/entrypoints/overlay.content/shared/modules/whats-new/WhatsNewDialog';
 import { useAppStore } from '@/shared/lib/store';
 import { useInitConversationMessages } from '@/shared/hooks/useInitConversationMessages';
+import { useModelStream } from '@/shared/hooks/useModelStream';
 import { ProfilePickerDialog } from '@/entrypoints/overlay.content/shared/components/ProfilePickerDialog';
 import { RatingPromptDialog } from '@/entrypoints/overlay.content/shared/modules/feedback/RatingPromptDialog';
 import { PowerPackPaywall } from '@/shared/components/PowerPackPaywall';
@@ -41,6 +43,12 @@ export const GeminiEnhancedFeatures = () => {
   // Initialize the shared conversation messages store (DB fetch, interceptor, DOM observer)
   useInitConversationMessages();
 
+  // Feed the in-flight generation into the live stream store. On Gemini the agent view
+  // still reads the DOM for its transcript, so this is not (yet) about rendering — it
+  // is what gives the agent loop the model's own bytes to parse instead of the ones the
+  // markdown renderer left behind. See `model-stream-store`.
+  useModelStream();
+
   // Keep GeminiUI side-effects running (CSS injection, top-bar-actions offset, etc.)
   // even though the control panel UI is hidden.
   useGeminiUI();
@@ -60,6 +68,7 @@ export const GeminiEnhancedFeatures = () => {
       <SelectionToolbarFeature />
       <SnippetDragDrawer />
       <SnippetReaderDrawer />
+      <WorkspaceFileDrawer />
       <SettingsModal open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
       <WhatsNewDialog />
       <ProfilePickerDialog />

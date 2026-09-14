@@ -17,16 +17,24 @@ export const dracula: ThemePreset = {
   isPremium: true,
   preferredMode: 'dark',
   fonts: ['Fira+Code:wght@300;400;500;600'],
-  extraCss: `
+  fontMono: `'Fira Code', 'JetBrains Mono', 'SF Mono', monospace`,
+  fontCss: `
 /* Dracula monospace font override */
-body.bs-theme--dracula {
+body.bs-fonts--dracula {
   font-family: 'Fira Code', 'SF Mono', 'Cascadia Code', monospace !important;
 }
 
-body.bs-theme--dracula *:not(.material-symbols-outlined):not(.material-symbols-rounded):not(.material-symbols-sharp):not(.google-symbols):not(mat-icon):not(.mat-icon):not([class*="material-symbols"]):not([class*="google-symbols"]) {
+body.bs-fonts--dracula *:not(.material-symbols-outlined):not(.material-symbols-rounded):not(.material-symbols-sharp):not(.google-symbols):not(mat-icon):not(.mat-icon):not([class*="material-symbols"]):not([class*="google-symbols"]) {
   font-family: inherit;
 }
 `,
+  fontVariables: [
+    { property: '--mat-menu-item-label-text-font', value: '"Fira Code", "SF Mono", "Cascadia Code", monospace' },
+    { property: '--mat-list-list-item-label-text-font', value: '"Fira Code", "SF Mono", "Cascadia Code", monospace' },
+    { property: '--mat-list-list-item-supporting-text-font', value: '"Fira Code", "SF Mono", "Cascadia Code", monospace' },
+    { property: '--mat-button-text-label-text-font', value: '"Fira Code", "SF Mono", "Cascadia Code", monospace' },
+    { property: '--mat-button-filled-label-text-font', value: '"Fira Code", "SF Mono", "Cascadia Code", monospace' },
+  ],
   variables: [
     // ─── Surface / Background ───────────────────────────────────────
     { property: '--gem-sys-color--surface', value: '#282a36' },
@@ -129,13 +137,6 @@ body.bs-theme--dracula *:not(.material-symbols-outlined):not(.material-symbols-r
     // ─── Prompt Chips ───────────────────────────────────────────────
     { property: '--bard-color-zero-state-prompt-chip-background', value: '#44305e' },
     { property: '--bard-color-zero-state-prompt-chip-text', value: '#bd93f9' },
-
-    // ─── Font override via CSS variable ─────────────────────────────
-    { property: '--mat-menu-item-label-text-font', value: '"Fira Code", "SF Mono", "Cascadia Code", monospace' },
-    { property: '--mat-list-list-item-label-text-font', value: '"Fira Code", "SF Mono", "Cascadia Code", monospace' },
-    { property: '--mat-list-list-item-supporting-text-font', value: '"Fira Code", "SF Mono", "Cascadia Code", monospace' },
-    { property: '--mat-button-text-label-text-font', value: '"Fira Code", "SF Mono", "Cascadia Code", monospace' },
-    { property: '--mat-button-filled-label-text-font', value: '"Fira Code", "SF Mono", "Cascadia Code", monospace' },
 
     // ─── Shadows ────────────────────────────────────────────────────
     { property: '--mat-app-elevation-shadow-level-1', value: '0px 2px 4px rgba(0,0,0,0.3)' },

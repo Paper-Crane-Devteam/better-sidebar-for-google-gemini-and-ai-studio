@@ -3,6 +3,7 @@ import { useIdbStorage } from '@subframe7536/sqlite-wasm/idb';
 import { useOpfsStorage } from '@subframe7536/sqlite-wasm/opfs';
 import { SCHEMA } from '@/shared/db/schema';
 import { NO_DB_OPEN } from '@/shared/db/protocol';
+import { isTracing } from '@/shared/lib/trace';
 import { runMigrations } from './migrations';
 
 let db: any = null;
@@ -195,18 +196,27 @@ const execSql = async (
 ): Promise<any[]> => {
   if (!db) throw new Error('DB not initialized');
 
-  const logSql = sql.trim().replace(/\s+/g, ' ');
-  console.log(
-    `${DB_LOG_PREFIX} SQL:`,
-    logSql,
-    bind != null && bind.length ? `bind: [${bind.join(', ')}]` : '',
-  );
+  const tracing = isTracing();
+  if (tracing) {
+    console.log(
+      `${DB_LOG_PREFIX} SQL:`,
+      sql.trim().replace(/\s+/g, ' '),
+      bind != null && bind.length ? `bind: [${bind.join(', ')}]` : '',
+    );
+  }
 
   let result: any[];
   try {
     result = await db.run(sql, bind);
   } catch (err) {
-    if (!allowReopen || !isConnectionLost(err)) throw err;
+    if (!allowReopen || !isConnectionLost(err)) {
+      console.error(
+        `${DB_LOG_PREFIX} Failed:`,
+        sql.trim().replace(/\s+/g, ' '),
+        err,
+      );
+      throw err;
+    }
 
     // The statement never ran against a usable connection, so replaying it
     // cannot duplicate a write.
@@ -215,13 +225,11 @@ const execSql = async (
     return execSql(sql, bind, false);
   }
 
-  if (result.length > 0) {
+  if (tracing && result.length > 0) {
     console.log(
       `${DB_LOG_PREFIX} Result: ${result.length} row(s)`,
       result.length <= 3 ? result : result.slice(0, 3),
     );
-  } else {
-    console.log(`${DB_LOG_PREFIX} Result: 0 rows (ok)`);
   }
   return result;
 };

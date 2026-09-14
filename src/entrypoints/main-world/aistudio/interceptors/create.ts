@@ -1,10 +1,17 @@
 import { parsePromptType } from '../lib/response-parser';
 import { handleChatResponse } from './chat';
 
-export function handleCreatePromptResponse(response: any, url: string) {
+/**
+ * @param isTemporary Whether the sidebar asked for this to be a temporary chat.
+ *   Only meaningful here, on the event that creates the row — later turns arrive
+ *   via AI_STUDIO_RESPONSE and attach to a row that is already marked.
+ */
+export function handleCreatePromptResponse(
+  response: any,
+  url: string,
+  isTemporary = false,
+) {
   if (response.status === 200) {
-    console.log('Better Sidebar: Intercepted CreatePrompt');
-
     let responseBody = response.response;
     if (typeof responseBody !== 'string') {
       responseBody = JSON.stringify(responseBody);
@@ -35,6 +42,11 @@ export function handleCreatePromptResponse(response: any, url: string) {
 
         if (id) {
           console.log(`Better Sidebar: Detected new prompt creation: ${id}`);
+          if (isTemporary) {
+            console.log(
+              `Better Sidebar: Marking new prompt as a temporary chat: ${id}`,
+            );
+          }
           globalThis.dispatchEvent(
             new CustomEvent('BETTER_SIDEBAR_PROMPT_CREATE', {
               detail: {
@@ -44,6 +56,7 @@ export function handleCreatePromptResponse(response: any, url: string) {
                 created_at: createdAt || Math.floor(Date.now() / 1000),
                 originalUrl: url,
                 type,
+                is_temporary: isTemporary,
               },
             })
           );

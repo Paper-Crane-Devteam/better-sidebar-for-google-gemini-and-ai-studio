@@ -123,14 +123,6 @@ export const SlashCommandFeature: React.FC = () => {
     doInsertPrompt(match.prompt);
   }
 
-  console.log('[AIStudio SlashCommand] render', {
-    enabled: slashCommandEnabled,
-    isOpen: state.isOpen,
-    query: state.query,
-    matches: state.matches.length,
-    popupPosition,
-  });
-
   if (!slashCommandEnabled) return null;
 
   return (

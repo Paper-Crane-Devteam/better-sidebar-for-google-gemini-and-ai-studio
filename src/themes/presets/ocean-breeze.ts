@@ -16,16 +16,23 @@ export const oceanBreeze: ThemePreset = {
   isPremium: true,
   preferredMode: 'light',
   fonts: ['Nunito:wght@300;400;500;600;700'],
-  extraCss: `
+  fontCss: `
 /* Ocean Breeze font override */
-body.bs-theme--ocean-breeze {
+body.bs-fonts--ocean-breeze {
   font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
 }
 
-body.bs-theme--ocean-breeze *:not(.material-symbols-outlined):not(.material-symbols-rounded):not(.material-symbols-sharp):not(.google-symbols):not(mat-icon):not(.mat-icon):not([class*="material-symbols"]):not([class*="google-symbols"]) {
+body.bs-fonts--ocean-breeze *:not(.material-symbols-outlined):not(.material-symbols-rounded):not(.material-symbols-sharp):not(.google-symbols):not(mat-icon):not(.mat-icon):not([class*="material-symbols"]):not([class*="google-symbols"]) {
   font-family: inherit;
 }
 `,
+  fontVariables: [
+    { property: '--mat-menu-item-label-text-font', value: '"Nunito", -apple-system, BlinkMacSystemFont, sans-serif' },
+    { property: '--mat-list-list-item-label-text-font', value: '"Nunito", -apple-system, BlinkMacSystemFont, sans-serif' },
+    { property: '--mat-list-list-item-supporting-text-font', value: '"Nunito", -apple-system, BlinkMacSystemFont, sans-serif' },
+    { property: '--mat-button-text-label-text-font', value: '"Nunito", -apple-system, BlinkMacSystemFont, sans-serif' },
+    { property: '--mat-button-filled-label-text-font', value: '"Nunito", -apple-system, BlinkMacSystemFont, sans-serif' },
+  ],
   variables: [
     // ─── Surface / Background ───────────────────────────────────────
     { property: '--gem-sys-color--surface', value: '#f8fbfd' },
@@ -128,13 +135,6 @@ body.bs-theme--ocean-breeze *:not(.material-symbols-outlined):not(.material-symb
     // ─── Prompt Chips ───────────────────────────────────────────────
     { property: '--bard-color-zero-state-prompt-chip-background', value: '#cce5f5' },
     { property: '--bard-color-zero-state-prompt-chip-text', value: '#0077b6' },
-
-    // ─── Font override via CSS variable ─────────────────────────────
-    { property: '--mat-menu-item-label-text-font', value: '"Nunito", -apple-system, BlinkMacSystemFont, sans-serif' },
-    { property: '--mat-list-list-item-label-text-font', value: '"Nunito", -apple-system, BlinkMacSystemFont, sans-serif' },
-    { property: '--mat-list-list-item-supporting-text-font', value: '"Nunito", -apple-system, BlinkMacSystemFont, sans-serif' },
-    { property: '--mat-button-text-label-text-font', value: '"Nunito", -apple-system, BlinkMacSystemFont, sans-serif' },
-    { property: '--mat-button-filled-label-text-font', value: '"Nunito", -apple-system, BlinkMacSystemFont, sans-serif' },
 
     // ─── Shadows ────────────────────────────────────────────────────
     { property: '--mat-app-elevation-shadow-level-1', value: '0px 2px 4px rgba(0,119,182,0.08)' },

@@ -32,14 +32,27 @@ const GAP_PX = 8;
 /**
  * The composer's outer box, not the editable area.
  *
- * `.text-input-field` is the wrapper Gemini puts the send button and the model picker
- * in, so its right edge is the one the user reads as "the corner of the input box".
+ * Per platform, the wrapper that also holds the send button and the model picker — its
+ * right edge is the one the user reads as "the corner of the input box". Anchoring to the
+ * editable area instead would put the dock over the text on Gemini and inside the button
+ * row on AI Studio.
+ *
+ * ⚠️ Tried in order, one query at a time. A comma-separated list resolves in *document*
+ * order, which says nothing about which platform we are on.
  */
+const COMPOSER_BOX_SELECTORS = [
+  '.text-input-field', // Gemini
+  'rich-textarea', // Gemini fallback
+  'ms-chunk-editor footer ms-prompt-box .prompt-box-container', // AI Studio
+  'ms-prompt-box .prompt-box-container', // AI Studio fallback
+] as const;
+
 function findComposerBox(): HTMLElement | null {
-  return (
-    document.querySelector<HTMLElement>('.text-input-field') ||
-    document.querySelector<HTMLElement>('rich-textarea')
-  );
+  for (const selector of COMPOSER_BOX_SELECTORS) {
+    const el = document.querySelector<HTMLElement>(selector);
+    if (el) return el;
+  }
+  return null;
 }
 
 function measure(): ComposerAnchor | null {

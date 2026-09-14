@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
+import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { TreeApi, NodeApi } from 'react-arborist';
 import { FolderTreeNodeData } from './types';
 import { useI18n } from '@/shared/hooks/useI18n';
@@ -179,6 +180,54 @@ export const useFolderTree = (options: UseFolderTreeOptions) => {
     }
   };
 
+  /**
+   * Extra keyboard shortcuts layered on top of react-arborist's defaults.
+   *
+   * react-arborist only binds Backspace for delete and Enter for rename, so
+   * `Delete` and `F2` (the conventional keys on Windows/Linux file managers)
+   * are wired up here. The delete branch mirrors arborist's own Backspace
+   * handling so focus lands on a sensible neighbour afterwards.
+   */
+  const handleKeyDown = (e: ReactKeyboardEvent<HTMLDivElement>) => {
+    const tree = treeRef.current;
+    if (!tree || tree.isEditing) return;
+
+    // ─── Delete: same behaviour as arborist's Backspace ───
+    if (e.key === 'Delete') {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const selectedIds = Array.from(tree.selectedIds);
+      if (selectedIds.length > 1) {
+        let nextFocus = tree.mostRecentNode;
+        while (nextFocus && nextFocus.isSelected) {
+          nextFocus = nextFocus.nextSibling;
+        }
+        if (!nextFocus) nextFocus = tree.lastNode;
+        tree.focus(nextFocus, { scroll: false });
+        tree.delete(selectedIds);
+        return;
+      }
+
+      const node = tree.focusedNode;
+      if (!node) return;
+      tree.focus(node.nextSibling || node.parent, { scroll: false });
+      tree.delete(node);
+      return;
+    }
+
+    // ─── F2: start renaming the focused node ───
+    if (e.key === 'F2') {
+      const node = tree.focusedNode;
+      if (!node || !node.isEditable) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      // Defer so the keyup doesn't land inside the freshly mounted input.
+      setTimeout(() => tree.edit(node));
+    }
+  };
+
   return {
     treeRef,
     containerRef,
@@ -190,5 +239,6 @@ export const useFolderTree = (options: UseFolderTreeOptions) => {
     onDelete,
     handleToggle,
     handleCreateFolder,
+    handleKeyDown,
   };
 };

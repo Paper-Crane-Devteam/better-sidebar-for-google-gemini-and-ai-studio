@@ -3,49 +3,28 @@ Organize conversations into folders, search across all messages, export chats, s
 
 Meet BETTER SIDEBAR FOR GEMINI & AI STUDIO — designed to help developers, prompt engineers, and AI power users streamline their daily workflows. We aim to transform the default interface into a more organized knowledge base, helping you find what you need without endless scrolling.
 
-🔥 WHAT'S NEW (v2.9.0)
+🔥 WHAT'S NEW (v2.10.0)
 
-🤖 AI Agent (New Experimental Feature):
-• We've introduced an AI Agent to help with your workflow. Simply type ">" in the Gemini input box, describe what you need, and the Agent will try its best to execute the tasks for you.
-• Built-in Skills: It comes with practical skills like auto-organizing chats, backfilling search indexes, querying data, and batch-managing Prompts & Snippets.
-• Custom Skills: You can write your own custom Skills in Settings → Agent to suit your specific needs.
-• Multi-turn Support: The Agent maintains context across multiple rounds of conversation, helping you break down complex tasks step by step.
-• Safety & Control: Your data safety is our priority. Write operations require your explicit approval (Speed Mode is available for trusted scenarios). A circuit breaker is built in to prevent endless loops.
-• Always Accessible: The Agent Dock rests quietly above your input box, ready to help even when the sidebar is closed.
-• A Token of Gratitude: Early Bird Powerpack supporters will receive access to the Agent as our way of saying thanks.
+💼 Workspace Agent (Let AI edit files for you):
+• The game-changer is here! Type ">" to summon the Workspace Agent, drag and drop your files (supports Word, Excel, PDF, subtitles, Markdown, and code), and let the Agent analyze and edit them.
+• The best part? It strictly preserves your formatting. Using tracked changes and precise replacements rather than brutal overwrites, your Excel formulas, Word styles, and subtitle timestamps remain perfectly intact.
+• Currently in Beta. Powerpack unlocks unlimited workspaces and files.
 
-⚡ Gemini Spark Integration:
-• If your Google account has Spark enabled, a dedicated tab will smoothly appear in the sidebar—no extra configuration needed.
-
-🎨 UI Refinements & Animations:
-• We've polished the spacing, contrast, and overall theme details. Switching themes now comes with a smooth transition animation for a more pleasant visual experience.
-
-🎛️ Extension Icon Panel:
-• Clicking the extension icon in your browser toolbar now opens a quick control panel, making it easier to toggle features without diving into menus.
-
-⌨️ Slash Commands in AI Studio:
-• The popular "/" shortcut to open the Prompt Library is now fully supported in AI Studio.
-
-💾 Automatic Local Backups:
-• Extension data is now backed up locally on a schedule. You can also create manual snapshots to easily restore your data if things go wrong.
-
-📜 Smart Scrollbar Enhancements:
-• Clicking the smart scrollbar now expands it into a full message list, helping you navigate long conversations effortlessly.
-
-📁 Improved Folder Organization:
-• We've added a "New Folder" button directly within the "Move to folder" dialog for a smoother organizing experience.
-
-🐛 Details & Fixes:
-• Google Drive sync has been adjusted to protect your local data; it no longer overwrites local files automatically (restore is now a manual download).
-• Fixed several issues, including Gemini conversation scanning glitches, frozen sidebars after tab sleep, and layout jumping. Thank you for your continued feedback that helps us improve.
+✨ Quality of Life Improvements:
+• Compact Mode: Hide the sidebar icon bar completely for an ultra-clean, distraction-free interface.
+• Temporary Chats for AI Studio: A simulated temp chat experience that leaves no trace in your file tree. Also fixed a bug where Gemini temp chats created phantom folder entries.
+• Quicker Actions: Middle-click the "New Chat" button to open it in a new tab. We've also added keyboard shortcuts: F2 to rename and Delete to trash files.
+• Folder Search: Added a search bar to the folder selection popup so you can locate folders instantly.
+• UI Polish: Fixed smart scrollbar ordering during branch chats, corrected the AI Studio theme sidebar background, and added an account avatar display for easier multi-account switching.
+• New Themes: Added 6 gorgeous new themes (in Supportpack) and a more convenient custom color picker right in the folder dropdown menu.
 
 ---
 
 🚀 KEY FEATURES
 
-🤖 AI AGENT (NEW)
+🤖 AI AGENT & WORKSPACE
 
-Type ">" to summon the Agent. Describe your tasks in everyday language, and it will try its best to help you execute them — auto-organize, query data, manage prompts, sync missing messages, and more. Write custom Skills. Multi-turn conversation with full context. Approval-gated writes, speed mode, circuit breakers. Works even with the sidebar closed via the Agent Dock.
+Type ">" to summon the Agent. Describe your tasks in everyday language, and it will help you execute them. With the new Workspace Agent, you can drag and drop documents (Word, Excel, PDF, code files, etc.) and let AI analyze or edit them while strictly preserving your original formatting and layouts. Also supports auto-organizing chats, querying data, custom Skills, and multi-turn context. Works even with the sidebar closed via the Agent Dock.
 
 📂 SIDEBAR & ORGANIZATION
 

@@ -94,7 +94,30 @@ export const modal = {
       });
     });
   },
-  // Add other methods (info, error, warn) as needed later
+  info: (options: {
+    title: React.ReactNode;
+    content: React.ReactNode;
+    confirmText?: string;
+    modalClassName?: string;
+  }) => {
+    return new Promise<void>((resolve) => {
+      useModalStore.getState().open({
+        type: 'info',
+        title: options.title,
+        content: options.content,
+        confirmText: options.confirmText,
+        modalClassName: options.modalClassName,
+        onConfirm: () => {
+          useModalStore.getState().close();
+          resolve();
+        },
+        onCancel: () => {
+          useModalStore.getState().close();
+          resolve();
+        },
+      });
+    });
+  },
 
   /**
    * Specialized delete confirmation modal.

@@ -1,35 +1,43 @@
 /**
  * SessionEndCard — the "that's the end of the task" marker in the conversation.
  *
- * A divider rather than a card: the dock already carries the detailed summary (step
- * counts, failures, upgrade prompts), and repeating it here would give the same
- * information two competing homes.
+ * It reads as one more AI turn, because that is what it is: `complete_task`'s
+ * `summary` is the AI's closing word on the job, and the only thing separating it
+ * from the prose above is a tick in the gutter.
  *
- * It does own the *primary* undo entry point, though. The dock can be collapsed,
- * dismissed, or left behind by switching conversations, while this sits at the bottom
- * of the transcript — which is where someone looking over what the agent did actually
- * is when they decide they want it reverted.
+ * ## Why not a divider
  *
- * ## Two sizes, because "task" is not always the right word
+ * It used to be a full-width rule with a verdict in the middle and the summary set
+ * below it in small centred grey type. Two problems with that. The rule announces a
+ * chapter break the reader didn't ask for — after a five-second question it reads as
+ * the feature having closed on them, which is why there used to be a second, compact
+ * form, plus a whole pass over the transcript to weigh a session and decide which form
+ * it deserved. And the summary, the one piece of writing on screen that says what
+ * actually happened, was set as a footnote to the rule.
  *
- * A session that ran one SELECT is not an event worth a full-width rule and a verdict.
- * Read as a first-time user, "Task finished" across the screen after a five-second
- * question reads as the feature having closed on them — so a light session (see
- * `isLightSession`) gets one line of small text instead. Nothing is hidden by the
- * downgrade: light means no writes, no failures and no undo, so there is no control
- * living in the compact form.
+ * Rendered as a turn, both go away: the summary sits in the reading column at reading
+ * size, and a session that did little simply produces a short one. No second form to
+ * pick between, so the weighing that fed it is gone too.
  *
- * ## The summary lives here
+ * ## When the turn already spoke
  *
- * `complete_task`'s `summary` is the AI's own account of what it did, and this is the
- * only place it is shown. The engine files it into the runtime store, but the card that
- * renders it appears only for an "infeasible" verdict and the dock hides itself on a
- * clean finish — so on the happy path the AI wrote a paragraph that went nowhere. Read
- * off the tool call instead of the store, so it also survives a reload.
+ * A model turn can carry prose of its own alongside the completion call, and then the
+ * summary is a paraphrase of the paragraph directly above it. In that case the marker
+ * steps aside entirely (`hasOwnText`) and the turn renders as any other AI reply —
+ * saying the same thing twice, once in full and once in miniature, was the worst of
+ * the old layout.
+ *
+ * ## What it still owns
+ *
+ * The primary undo entry point. The dock can be collapsed, dismissed, or left behind
+ * by switching conversations, while this sits at the bottom of the transcript — which
+ * is where someone looking over what the agent did actually is when they decide they
+ * want it reverted. So the footer renders even when the marker itself has stepped
+ * aside.
  *
  * ## The follow-up hint
  *
- * The one thing the divider cannot say by itself is what comes next. A follow-up
+ * The one thing the marker cannot say by itself is what comes next. A follow-up
  * message keeps the agent going — the AI still has the system prompt, so it answers in
  * tool format and auto-pickup takes over — but nothing on screen suggests that, so
  * people retype `>` or open a new chat. The hint says it once or twice and then gets
@@ -42,6 +50,7 @@ import { CheckCircle2, AlertTriangle, Undo2, RotateCcw, X } from 'lucide-react';
 import type { SessionOutcome } from '../helpers/session-end';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useOnboardingHint } from '@/shared/lib/onboarding-store';
+import { MarkdownRenderer } from '@/shared/components/MarkdownRenderer';
 import { useUndoAvailable, useUndoWasUndone, useUndoAction } from '../../undo';
 
 interface SessionEndCardProps {
@@ -52,24 +61,26 @@ interface SessionEndCardProps {
    * Whether this marker owns the undo entry point.
    *
    * A conversation can contain several finished sessions, but the snapshot only ever
-   * covers the most recent one — offering "Undo changes" on an older divider would
+   * covers the most recent one — offering "Undo changes" on an older marker would
    * revert work the user never pointed at.
    */
   isLatest?: boolean;
   /**
-   * Render the compact form: the session did almost nothing.
+   * Whether the turn this closes already said something in its own words.
    *
-   * Passed in rather than derived here because weighing a session means walking the
-   * surrounding messages, which only the overlay has.
+   * When it did, the summary is a restatement of it and the marker keeps quiet; the
+   * turn is left to read as a plain AI reply. Passed in because working it out means
+   * looking at the prose either side of the tool blocks, which is the response
+   * component's business, not this one's.
    */
-  light?: boolean;
+  hasOwnText?: boolean;
 }
 
 export const SessionEndCard: React.FC<SessionEndCardProps> = ({
   outcome,
   summary = '',
   isLatest = true,
-  light = false,
+  hasOwnText = false,
 }) => {
   const { t } = useI18n();
   const undoAvailable = useUndoAvailable() && isLatest;
@@ -77,7 +88,7 @@ export const SessionEndCard: React.FC<SessionEndCardProps> = ({
   const { undoing, runUndo } = useUndoAction();
 
   // Only the newest marker: the hint is about what to do *now*, and hanging it on
-  // every historical divider would turn a one-off tip into wallpaper.
+  // every historical marker would turn a one-off tip into wallpaper.
   const hint = useOnboardingHint('agentContinueAfterEnd', 3);
   const showHint = isLatest && !undone && hint.visible;
 
@@ -101,94 +112,89 @@ export const SessionEndCard: React.FC<SessionEndCardProps> = ({
       ? 'text-success'
       : 'text-warning';
 
-  const text = undone ? t('agent.undo.reverted', { defaultValue: 'Changes reverted' }) : label;
-
   /**
-   * Suppressed once the changes are gone: the summary describes work that has been
-   * rolled back, and leaving it under "Changes reverted" reads as a contradiction.
+   * The body of the marker turn.
    *
-   * Clamped rather than scrolled or truncated, with the full text on hover — a summary
-   * is meant to be one to three sentences, and a model that ignores that shouldn't be
-   * able to push the rest of the conversation off screen.
+   * The summary when there is one — the AI wrote it to be read, so it gets the same
+   * treatment as any other thing the AI writes. The verdict label only stands in when
+   * the call carried no summary at all, which means a malformed call.
+   *
+   * Suppressed once the changes are gone: the summary describes work that has been
+   * rolled back, and leaving it under a tick reads as a contradiction. The revert
+   * itself becomes the whole message.
    */
-  const summaryLine = summary && !undone && (
-    <p
-      className="mx-auto max-w-prose px-6 text-center text-xs leading-relaxed
-                 text-muted-foreground line-clamp-3"
-      title={summary}
-    >
-      {summary}
-    </p>
+  const body = undone ? (
+    <span className="text-sm text-muted-foreground">
+      {t('agent.undo.reverted', { defaultValue: 'Changes reverted' })}
+    </span>
+  ) : summary ? (
+    <MarkdownRenderer className="leading-relaxed">{summary}</MarkdownRenderer>
+  ) : (
+    <span className="text-sm text-muted-foreground">{label}</span>
   );
 
-  const followUpHint = showHint && (
-    <div className="flex items-center justify-center gap-1.5">
-      <span className="text-xs text-muted-foreground/80">
-        {t('agent.summary.continueHint', {
-          defaultValue: 'Just keep talking to carry on — no need to type > again.',
-        })}
-      </span>
-      <button
-        type="button"
-        onClick={hint.dismiss}
-        aria-label={t('agent.summary.hintDismiss', { defaultValue: 'Got it' })}
-        title={t('agent.summary.hintDismiss', { defaultValue: 'Got it' })}
-        className="shrink-0 rounded p-0.5 text-muted-foreground/60 transition-colors
-                   hover:bg-accent/40 hover:text-foreground"
-      >
-        <X className="h-3 w-3" />
-      </button>
+  const footer = (undoAvailable || showHint) && (
+    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+      {undoAvailable && (
+        <button
+          type="button"
+          onClick={runUndo}
+          disabled={undoing}
+          className="-ml-1 inline-flex items-center gap-1 rounded px-2 py-1 text-xs
+                     font-medium text-[rgb(var(--highlight))] transition-colors
+                     hover:bg-[rgb(var(--highlight)/0.1)] disabled:opacity-50"
+        >
+          <Undo2 className="h-3 w-3" />
+          {undoing
+            ? t('agent.undo.working', { defaultValue: 'Undoing…' })
+            : t('agent.undo.action', { defaultValue: 'Undo changes' })}
+        </button>
+      )}
+
+      {showHint && (
+        <span className="inline-flex items-center gap-1.5">
+          <span className="text-xs text-muted-foreground/80">
+            {t('agent.summary.continueHint', {
+              defaultValue: 'Just keep talking to carry on — no need to type > again.',
+            })}
+          </span>
+          <button
+            type="button"
+            onClick={hint.dismiss}
+            aria-label={t('agent.summary.hintDismiss', { defaultValue: 'Got it' })}
+            title={t('agent.summary.hintDismiss', { defaultValue: 'Got it' })}
+            className="shrink-0 rounded p-0.5 text-muted-foreground/60 transition-colors
+                       hover:bg-accent/40 hover:text-foreground"
+          >
+            <X className="h-3 w-3" />
+          </button>
+        </span>
+      )}
     </div>
   );
 
   /**
-   * A light session gets a line, not a rule. Same information, a tenth of the volume —
-   * and since there is no undo on a light session, no control is lost with the frame.
+   * The turn spoke for itself, so there is nothing left to announce — only the
+   * controls that have nowhere else to live. A revert still gets its line, because
+   * that one contradicts the prose above it and has to be said out loud.
    */
-  if (light) {
-    return (
-      <div className="my-3 space-y-1">
-        <div className="flex items-center justify-center gap-1.5">
-          <Icon className={`h-3 w-3 shrink-0 ${iconColor}`} />
-          <span className="text-xs text-muted-foreground">{text}</span>
-        </div>
-        {summaryLine}
-        {followUpHint}
-      </div>
-    );
+  if (hasOwnText && !undone) {
+    if (!footer) return null;
+    // No gutter here: with no icon to align to, the controls belong on the same
+    // column as the prose they follow.
+    return <div className="-mt-3 mb-6 w-full">{footer}</div>;
   }
 
   return (
-    <div className="my-6 space-y-1 py-3">
-      <div className="flex items-center gap-2">
-        <div className="h-px flex-1 bg-border/50" />
-
-        <div className="flex items-center gap-2 px-3">
-          <Icon className={`h-4 w-4 shrink-0 ${iconColor}`} />
-          <span className="text-xs font-medium text-muted-foreground">{text}</span>
-
-          {undoAvailable && (
-            <button
-              type="button"
-              onClick={runUndo}
-              disabled={undoing}
-              className="ml-2 inline-flex items-center gap-1 rounded px-2 py-1 text-xs
-                         font-medium text-[rgb(var(--highlight))] transition-colors
-                         hover:bg-[rgb(var(--highlight)/0.1)] disabled:opacity-50"
-            >
-              <Undo2 className="h-3 w-3" />
-              {undoing
-                ? t('agent.undo.working', { defaultValue: 'Undoing…' })
-                : t('agent.undo.action', { defaultValue: 'Undo changes' })}
-            </button>
-          )}
-        </div>
-
-        <div className="h-px flex-1 bg-border/50" />
+    /* Same vertical rhythm as CustomModelResponse: this is a turn, not an interlude.
+       The icon sits in a fixed gutter so the text lands on one column whether it is
+       one line or three paragraphs. */
+    <div className="my-6 flex w-full items-start gap-2 text-[rgb(var(--foreground))]">
+      <Icon className={`mt-[3px] h-4 w-4 shrink-0 ${iconColor}`} />
+      <div className="min-w-0 flex-1">
+        {body}
+        {footer}
       </div>
-
-      {summaryLine}
-      {followUpHint}
     </div>
   );
 };

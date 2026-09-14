@@ -7,6 +7,8 @@
 import { create } from 'zustand';
 import { useAgentViewStore } from './agent-view-store';
 import { toolCallRecorder } from './records';
+import { DEFAULT_AGENT_ID } from './agents/registry';
+import type { AgentId } from './agents/types';
 import type {
   AgentLoopStatus,
   AgentEndReason,
@@ -94,6 +96,26 @@ export interface AgentLoopStoreState {
   /** Currently activated skill ID in this loop session */
   activeSkillId: string | null;
 
+  /**
+   * Which agent this session is running as.
+   *
+   * Fixed for the session's lifetime — it is what the prompt was built from, so changing it
+   * mid-run would leave the model holding instructions for one agent while the tool layer
+   * enforces another's permissions.
+   *
+   * Read by `tool-registry` to refuse a tool the running agent does not own. Defaults to
+   * the Better Sidebar agent rather than to null so a session started by a path that
+   * forgot to pass one still has tools rather than none.
+   *
+   * ⚠️ That default is a floor, not a substitute for passing the real value. Auto-pickup
+   * and owed-result delivery both relied on it and therefore ran every recovered session
+   * as Better Sidebar — so an interrupted Workspace task came back to
+   * `"glob_files" is not available to the Better Sidebar agent`, on a tool that had
+   * worked a round earlier. Both now derive the agent from the calls they are replaying
+   * (`mcpRegistry.agentForTools`). A new entry point must supply it too.
+   */
+  activeAgentId: AgentId;
+
   /** Conversation this session belongs to — used to scope the Agent tab */
   sessionConversationId: string | null;
 
@@ -114,7 +136,15 @@ export interface AgentLoopStoreState {
   setViewMode: (mode: 'custom' | 'original') => void;
   setAgentViewActive: (active: boolean) => void;
   setActiveSkillId: (id: string | null) => void;
-  start: (maxRounds: number, session?: { conversationId?: string | null; title?: string }) => void;
+  start: (
+    maxRounds: number,
+    session?: {
+      conversationId?: string | null;
+      title?: string;
+      /** Omitted means the default agent — see `activeAgentId`. */
+      agentId?: AgentId;
+    },
+  ) => void;
   /**
    * Tool results are in the editor — waiting for the send to go through.
    *
@@ -171,6 +201,7 @@ export const useAgentLoopStore = create<AgentLoopStoreState>((set) => ({
   viewMode: 'custom',
   isAgentViewActive: false,
   activeSkillId: null,
+  activeAgentId: DEFAULT_AGENT_ID,
   sessionConversationId: null,
   sessionTitle: null,
   endReason: null,
@@ -209,6 +240,7 @@ export const useAgentLoopStore = create<AgentLoopStoreState>((set) => ({
       pendingApproval: null,
       approveRestOfRound: false,
       activeSkillId: null,
+      activeAgentId: session?.agentId ?? DEFAULT_AGENT_ID,
       sessionConversationId: session?.conversationId ?? null,
       sessionTitle: session?.title ?? null,
       endReason: null,
@@ -322,6 +354,9 @@ export const useAgentLoopStore = create<AgentLoopStoreState>((set) => ({
       sessionConversationId: null,
       sessionTitle: null,
       activeSkillId: null,
+      // Deliberately *not* reset to the default: the Agent tab reads this to decide which
+      // agent's panel to show, and snapping back to Better Sidebar the moment a workspace
+      // task finishes would yank the file tree out from under the user mid-review.
       endReason: null,
       executedCalls: {},
     }),

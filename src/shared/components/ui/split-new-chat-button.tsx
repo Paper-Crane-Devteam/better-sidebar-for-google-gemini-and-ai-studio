@@ -16,6 +16,8 @@ interface SplitNewChatButtonProps {
   label: string;
   onClick: () => void;
   onContextMenu?: (e: React.MouseEvent) => void;
+  /** Middle-click (auxclick, button === 1) handler */
+  onMiddleClick?: (e: React.MouseEvent) => void;
   tooltip?: string;
   dropdownItems?: SplitNewChatItem[];
   dropdownTooltip?: string;
@@ -32,6 +34,7 @@ export const SplitNewChatButton = ({
   label,
   onClick,
   onContextMenu,
+  onMiddleClick,
   tooltip,
   dropdownItems,
   dropdownTooltip,
@@ -82,6 +85,18 @@ export const SplitNewChatButton = ({
               if (onContextMenu) {
                 e.preventDefault();
                 onContextMenu(e);
+              }
+            }}
+            onMouseDown={(e) => {
+              // Prevent middle-click autoscroll from kicking in
+              if (onMiddleClick && e.button === 1) {
+                e.preventDefault();
+              }
+            }}
+            onAuxClick={(e) => {
+              if (onMiddleClick && e.button === 1) {
+                e.preventDefault();
+                onMiddleClick(e);
               }
             }}
           >

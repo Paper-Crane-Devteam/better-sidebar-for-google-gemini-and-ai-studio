@@ -76,10 +76,6 @@
     "bottomLeft": "左下角",
     "bottomRight": "右下角",
     "behavior": "行为",
-    "newChatBehavior": "新建对话行为",
-    "newChatBehaviorDescription": "在哪里打开新对话",
-    "currentTab": "当前标签页",
-    "newTab": "新标签页",
     "skipDeleteConfirm": "删除对话时不再确认",
     "skipDeleteConfirmDescription": "危险：单个对话将被立即永久删除，不会弹出确认框，也无法撤销。本插件和平台上的数据都会被删除。批量删除仍会询问确认。",
     "defaultSyncFolder": "默认同步文件夹",
@@ -124,7 +120,8 @@
     "importAiStudioSystemSuccess": "已从 AI Studio 导入 {{count}} 条系统指令",
     "importAiStudioSystemNoData": "当前页面未找到 AI Studio 系统指令数据",
     "importAiStudioSystemInvalid": "AI Studio 系统指令数据格式无效",
-    "importAiStudioSystemFailed": "导入 AI Studio 系统指令失败"
+    "importAiStudioSystemFailed": "导入 AI Studio 系统指令失败",
+    "compactModeTitleHint": "你也可以点击「库」标题来切换紧凑模式哦 😉"
   },
   "prompts": {
     "inbox": "收件箱",
@@ -206,6 +203,8 @@
     "scanChatList": "导入聊天列表",
     "scanning": "扫描中...",
     "sqlQuery": "SQL 查询",
+    "enterCompactMode": "进入精简模式",
+    "exitCompactMode": "退出精简模式",
     "settings": "设置"
   },
   "about": {
@@ -218,7 +217,8 @@
     "license": "许可证",
     "sourceCode": "源代码",
     "githubRepository": "GitHub 仓库",
-    "viewChangelog": "查看更新日志"
+    "viewChangelog": "查看更新日志",
+    "userGuide": "使用教程"
   },
   "sponsor": {
     "title": "分享给朋友",
@@ -337,7 +337,13 @@
     "switchToOriginalUI": "切换到原始侧边栏",
     "temporaryChat": "临时对话",
     "toggleMenu": "切换菜单",
-    "newChatCta": "点击：新建对话 · 右键：私密对话"
+    "collapseSidebar": "收起侧边栏",
+    "account": "账户",
+    "signIn": "登录",
+    "enterCompactMode": "点击进入精简模式",
+    "exitCompactMode": "点击退出精简模式",
+    "newChatCta": "点击：新建对话 · 右键：临时对话 · 中键：在新标签页新建对话",
+    "newChatCtaAiStudio": "点击：新建对话 · 右键：临时对话 · 中键：在新标签页新建对话"
   },
   "newChatButton": {
     "dropdownTooltip": "更多新建选项",
@@ -423,7 +429,10 @@
     "name": "名称",
     "color": "图标颜色",
     "defaultColor": "默认",
-    "customColor": "自定义：",
+    "customColor": "自定义",
+    "customColorArea": "饱和度与明度",
+    "customColorHue": "色相",
+    "customColorHex": "十六进制色值",
     "defaultTargets": "默认存放来源",
     "defaultTargetsHint": "从这些 Gem 或 Notebook 发起的新对话会保存到此文件夹。",
     "addGemTarget": "Gem",
@@ -546,6 +555,9 @@
     "selectColor": "选择颜色"
   },
   "moveItemsDialog": {
+    "searchFolders": "搜索文件夹...",
+    "noMatchingFolders": "没有匹配的文件夹",
+    "clearSearch": "清除搜索",
     "rootLevel": "根目录（顶层）",
     "createFolder": "新建文件夹"
   },
@@ -679,7 +691,30 @@
     "openSourceNote": "免费开源，由一位独立开发者维护。感谢你的支持！",
     "loginRequired": "请先登录 AI 平台 — 侧边栏会在你登录平台页面后自动激活。",
     "uiUpdateNote": "如果侧边栏突然不能用了，很可能是平台 UI 更新导致的。请更新插件或稍等修复，我会第一时间处理！",
-    "feedbackNote": "遇到问题？随时使用内置的反馈功能告诉我，我会第一时间修复。请不要直接打差评哦！"
+    "feedbackNote": "遇到问题？随时使用内置的反馈功能告诉我，我会第一时间修复。请不要直接打差评哦！",
+    "ready": "准备就绪",
+    "headline": "让聊天井井有条，",
+    "headlineAccent": "让灵感自由生长。",
+    "intro": "为 Gemini 和 AI Studio 的对话打造一个舒适的家。整理重要内容，快速找回想法，让好用的提示词随手可得。",
+    "watch": "观看入门教程",
+    "previewAlt": "Better Sidebar 在 Gemini 中的真实界面",
+    "previewCaption": "你的对话，整理得恰到好处",
+    "basics": "从基础功能开始",
+    "organizeTitle": "给每段对话一个家",
+    "organizeBody": "用文件夹归纳对话，再加上标签，让不同项目各就各位。",
+    "findTitle": "好想法，随时找回",
+    "findBody": "搜索历史对话，快速回到值得保留的思路与内容。",
+    "reuseTitle": "把好用的提示词留下",
+    "reuseBody": "将常用提示词收进提示词库，下次需要时轻松复用。",
+    "startLabel": "从这里开始",
+    "choose": "选择你常用的平台",
+    "firstStep": "登录后，在平台页面打开 Better Sidebar。不妨先建一个文件夹，整理你的聊天。",
+    "tutorialTitle": "看一遍，上手更轻松。",
+    "tutorialBody": "跟着教程认识 Better Sidebar，再到自己的页面动手试试。随时暂停，需要时再回来。",
+    "openYoutube": "在 YouTube 中打开",
+    "videoNote": "点击后才会加载播放器。如果这里无法播放，可前往 YouTube 观看。",
+    "help": "需要一点帮助？",
+    "footerNote": "让每一次 AI 对话更有条理。"
   },
   "guidedTour": {
     "next": "下一步",
@@ -948,8 +983,6 @@
     "customThemesDescription": "为 Gemini 界面应用自定义视觉主题，覆盖默认配色方案。",
     "default": "默认",
     "defaultDescription": "默认主题，支持浅色/深色模式切换",
-    "classic": "Gemini 经典",
-    "classicDescription": "经典 Gemini 外观，冷蓝色调面板",
     "cupertinoGlassName": "果味毛玻璃",
     "cupertinoGlassDescription": "磨砂玻璃质感，系统原生字体，极简黑白灰，纯粹生产力",
     "grimoireName": "魔法卷轴",
@@ -976,6 +1009,18 @@
     "oceanBreezeDescription": "清新明亮的浅色主题，海洋蓝与珊瑚色点缀",
     "midnightPurpleName": "午夜紫",
     "midnightPurpleDescription": "深邃纯黑底色，紫色与靛蓝渐变点缀",
+    "gruvboxName": "暖褐复古",
+    "gruvboxDescription": "像烛光下读代码的感觉，复古土色调深色主题",
+    "everforestName": "常青森林",
+    "everforestDescription": "深林气息的深色主题，沉静的绿色底调带一点暖琥珀",
+    "highContrastName": "高对比",
+    "highContrastDescription": "纯黑白加一点琥珀色，一切为清晰可读而生",
+    "solarizedLightName": "日蚀·浅色",
+    "solarizedLightDescription": "经典 Solarized 的浅色一面，护眼、熟悉、经得起时间",
+    "sakuraName": "樱色",
+    "sakuraDescription": "柔粉与鼠尾草绿交融，像春日午后的一个轻浅的下午",
+    "graphiteName": "石墨",
+    "graphiteDescription": "纯灰阶浅色主题，只有结构，没有颜色的打扰",
     "previewBannerText": "预览模式 — 主题将在 5 分钟后恢复默认。购买支持包可永久使用。",
     "buyNow": "立即购买",
     "aiGeneratorTitle": "没有想要的主题？",
@@ -1008,7 +1053,7 @@
     "spFeature1": "永久解锁所有高级主题",
     "spFeature2": "未来新增主题免费获取",
     "spFeature3": "创建 AI 生成的自定义主题",
-    "spFeature4": "最多可在 3 台设备上激活",
+    "spFeature4": "最多 10 次激活，多个浏览器配置和多台电脑都能用",
     "getSupportPack": "获取 Support Pack",
     "powerPackTitle": "Power Pack",
     "powerPackTagline": "释放 AI 助手的全部潜能",
@@ -1035,10 +1080,10 @@
   "supportPack": {
     "title": "支持包",
     "heroTitle": "解锁高级主题",
-    "heroDescription": "精心设计的主题，让你的 AI 工作空间焕然一新。一次购买，最多 3 台设备永久使用。",
+    "heroDescription": "精心设计的主题，让你的 AI 工作空间焕然一新。一次购买，最多 10 次激活，永久使用。",
     "feature1": "永久解锁所有高级主题",
     "feature2": "未来新增主题免费获取",
-    "feature3": "最多可在 3 台设备上激活",
+    "feature3": "最多 10 次激活，多个浏览器配置和多台电脑都能用",
     "feature4": "支持独立开源开发者",
     "feature5": "创建 AI 生成的自定义主题",
     "buyButton": "获取支持包",
@@ -1050,12 +1095,29 @@
     "activate": "激活",
     "invalidToken": "格式无效。请输入 BS-SP-XXXXXXXX 或 Gumroad 许可证密钥。",
     "networkError": "网络错误，请检查网络连接后重试。",
-    "maxDevices": "已达到设备上限（3 台设备）。请先在其他设备上取消激活。",
+    "maxDevices": "10 个激活名额都用完了。到一个不再使用的浏览器配置里打开设置，点「释放这次激活」，然后再试一次。",
     "activationFailed": "激活失败，请检查激活码后重试。",
     "activationSuccess": "激活成功！所有高级主题已解锁。",
     "activatedTitle": "支持包已激活",
     "activatedDescription": "所有高级主题已解锁。感谢你对 Better Sidebar 的支持！",
-    "deactivate": "取消激活"
+    "deactivate": "取消激活",
+    "releaseDevice": "释放这次激活",
+    "releaseHint": "每个浏览器配置占用一个激活名额。释放之后可以在别处使用。",
+    "releaseConfirmTitle": "确定释放这次激活？",
+    "releaseConfirmDesc": "当前浏览器配置里的高级功能会关闭，名额会还回去给别的配置或别的电脑用。之后随时可以用同一个激活码在这里重新激活。",
+    "releaseConfirm": "释放",
+    "cancel": "取消",
+    "releaseNetworkError": "连不上授权服务器，名额没有释放成功。检查一下网络后重试。",
+    "releaseFailed": "释放失败，请重试，或者联系我们。",
+    "renewalWarningTitle": "暂时连不上授权服务器",
+    "renewalWarningDesc": "你的授权仍然有效，后台会自动重试。如果一直这样，检查一下网络连接或者 VPN / 代理设置。",
+    "renewalGraceUntil": "有效期至",
+    "retryNow": "立即重试",
+    "dismiss": "忽略",
+    "rejectedTitle": "这个授权已失效",
+    "rejectedRevoked": "授权已被撤销，通常发生在退款或支付被撤回之后。如果你觉得有误，请联系我们。",
+    "rejectedMaxDevices": "激活名额都被占满了，而这一个已经不在名单里。可以到别的浏览器配置里释放一个名额，或者联系我们。",
+    "rejectedGeneric": "授权服务器不再认可这个激活码。如果你觉得有误，请联系我们。"
   },
   "hotkeys": {
     "title": "快捷键",
@@ -1102,19 +1164,61 @@
     "launcher": {
       "title": "Agent",
       "subtitle": "和 AI 一起管理你的对话、提示词和数据。",
-      "placeholder": "描述你想完成的事…",
-      "run": "运行",
-      "skills": "或从技能开始",
-      "stageHint": "可选项 —— 直接描述你的任务，Agent 会自己挑合适的技能。在这里选一个，它会先填进输入框，你还可以补充细节再发送。",
+      "about": "关于 Agent",
       "noEditor": "请先打开一个对话，Agent 通过输入框运行。",
       "composerBusy": "正在执行的任务有结果等在输入框里。先把它发出去，再试一次。",
       "sessionBusy": "已经有任务在执行了。先完成或停止它，再开始新的。",
       "stopRunning": "停止正在执行的任务",
       "safety": "只操作本地数据库，修改前会先向你确认。",
       "freeTier": "免费版只能读取。升级后 Agent 才能修改数据。",
-      "manage": "管理技能与工具",
-      "newChatHint": "在你打开的聊天中运行。开个新聊天可以保持整洁。",
-      "triggerHint": "在聊天输入框输入 > 也能从那里启动智能体。"
+      "manage": "技能与工具",
+      "workspace": "工作区",
+      "stepsTitle": "如何使用",
+      "step1": "打开任意一个聊天窗口。",
+      "step2": "在输入框中键入 >，选中 Agent。",
+      "step3": "写下你的需求，回车发送。",
+      "examplesTitle": "试试这样问",
+      "examplesHint": "点击即可填入输入框，发送前可以继续修改。需求描述越清晰，执行效果越好。",
+      "examplesHintLabel": "用法说明",
+      "examplePick": "填入输入框",
+      "workspaceHint": "Agent 读写文件的工作区",
+      "manageHint": "设置 Agent 的能力边界与确认机制",
+      "examplePrev": "上一个例子",
+      "exampleNext": "下一个例子",
+      "examples": {
+        "classify": {
+          "label": "整理聊天记录",
+          "text": "帮我整理下未归类的对话：先按主题分组并给我看下方案。如果现有文件夹不合适，就新建文件夹再移进去。最后根据内容给每个对话打上标签，尽量复用已有的标签，不要创建一堆意思重复的。"
+        },
+        "search": {
+          "label": "深度搜索",
+          "text": "帮我找出所有提到「Docker 部署」的内容。要全面搜索对话、消息正文和代码片段，不要只搜标题。按最近活跃时间倒序排列，每条给出一句话摘要，并说明它所在的文件夹。"
+        },
+        "export": {
+          "label": "批量导出存档",
+          "text": "把「工作」文件夹里 3 月以后的对话全部导出为 Markdown 格式，每个对话单独存一个文件，最后打包成 zip。如果有对话还没同步消息内容，在导出前先列出来告诉我。"
+        },
+        "sync": {
+          "label": "同步缺失记录",
+          "text": "帮我查下有多少对话是只有标题而没存下消息的。先告诉我总数，把最近的排在前面，然后帮我同步最近 20 个对话的消息内容，以确保后续搜索和导出时能包含它们。"
+        },
+        "prompts": {
+          "label": "重构提示词库",
+          "text": "帮我整理下提示词库：把那些用 / 很难搜到的提示词重命名，把核心关键词放在标题最前面；把几个提示词里重复的「角色设定+输出格式」抽离成公共提示词，并在其他地方使用引用；对于只有几个固定选项的变量，全部改成下拉菜单形式。"
+        },
+        "snippets": {
+          "label": "清理片段收件箱",
+          "text": "我的代码片段收件箱太乱了，帮我按主题分类移到不同的文件夹里。如果标题还是我当时的提问，请帮我精简成一句话概括。遇到重复保存的内容只保留最早的一份。在执行任何删除操作前，先让我确认下清单。"
+        },
+        "workspace": {
+          "label": "记录讨论结论",
+          "text": "把我们这次对话中定下来的结论总结成要点列表，保存到工作区的 notes/decisions.md 文件中，并在最后附上待确认的问题。如果该文件已存在，请在末尾加上今天的日期并追加内容，不要覆盖原文件。"
+        },
+        "stats": {
+          "label": "统计对话数据",
+          "text": "帮我做一张统计表：列出每个文件夹的对话数量、最近一个月新增的对话数，以及哪些文件夹已经三个月没活跃过了。最后根据这些数据，给我一些合并文件夹的建议。"
+        }
+      }
     },
     "send": {
       "sessionBusy": "已经有任务在执行了，这条没有发出去。先停止它，然后再按一次回车。",
@@ -1224,7 +1328,16 @@
       "viewPrompt": "点击查看完整提示词",
       "systemPrompt": "系统提示词",
       "resultsTitle": "工具结果",
-      "promptTitle": "提示词内容"
+      "promptTitle": "提示词内容",
+      "readFile": "读取文件",
+      "writeFile": "写入文件",
+      "editFile": "编辑文件",
+      "listFiles": "查看工作区",
+      "globFiles": "查找文件",
+      "grepFiles": "搜索文件内容",
+      "manageFiles": "管理文件",
+      "docRead": "读取文档",
+      "docEdit": "标注文档"
     },
     "sync": {
       "progress": "正在获取对话内容 — {{current}}/{{total}}",
@@ -1254,6 +1367,7 @@
       "noToolCallDesc": "Agent 最后的回复没有执行任何操作。可以在聊天里看看内容，如果任务还需要做，重新发起一次。",
       "ended": "会话结束",
       "paywallDesc": "免费版只允许 Agent 读取数据，升级后可以修改。",
+      "paywallWorkspaceDesc": "免费版支持 1 个工作区（最多 {{max}} 个文件）。升级即可无限制使用。",
       "paywallFeature": "Agent 数据库写入",
       "steps_one": "执行了 {{count}} 步",
       "steps_other": "执行了 {{count}} 步",
@@ -1326,7 +1440,12 @@
       "maxSkills": "已达到 20 个自定义技能的上限。",
       "mcpTitle": "MCP 服务器",
       "mcpDescription": "MCP 服务器为智能体提供工具。",
-      "mcpToolCount": "{{count}} 个工具"
+      "mcpToolCount": "{{count}} 个工具",
+      "agentsTitle": "Agent",
+      "agentsDesc": "每个 Agent 处理的东西不同，工具也各自独立。在输入框打 > 就能启动。",
+      "noTools": "没有可选工具。",
+      "noSkills": "还没有技能。这个 Agent 直接按自己的说明干活。",
+      "builtinSkillNote": "内置技能可以关掉，但不能编辑。"
     },
     "skills": {
       "autoClassify": {
@@ -1348,6 +1467,18 @@
       "manageSnippets": {
         "title": "管理片段",
         "description": "整理、去重和搜索已保存的片段 — 包括全文内容"
+      },
+      "workspace": {
+        "title": "工作区助手",
+        "description": "在私有工作区中读写、编辑和搜索文件"
+      },
+      "docxReview": {
+        "title": "审阅 Word 文档",
+        "description": "逐章读完 .docx — 在问题处留下批注，修改则以修订形式提出"
+      },
+      "spreadsheetAnalysis": {
+        "title": "处理表格数据",
+        "description": "读 .xlsx 先看结构再动手算 — 用加列、加工作表的方式，不改原始数据"
       }
     },
     "mcp": {
@@ -1360,12 +1491,75 @@
         "execute_sql": "在本地数据库上运行 SQL 查询",
         "sync_conversation_messages": "为没有消息记录的对话补录历史",
         "export": "将对话导出为文件",
-        "complete_task": "结束智能体循环并汇报结果"
+        "complete_task": "结束智能体循环并汇报结果",
+        "doc_read": "读取 Word 文档：大纲、章节与搜索",
+        "read_file": "读取文本文件，带行号",
+        "write_file": "新建文件或整体覆盖",
+        "edit_file": "替换文件里的指定文本",
+        "list_files": "列出文件夹里的内容",
+        "glob_files": "按名称模式查找文件",
+        "grep_files": "用正则搜索文件内容",
+        "manage_files": "删除、移动或新建文件夹"
+      },
+      "documents": {
+        "name": "文档",
+        "description": "按大纲和章节读取 Word 文档"
+      },
+      "workspace": {
+        "name": "文件",
+        "description": "读写、编辑和搜索文本文件"
+      },
+      "core": {
+        "name": "核心",
+        "description": "所有 Agent 共用，且始终启用。"
+      },
+      "bettersidebar": {
+        "name": "Better Sidebar 数据",
+        "description": "查询和修改对话、文件夹、标签和提示词"
       }
     },
     "entry": {
       "autoTitle": "Better Sidebar 智能体",
       "autoDescription": "描述一个任务，让智能体选择合适的工具"
+    },
+    "workspace": {
+      "title": "工作区",
+      "create": "新建工作区",
+      "delete": "删除此工作区",
+      "clearAll": "清空所有文件",
+      "clearTitle": "清空工作区",
+      "deleteTitle": "删除工作区",
+      "namePlaceholder": "工作区名称",
+      "empty": "暂无文件。让 AI 助手写入内容后会显示在这里。",
+      "emptyFile": "文件为空。",
+      "lockedHint": "此对话已使用\"{name}\"工作区，如需切换请开启新对话。",
+      "busyHint": "任务运行中，请完成或停止后再切换。",
+      "paywallWorkspaces": "创建多个工作区",
+      "paywallFiles": "工作区文件数超过 {{max}} 个",
+      "paywallFilesSkipped": "已忽略 {{files}} 个文件 —— 免费版工作区最多支持 {{max}} 个文件",
+      "clearWarning": "删除\"{name}\"中的所有 {fileCount} 个文件？此操作无法撤销。",
+      "deleteWarning": "删除工作区\"{name}\"及其中 {fileCount} 个文件？已使用此工作区的对话将无法再读写文件。此操作无法撤销。"
+    },
+    "agents": {
+      "bettersidebar": {
+        "name": "Better Sidebar",
+        "description": "整理对话、文件夹、标签、提示词和片段"
+      },
+      "workspace": {
+        "name": "工作区",
+        "description": "读写和编辑工作区里的文件与文档"
+      }
+    },
+    "switcher": {
+      "label": "选择 Agent"
+    },
+    "workspaceIntro": {
+      "title": "与 AI 一起处理您的工作区文档",
+      "body": "这里的文件跨对话保留，Gemini 和 AI Studio 共用同一份。在输入框打 > Workspace 就能让它开始干活。",
+      "detail": "文本文件直接读写；Word 文档按大纲和章节读取。它看不到你的对话，也看不到工作区以外的任何东西，每次改动都会先跟你确认。",
+      "about": "关于工作区",
+      "howToUseTitle": "如何使用 Workspace",
+      "howToUseContent": "Workspace 是您的专属文件工作区，AI 可以直接读取、写入、精准修改并从零创建文档与代码。\n\n如何使用：\n在聊天输入框中输入 >Workspace 即可唤起 Agent。您可以将本地已有文件拖入工作区让 AI 处理，也可以直接对它下指令，让 AI 从零为您创建新文件（例如从零开发一个完整的前端项目）。\n\n支持的功能与格式：\n- 纯文本与代码（.html, .js, .ts, .py, .md, .txt 等）：支持从零创建与精准编辑！可直接让 AI 从零搭建前端项目、编写脚本、起草 Markdown 笔记，或对现有代码进行检索和局部重构。\n- Word 文档 (.docx)：逐章审阅论文、通过修订模式改写段落（可在 Word 中逐条确认接受/拒绝）、添加批注意见（需上传现有文件）。\n- Excel 表格 (.xlsx/.csv)：数据分析、编写计算公式、添加数据列，且不破坏原有图表与排版格式（需上传现有文件）。\n- PDF 文档：阅读文献与报告、提取文字、合并页面、添加批注与高亮（需上传现有文件）。\n- 演示文稿 (.pptx)：读取与编辑每页幻灯片文本及演讲者备注（需上传现有文件）。\n- 字幕文件 (.srt/.vtt)：翻译与润色字幕内容，严格保持时间轴对齐（需上传现有文件）。\n\n💡 提示：文本与代码类文件支持由 AI 从零创建及随时修改；Word/Excel/PPT/PDF 等特殊格式目前支持基于已有文件的读取、批注与精准修改（保护原有排版不乱）。"
     }
   },
   "backup": {

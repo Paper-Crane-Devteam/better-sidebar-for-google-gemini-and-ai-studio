@@ -65,10 +65,38 @@
     border-radius: var(--radius) !important;
   }
 
+  /* Line weight for the rail glyphs. Both icon sets ship a 2px stroke baked in
+     as an SVG presentation attribute, which any CSS rule outranks — so this one
+     declaration retunes them all without touching a single component.
+       - lucide-react puts stroke-width on the root <svg>, so the paths inherit
+         it and the rule below is redundant for them.
+       - Iconify inlines tabler markup that carries stroke-width on the inner
+         <g>/<path>. An element's own attribute beats a value inherited from the
+         parent <svg>, so those children need `inherit` spelled out to pick this
+         up.
+     Filled glyphs (e.g. codicon) have no stroke and are unaffected, as is the
+     account avatar, which is an <img> (.sidebar-avatar). */
   .sidebar-icon {
     width: var(--sidebar-icon-size) !important;
     height: var(--sidebar-icon-size) !important;
     color: rgb(var(--sidebar-icon-color));
+    stroke-width: var(--sidebar-icon-stroke, 1.75);
+  }
+
+  .sidebar-icon :is(g, path, circle, ellipse, rect, line, polyline, polygon) {
+    stroke-width: inherit;
+  }
+
+  /* Account avatar standing in for a sidebar icon. Sized a touch larger than
+     --sidebar-icon-size because a filled circle reads smaller than a line icon
+     of the same box, and given a hairline rim so a light photo does not bleed
+     into a light panel. */
+  .sidebar-avatar {
+    width: calc(var(--sidebar-icon-size) + 4px) !important;
+    height: calc(var(--sidebar-icon-size) + 4px) !important;
+    border-radius: 9999px;
+    object-fit: cover;
+    box-shadow: 0 0 0 1px rgb(var(--border));
   }
 
   * {

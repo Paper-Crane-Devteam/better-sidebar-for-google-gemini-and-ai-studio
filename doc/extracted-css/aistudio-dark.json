@@ -1,0 +1,7 @@
+{
+    "--conic-blue-color": "rgba(66, 133, 244, 0.55)",
+    "--conic-green-color": "rgba(26, 166, 74, 0.5)",
+    "--conic-yellow-color": "rgba(252, 189, 0, 0.5)",
+    "--conic-red-color": "rgba(219, 55, 45, 0.5)",
+    "--mat-pseudo-checkbox-minimal-selected-checkmark-color": "#007bc9"
+}

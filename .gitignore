@@ -15,12 +15,14 @@ dist-ssr
 .dev-profile
 .dev-profile-firefox
 misc/
-package-lock.json
 
 # WXT
 .wxt
 .output
 
+# devtap output: console dumps and snapshots of a live dev browser. Transient,
+# and they contain real conversation data from whatever profile was open.
+.kiro/devlog/
 # Editor directories and files
 .vscode/*
 .cursor/

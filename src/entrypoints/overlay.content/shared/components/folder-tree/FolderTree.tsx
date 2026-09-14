@@ -2,6 +2,7 @@ import React, { forwardRef, useImperativeHandle } from 'react';
 import { Tree, NodeRendererProps, RowRendererProps } from 'react-arborist';
 import { FolderTreeNodeData, FolderTreeHandle } from './types';
 import { useFolderTree, UseFolderTreeOptions } from './useFolderTree';
+import { getTreeDndManager } from './dnd-manager';
 
 export interface FolderTreeProps extends UseFolderTreeOptions {
   /** Tree data (already transformed into hierarchy) */
@@ -28,6 +29,7 @@ export const FolderTree = forwardRef<FolderTreeHandle, FolderTreeProps>(
       onRename,
       onDelete,
       handleToggle,
+      handleKeyDown,
     } = useFolderTree(hookOptions);
 
     const rowHeight = rowHeightProp ?? 32;
@@ -49,7 +51,13 @@ export const FolderTree = forwardRef<FolderTreeHandle, FolderTreeProps>(
     }));
 
     return (
-      <div ref={containerRef} className="h-full w-full pl-1">
+      <div
+        ref={containerRef}
+        className="h-full w-full pl-1"
+        // Capture phase so Delete/F2 are claimed before react-arborist's own
+        // container handler feeds them into its type-ahead search buffer.
+        onKeyDownCapture={handleKeyDown}
+      >
         <Tree
           padding={2}
           ref={treeRef}
@@ -65,6 +73,11 @@ export const FolderTree = forwardRef<FolderTreeHandle, FolderTreeProps>(
           rowHeight={rowHeight}
           openByDefault={false}
           initialOpenState={initialOpenState}
+          // Our own manager, so react-dnd never falls back to its `window`-cached
+          // singleton. That cache is released on a ref count that does not track the
+          // HTML5 backend's teardown, and a tree mounting into the gap between the two
+          // throws "Cannot have two HTML5 backends at the same time." See `dnd-manager`.
+          dndManager={getTreeDndManager()}
 
           renderRow={renderRow}
         >

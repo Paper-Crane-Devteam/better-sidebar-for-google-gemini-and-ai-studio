@@ -6,7 +6,6 @@ import { SimpleTooltip } from '@/shared/components/ui/tooltip';
 import { Database, X, ChevronUp, ChevronDown, Filter, ChevronLeft, ChevronRight, GripHorizontal } from 'lucide-react';
 import { applyShadowStyles } from '@/shared/lib/utils';
 import { bindShadowRootToTheme } from '@/themes';
-import { useSettingsStore } from '@/shared/lib/settings-store';
 import mainStyles from '@/index.scss?inline';
 
 const PAGE_SIZE = 10;
@@ -43,11 +42,7 @@ function useSqlPortal() {
     applyShadowStyles(shadow, mainStyles);
 
     const root = document.createElement('div');
-    root.classList.add('shadow-body');
-
-    // Theme class
-    const geminiStyle = useSettingsStore.getState().geminiStyle;
-    root.classList.add(geminiStyle === 'classic' ? 'theme-gemini-classic' : 'theme-gemini');
+    root.classList.add('shadow-body', 'theme-gemini');
 
     // Dark mode sync
     const syncTheme = () => {

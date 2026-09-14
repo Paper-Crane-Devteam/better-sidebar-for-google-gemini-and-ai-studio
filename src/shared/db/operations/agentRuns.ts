@@ -77,6 +77,37 @@ export const agentSessionRepo = {
       [conversationId],
     )) as AgentSessionRow[];
   },
+
+  /**
+   * Record which workspace a session's file operations went to.
+   *
+   * `WHERE workspace_id IS NULL` makes this write-once: the first workspace a session
+   * touched is the one it stays bound to, so a later call cannot move it. Re-running
+   * the statement is therefore harmless.
+   */
+  bindWorkspace: async (sessionId: string, workspaceId: string): Promise<void> => {
+    await runCommand(
+      'UPDATE agent_sessions SET workspace_id = ? WHERE id = ? AND workspace_id IS NULL',
+      [workspaceId, sessionId],
+    );
+  },
+
+  /**
+   * The workspace a conversation is locked to, if any.
+   *
+   * Scoped by conversation rather than session because the lock is a property of the
+   * chat: a conversation can run several sessions, and the second one must land in the
+   * same workspace as the first.
+   */
+  boundWorkspace: async (conversationId: string): Promise<string | null> => {
+    const rows = await runQuery(
+      `SELECT workspace_id FROM agent_sessions
+        WHERE conversation_id = ? AND workspace_id IS NOT NULL
+        ORDER BY started_at ASC LIMIT 1`,
+      [conversationId],
+    );
+    return (rows[0] as { workspace_id?: string } | undefined)?.workspace_id ?? null;
+  },
 };
 
 export const agentToolCallRepo = {

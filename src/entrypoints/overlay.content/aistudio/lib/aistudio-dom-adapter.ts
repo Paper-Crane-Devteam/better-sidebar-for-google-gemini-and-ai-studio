@@ -13,6 +13,8 @@
 
 import type { PlatformDomAdapter } from '@/shared/lib/platform-dom-adapter';
 import type { ConversationMessage } from '@/shared/lib/conversation-messages-store';
+import { RESERVED_CONVERSATION_SEGMENTS } from '@/entrypoints/overlay.content/shared/hooks/useCurrentConversationId';
+import { Platform } from '@/shared/types/platform';
 
 // AI Studio URL pattern: /prompts/{id}
 const AISTUDIO_PROMPT_ID_RE = /\/prompts\/([a-zA-Z0-9_-]+)/;
@@ -55,8 +57,10 @@ export const aistudioDomAdapter: PlatformDomAdapter = {
     const match = AISTUDIO_PROMPT_ID_RE.exec(path);
     if (!match) return null;
     const id = match[1];
-    // Exclude non-conversation paths like "new_chat"
-    if (id === 'new_chat') return null;
+    // Route segments that sit where an id goes. Shared with `readConversationIdFromPath`
+    // rather than re-listed here: the two answering this differently is what the agent
+    // loop's session binding breaks on.
+    if ((RESERVED_CONVERSATION_SEGMENTS[Platform.AI_STUDIO] ?? []).includes(id)) return null;
     return id;
   },
 

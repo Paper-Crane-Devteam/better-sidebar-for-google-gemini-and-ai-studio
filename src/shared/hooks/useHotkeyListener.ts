@@ -20,12 +20,22 @@ import {
  * from stores and performs the side effect. No React component coupling.
  */
 const actionHandlers: Record<HotkeyActionId, () => void> = {
+  /**
+   * Collapse or expand the native sidebar.
+   *
+   * Clicks the platform's own control rather than writing our state directly, so
+   * the real animation runs and the observers that mirror the collapsed state
+   * stay in agreement with the page.
+   *
+   * Dispatched on the detected platform instead of trying one platform's
+   * selectors and falling through to the other's. The fall-through worked while
+   * the two selector sets could not both match, but AI Studio's toggle now
+   * depends on which direction it is going, so "did the click land" is no longer
+   * a reliable signal for "is this AI Studio".
+   */
   toggleSidebar: () => {
-    // Trigger the native sidebar toggle button instead of directly modifying
-    // state, so that the actual sidebar animation fires and observers keep
-    // state in sync.
-    if (toggleAIStudioSidebar()) return;
-    toggleGeminiSidebar();
+    if (detectPlatform() === Platform.AI_STUDIO) toggleAIStudioSidebar();
+    else toggleGeminiSidebar();
   },
 
   newConversation: () => {

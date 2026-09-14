@@ -25,9 +25,9 @@ import React, { useEffect, useState } from 'react';
 import { cn } from '@/shared/lib/utils/utils';
 import { useAgentLoopStore } from '../agent-loop/agent-loop-store';
 import { useAgentRecordStore } from '../agent-loop/agent-record-store';
-import { useUndoAvailable, useUndoWasUndone } from '../agent-loop/undo';
 import { useCurrentConversationId } from '../../hooks/useCurrentConversationId';
 import { useComposerAnchor } from './useComposerAnchor';
+import { useSessionSummary } from './useSessionSummary';
 import { AgentDockPill } from './components/AgentDockPill';
 import { AgentApproval } from './components/AgentApproval';
 import { AgentContinuePrompt } from './components/AgentContinuePrompt';
@@ -58,11 +58,9 @@ export const AgentDock: React.FC<AgentDockProps> = ({ hidden }) => {
   const checkInSteps = useAgentLoopStore((s) => s.checkInSteps);
   const awaitingUserSend = useAgentLoopStore((s) => s.awaitingUserSend);
   const sessionConversationId = useAgentLoopStore((s) => s.sessionConversationId);
-  const history = useAgentLoopStore((s) => s.history);
   const owed = useAgentRecordStore((s) => s.owed);
-  const undoAvailable = useUndoAvailable();
-  const undone = useUndoWasUndone();
   const conversationId = useCurrentConversationId();
+  const { worthShowing } = useSessionSummary();
 
   const [collapsed, setCollapsed] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -78,24 +76,6 @@ export const AgentDock: React.FC<AgentDockProps> = ({ hidden }) => {
   const belongsToCurrent =
     sessionConversationId === null || sessionConversationId === conversationId;
 
-  const failedSteps = history.reduce(
-    (sum, h) => sum + h.results.filter((r) => !r.success).length,
-    0,
-  );
-
-  /**
-   * Whether a finished session has anything for the user to *do*.
-   *
-   * A run that completed cleanly and left nothing to revert has nothing to offer here:
-   * the conversation already ends with its own "Task finished" divider, so a floating
-   * card over the composer saying the same thing is a second announcement of an event
-   * the user just watched happen. Worse, it needs dismissing.
-   *
-   * The cases that keep it are the ones with a button on them: an upgrade prompt, a
-   * failure worth noticing, an undo offer, or a restore that just rewrote history.
-   */
-  const finishedNeedsAttention =
-    endReason !== 'complete' || failedSteps > 0 || undoAvailable || undone;
   const isFinished = !isRunning && endReason !== null;
 
   /**
@@ -109,10 +89,17 @@ export const AgentDock: React.FC<AgentDockProps> = ({ hidden }) => {
   const hasOwedResults =
     owed !== null && owed.conversationId === conversationId && !isRunning;
 
+  /**
+   * ⚠️ A finished session is gated on `worthShowing` — the same value
+   * `AgentSessionSummary` uses to decide whether it renders anything. The dock used to
+   * decide this for itself, and when the card learned to stay quiet after a
+   * `no_tool_call` finish this rule did not follow: the container opened around a body
+   * where every card returned null, leaving a blank bar over the composer that nothing
+   * could dismiss and the auto-reset skipped.
+   */
   const visible =
     !hidden &&
-    ((hasSession && belongsToCurrent && (!isFinished || finishedNeedsAttention)) ||
-      hasOwedResults);
+    ((hasSession && belongsToCurrent && (!isFinished || worthShowing)) || hasOwedResults);
   const anchor = useComposerAnchor(visible);
 
   // Adopt the conversation id once the platform assigns one — including after the
@@ -133,9 +120,9 @@ export const AgentDock: React.FC<AgentDockProps> = ({ hidden }) => {
   /**
    * Clear the session state behind a finish nobody has to act on.
    *
-   * Nothing is on screen for this case any more (see `finishedNeedsAttention`), so the
-   * delay isn't about giving the user time to read — it's slack for `undoAvailable`
-   * and the rest to settle before the state they're read from is thrown away.
+   * Nothing is on screen for this case (see `worthShowing`), so the delay isn't about
+   * giving the user time to read — it's slack for the undo state and the rest to settle
+   * before what they're read from is thrown away.
    *
    * Deliberately not applied to the cases that *do* show a card: an earlier version
    * auto-reset every ended session, which discarded the paywall's upgrade button and
@@ -143,11 +130,11 @@ export const AgentDock: React.FC<AgentDockProps> = ({ hidden }) => {
    */
   useEffect(() => {
     if (isRunning || endReason === null || !belongsToCurrent) return;
-    if (finishedNeedsAttention) return;
+    if (worthShowing) return;
 
     const timer = setTimeout(() => useAgentLoopStore.getState().reset(), 4000);
     return () => clearTimeout(timer);
-  }, [isRunning, endReason, belongsToCurrent, finishedNeedsAttention]);
+  }, [isRunning, endReason, belongsToCurrent, worthShowing]);
 
   /**
    * Identifies *which* decision is currently pending, so a new one can re-open a dock

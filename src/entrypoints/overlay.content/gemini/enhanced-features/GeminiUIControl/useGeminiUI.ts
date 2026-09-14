@@ -1,8 +1,15 @@
 import { useState, useEffect } from 'react';
 import { usePegasusStore } from '@/shared/lib/pegasus-store';
 import { useAppStore } from '@/shared/lib/store';
+import { useSettingsStore } from '@/shared/lib/settings-store';
 import { waitForElement } from '@/shared/lib/utils';
 import { useUrl } from '@/shared/hooks/useUrl';
+
+/**
+ * Width of the sidebar's left icon bar. Mirrors `--sidebar-width` in
+ * _gemini.scss and the `--bard-sidenav-closed-width` set in Layout.tsx.
+ */
+const ICON_BAR_WIDTH = 56;
 
 export const useGeminiUI = () => {
   const geminiSettings = usePegasusStore((s) => s.enhancedFeatures?.gemini);
@@ -24,6 +31,17 @@ export const useGeminiUI = () => {
   const isGemsCreatePage = path.includes('/gems/create');
 
   const isSidebarExpanded = useAppStore((s) => s.ui.overlay.isSidebarExpanded);
+  const compactMode = useSettingsStore((s) => s.compactMode);
+
+  /**
+   * Compact mode shrinks the whole sidenav by the icon bar's width
+   * rather than letting the content area stretch into the freed space. That
+   * keeps the conversation tree exactly as wide as before, so toggling the
+   * icon bar never reflows the tree — only the sidebar's right edge moves.
+   */
+  const effectiveSidebarWidth = compactMode
+    ? storeSidebarWidth - ICON_BAR_WIDTH
+    : storeSidebarWidth;
 
   const [showUpgradeOption, setShowUpgradeOption] = useState(false);
 
@@ -114,7 +132,7 @@ export const useGeminiUI = () => {
     // Layout Widths
     css += `
       bard-sidenav { 
-        --bard-sidenav-open-width: ${storeSidebarWidth}px !important; 
+        --bard-sidenav-open-width: ${effectiveSidebarWidth}px !important; 
       }
     `;
 
@@ -177,7 +195,7 @@ export const useGeminiUI = () => {
     // [DEPRECATED] hideBrand,
     hideDisclaimer,
     hideUpgrade,
-    storeSidebarWidth,
+    effectiveSidebarWidth,
     storeChatWidth,
     storeInputWidth,
     // [DEPRECATED] geminiSettings.showTopBarTag,

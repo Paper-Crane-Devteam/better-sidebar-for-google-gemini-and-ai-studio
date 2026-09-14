@@ -1,18 +1,19 @@
 /**
  * MCP Schema Generator.
  *
- * Generates the tool schema text section for injection into the Soul prompt.
- * Lists all tools from all enabled MCP servers, grouped by server.
+ * Renders the "Available Tools" section of a soul prompt: the tools of whichever servers
+ * the running agent owns and the user has switched on.
+ *
+ * ⚠️ Scoped by agent, and that is not cosmetic. Listing every tool would tell the Workspace
+ * agent that `execute_sql` exists while its prompt contains no schema — so its first
+ * instinct on any data question would be to invent SQL against tables it has never seen.
  */
 
 import { mcpRegistry } from './registry';
+import type { AgentId } from '../agents/types';
 
-/**
- * Generate tool schema prompt section for all enabled MCP servers.
- * Output format is human-readable markdown suitable for prompt injection.
- */
-export function generateToolSchemaPrompt(): string {
-  const servers = mcpRegistry.getEnabledServers();
+export function generateToolSchemaPrompt(agentId: AgentId): string {
+  const servers = mcpRegistry.getServersForAgent(agentId);
 
   if (servers.length === 0) return 'No tools available.';
 

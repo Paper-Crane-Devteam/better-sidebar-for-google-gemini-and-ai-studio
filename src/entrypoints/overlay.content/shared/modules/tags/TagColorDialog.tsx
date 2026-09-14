@@ -27,6 +27,8 @@ export const TagColorDialog = ({
         size="lg"
         selectedColor={color}
         onColorChange={(c) => setColor(c)}
+        allowCustom
+        inlineCustom
       />
     </div>
   );

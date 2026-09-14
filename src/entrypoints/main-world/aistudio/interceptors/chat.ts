@@ -1,4 +1,5 @@
 import { parseConversation } from '../lib/response-parser';
+import { trace } from '@/shared/lib/trace';
 
 export function handleChatResponse(response: any, url: string) {
   if (response.status === 200 || response.response) {
@@ -19,7 +20,10 @@ export function handleChatResponse(response: any, url: string) {
     const parsedData = parseConversation(json);
 
     if (parsedData && parsedData.messages.length > 0) {
-      console.log('Better Sidebar: Successfully parsed chat data', parsedData);
+      console.log(
+        `Better Sidebar: Parsed chat data, ${parsedData.messages.length} message(s)`,
+      );
+      trace('Better Sidebar: Parsed chat data:', parsedData);
 
       globalThis.dispatchEvent(
         new CustomEvent('AI_STUDIO_RESPONSE', {

@@ -44,12 +44,17 @@ import { useModuleConfig } from './useModuleConfig';
 import { toast } from '@/shared/lib/toast';
 import { detectAccount } from '@/entrypoints/content/shared/detect-account';
 import { Platform } from '@/shared/types/platform';
-import { useBadgeStore } from '@/shared/lib/badge-store';
-import { BadgeDot } from '@/shared/components/ui/badge-dot';
+import { trace } from '@/shared/lib/trace';
+import { useBadge } from '@/shared/lib/badge-store';
+import { FeatureBadge } from '@/shared/components/ui/badge-dot';
 
 import { useHotkeyListener } from '@/shared/hooks/useHotkeyListener';
 
 import { toggleGeminiSidebar } from '@/shared/lib/dom-selectors';
+import {
+  AccountButton,
+  GEMINI_ACCOUNT,
+} from '../shared/components/AccountButton';
 
 export const OverlayPanel = ({ className }: { className?: string }) => {
   const moduleConfig = useModuleConfig();
@@ -59,8 +64,9 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
   const { path } = useUrl();
 
   const shortcuts = useSettingsStore((state) => state.shortcuts);
+  const compactMode = useSettingsStore((state) => state.compactMode);
   const sparkAvailable = isSparkAvailable();
-  const hasSettingsBadge = useBadgeStore((s) => s.isGroupVisible('settings.'));
+  const agentBadge = useBadge('tab.agent');
 
   const {
     fetchData,
@@ -84,6 +90,10 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
   } = ui.overlay;
 
   useEffect(() => {
+    if (compactMode && activeTab !== 'files') setActiveTab('files');
+  }, [compactMode, activeTab, setActiveTab]);
+
+  useEffect(() => {
     // Initial fetch
     fetchData();
 
@@ -98,7 +108,6 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
         // Only process in the active tab — background DB may belong to another profile
         if (document.visibilityState !== 'visible') return;
 
-        console.log('Received DATA_UPDATED signal, refreshing...');
         fetchData(true);
 
         // Handle specific update types with payload
@@ -126,7 +135,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
   useEffect(() => {
     const handleVisibilityChange = async () => {
       if (document.visibilityState === 'visible') {
-        console.log('Tab became visible, syncing profile and refreshing...');
+        trace('Tab became visible, syncing profile and refreshing...');
         try {
           const username = await detectAccount(Platform.GEMINI);
           if (username) {
@@ -167,6 +176,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
       setIsSettingsOpen(true);
       return;
     }
+    if (tab === 'agent') agentBadge.dismiss();
     setActiveTab(tab);
   };
 
@@ -184,8 +194,14 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
     <div
       className={`flex bg-background text-foreground ${className || 'h-full'} relative overflow-hidden`}
     >
-      {/* Sidebar Tabs */}
-      <div className="sidebar-nav flex flex-col items-center shrink-0">
+      {/* Sidebar Tabs — hidden in expanded view when the user opts for a
+          clutter-free tree. Kept in collapsed view since it is the only
+          entry point there. */}
+      <div
+        className={`sidebar-nav flex flex-col items-center shrink-0 ${
+          isSidebarExpanded && compactMode ? 'hidden' : ''
+        }`}
+      >
         <SimpleTooltip content={t('tooltip.toggleMenu')}>
           <Button
             variant="ghost"
@@ -236,9 +252,10 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               className="sidebar-btn transition-all relative"
             >
               <Settings className="sidebar-icon" />
-              <BadgeDot visible={hasSettingsBadge} className="absolute top-1.5 right-1.5" />
+              <FeatureBadge badgeKey="settings." group />
             </Button>
           </SimpleTooltip>
+          <AccountButton config={GEMINI_ACCOUNT} />
         </div>
 
         <div
@@ -290,6 +307,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               data-tour-id="tour-agent"
             >
               <Bot className="sidebar-icon" />
+              <FeatureBadge badgeKey="tab.agent" />
             </Button>
           </SimpleTooltip>
           <SimpleTooltip content={t('tabs.tags')}>
@@ -425,18 +443,26 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
               data-tour-id="tour-settings"
             >
               <Settings className="sidebar-icon" />
-              <BadgeDot visible={hasSettingsBadge} className="absolute top-1.5 right-1.5" />
+              <FeatureBadge badgeKey="settings." group />
             </Button>
           </SimpleTooltip>
+          <AccountButton config={GEMINI_ACCOUNT} />
         </div>
       </div>
 
-      {/* Main Content Area */}
+      {/* Main Content Area.
+          With the icon bar hidden, useGeminiUI already shrank
+          --bard-sidenav-open-width by the icon bar's width, so taking the full
+          open width here yields the exact same content width as the
+          `open - closed` expression below. Net effect: the tree keeps its
+          width and only the sidebar's right edge moves. */}
       <div
         className={`flex flex-col px-1 pt-1`}
         style={{
           width:
-            'calc(var(--bard-sidenav-open-width, 360px) - var(--bard-sidenav-closed-width, 64px))',
+            isSidebarExpanded && compactMode
+              ? 'var(--bard-sidenav-open-width, 360px)'
+              : 'calc(var(--bard-sidenav-open-width, 360px) - var(--bard-sidenav-closed-width, 64px))',
           flexShrink: 0,
         }}
       >

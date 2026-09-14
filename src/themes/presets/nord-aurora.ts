@@ -17,16 +17,23 @@ export const nordAurora: ThemePreset = {
   isPremium: true,
   preferredMode: 'dark',
   fonts: ['Inter:wght@300;400;500;600'],
-  extraCss: `
-/* Subtle aurora gradient on page background */
-body.bs-theme--nord-aurora {
+  fontCss: `
+/* Nord Aurora font override */
+body.bs-fonts--nord-aurora {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
 }
 
-body.bs-theme--nord-aurora *:not(.material-symbols-outlined):not(.material-symbols-rounded):not(.material-symbols-sharp):not(.google-symbols):not(mat-icon):not(.mat-icon):not([class*="material-symbols"]):not([class*="google-symbols"]) {
+body.bs-fonts--nord-aurora *:not(.material-symbols-outlined):not(.material-symbols-rounded):not(.material-symbols-sharp):not(.google-symbols):not(mat-icon):not(.mat-icon):not([class*="material-symbols"]):not([class*="google-symbols"]) {
   font-family: inherit;
 }
 `,
+  fontVariables: [
+    { property: '--mat-menu-item-label-text-font', value: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif' },
+    { property: '--mat-list-list-item-label-text-font', value: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif' },
+    { property: '--mat-list-list-item-supporting-text-font', value: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif' },
+    { property: '--mat-button-text-label-text-font', value: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif' },
+    { property: '--mat-button-filled-label-text-font', value: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif' },
+  ],
   variables: [
     // ─── Surface / Background (Nord Polar Night) ────────────────────
     { property: '--gem-sys-color--surface', value: '#2e3440' },
@@ -130,12 +137,6 @@ body.bs-theme--nord-aurora *:not(.material-symbols-outlined):not(.material-symbo
     { property: '--bard-color-zero-state-prompt-chip-background', value: '#2e4a54' },
     { property: '--bard-color-zero-state-prompt-chip-text', value: '#88c0d0' },
 
-    // ─── Font override via CSS variable ─────────────────────────────
-    { property: '--mat-menu-item-label-text-font', value: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif' },
-    { property: '--mat-list-list-item-label-text-font', value: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif' },
-    { property: '--mat-list-list-item-supporting-text-font', value: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif' },
-    { property: '--mat-button-text-label-text-font', value: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif' },
-    { property: '--mat-button-filled-label-text-font', value: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif' },
 
     // ─── Shadows ────────────────────────────────────────────────────
     { property: '--mat-app-elevation-shadow-level-1', value: '0px 2px 4px rgba(0,0,0,0.25)' },

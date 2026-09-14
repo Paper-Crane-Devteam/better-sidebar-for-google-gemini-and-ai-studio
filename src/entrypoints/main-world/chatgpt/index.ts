@@ -1,6 +1,7 @@
 import { interceptFetch, readResponseBody } from '../lib/fetch-interceptor';
 import { handleListChatResponse } from './interceptors/list-chat';
 import { handleConversationResponse } from './interceptors/conversation';
+import { trace } from '@/shared/lib/trace';
 
 export function initChatGPTInterceptors() {
   console.log('Better Sidebar: Main World Script (ChatGPT) Initialized');
@@ -11,11 +12,19 @@ export function initChatGPTInterceptors() {
     urlPattern: (url) => url.includes('/backend-api/conversations') || url.includes('/backend-api/f/conversation'),
     
     onRequest: (url) => {
-      console.log('Better Sidebar (ChatGPT): Fetch intercepted', url);
+      trace('Better Sidebar (ChatGPT): Fetch intercepted', url);
     },
     
     onResponse: async (url, response, clonedResponse, init) => {
-      console.log('Better Sidebar (ChatGPT): Intercepting ChatGPT API', url, response.status);
+      if (response.status !== 200) {
+        console.warn(
+          'Better Sidebar (ChatGPT): API responded',
+          response.status,
+          url,
+        );
+      } else {
+        trace('Better Sidebar (ChatGPT): Intercepting ChatGPT API', url);
+      }
 
       let responseBody: unknown;
       try {

@@ -282,20 +282,25 @@ export class CircuitBreaker {
   }
 
   /**
-   * Get progressive error message based on consecutive failure count.
-   * Useful for formatting tool error responses back to the AI.
+   * Escalating hints appended to a failing tool's result.
+   *
+   * ⚠️ The hint has to match the tool that failed. This used to be SQL-only advice
+   * given to every tool, so a `doc_read` on an unsupported `.doc` came back with
+   * "double-check table and column names against the schema", and a third failure
+   * escalated to "run SELECT name FROM sqlite_master" — actively steering the model
+   * away from the file it was asked to open. A hint about the wrong subsystem is
+   * worse than no hint: the model follows it.
    */
-  getProgressiveErrorGuidance(baseError: string): string {
+  getProgressiveErrorGuidance(baseError: string, toolName?: string): string {
     const count = this.state.consecutiveFailedRounds;
+    const hints = hintsFor(toolName);
 
     if (count >= 3) {
       return (
         `${baseError}\n\n` +
         `CRITICAL: ${count} of your responses in a row have failed. You MUST change your approach:\n` +
-        `1. Run "SELECT name FROM sqlite_master WHERE type='table'" to verify table names\n` +
-        `2. Run "PRAGMA table_info(table_name)" — wait, PRAGMA is blocked. Use "SELECT sql FROM sqlite_master WHERE name='table_name'" instead\n` +
-        `3. Break your operation into smaller, simpler steps\n` +
-        `4. If still stuck, explain the problem to the user`
+        hints.critical.map((line, i) => `${i + 1}. ${line}`).join('\n') +
+        `\n${hints.critical.length + 1}. If still stuck, explain the problem to the user`
       );
     }
 
@@ -303,13 +308,11 @@ export class CircuitBreaker {
       return (
         `${baseError}\n\n` +
         `This is the ${count}th response in a row that has failed. Consider:\n` +
-        `- Are table/column names correct? Query sqlite_master to verify.\n` +
-        `- Is the SQL syntax valid for SQLite?\n` +
-        `- Try a simpler query first to confirm data exists.`
+        hints.consider.map((line) => `- ${line}`).join('\n')
       );
     }
 
-    return `${baseError}\n\nSuggestion: Double-check table and column names against the schema.`;
+    return `${baseError}\n\nSuggestion: ${hints.first}`;
   }
 
   /** Get current state snapshot (for debugging / UI) */
@@ -322,4 +325,101 @@ export class CircuitBreaker {
     this.state = createInitialState();
     agentEventBus.emit('circuit-breaker:reset', undefined);
   }
+}
+// ─── Retry hints, per tool family ────────────────────────────────────────────
+
+/**
+ * What to suggest at each escalation level.
+ *
+ * Grouped by *subsystem*, not by tool: the reason a `grep_files` and a `write_file`
+ * fail is the same class of mistake (a path that isn't there), and splitting them
+ * would mean maintaining a paragraph per tool for no gain.
+ *
+ * Tools not listed here fall through to `GENERIC`, which is deliberately vague —
+ * a wrong-but-specific hint is the failure mode this whole table exists to prevent.
+ */
+interface RetryHints {
+  /** One line, appended to the first failure. */
+  first: string;
+  /** Bullet list, for the second failing round in a row. */
+  consider: string[];
+  /** Numbered steps, for the third. "Explain it to the user" is appended after these. */
+  critical: string[];
+}
+
+const SQL_HINTS: RetryHints = {
+  first: 'Double-check table and column names against the schema.',
+  consider: [
+    'Are table/column names correct? Query sqlite_master to verify.',
+    'Is the SQL syntax valid for SQLite?',
+    'Try a simpler query first to confirm data exists.',
+  ],
+  critical: [
+    'Run "SELECT name FROM sqlite_master WHERE type=\'table\'" to verify table names',
+    'PRAGMA is blocked — use "SELECT sql FROM sqlite_master WHERE name=\'table_name\'" for columns',
+    'Break your operation into smaller, simpler steps',
+  ],
+};
+
+const WORKSPACE_HINTS: RetryHints = {
+  first: 'Confirm the path exists — list_files with no argument shows the workspace root.',
+  consider: [
+    'Does the path exist? Run list_files, or glob_files with a pattern, instead of assuming it.',
+    'For edit_file, old_string must match the most recent read_file output character for character, indentation included.',
+    'If old_string matched more than once, add surrounding lines rather than reaching for replace_all.',
+  ],
+  critical: [
+    'Run "list_files" with no path to see what is actually in the workspace',
+    'Re-read the file with read_file and copy old_string from that output, not from memory',
+    'Narrow the work: one file, one edit, and check the result before the next one',
+  ],
+};
+
+const DOCUMENT_HINTS: RetryHints = {
+  first: 'Call doc_read with only a path first — the outline names the ranges and ids you can use.',
+  consider: [
+    'Is the format supported? Legacy .doc/.xls/.ppt are not; the file has to be saved as .docx first.',
+    'Quote old_text exactly from the most recent doc_read output. Paragraph ids shift after any insert or delete.',
+    'Filling a blank table cell is set_text with the cell id ("t3r2c1"), not replace_text on the cell beside it.',
+    'Text you cannot find in the body may be in a header or a footnote — doc_read mode="search" covers those.',
+    'Activate the builtin-docx-review skill — it holds the doc_edit operation list the schema does not.',
+  ],
+  critical: [
+    'Run doc_read with just the path and read the warnings, not only the outline',
+    'Re-read the range you are editing and copy old_text from that output verbatim',
+    'If the format itself is unsupported, say so and stop retrying — no parameter change will fix it',
+  ],
+};
+
+const GENERIC_HINTS: RetryHints = {
+  first: 'Read the error text above — it names what was wrong with the call.',
+  consider: [
+    'What exactly did the error say? It usually names the parameter at fault.',
+    'Are you assuming something you have not verified with a read-only call?',
+    'Try the smallest version of this operation first.',
+  ],
+  critical: [
+    'Stop repeating the call and re-read the error messages above',
+    'Verify your assumptions with a read-only tool before writing anything',
+    'Break the operation into smaller steps',
+  ],
+};
+
+const HINTS_BY_TOOL: Record<string, RetryHints> = {
+  execute_sql: SQL_HINTS,
+  sync_conversation_messages: SQL_HINTS,
+  export: SQL_HINTS,
+  read_file: WORKSPACE_HINTS,
+  write_file: WORKSPACE_HINTS,
+  edit_file: WORKSPACE_HINTS,
+  list_files: WORKSPACE_HINTS,
+  glob_files: WORKSPACE_HINTS,
+  grep_files: WORKSPACE_HINTS,
+  manage_files: WORKSPACE_HINTS,
+  doc_read: DOCUMENT_HINTS,
+  doc_edit: DOCUMENT_HINTS,
+};
+
+function hintsFor(toolName?: string): RetryHints {
+  return (toolName && HINTS_BY_TOOL[toolName]) || GENERIC_HINTS;
 }

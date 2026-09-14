@@ -16,16 +16,23 @@ export const midnightPurple: ThemePreset = {
   isPremium: true,
   preferredMode: 'dark',
   fonts: ['Space+Grotesk:wght@300;400;500;600'],
-  extraCss: `
+  fontCss: `
 /* Midnight Purple font override */
-body.bs-theme--midnight-purple {
+body.bs-fonts--midnight-purple {
   font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
 }
 
-body.bs-theme--midnight-purple *:not(.material-symbols-outlined):not(.material-symbols-rounded):not(.material-symbols-sharp):not(.google-symbols):not(mat-icon):not(.mat-icon):not([class*="material-symbols"]):not([class*="google-symbols"]) {
+body.bs-fonts--midnight-purple *:not(.material-symbols-outlined):not(.material-symbols-rounded):not(.material-symbols-sharp):not(.google-symbols):not(mat-icon):not(.mat-icon):not([class*="material-symbols"]):not([class*="google-symbols"]) {
   font-family: inherit;
 }
 `,
+  fontVariables: [
+    { property: '--mat-menu-item-label-text-font', value: '"Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif' },
+    { property: '--mat-list-list-item-label-text-font', value: '"Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif' },
+    { property: '--mat-list-list-item-supporting-text-font', value: '"Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif' },
+    { property: '--mat-button-text-label-text-font', value: '"Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif' },
+    { property: '--mat-button-filled-label-text-font', value: '"Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif' },
+  ],
   variables: [
     // ─── Surface / Background ───────────────────────────────────────
     { property: '--gem-sys-color--surface', value: '#0d0d14' },
@@ -128,13 +135,6 @@ body.bs-theme--midnight-purple *:not(.material-symbols-outlined):not(.material-s
     // ─── Prompt Chips ───────────────────────────────────────────────
     { property: '--bard-color-zero-state-prompt-chip-background', value: '#2e1a5e' },
     { property: '--bard-color-zero-state-prompt-chip-text', value: '#8b5cf6' },
-
-    // ─── Font override via CSS variable ─────────────────────────────
-    { property: '--mat-menu-item-label-text-font', value: '"Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif' },
-    { property: '--mat-list-list-item-label-text-font', value: '"Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif' },
-    { property: '--mat-list-list-item-supporting-text-font', value: '"Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif' },
-    { property: '--mat-button-text-label-text-font', value: '"Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif' },
-    { property: '--mat-button-filled-label-text-font', value: '"Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif' },
 
     // ─── Shadows ────────────────────────────────────────────────────
     { property: '--mat-app-elevation-shadow-level-1', value: '0px 2px 4px rgba(0,0,0,0.4)' },

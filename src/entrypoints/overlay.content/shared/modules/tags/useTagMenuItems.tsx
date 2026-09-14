@@ -38,6 +38,7 @@ export function useTagMenuItems({
         <ColorPickerGrid
           selectedColor={tag.color}
           onColorChange={onColorChange}
+          allowCustom
         />
       ),
     },

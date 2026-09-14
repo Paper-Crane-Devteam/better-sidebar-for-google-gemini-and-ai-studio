@@ -1,63 +1,67 @@
 /**
- * Prompt Assembler — composes the final prompt from Soul + Skills + MCP schemas.
+ * Prompt Assembler — builds one agent's system prompt.
  *
- * Two main entry points:
- * 1. assembleFinalPrompt() — called when user triggers agent (> popup select)
- * 2. assembleSkillActivation() — called when AI invokes activate_skill tool
+ * Two entry points:
+ * 1. `assembleFinalPrompt()` — when the user starts a session from the `>` list.
+ * 2. `assembleSkillActivation()` — when the running agent calls `activate_skill`.
+ *
+ * ⚠️ Everything is scoped to one agent. The soul, the tool schemas and the skill list all
+ * come from that agent's definition, so nothing here decides what an agent can do — it only
+ * assembles what `agents/registry.ts` already declared.
+ *
+ * There is no longer a `selectedSkill`. The `>` list offers agents, and a skill is loaded
+ * mid-task by the agent that needs it, so a prompt is never built with one already pinned.
  */
 
 import type { Skill } from '../skills/types';
 import type { PlatformId } from '../adapters/adapter-factory';
 import { getCurrentPlatformId } from '../adapters/adapter-factory';
 import { INBOX_FOLDER_ID, SNIPPET_INBOX_ID, PROMPT_INBOX_ID } from '@/shared/constants/inbox';
-import { getSoulPrompt } from './soul';
+import { getAgent } from '../agents/registry';
+import type { AgentId } from '../agents/types';
+import { getEnabledSkillsForAgent } from '../skills/skill-registry';
 import { generateToolSchemaPrompt } from '../mcp/schema-generator';
 import { browserPrompt } from '../../browser-agent/prompt';
 
 // ─── Placeholder Resolution ──────────────────────────────────────────────────
 
 /**
- * Skill prompts (built-in and user-authored) are static strings, so they refer
- * to inbox folders through placeholders. Resolve them to the literal IDs here
- * so the agent never has to guess or look an inbox up by its localized name.
+ * Skill prompts (built-in and user-authored) are static strings, so they refer to inbox
+ * folders through placeholders. Resolve them to literal IDs here so the agent never has to
+ * guess, or look an inbox up by its localized name.
  */
 function resolveInboxPlaceholders(content: string, platform: PlatformId | null): string {
-  // Platform is always known in practice (the agent only runs on a detected
-  // platform); the fallback keeps the placeholder self-describing just in case.
-  const conversationInbox = platform ? INBOX_FOLDER_ID(platform) : `${INBOX_FOLDER_ID('')}<platform>`;
+  // Platform is always known in practice (the agent only runs on a detected platform);
+  // the fallback keeps the placeholder self-describing just in case.
+  const conversationInbox = platform
+    ? INBOX_FOLDER_ID(platform)
+    : `${INBOX_FOLDER_ID('')}<platform>`;
   return content
     .replace(/<CONVERSATION_INBOX_ID>/g, conversationInbox)
     .replace(/<SNIPPET_INBOX_ID>/g, SNIPPET_INBOX_ID)
     .replace(/<PROMPT_INBOX_ID>/g, PROMPT_INBOX_ID);
 }
 
-// ─── Skills Summary Generation ───────────────────────────────────────────────
+// ─── Skills Summary ──────────────────────────────────────────────────────────
 
 /**
- * Generate skills summary for the Soul prompt.
+ * The agent's own skills, as a list it can activate from.
  *
- * Always lists every enabled skill, including when the user pre-selected one.
- * Naming only the active skill made `activate_skill` a tool with no legal argument:
- * a run started from "Export Conversations" that turned out to need a sync had no way
- * of knowing a sync skill existed, let alone what its id was.
- *
- * `activeSkill` only changes the framing — its instructions are appended verbatim
- * further down, so the agent is told not to re-activate it.
+ * ⚠️ Returns an empty string when there are none, and the caller relies on that: an agent
+ * shown an empty skill list calls `activate_skill` with an invented id and burns a round
+ * being told it does not exist. The Workspace agent has no skills yet, so this is the live
+ * path, not a defensive branch.
  */
-function generateSkillsSummary(skills: Skill[], activeSkill?: Skill): string {
-  if (skills.length === 0) return 'No skills available.';
+function generateSkillsSummary(skills: Skill[]): string {
+  if (skills.length === 0) return '';
 
-  let output = '### Available Skills\n\n';
+  let output = '';
   for (const skill of skills) {
-    const active = skill.id === activeSkill?.id ? ' — **already active** (instructions included below)' : '';
-    output += `- **${skill.id}**: ${skill.title} — ${skill.description}${active}\n`;
+    output += `- **${skill.id}**: ${skill.title} — ${skill.description}\n`;
   }
-  output += '\nTo activate a skill, call:\n';
-  output += '```\n<bs_agent_tool>\n{"name": "activate_skill", "description": "Activating skill", "params": {"skill_id": "SKILL_ID"}}\n</bs_agent_tool>\n```\n';
-
-  if (activeSkill) {
-    output += `\nThe user already chose **${activeSkill.title}**, and its full instructions are at the end of this message — do not activate it again. Activate one of the others only if the work turns out to need it.\n`;
-  }
+  output += '\nTo activate one:\n';
+  output +=
+    '```\n<bs_agent_tool>\n{"name": "activate_skill", "description": "Activating skill", "params": {"skill_id": "SKILL_ID"}}\n</bs_agent_tool>\n```\n';
 
   return output;
 }
@@ -65,58 +69,28 @@ function generateSkillsSummary(skills: Skill[], activeSkill?: Skill): string {
 // ─── Main Assembly ───────────────────────────────────────────────────────────
 
 export interface AssembleOptions {
-  agentKind?: 'data' | 'browser';
+  /** Which agent this session runs as. */
+  agentId: AgentId;
   focus?: string;
-  /** User explicitly chose a skill from popup (null = free-form / AI will choose) */
-  selectedSkill?: Skill;
-  /** All enabled skills (for generating summary) */
-  allSkills: Skill[];
-  /** Current platform */
+  /** Current platform. */
   platform: PlatformId | null;
 }
 
-/**
- * Assemble the final prompt to inject into the editor capsule.
- *
- * Always: Soul + every enabled skill (id, title, description) + tool schemas.
- * Plus, when a skill was pre-selected, its full instructions appended at the end.
- */
 export function assembleFinalPrompt(options: AssembleOptions): string {
-  if (options.agentKind === 'browser') return browserPrompt(options.focus);
-  const { selectedSkill, allSkills, platform } = options;
+  if (options.agentId === 'browser') return browserPrompt(options.focus);
+  const { agentId, platform } = options;
+  const agent = getAgent(agentId);
 
-  // The picked skill has to appear in the list even if it is disabled — the user
-  // launching it is a stronger signal than the toggle.
-  const skills =
-    selectedSkill && !allSkills.some((s) => s.id === selectedSkill.id)
-      ? [...allSkills, selectedSkill]
-      : allSkills;
-
-  const skillsSummary = generateSkillsSummary(skills, selectedSkill);
-
-  const toolSchemas = generateToolSchemaPrompt();
-
-  let prompt = getSoulPrompt({
+  return agent.buildSoul({
     platform,
-    skillsSummary,
-    toolSchemas,
+    skillsSummary: generateSkillsSummary(getEnabledSkillsForAgent(agentId)),
+    toolSchemas: generateToolSchemaPrompt(agentId),
   });
-
-  // Append selected skill's prompt content
-  if (selectedSkill) {
-    const skillContent = resolveInboxPlaceholders(selectedSkill.promptContent, platform);
-    prompt += `\n\n## Active Skill Instructions\n\n${skillContent}`;
-  }
-
-  return prompt;
 }
 
 // ─── Skill Activation Response ───────────────────────────────────────────────
 
-/**
- * Assemble the response when AI calls activate_skill.
- * Returns skill prompt content so AI gets specialized instructions.
- */
+/** What `activate_skill` returns: the skill's full instructions. */
 export function assembleSkillActivation(skill: Skill): string {
   const content = resolveInboxPlaceholders(skill.promptContent, getCurrentPlatformId());
 

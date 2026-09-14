@@ -76,10 +76,6 @@
     "bottomLeft": "Inferior Izquierdo",
     "bottomRight": "Inferior Derecho",
     "behavior": "Comportamiento",
-    "newChatBehavior": "Comportamiento de Nuevo Chat",
-    "newChatBehaviorDescription": "Dónde abrir nuevas conversaciones",
-    "currentTab": "Pestaña Actual",
-    "newTab": "Nueva Pestaña",
     "skipDeleteConfirm": "Eliminar conversaciones sin confirmación",
     "skipDeleteConfirmDescription": "Peligro: una conversación individual se elimina de inmediato y de forma permanente, sin diálogo de confirmación y sin posibilidad de deshacer. Se elimina aquí y en la plataforma. La eliminación por lotes sigue pidiendo confirmación.",
     "defaultSyncFolder": "Carpeta de Sincronización Predeterminada",
@@ -124,7 +120,8 @@
     "importAiStudioSystemSuccess": "Importadas {{count}} instrucción(es) de sistema desde AI Studio",
     "importAiStudioSystemNoData": "No se encontraron instrucciones de sistema de AI Studio en esta página",
     "importAiStudioSystemInvalid": "Datos de instrucciones de sistema de AI Studio no válidos",
-    "importAiStudioSystemFailed": "Error al importar instrucciones de sistema de AI Studio"
+    "importAiStudioSystemFailed": "Error al importar instrucciones de sistema de AI Studio",
+    "compactModeTitleHint": "También puedes hacer clic en el título BIBLIOTECA para cambiar el modo compacto en cualquier momento 😉"
   },
   "prompts": {
     "inbox": "Bandeja de entrada",
@@ -206,6 +203,8 @@
     "scanChatList": "Importar Lista de Chats",
     "scanning": "Escaneando...",
     "sqlQuery": "Consulta SQL",
+    "enterCompactMode": "Activar modo compacto",
+    "exitCompactMode": "Salir del modo compacto",
     "settings": "Configuración"
   },
   "about": {
@@ -218,7 +217,8 @@
     "license": "Licencia",
     "sourceCode": "Código Fuente",
     "githubRepository": "Repositorio de GitHub",
-    "viewChangelog": "Ver registro de cambios"
+    "viewChangelog": "Ver registro de cambios",
+    "userGuide": "Guía de inicio"
   },
   "sponsor": {
     "title": "Compartir",
@@ -337,7 +337,13 @@
     "switchToOriginalUI": "Cambiar a Barra Lateral Original",
     "temporaryChat": "Chat temporal",
     "toggleMenu": "Alternar menú",
-    "newChatCta": "Clic: Nuevo chat · Clic derecho: Chat privado"
+    "collapseSidebar": "Contraer barra lateral",
+    "account": "Cuenta",
+    "signIn": "Iniciar sesión",
+    "enterCompactMode": "Haz clic para activar el modo compacto",
+    "exitCompactMode": "Haz clic para salir del modo compacto",
+    "newChatCta": "Clic: Nuevo chat · Clic derecho: Chat temporal · Clic central: Nuevo chat en nueva pestaña",
+    "newChatCtaAiStudio": "Clic: Nuevo chat · Clic derecho: Chat temporal · Clic central: Nuevo chat en nueva pestaña"
   },
   "newChatButton": {
     "dropdownTooltip": "Más opciones de chat",
@@ -423,7 +429,10 @@
     "name": "Nombre",
     "color": "Color del Ícono",
     "defaultColor": "Predeterminado",
-    "customColor": "Personalizado:",
+    "customColor": "Personalizado",
+    "customColorArea": "Saturación y brillo",
+    "customColorHue": "Tono",
+    "customColorHex": "Valor hexadecimal",
     "defaultTargets": "Carpeta predeterminada de",
     "defaultTargetsHint": "Los chats nuevos iniciados desde estos Gems o Notebooks se guardan en esta carpeta.",
     "addGemTarget": "Gem",
@@ -546,6 +555,9 @@
     "selectColor": "Seleccionar Color"
   },
   "moveItemsDialog": {
+    "searchFolders": "Buscar carpetas...",
+    "noMatchingFolders": "No hay carpetas coincidentes",
+    "clearSearch": "Borrar búsqueda",
     "rootLevel": "Raíz (Nivel Superior)",
     "createFolder": "Nueva Carpeta"
   },
@@ -680,7 +692,30 @@
     "openSourceNote": "Gratuito y de código abierto, creado y mantenido por un desarrollador independiente. ¡Gracias por tu apoyo!",
     "loginRequired": "Primero inicia sesión en la plataforma de IA — la barra lateral se activa en la página de la plataforma después de iniciar sesión.",
     "uiUpdateNote": "Si la barra lateral deja de funcionar, probablemente se deba a una actualización de la interfaz de la plataforma. Actualiza la extensión o espera una corrección — ¡lo arreglaré lo antes posible!",
-    "feedbackNote": "¿Encontraste un error? Usa la función de feedback integrada en cualquier momento — lo resolveré de inmediato. ¡Por favor, no dejes una mala reseña sin contactarnos primero!"
+    "feedbackNote": "¿Encontraste un error? Usa la función de feedback integrada en cualquier momento — lo resolveré de inmediato. ¡Por favor, no dejes una mala reseña sin contactarnos primero!",
+    "ready": "Todo listo",
+    "headline": "Menos desorden.",
+    "headlineAccent": "Más posibilidades.",
+    "intro": "Un lugar para tus conversaciones de Gemini y AI Studio. Organiza lo importante, encuentra ideas y guarda tus mejores prompts.",
+    "watch": "Ver el tutorial",
+    "previewAlt": "Better Sidebar en Gemini",
+    "previewCaption": "Tus conversaciones, bien organizadas",
+    "basics": "Empieza por lo esencial",
+    "organizeTitle": "Un lugar para cada chat",
+    "organizeBody": "Agrupa conversaciones en carpetas y añade etiquetas para organizar tus proyectos.",
+    "findTitle": "Encuentra buenas ideas",
+    "findBody": "Busca en tu historial y vuelve al contenido que merece la pena conservar.",
+    "reuseTitle": "Guarda tus mejores prompts",
+    "reuseBody": "Conserva los prompts útiles en tu biblioteca y reutilízalos cuando los necesites.",
+    "startLabel": "Empieza aquí",
+    "choose": "Elige tu plataforma",
+    "firstStep": "Inicia sesión y abre Better Sidebar en la plataforma. Crea tu primera carpeta para organizar los chats.",
+    "tutorialTitle": "Un recorrido para empezar.",
+    "tutorialBody": "Descubre Better Sidebar en acción y pruébalo en tu página. Pausa el vídeo y vuelve cuando quieras.",
+    "openYoutube": "Abrir en YouTube",
+    "videoNote": "El reproductor solo se carga al hacer clic. Si no funciona aquí, abre el tutorial en YouTube.",
+    "help": "¿Necesitas ayuda?",
+    "footerNote": "Para trabajar con más claridad."
   },
   "guidedTour": {
     "next": "Siguiente",
@@ -949,8 +984,6 @@
     "customThemesDescription": "Aplica un tema visual personalizado a la interfaz de Gemini. Estos temas anulan el esquema de colores predeterminado.",
     "default": "Predeterminado",
     "defaultDescription": "Tema predeterminado con soporte para modo claro/oscuro",
-    "classic": "Gemini Clásico",
-    "classicDescription": "Aspecto clásico de Gemini con superficies azuladas",
     "cupertinoGlassName": "Cupertino Glass",
     "cupertinoGlassDescription": "Estética de vidrio esmerilado con fuentes del sistema y paleta de colores mínima",
     "grimoireName": "The Grimoire",
@@ -977,6 +1010,18 @@
     "oceanBreezeDescription": "Tema claro fresco con acentos azul océano y coral",
     "midnightPurpleName": "Midnight Purple",
     "midnightPurpleDescription": "Negro profundo con acentos de degradado púrpura e índigo",
+    "gruvboxName": "Gruvbox",
+    "gruvboxDescription": "Tema oscuro retro con tonos terrosos y cálidos, como leer código a la luz de una vela",
+    "everforestName": "Everforest",
+    "everforestDescription": "Tema oscuro inspirado en bosques profundos — verdes apagados con un toque de ámbar cálido",
+    "highContrastName": "High Contrast",
+    "highContrastDescription": "Blanco y negro puros con un único acento ámbar — diseñado ante todo para la claridad",
+    "solarizedLightName": "Solarized Light",
+    "solarizedLightDescription": "El querido lado claro de Solarized — agradable a la vista, familiar y atemporal",
+    "sakuraName": "Sakura",
+    "sakuraDescription": "Un tema claro delicado con rosas suaves y verdes salvia, como una tarde de primavera",
+    "graphiteName": "Graphite",
+    "graphiteDescription": "Tema claro en escala de grises — estructura pura, sin distracciones de color",
     "previewBannerText": "Modo vista previa — el tema volverá al predeterminado en 5 minutos. Compra para conservarlo.",
     "buyNow": "Comprar",
     "aiGeneratorTitle": "¿No encuentras lo que buscas?",
@@ -1009,7 +1054,7 @@
     "spFeature1": "Todos los temas premium desbloqueados permanentemente",
     "spFeature2": "Futuros temas incluidos sin costo adicional",
     "spFeature3": "Crea temas personalizados generados por IA",
-    "spFeature4": "Activa en hasta 3 dispositivos",
+    "spFeature4": "Hasta 10 activaciones, en varios perfiles y ordenadores",
     "getSupportPack": "Obtener Support Pack",
     "powerPackTitle": "Power Pack",
     "powerPackTagline": "Desbloquea todo el potencial de tu asistente de IA",
@@ -1036,10 +1081,10 @@
   "supportPack": {
     "title": "Pack de Soporte",
     "heroTitle": "Desbloquea Temas Premium",
-    "heroDescription": "Temas hermosos y artesanales que transforman tu espacio de trabajo con IA. Una compra, acceso permanente en hasta 3 dispositivos.",
+    "heroDescription": "Temas hermosos y artesanales que transforman tu espacio de trabajo con IA. Una compra, acceso permanente con hasta 10 activaciones.",
     "feature1": "Todos los temas premium desbloqueados permanentemente",
     "feature2": "Futuros temas incluidos sin costo adicional",
-    "feature3": "Activa en hasta 3 dispositivos",
+    "feature3": "Hasta 10 activaciones, en varios perfiles de navegador y ordenadores",
     "feature4": "Apoya el desarrollo independiente de código abierto",
     "feature5": "Crea temas personalizados generados por IA",
     "buyButton": "Obtener Pack de Soporte",
@@ -1051,12 +1096,29 @@
     "activate": "Activar",
     "invalidToken": "Formato no válido. Se espera BS-SP-XXXXXXXX o clave de licencia de Gumroad.",
     "networkError": "Error de red. Comprueba tu conexión e inténtalo de nuevo.",
-    "maxDevices": "Límite de dispositivos alcanzado (3 dispositivos). Desactiva otro dispositivo primero.",
+    "maxDevices": "Las 10 plazas de activación están en uso. Abre los ajustes en un perfil de navegador que ya no uses, elige «Liberar esta activación» e inténtalo de nuevo.",
     "activationFailed": "Activación fallida. Comprueba tu token e inténtalo de nuevo.",
     "activationSuccess": "¡Activado! Todos los temas premium están desbloqueados.",
     "activatedTitle": "Pack de Soporte Activo",
     "activatedDescription": "Todos los temas premium están desbloqueados. ¡Gracias por apoyar Better Sidebar!",
-    "deactivate": "Desactivar"
+    "deactivate": "Desactivar",
+    "releaseDevice": "Liberar esta activación",
+    "releaseHint": "Cada perfil de navegador ocupa una plaza de activación. Libérala para usar la licencia en otro sitio.",
+    "releaseConfirmTitle": "¿Liberar esta activación?",
+    "releaseConfirmDesc": "Las funciones premium se desactivarán en este perfil de navegador y la plaza quedará libre para otro perfil u ordenador. Puedes volver a activar aquí en cualquier momento con el mismo token.",
+    "releaseConfirm": "Liberar",
+    "cancel": "Cancelar",
+    "releaseNetworkError": "No se pudo conectar con el servidor de licencias, así que la plaza no se liberó. Revisa tu conexión e inténtalo de nuevo.",
+    "releaseFailed": "No se pudo liberar esta activación. Inténtalo de nuevo o contacta con soporte.",
+    "renewalWarningTitle": "No se pudo conectar con el servidor de licencias",
+    "renewalWarningDesc": "Tu licencia sigue activa y seguiremos reintentando en segundo plano. Si esto continúa, revisa tu conexión a internet o cualquier VPN/proxy.",
+    "renewalGraceUntil": "Activa hasta",
+    "retryNow": "Reintentar ahora",
+    "dismiss": "Descartar",
+    "rejectedTitle": "Esta licencia ya no está activa",
+    "rejectedRevoked": "La licencia fue revocada, normalmente tras un reembolso o un contracargo. Contacta con soporte si crees que es un error.",
+    "rejectedMaxDevices": "Todas las plazas de activación están en uso y esta ya no está entre ellas. Libera una plaza desde otro perfil de navegador o contacta con soporte.",
+    "rejectedGeneric": "El servidor de licencias ya no reconoce este token. Contacta con soporte si crees que es un error."
   },
   "hotkeys": {
     "title": "Atajos de teclado",
@@ -1103,19 +1165,60 @@
     "launcher": {
       "title": "Agente",
       "subtitle": "Trabaja junto a la IA para gestionar tus chats, prompts y datos.",
-      "placeholder": "Describe lo que quieres conseguir...",
-      "run": "Ejecutar",
-      "skills": "O empieza con una habilidad",
-      "stageHint": "Opcional: describe tu tarea y el agente elegirá la habilidad adecuada por su cuenta. Si eliges una aquí, se añade al campo del chat para que puedas dar más detalles antes de enviarlo.",
+      "about": "Sobre el agente",
       "noEditor": "Abre primero un chat: el agente funciona a través del campo de entrada.",
       "composerBusy": "La tarea en marcha tiene resultados esperando en el campo del chat. Envíalos primero y vuelve a intentarlo.",
       "sessionBusy": "Ya hay una tarea en marcha. Termínala o detenla antes de empezar otra.",
       "stopRunning": "Detener la tarea en marcha",
       "safety": "Solo se toca tu base de datos local. Los cambios se confirman antes de ejecutarse.",
       "freeTier": "El plan gratuito es de solo lectura. Mejora tu plan para que el agente pueda hacer cambios.",
-      "manage": "Gestionar habilidades y herramientas",
-      "newChatHint": "Se ejecuta en el chat que tienes abierto. Abre uno nuevo para mantenerlo limpio.",
-      "triggerHint": "Escribir > en el campo del chat también inicia el agente desde ahí."
+      "manage": "Habilidades y herramientas",
+      "stepsTitle": "Cómo usarlo",
+      "step1": "Abre cualquier chat.",
+      "step2": "Escribe > en el cuadro de entrada y selecciona el Agente.",
+      "step3": "Escribe lo que necesites y pulsa Intro para enviarlo.",
+      "examplesTitle": "Prueba a pedirle esto",
+      "examplesHint": "Haz clic para insertarlo en el cuadro de entrada; puedes editarlo antes de enviar. Cuanto más específico seas, mejores serán los resultados.",
+      "examplesHintLabel": "Cómo usar estos ejemplos",
+      "examplePick": "Insertar en el chat",
+      "workspaceHint": "Espacio de trabajo del Agente para leer y guardar archivos",
+      "manageHint": "Configurar los permisos y confirmaciones del Agente",
+      "examplePrev": "Anterior",
+      "exampleNext": "Siguiente",
+      "examples": {
+        "classify": {
+          "label": "Organizar historial",
+          "text": "Organiza mis chats sin clasificar: agrúpalos por tema y muéstrame primero tu propuesta. Si las carpetas actuales no sirven, crea nuevas y muévelos ahí. Por último, etiqueta cada chat según su contenido intentando reutilizar las etiquetas que ya tengo para no duplicarlas."
+        },
+        "search": {
+          "label": "Búsqueda profunda",
+          "text": "Encuentra todo lo que mencione «despliegue en Docker». Busca a fondo en chats, mensajes y fragmentos de código, no solo en los títulos. Ordénalo del más reciente al más antiguo, dando un resumen de una línea de cada uno e indicando en qué carpeta están."
+        },
+        "export": {
+          "label": "Exportar y archivar",
+          "text": "Exporta todos los chats de mi carpeta «Trabajo» desde marzo a formato Markdown, un archivo por chat, y comprímelos en un zip. Si algún chat aún no tiene sus mensajes sincronizados, dímelo antes de empezar a exportar."
+        },
+        "sync": {
+          "label": "Sincronizar mensajes",
+          "text": "Comprueba cuántos chats tienen solo el título pero ningún mensaje guardado. Dame primero el número total, ordenados por los más recientes, y luego sincroniza los últimos 20 para que aparezcan en las búsquedas y exportaciones."
+        },
+        "prompts": {
+          "label": "Limpiar biblioteca de prompts",
+          "text": "Revisa mi biblioteca de prompts: renombra los que son difíciles de encontrar con / poniendo la palabra clave al principio. Extrae el bloque repetido de «rol + formato de salida» a un prompt compartido e impórtalo en los demás. Si una variable solo tiene unas pocas opciones fijas, cámbiala a un menú desplegable."
+        },
+        "snippets": {
+          "label": "Organizar fragmentos",
+          "text": "Mi bandeja de entrada de fragmentos es un caos. Agrúpalos en carpetas por tema y acorta los títulos que siguen siendo mi pregunta original a un breve resumen. Si el mismo contenido está guardado dos veces, quédate solo con el más antiguo. Enséñame la lista antes de borrar nada."
+        },
+        "workspace": {
+          "label": "Guardar decisiones",
+          "text": "Resume las conclusiones a las que hemos llegado en este chat en forma de lista de viñetas y guárdalo en notes/decisions.md en el espacio de trabajo. Añade al final las dudas que queden por resolver. Si el archivo ya existe, añade el contenido al final con la fecha de hoy, no lo sobrescribas."
+        },
+        "stats": {
+          "label": "Analizar estadísticas",
+          "text": "Hazme una tabla estadística: cuántos chats hay en cada carpeta, cuántos chats nuevos se han creado el último mes y qué carpetas llevan más de tres meses sin usarse. Con esos datos, recomiéndame qué carpetas podría fusionar."
+        }
+      }
     },
     "send": {
       "sessionBusy": "Ya hay una tarea en marcha, así que esta no se envió. Detenla y vuelve a pulsar Enter.",
@@ -1205,6 +1308,15 @@
       "export": "Exportando",
       "complete": "Finalizando",
       "generic": "Ejecutando un paso",
+      "readFile": "Leyendo un archivo",
+      "writeFile": "Escribiendo un archivo",
+      "editFile": "Editando un archivo",
+      "listFiles": "Explorando el espacio de trabajo",
+      "globFiles": "Buscando archivos",
+      "grepFiles": "Buscando dentro de los archivos",
+      "manageFiles": "Reorganizando archivos",
+      "docRead": "Leyendo un documento",
+      "docEdit": "Marcando cambios en un documento",
       "nameLabel": "Acción",
       "statement": "Sentencia",
       "waiting": "Esperándote",
@@ -1255,6 +1367,7 @@
       "noToolCallDesc": "La última respuesta del agente no ejecutó nada. Léela en el chat; si la tarea sigue pendiente, vuelve a empezarla.",
       "ended": "Sesión finalizada",
       "paywallDesc": "El plan gratuito permite al agente leer tus datos, pero no modificarlos. Mejora tu plan para permitir escrituras.",
+      "paywallWorkspaceDesc": "El plan gratuito incluye 1 espacio de trabajo con hasta {{max}} archivos. Mejora tu plan para acceso ilimitado.",
       "paywallFeature": "Escrituras del agente en la base de datos",
       "steps_one": "{{count}} paso ejecutado",
       "steps_other": "{{count}} pasos ejecutados",
@@ -1327,7 +1440,12 @@
       "maxSkills": "Se alcanzó el máximo de 20 habilidades personalizadas.",
       "mcpTitle": "Servidores MCP",
       "mcpDescription": "Los servidores MCP proporcionan herramientas que el Agente puede usar.",
-      "mcpToolCount": "{{count}} herramientas"
+      "mcpToolCount": "{{count}} herramientas",
+      "agentsTitle": "Agentes",
+      "agentsDesc": "Cada agente trabaja sobre cosas distintas y tiene sus propias herramientas. Escribe > en el chat para iniciar uno.",
+      "noTools": "Sin herramientas opcionales.",
+      "noSkills": "Aún sin habilidades. Este agente trabaja con sus propias instrucciones.",
+      "builtinSkillNote": "Las habilidades integradas pueden desactivarse, pero no editarse."
     },
     "skills": {
       "autoClassify": {
@@ -1349,6 +1467,18 @@
       "manageSnippets": {
         "title": "Gestionar snippets",
         "description": "Organiza, deduplica y busca snippets guardados — incluyendo su texto completo"
+      },
+      "workspace": {
+        "title": "Asistente de espacio de trabajo",
+        "description": "Lee, escribe, edita y busca archivos en tu espacio de trabajo privado"
+      },
+      "docxReview": {
+        "title": "Revisar un documento de Word",
+        "description": "Recorre un .docx capítulo a capítulo — comenta los problemas y propone correcciones como cambios controlados"
+      },
+      "spreadsheetAnalysis": {
+        "title": "Trabajar con una hoja de cálculo",
+        "description": "Lee un .xlsx primero por su estructura y luego calcula — añadiendo columnas y hojas en lugar de modificar los datos"
       }
     },
     "mcp": {
@@ -1361,12 +1491,62 @@
         "execute_sql": "Ejecutar consultas SQL en la base de datos local",
         "sync_conversation_messages": "Registrar el historial de mensajes de conversaciones sin contenido",
         "export": "Descargar conversaciones como archivos",
-        "complete_task": "Finalizar el bucle del agente y reportar resultados"
+        "complete_task": "Finalizar el bucle del agente y reportar resultados",
+        "doc_read": "Leer documentos de Word: esquema, secciones y búsqueda",
+        "read_file": "Lee un archivo de texto con números de línea",
+        "write_file": "Crea un archivo o lo reemplaza por completo",
+        "edit_file": "Reemplaza texto exacto dentro de un archivo",
+        "list_files": "Lista el contenido de una carpeta",
+        "glob_files": "Busca archivos por patrón de nombre",
+        "grep_files": "Busca en el contenido con expresiones regulares",
+        "manage_files": "Elimina, mueve o crea carpetas"
+      },
+      "documents": {
+        "name": "Documentos",
+        "description": "Lee documentos de Word por esquema y sección"
+      },
+      "core": {
+        "name": "Núcleo",
+        "description": "Disponible para todos los agentes y siempre activo."
+      },
+      "bettersidebar": {
+        "name": "Datos de Better Sidebar",
+        "description": "Consulta y modifica conversaciones, carpetas, etiquetas y prompts"
+      },
+      "workspace": {
+        "name": "Archivos",
+        "description": "Lee, escribe, edita y busca archivos de texto"
       }
     },
     "entry": {
       "autoTitle": "Agente Better Sidebar",
       "autoDescription": "Describe una tarea y deja que el agente elija las herramientas adecuadas"
+    },
+    "workspace": {
+      "paywallWorkspaces": "Múltiples espacios de trabajo",
+      "paywallFiles": "Más de {{max}} archivos por espacio de trabajo",
+      "paywallFilesSkipped": "{{files}} archivo(s) omitido(s): el límite gratuito es de {{max}} por espacio de trabajo"
+    },
+    "agents": {
+      "bettersidebar": {
+        "name": "Better Sidebar",
+        "description": "Organiza conversaciones, carpetas, etiquetas, prompts y fragmentos"
+      },
+      "workspace": {
+        "name": "Espacio de trabajo",
+        "description": "Lee, escribe y edita archivos y documentos de tu espacio de trabajo"
+      }
+    },
+    "switcher": {
+      "label": "Elige un agente"
+    },
+    "workspaceIntro": {
+      "title": "Colabora con la IA en tus documentos de Workspace",
+      "body": "Los archivos se conservan entre chats y se comparten entre Gemini y AI Studio. Escribe > Workspace en el chat para poner este agente a trabajar.",
+      "detail": "Los archivos de texto se leen y editan directamente. Los documentos de Word se leen por esquema y sección. No ve tus conversaciones ni nada fuera de este espacio, y cada cambio se confirma antes de aplicarse.",
+      "about": "Acerca del espacio de trabajo",
+      "howToUseTitle": "Cómo usar Workspace",
+      "howToUseContent": "El agente Workspace es tu entorno de archivos dedicado donde la IA puede leer, escribir, editar y crear documentos y código desde cero.\n\nCómo usar:\nEscribe >Workspace en el campo de chat para activar el agente. Puedes arrastrar y soltar archivos existentes en el espacio de trabajo, o pedirle a la IA que cree nuevos archivos desde cero (por ejemplo, desarrollando un proyecto frontend completo).\n\nFormatos y funciones compatibles:\n- Texto y Código (.html, .js, .ts, .py, .md, .txt, etc.): ¡Compatibilidad total para creación desde cero y edición precisa! Pídele a la IA crear un proyecto frontend completo, escribir scripts, redactar notas Markdown o refactorizar código existente.\n- Word (.docx): Revisa documentos por capítulos, reescribe párrafos con control de cambios y añade comentarios (requiere subir un archivo existente).\n- Excel (.xlsx/.csv): Analiza datos, añade fórmulas y nuevas columnas sin alterar formatos ni gráficos originales (requiere subir un archivo existente).\n- PDF: Lee informes y artículos, extrae texto, combina páginas y añade anotaciones.\n- PowerPoint (.pptx): Lee y edita el texto de diapositivas y notas del orador.\n- Subtítulos (.srt/.vtt): Traduce y pule subtítulos manteniendo la sincronización de tiempos.\n\n💡 Consejo: Los archivos de texto y código se pueden crear desde cero y editar libremente. Los formatos especiales (Word, Excel, PPT, PDF) actualmente se centran en leer, anotar y modificar con precisión archivos existentes preservando su formato original."
     }
   },
   "backup": {

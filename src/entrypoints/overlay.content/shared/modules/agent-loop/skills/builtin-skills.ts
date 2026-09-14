@@ -15,6 +15,7 @@ export const BUILTIN_SKILLS: Skill[] = [
   {
     id: 'builtin-auto-classify',
     type: 'builtin',
+    agentId: 'bettersidebar',
     title: 'Auto-Classify Conversations',
     description: 'Automatically organize conversations into folders and tags based on their titles',
     titleKey: 'agent.skills.autoClassify.title',
@@ -46,6 +47,7 @@ Tips:
   {
     id: 'builtin-find-empty-chats',
     type: 'builtin',
+    agentId: 'bettersidebar',
     title: 'Sync Missing Messages',
     description:
       'Find conversations whose messages were never recorded, then sync their content',
@@ -125,6 +127,7 @@ Notes:
   {
     id: 'builtin-export-chats',
     type: 'builtin',
+    agentId: 'bettersidebar',
     title: 'Export Conversations',
     description: 'Query and display conversation data for the user',
     titleKey: 'agent.skills.export.title',
@@ -154,6 +157,7 @@ Notes:
   {
     id: 'builtin-manage-prompts',
     type: 'builtin',
+    agentId: 'bettersidebar',
     title: 'Manage Prompt Library',
     description:
       'Author, refactor and organize reusable prompts — including variables and imports',
@@ -264,6 +268,7 @@ Report edits as before/after per prompt, then call \`complete_task\`.
   {
     id: 'builtin-manage-snippets',
     type: 'builtin',
+    agentId: 'bettersidebar',
     title: 'Manage Snippets',
     description:
       'Organize, dedupe and search saved snippets — including their full text',
@@ -336,5 +341,440 @@ Say what changed, per row or per group, then call \`complete_task\`.
     enabled: true,
     createdAt: 0,
     updatedAt: 0,
+  },
+  {
+    id: 'builtin-docx-review',
+    type: 'builtin',
+    agentId: 'workspace',
+    title: 'Review a Word Document',
+    description:
+      'Work through a .docx chapter by chapter — comment on problems, suggest fixes as tracked changes',
+    titleKey: 'agent.skills.docxReview.title',
+    descriptionKey: 'agent.skills.docxReview.description',
+    icon: 'FileText',
+    promptContent: `## Task: Review or Revise a Word Document
+
+This skill carries the full \`doc_edit\` operation list, which the tool schema deliberately
+leaves out. It also carries the working order, and that order matters more than the syntax.
+
+### Read before you write. Always, and in this order.
+
+1. **\`doc_read path="…"\`** with nothing else. That returns the outline, the counts, and the
+   warnings. The warnings are the part to actually read — existing tracked changes, field
+   codes, a protected document — because each one changes what you should do next. The facts
+   also name any text **outside the body**: \`hd1 = the first-page header\`, \`fn = footnotes\`.
+   If the user asks about something you cannot find in the body, look there before concluding
+   it is not in the document.
+2. **If it already has comments, read them first.** On a thesis they usually *are* the
+   review the user is asking you to address, and answering feedback you never read is the
+   most expensive way to be unhelpful.
+3. **Read a range, not the document.** \`mode="range" range="p12-p48"\`, one section at a
+   time, using the ids from the outline. Output is capped per round; asking for everything
+   gets you a silent truncation and a wrong picture of the file.
+4. **\`mode="search" query="…"\`** to find a term without reading around it. This is how you
+   check whether a fix needs to be applied in more than one place. Search covers **every**
+   part, including headers and footnotes, so it is also how you find out where something lives.
+
+### Addresses
+
+| form | means |
+| --- | --- |
+| \`p12\` | a paragraph of the body |
+| \`t3\` | a table of the body |
+| \`t3r2\` | row 2 of table \`t3\` |
+| \`t3r2c1\` | row 2, column 1 of table \`t3\` |
+| \`hd1\` / \`ft1\` | a header / footer part. \`hd1:p2\` for a paragraph in it |
+| \`fn\` / \`en\` | footnotes / endnotes. \`fn:p3\` for one paragraph |
+
+A projected table carries its own axes so you never have to count:
+
+\`\`\`
+[t2 4×3 · cells t2r1c1… · ∅ = empty, fill with set_text]
+| r\\c | c1 | c2 | c3 |
+| --- | --- | --- | --- |
+| r1 | 序号 | 检查内容 | 自查评估结果 |
+| r2 | 1 | 是否建立管理制度 | ∅ |
+\`\`\`
+
+So the blank result cell on row 2 is \`t2r2c3\`. ∅ means the cell exists and is empty; — means
+the row has no cell in that position at all.
+
+⚠️ **Do not fill a blank column by replacing the neighbouring cell's text.** That is the one
+mistake this address space exists to prevent: \`replace_text\` puts the new text where the
+quoted text is, so quoting column 2 writes the answer into column 2. Use \`set_text\` with the
+cell id.
+
+### Comment, don't rewrite — unless they asked for the rewrite
+
+Two different requests, two different outputs:
+
+- **"Review my paper" / "what's wrong with this" → comments.** No text changes at all. This
+  is the supervisor's form of feedback and it is the safe default. A comment cannot be wrong
+  in a way that costs the user anything.
+- **"Fix the grammar" / "rewrite this section" → tracked changes.** Actual edits, which Word
+  shows inline with Accept and Reject on each one.
+
+When in doubt, comment. Then offer to make the changes.
+
+### The operations
+
+Every one goes in the \`ops\` array of a single \`doc_edit\` call. \`path\` is separate.
+
+**\`replace_text\`** — rewrite a stretch of text that is already there.
+| param | |
+| --- | --- |
+| \`old_text\` | the exact text to replace, quoted from \`doc_read\` output |
+| \`new_text\` | the replacement; \`""\` deletes the text |
+| \`scope\` | optional \`"p12"\`, \`"t3"\`, \`"t3r2c1"\`, \`"hd1"\` — narrows, and reaches parts outside the body |
+| \`all\` | optional \`true\` — replace every occurrence |
+
+⚠️ Without \`scope\` this searches the **body only**. A term that also appears in a header is
+reported in the result and left alone; change it with a second op scoped to that part.
+
+**\`set_text\`** — put text into an **empty** paragraph or table cell.
+| param | |
+| --- | --- |
+| \`scope\` | required — \`"t3r2c1"\` or \`"p12"\` |
+| \`text\` | what to write |
+
+This is the only op addressed by id alone, so it refuses any target that already has text —
+use \`replace_text\` for that. It is how you fill in a blank column, a blank form field or an
+empty line. New text inherits the target's own formatting, so a filled cell matches its column.
+
+**\`comment\`** — attach a margin note, changing no text.
+| param | |
+| --- | --- |
+| \`text\` | the comment itself. Newlines become paragraphs. |
+| \`old_text\` | the phrase to attach it to |
+| \`scope\` | \`"p12"\` — comment on the whole paragraph. Use this instead of \`old_text\` when the sentence runs through an equation, an image or a citation field. |
+
+⚠️ Body only. Word shows no comments in a header, a footer or a footnote, so those are
+refused rather than written somewhere the user would never see them.
+
+**\`insert_paragraph\`** — add a paragraph.
+| param | |
+| --- | --- |
+| \`text\` | the new paragraph |
+| \`after\` or \`before\` | a paragraph id — exactly one of the two |
+| \`style\` | optional style **id** |
+
+**\`delete_paragraph\`** — remove a whole paragraph. Takes \`scope\` (an id) or \`old_text\`.
+
+**\`set_style\`** — \`scope\` + \`style\`. Mostly for promoting a line to a heading in a document
+that has no real outline.
+
+### Table structure
+
+**\`insert_table\`** — a new table.
+| param | |
+| --- | --- |
+| \`rows\` | array of arrays, one inner array per row: \`[["Item","Result"],["A",""]]\` |
+| \`after\` or \`before\` | a paragraph or table id — exactly one of the two |
+| \`header\` | optional \`false\` — by default the first row is bold and repeats on each page |
+| \`style\` | optional table style **id**. Without one you get a plainly bordered table |
+
+**\`insert_row\`** — one more row in an existing table.
+| param | |
+| --- | --- |
+| \`table\` | \`"t3"\` — append at the end. This is the usual form |
+| \`after\` or \`before\` | \`"t3r4"\` — instead of \`table\`, to place it precisely |
+| \`cells\` | optional \`["1","是否…",""]\`, left to right. Short lists leave the rest empty |
+
+The new row copies its shape from a row that is already there — column widths, shading,
+borders, fonts — so it matches. Anchoring on the header row gives you the header's look;
+anchor on a data row, or just pass \`table\` and let it copy the last one.
+
+**\`delete_row\`** — \`scope="t3r4"\`. Refused on a table's last remaining row.
+
+**\`delete_table\`** — \`scope="t3"\`. In track mode every row is marked deleted as one change,
+so the user can still reject it.
+
+⚠️ \`style\` is a style **id**, not the name Word shows in its gallery. In a Chinese or German
+document those differ — \`标题 2\` is often the id \`2\`. If you pass an unknown id the call is
+refused and tells you the ids that exist.
+
+### The one rule that prevents a wrong edit
+
+**\`old_text\` is the address. Paragraph ids are not** — except for \`set_text\`, which cannot
+have one and is restricted to empty targets because of it.
+
+Insert a paragraph and every later id shifts, so a \`pN\` you noted a few rounds ago may now
+point somewhere else — and nothing in the output would look wrong. Spacing is forgiven when
+matching; wording is not. Copy the text from the most recent \`doc_read\`, not from your own
+summary of it. If you are using \`set_text\` or a cell id, read the table again in the same
+turn first.
+
+If a quote matches more than once the call is refused and lists the paragraphs. Two correct
+responses: add surrounding words until it is unique, or pass \`scope\`. \`all=true\` is for a
+deliberate global rename and nothing else — do not reach for it to get past the refusal.
+
+### How to batch
+
+Read a section, then send its ops in **one** \`doc_edit\` call. But note:
+
+⚠️ **Ops in one call cannot see each other's results.** They all resolve against the file as
+it was, and two ops touching the same sentence are refused as overlapping, with nothing
+written. If a later change depends on an earlier one, use a second call.
+
+Five to ten ops per call is comfortable. A call that touches the same paragraph twice is the
+one to split.
+
+### Reporting
+
+The result lists what applied, what was skipped and why, and where the backup went. Say all
+three. In particular:
+
+- If ops were skipped, say which and why — do not report the call as a success.
+- If the document already had tracked changes from someone else, say so, because the user
+  cannot tell yours apart from theirs by looking.
+- Tell them where to look: comments are in Word's review pane, changes are inline with
+  Accept and Reject.
+- The pre-edit copy is under \`.history/\`. Mention it once, at the end.
+
+Then \`complete_task\` with a summary of what you changed and what you would still flag.
+`,
+    enabled: true,
+    createdAt: 0,
+    updatedAt: 0,
+  },
+  {
+    id: 'builtin-spreadsheet-analysis',
+    type: 'builtin',
+    agentId: 'workspace',
+    title: 'Work Through a Spreadsheet',
+    description:
+      'Read an .xlsx by schema first, then compute — adding columns and sheets rather than changing the data',
+    titleKey: 'agent.skills.spreadsheetAnalysis.title',
+    descriptionKey: 'agent.skills.spreadsheetAnalysis.description',
+    icon: 'Table',
+    promptContent: `## Task: Analyse or Edit an Excel Workbook
+
+This skill carries the full \`doc_edit\` operation list for \`.xlsx\`, which the tool schema
+leaves out, and the working order. The order is the part that matters.
+
+### The one habit that makes this work: add, don't change
+
+A workbook is not prose. Numbers in it are referenced by *address* — by formulas, by charts,
+by pivot ranges, by conditional formats. So the safe shape of almost every request is:
+
+| they ask | you do |
+| --- | --- |
+| "work out the growth rate" | \`add_column\` with a formula |
+| "sort by score" | read it, \`add_sheet\` with the sorted copy |
+| "which rows are outliers" | \`add_column\` that flags them, or just say so |
+| "fix the total in D20" | \`set_cell\` — one cell, deliberately |
+
+The original data stays where it was, the user can compare, and nothing you do is hard to
+undo. Rows and columns cannot be inserted or deleted at all, and sorting in place is refused,
+for exactly this reason — the refusal message names the alternative each time.
+
+### Read the schema before you read the data
+
+1. **\`doc_read path="…"\`** with nothing else. That gives you every sheet, its used range, and
+   **what each column holds** — \`A 序号(num) B 姓名(text) C 日期(date) D 分数(fx)\`. That line is
+   usually all you need to plan the whole job, and it costs a fraction of reading rows.
+   - \`num\` / \`text\` / \`date\` / \`bool\` are value types; \`fx\` means the column is **calculated**.
+     Never overwrite an \`fx\` column — change what it reads from instead.
+   - \`mixed\` usually means something is wrong: a stray header inside the data, or "N/A" in a
+     numeric column. Worth mentioning before you compute anything from it.
+2. **Read the warnings.** Charts, pivot tables, merged cells, shared formulas and protected
+   sheets each change what you should do next, and every one of them is silent if you ignore it.
+3. **Then read a region.** \`mode="range" range="Sheet1!A1:F50"\` — a rectangle, not a sheet. A
+   bare sheet name (\`range="数据"\`) reads the whole used range and is fine for a small sheet;
+   on a big one the output is capped and you will get a truncated picture without noticing what
+   you missed.
+4. **\`mode="search" query="…"\`** searches every sheet, **values and formulas**. It is the only
+   way to answer "where is this rate used", because a formula's text is not visible in the grid.
+
+### What a region read looks like
+
+\`\`\`
+Sheet1!A1:E3 of used A1:E2000
+	A	B	C	D	E
+1	序号	名称	日期	单价	金额
+2	1	甲	2026-01-05	12.5	25
+3	2	乙	2026-01-06	3.5	7
+Formulas (2): E2 =D2*2 (shared down its range — do not overwrite) · E3 shares the formula above it
+\`\`\`
+
+- The column letters and row numbers are the axes, so **every address is derivable** — the
+  12.5 above is \`D2\`. Never count columns.
+- The grid shows the **values** Excel last calculated; the \`Formulas\` line shows which cells are
+  computed and how. Both are true and you need both.
+- Dates come back as \`2026-01-05\`, restored from the serial number Excel actually stores. Do
+  not try to do arithmetic on the original serial.
+- Empty rows are skipped, so a jump in the row numbers is a gap in the data, not an error.
+- \`(not yet calculated)\` means a formula has no cached result — usually one you just wrote.
+  Excel fills it in on open.
+
+### The operations
+
+Every one goes in the \`ops\` array of a single \`doc_edit\` call. \`path\` is separate. A cell is
+\`"Sheet1!C2"\`; the sheet may also be given as its own \`sheet\` parameter.
+
+**\`set_cell\`** — one cell.
+| param | |
+| --- | --- |
+| \`ref\` | \`"Sheet1!C2"\` |
+| \`value\` | a number, text, or a formula starting with \`=\` |
+
+A leading \`=\` means formula, exactly as in Excel. \`"007"\`, \`"1.10"\` and phone numbers stay
+text, so nothing you write comes back looking different from what you wrote.
+
+**\`set_cells\`** — a rectangle.
+| param | |
+| --- | --- |
+| \`range\` | \`"Sheet1!C2:E10"\`, or \`"Sheet1!C2"\` for just the top-left corner |
+| \`values\` | array of arrays, one inner array per row |
+
+A \`values\` grid smaller than the range fills what it covers and leaves the rest alone.
+
+**\`add_column\`** — the one to reach for. Appends to the right of the data.
+| param | |
+| --- | --- |
+| \`sheet\` | which sheet |
+| \`header\` | the header cell text |
+| \`formula\` | a template using \`{row}\`: \`"=(C{row}-B{row})/B{row}"\` |
+| \`values\` | instead of \`formula\` — one entry per data row |
+| \`from_row\` / \`to_row\` | optional; defaults to the whole data range |
+
+⚠️ **Write a formula, not a computed number.** \`=(C2-B2)/B2\` stays correct when the user edits
+B2; \`0.14\` becomes a lie the moment they do. This is the single most valuable thing you can do
+differently from a person pasting values in.
+
+**\`clear_cells\`** — \`range\`. Empties cells but keeps their formatting. Not the same as writing
+\`""\`, which leaves a value that \`COUNTA\` still counts.
+
+**\`add_sheet\`** — a new tab.
+| param | |
+| --- | --- |
+| \`name\` | ≤31 characters, no \`: \\ / ? * [ ]\` |
+| \`rows\` | optional array of arrays, e.g. \`[["项","值"],["合计","=SUM(数据!D2:D100)"]]\` |
+
+Where every derived result belongs: sorted copies, summaries, statistics. Formulas here can
+reference the source sheet, which keeps the summary live.
+
+**\`rename_sheet\`** — \`sheet\` + \`name\`. Refused when any formula, chart or defined name
+mentions the old name, because Excel stores those references as literal text and we would leave
+them as \`#REF!\`. If it is refused, say so — renaming in Excel takes the user two seconds and
+updates everything.
+
+### What is refused, and what to do instead
+
+- **\`insert_row\` / \`delete_row\` / \`insert_column\` / \`delete_column\`** — every address below or
+  right of the change would move, and formulas, merged regions, table ranges, conditional
+  formats, validations and chart references all store addresses. Append below the data, or use
+  a new sheet.
+- **\`sort\` / \`filter\`** — read, sort in your answer, \`add_sheet\` the result.
+- **Overwriting a shared-formula host** — one cell holds the formula for a whole range and the
+  rest only point at it, so replacing it blanks the column. \`add_column\` instead.
+- **Number formats, fonts, merges, cell comments** — not editable here. A value keeps whatever
+  format its cell already had, and a new cell inherits from its left-hand neighbour, so a filled
+  column matches the one beside it. If a note is needed, put it in a column where it is visible.
+
+### Recalculation, and why the answer is not in the file yet
+
+Excel caches every formula's last result. After any write, this tool deletes the calculation
+chain and marks the workbook for a full recalculation on open — so **the numbers are correct the
+moment the user opens it, and a formula you wrote reads as \`(not yet calculated)\` until then.**
+Say that when you report back. Never quote a computed figure you did not calculate yourself.
+
+⚠️ **Pivot tables do not refresh on open.** If the workbook has one, tell the user to hit
+Refresh, or it will disagree with the source sheet.
+
+### How to batch
+
+Read a region, then send its ops in **one** \`doc_edit\` call.
+
+⚠️ **Ops in one call cannot see each other's results.** They all resolve against the file as it
+was, so two ops writing the same cell are refused with both named, and \`add_column\` picks its
+column from the *original* used range — two \`add_column\` ops in one call would aim at the same
+place. One \`add_column\` per call, and put dependent changes in a second call.
+
+### Reporting
+
+The result lists what applied, what was skipped and why, and where the backup went. Say all
+three, and in particular:
+
+- If ops were skipped, say which and why — do not report the call as a success.
+- Name the sheet and the exact range you wrote, so the user can go and look at it.
+- Mention the recalculation-on-open behaviour once.
+- The pre-edit copy is under \`.history/\`. Mention it once, at the end.
+
+Then \`complete_task\` with what you changed and what you would still check.
+`,
+    enabled: true,
+    createdAt: 0,
+    updatedAt: 0,
+  },
+  {
+    id: 'builtin-pdf-review', type: 'builtin', agentId: 'workspace',
+    title: 'Read and Review a PDF',
+    description: 'PDF page text, bookmarks, comments, AcroForm fields and page operations',
+    icon: 'FileText', enabled: true, createdAt: 0, updatedAt: 0,
+    promptContent: `Read with doc_read outline first, then mode="range" and range="1-3".
+Use mode="search", query=literal text, range="1-10" to locate passages.
+Read existing comments with range="annotations:1-3", fields with range="fields:1-3".
+Pages are 1-based; selections support "1-3,5". Follow nextRange when truncated.
+Continuation ranges may end in @characterOffset; pass nextRange back unchanged.
+Scans have no text to extract. No OCR, body-text editing or rendering in this release.
+
+PDF doc_edit ops (JSON array):
+- comment / note: page, text, optional x/y in unrotated PDF points (origin bottom left).
+- highlight: page, text (unique exact quote), optional comment. Matches uniquely ignoring whitespace differences from text extraction. Highlights whole intersecting text items, so may include
+  adjacent words within the same item; each item has its own quad. No vertical-text support.
+- fill_form: name, value (string; boolean for checkbox). Read field names/options first.
+- rotate_pages: pages, degrees (relative, multiple of 90).
+- delete_pages: pages. Must leave a page.
+- extract_pages: pages. Keeps selected pages in original order IN THE SAME FILE.
+  To extract into another file, copy the PDF with manage_files first, then edit the copy.
+- merge: source (workspace PDF path), optional pages selecting source pages. Appends to target.
+- watermark: pages, text, optional size (36), opacity (0.2), x/y.
+- page_numbers: pages, optional template ("{page} / {total}"), size (11), opacity (1), x/y.
+
+Operations run sequentially; later page numbers refer to the current page order.
+Do highlights before structural page operations or in another call after re-reading.
+A rejected operation aborts the entire batch without saving. Form page copying/removal/merge,
+XFA, encrypted PDFs and signature fields are refused. Removing pages drops old bookmarks
+and page labels; report this. Page copies may not retain document-level navigation.
+Watermarks, page numbers and filled text use Helvetica (WinAnsi); unsupported glyphs are
+refused, so do not claim CJK form filling is supported. Comments support Unicode.
+Coordinates do not account for viewer rotation. Inspect the result in a PDF viewer.
+Report applied operations and backupPath from the tool result; never claim body text changed.
+`,
+  },
+  {
+    id: 'builtin-pptx-review', type: 'builtin', agentId: 'workspace',
+    title: 'Read and Edit PowerPoint',
+    description: 'PPTX slide text, speaker notes, shapes and slide ordering',
+    icon: 'FileText', enabled: true, createdAt: 0, updatedAt: 0,
+    promptContent: `Start with doc_read outline, then mode="range", range="1-3" (or "slide2").
+Read slide titles, individual shape IDs/text and speaker notes. Search uses a literal query,
+optionally within a slide range. Pass nextRange unchanged with the same mode and query.
+Slide numbers are 1-based positions in the current presentation, not filenames.
+
+PPTX doc_edit ops:
+- replace_text: slide, old_text, new_text, optional shape (shape ID from doc_read).
+  Quote exact unique text within a paragraph; cross-run replacement inherits the first
+  affected run's formatting. Other runs and shape layout remain. No line breaks/tabs,
+  field edits, alternate DrawingML representations, automatic text fitting or editing text in charts/SmartArt/images.
+- set_notes: slide, text. Replaces speaker-notes body with plain text; newlines create
+  paragraphs. Other notes placeholders stay. Creates notes when absent; empty text clears.
+- duplicate_slide: slide, optional after (current position, 0 inserts first; default after source).
+  Notes/charts/embedded workbooks are independent copies; masters/layout/media stay shared.
+  Unsupported dependency types abort the batch.
+- delete_slides: slides (array, e.g. [2,4]). Must leave one slide. Removes slides from
+  presentation order; underlying parts remain to preserve references. This does NOT
+  securely erase their content or shrink the file. Existing hyperlinks can still reach them.
+- reorder_slides: order (array listing every current slide exactly once, e.g. [3,1,2]).
+
+Operations run sequentially. Re-read after structural edits before using old slide numbers.
+An invalid op aborts the entire batch without saving. Custom shows/sections block structural
+edits; signed packages and nonstandard/Strict namespaces are unsupported. No tracked changes
+in PowerPoint; edits are direct and backed up under .history. Explain before/after snippets
+in change_summary. Report applied/skipped and backupPath, and ask the user to review layout
+in PowerPoint/WPS since this tool does not render or resize text boxes. Creating a new PPTX
+from Markdown is not implemented.
+`,
   },
 ];

@@ -15,7 +15,7 @@ import type { ParsedToolCall } from '../../types';
 import type { LoopContext } from '../context';
 import { executeToolCall } from '../../tools/tool-registry';
 import { parseCompleteTaskSignal } from '../../tools/complete-task';
-import { PAYWALL_SIGNAL } from '../../tools/execute-sql';
+import { PAYWALL_SIGNAL } from '../../tools/paywall-signal';
 import {
   buildToolCallFingerprint,
   buildToolCallKey,
@@ -232,7 +232,7 @@ export async function executeTools(
 
     if (failure) {
       // Escalating hints, so the AI stops retrying the same broken approach
-      body = ctx.breaker.getProgressiveErrorGuidance(result);
+      body = ctx.breaker.getProgressiveErrorGuidance(result, toolCall.name);
 
       if (failure.action === 'stop') {
         console.warn('[AgentLoop] Circuit breaker: failure hard stop');

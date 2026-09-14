@@ -1,9 +1,15 @@
-import React, { memo, Component } from 'react';
+import React, { memo, useMemo, Component } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import katex from 'katex';
 import { cn } from '@/shared/lib/utils/utils';
+// Aliased: this file's own `highlight` is the search term to mark, which is a different
+// job and, below, a competing one.
+import {
+  FENCE_CHAR_LIMIT,
+  highlight as highlightCode,
+} from '@/shared/lib/syntax-highlight';
 
 // Error boundary to prevent math rendering errors from breaking the entire component
 class MarkdownErrorBoundary extends Component<
@@ -37,6 +43,52 @@ function renderKatex(tex: string, displayMode: boolean): string {
     return `<code>${tex}</code>`;
   }
 }
+
+/**
+ * A fenced code block with a language label, coloured.
+ *
+ * Its own component, and memoised, for one reason: this renderer runs on every token of a
+ * streaming reply, and `ReactMarkdown` rebuilds the whole element tree each time. Doing the
+ * parse inline in the `code` override would re-highlight every finished block in the message
+ * on every token — quadratic in the length of the reply. Here, blocks whose text has
+ * stopped changing get identical props, `memo` skips them, and only the block currently
+ * being written is parsed again.
+ *
+ * Falls back to plain text whenever `highlightCode` declines (unknown language, past
+ * `FENCE_CHAR_LIMIT`, grammar failure), which is what every code block looked like before.
+ */
+const HighlightedFence = memo(
+  ({
+    code,
+    language,
+    className,
+  }: {
+    code: string;
+    language: string;
+    className?: string;
+  }) => {
+    const html = useMemo(
+      () => highlightCode(code, language, FENCE_CHAR_LIMIT),
+      [code, language],
+    );
+
+    const classes = cn(
+      'bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-foreground block p-4',
+      html != null && 'hljs',
+      className,
+    );
+
+    // `highlightCode` escapes the block's own text and emits nothing but
+    // `<span class="hljs-…">` around it, so no code a model writes can become live markup.
+    return html == null ? (
+      <code className={classes}>{code}</code>
+    ) : (
+      <code className={classes} dangerouslySetInnerHTML={{ __html: html }} />
+    );
+  },
+);
+
+HighlightedFence.displayName = 'HighlightedFence';
 
 interface MarkdownRendererProps {
   children: string;
@@ -129,8 +181,34 @@ export const MarkdownRenderer = memo(({ children, className, highlight, highligh
           return <span className="math-display block my-2 overflow-x-auto" dangerouslySetInnerHTML={{ __html: html }} />;
         }
         
-        const match = /language-(\w+)/.exec(className || '');
+        // `+`, `#` and `-` are in the class because `c++`, `f#` and `objective-c` are real
+        // fence labels; `\w+` alone would read them as `c` and `f`, which highlight as the
+        // wrong language rather than as none.
+        const match = /language-([\w+#-]+)/.exec(className || '');
         const isInline = !match && !content.includes('\n');
+
+        /*
+          Search marking wins over syntax colouring when both apply.
+
+          `processChildren` walks React children to wrap matches in a <span>; the highlighter
+          returns an HTML string. There is no way to do both without re-implementing one of
+          them, and the choice is not close: someone reading with a search term active is
+          looking for the term, and a coloured block that hides their hits is worse than an
+          uncoloured one that shows them.
+        */
+        // `match[1] !== 'math'` belts the braces on the two exact-className checks above:
+        // if remark-math ever emits its classes in the other order, those miss, and this
+        // would otherwise try to highlight a formula as a language called `math`.
+        if (match && match[1] !== 'math' && !highlight) {
+          return (
+            <HighlightedFence
+              code={content}
+              language={match[1].toLowerCase()}
+              className={className}
+            />
+          );
+        }
+
         return (
           <code 
             className={cn(

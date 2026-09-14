@@ -3,9 +3,17 @@ import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
 import { detectPlatform, Platform } from '../types/platform';
 
 interface SettingsState {
-  /** Gemini sidebar base style: 'default' (v2) or 'classic' (pre-v2 blue-tinted) */
-  geminiStyle: 'default' | 'classic';
-  newChatBehavior: 'current-tab' | 'new-tab';
+  /**
+   * Compact mode keeps only the Library content and its overflow menu visible.
+   * The left tab bar and secondary Library header actions are hidden.
+   */
+  compactMode: boolean;
+  /**
+   * Whether the "you can also click the Library title" hint has been shown.
+   * The hint fires once, the first time compact mode is entered from the
+   * overflow menu, so the trip through the menu stays a one-off.
+   */
+  compactModeHintShown: boolean;
   autoScanLibrary: boolean;
   /**
    * When true, deleting a single conversation happens immediately without a
@@ -56,8 +64,8 @@ interface SettingsState {
   themeGridPage: number;
 
   // Actions
-  setGeminiStyle: (style: 'default' | 'classic') => void;
-  setNewChatBehavior: (behavior: 'current-tab' | 'new-tab') => void;
+  setCompactMode: (enabled: boolean) => void;
+  setCompactModeHintShown: (shown: boolean) => void;
   setAutoScanLibrary: (enabled: boolean) => void;
   setSkipDeleteConfirm: (enabled: boolean) => void;
   setOverlayPosition: (position: { x: number; y: number }) => void;
@@ -77,6 +85,20 @@ interface SettingsState {
   setOutlineHeight: (height: number) => void;
   setThemeGridPage: (page: number) => void;
 }
+
+/**
+ * Where the floating toggle sits before the user ever drags it, as an offset
+ * from the bottom-left corner.
+ *
+ * `x` clears the host's own collapsed nav rail (~72px on both Gemini and AI
+ * Studio) so the button lands *beside* that sidebar instead of on top of its
+ * bottom items. It cannot be exact — the rail expands, and our own sidebar
+ * width is user-set — but the button is draggable, so approximate is enough.
+ *
+ * `y` keeps it clear of the screen edge; the old 16px read as stuck to the
+ * corner and collided with page furniture that lives down there.
+ */
+export const DEFAULT_OVERLAY_POSITION = { x: 88, y: 56 };
 
 const storage: StateStorage = {
   getItem: async (name: string): Promise<string | null> => {
@@ -126,11 +148,11 @@ const getStorageName = () => {
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
-      geminiStyle: 'default',
-      newChatBehavior: 'current-tab',
+      compactMode: false,
+      compactModeHintShown: false,
       autoScanLibrary: false,
       skipDeleteConfirm: false,
-      overlayPosition: { x: 16, y: 16 },
+      overlayPosition: { ...DEFAULT_OVERLAY_POSITION },
       lastSelectedGemId: null,
       lastSelectedNotebookId: null,
       explorer: {
@@ -167,10 +189,9 @@ export const useSettingsStore = create<SettingsState>()(
       outlineHeight: 200,
       themeGridPage: 0,
 
-      setGeminiStyle: (style) => {
-        set({ geminiStyle: style });
-      },
-      setNewChatBehavior: (newChatBehavior) => set({ newChatBehavior }),
+      setCompactMode: (compactMode) => set({ compactMode }),
+      setCompactModeHintShown: (compactModeHintShown) =>
+        set({ compactModeHintShown }),
       setAutoScanLibrary: (autoScanLibrary) => set({ autoScanLibrary }),
       setSkipDeleteConfirm: (skipDeleteConfirm) => set({ skipDeleteConfirm }),
       setOverlayPosition: (overlayPosition) => set({ overlayPosition }),
@@ -203,7 +224,7 @@ export const useSettingsStore = create<SettingsState>()(
     {
       name: getStorageName(),
       storage: createJSONStorage(() => storage),
-      version: 6,
+      version: 10,
       partialize: (state) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { themeGridPage, ...rest } = state;
@@ -230,6 +251,30 @@ export const useSettingsStore = create<SettingsState>()(
           // theme/customTheme moved to pegasus-store; strip from persisted settings
           delete persistedState.theme;
           delete persistedState.customTheme;
+        }
+        if (version < 7) {
+          // The former icon-bar toggle is now compact mode. Preserve the old
+          // hidden state, then remove the retired setting.
+          persistedState.compactMode = persistedState.showIconBar === false;
+          delete persistedState.showIconBar;
+        }
+        if (version < 8) {
+          // Gemini Classic was removed; strip its retired persisted selector.
+          delete persistedState.geminiStyle;
+        }
+        if (version < 9) {
+          // "New chat behavior" (current tab vs new tab) was removed — new chats
+          // always open in the current tab now.
+          delete persistedState.newChatBehavior;
+        }
+        if (version < 10) {
+          // The toggle's default corner moved out beside the host sidebar. Only
+          // rewrite positions still sitting on the old default — anything else
+          // is where the user dragged it, and that must survive the upgrade.
+          const old = persistedState.overlayPosition;
+          if (old && old.x === 16 && old.y === 16) {
+            persistedState.overlayPosition = { ...DEFAULT_OVERLAY_POSITION };
+          }
         }
         return persistedState;
       },
