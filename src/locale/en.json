@@ -1546,6 +1546,10 @@
       "workspace": {
         "name": "Workspace",
         "description": "Read, write and edit files and documents in your workspace"
+      },
+      "browser": {
+        "name": "Browser Agent",
+        "description": "Organize Chrome tabs, tab groups and bookmarks"
       }
     },
     "switcher": {

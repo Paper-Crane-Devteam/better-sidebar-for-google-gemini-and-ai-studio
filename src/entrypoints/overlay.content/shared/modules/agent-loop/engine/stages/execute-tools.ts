@@ -110,7 +110,7 @@ export async function executeTools(
     let browserPlan: PlanPreview | undefined;
     if (isBrowserWrite(toolCall.name)) {
       try {
-        browserPlan = await prepareBrowserCall(toolCall.name, toolCall.params);
+        browserPlan = await prepareBrowserCall(toolCall.name, toolCall.params, ctx.store.activeAgentId);
         ctx.abort.check();
       } catch (error) {
         ctx.abort.check();

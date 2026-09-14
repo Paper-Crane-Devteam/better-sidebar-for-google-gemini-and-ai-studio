@@ -22,10 +22,10 @@ import React from 'react';
 import { Switch } from '@/shared/components/ui/switch';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useAgentPolicyStore } from '../../agent-loop/agent-policy-store';
-import { useBrowserAgent } from '../../browser-agent/client';
+import { useAgentLoopStore } from '../../agent-loop/agent-loop-store';
 
 export const AgentPolicyControls: React.FC = () => {
-  const browserMode = useBrowserAgent(s => s.running === 'browser');
+  const browserMode = useAgentLoopStore(s => s.activeAgentId === 'browser');
   const { t } = useI18n();
   const autoRunReads = useAgentPolicyStore((s) => s.autoRunReads);
   const setAutoRunReads = useAgentPolicyStore((s) => s.setAutoRunReads);

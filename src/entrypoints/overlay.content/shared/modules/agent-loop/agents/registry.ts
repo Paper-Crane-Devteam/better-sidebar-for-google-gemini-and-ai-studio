@@ -13,6 +13,8 @@ import { DOCUMENT_MCP_ID } from '../mcp/document-mcp';
 import { buildBetterSidebarSoul } from '../prompts/souls/bettersidebar-soul';
 import { buildWorkspaceSoul } from '../prompts/souls/workspace-soul';
 import type { AgentDefinition, AgentId } from './types';
+import { isChromeBuild } from '@/shared/browser-agent/contracts';
+import { browserPrompt } from '../../browser-agent/prompt';
 
 /**
  * The agent a session runs as when nothing says otherwise.
@@ -35,6 +37,10 @@ export const DEFAULT_AGENT_ID: AgentId = 'bettersidebar';
 const LEGACY_AGENT_IDS: Record<string, AgentId> = {
   __agent_auto__: 'bettersidebar',
   'builtin-workspace-agent': 'workspace',
+  __browser_agent__: 'browser',
+  __browser_tabs__: 'browser',
+  __browser_groups__: 'browser',
+  __browser_bookmarks__: 'browser',
 };
 
 export const AGENTS: AgentDefinition[] = [
@@ -56,6 +62,15 @@ export const AGENTS: AgentDefinition[] = [
     tabContent: 'workspace',
     buildSoul: buildWorkspaceSoul,
   },
+  ...(isChromeBuild() ? [{
+    id: 'browser' as const,
+    name: 'Browser Agent',
+    description: 'Organize Chrome tabs, tab groups and bookmarks',
+    icon: 'Globe',
+    mcpServerIds: [],
+    tabContent: 'browser' as const,
+    buildSoul: () => browserPrompt(),
+  }] : []),
 ];
 
 /** Resolve an id, tolerating the ids that used to mean something else. Never throws. */
@@ -69,7 +84,8 @@ export function getAgent(id: string | null | undefined): AgentDefinition {
 export function normalizeAgentId(id: string | null | undefined): AgentId {
   if (!id) return DEFAULT_AGENT_ID;
   if (AGENTS.some((a) => a.id === id)) return id as AgentId;
-  return LEGACY_AGENT_IDS[id] ?? DEFAULT_AGENT_ID;
+  const legacy = LEGACY_AGENT_IDS[id];
+  return legacy && AGENTS.some(a => a.id === legacy) ? legacy : DEFAULT_AGENT_ID;
 }
 
 /** Whether this id names an agent we know, before falling back. For diagnostics. */

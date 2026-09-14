@@ -12,7 +12,7 @@
  */
 
 import React from 'react';
-import { Bot, FolderOpen, Loader2 } from 'lucide-react';
+import { Bot, FolderOpen, Globe, Loader2 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils/utils';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { listAgents } from '../../agent-loop/agents/registry';
@@ -23,6 +23,7 @@ import { useAgentLoopStore } from '../../agent-loop/agent-loop-store';
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Bot,
   FolderOpen,
+  Globe,
 };
 
 interface AgentSwitcherProps {

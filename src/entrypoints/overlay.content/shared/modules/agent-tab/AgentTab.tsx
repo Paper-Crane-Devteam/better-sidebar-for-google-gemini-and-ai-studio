@@ -38,6 +38,7 @@ import { SplitNewChatButton } from '@/shared/components/ui/split-new-chat-button
 import { UIcon } from '@/shared/components/ui/icon';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { navigateToNewChat } from '@/shared/lib/navigation';
+import { BrowserAgentLauncher } from '../browser-agent/BrowserAgentLauncher';
 
 export const AgentTab: React.FC = () => {
   const { t } = useI18n();
@@ -73,7 +74,7 @@ export const AgentTab: React.FC = () => {
         <AgentSwitcher selected={selectedAgentId} onSelect={setSelectedAgentId} />
       </div>
 
-      {agent.tabContent === 'workspace' ? (
+      {agent.tabContent === 'browser' ? <BrowserAgentLauncher /> : agent.tabContent === 'workspace' ? (
         // `min-h-0` is what lets the file tree scroll instead of pushing the flex parent
         // past the viewport — without it the tree grows and the switcher slides off screen.
         <div className="flex min-h-0 flex-1 flex-col">

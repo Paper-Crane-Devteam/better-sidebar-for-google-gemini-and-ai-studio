@@ -1,3 +1,5 @@
+import { browserRequest, initializeBrowserAgent } from '@/entrypoints/overlay.content/shared/modules/browser-agent/client';
+import { browserEntryNeedsPermission } from '@/entrypoints/overlay.content/shared/modules/agent-loop/agent-entry';
 /**
  * AgentLoopFeature — AI Studio entry point for Agent Loop.
  *
@@ -85,6 +87,7 @@ function isComposerHeldByEngine(): boolean {
 }
 
 export const AgentLoopFeature: React.FC = () => {
+  useEffect(initializeBrowserAgent, []);
   const { t } = useI18n();
   const enabled = usePegasusStore((s) => s.enhancedFeatures.aistudio?.slashCommand ?? true);
 
@@ -218,6 +221,14 @@ export const AgentLoopFeature: React.FC = () => {
     const textarea = getTextarea();
     if (!entry || !textarea) return;
 
+    // Picking a browser row the user has not granted yet opens the permission window
+    // instead of writing a marker that could only fail at send time.
+    if (browserEntryNeedsPermission(entry.id)) {
+      close();
+      void browserRequest({ action: 'open-settings' }).catch((e) => toast.warning(e.message));
+      return;
+    }
+
     const triggerPos = triggerStateRef.current.triggerPosition;
     const cursorPos = textarea.selectionStart;
 
@@ -327,6 +338,12 @@ export const AgentLoopFeature: React.FC = () => {
 
     const entry = match.entry;
 
+    // A marker typed by hand, or granted permission that was revoked since it was picked.
+    if (entry.agent.id === 'browser' && browserEntryNeedsPermission(entry.id)) {
+      void browserRequest({ action: 'open-settings' }).catch((e) => toast.warning(e.message));
+      return abort('browser permission missing', '请先开启 Browser Agent 读取权限，然后重新发送。');
+    }
+
     /**
      * Assembled before the composer is touched. The other order means a throw in here
      * leaves a half-rewritten composer behind while the exception escapes the handler —
@@ -336,6 +353,7 @@ export const AgentLoopFeature: React.FC = () => {
     try {
       basePrompt = assembleFinalPrompt({
         agentId: entry.agent.id,
+        focus: entry.focus,
         platform: getCurrentPlatformId(),
       });
     } catch (err) {

@@ -12,7 +12,7 @@
  */
 
 import React, { useRef } from 'react';
-import { Bot, FolderOpen } from 'lucide-react';
+import { Bot, FolderOpen, Globe } from 'lucide-react';
 import { OverflowTooltip } from '@/shared/components/ui/overflow-tooltip';
 import type { AgentEntry } from './agent-entry';
 import { PopupFooterHints } from '@/entrypoints/overlay.content/shared/features/trigger-popup';
@@ -29,13 +29,18 @@ interface AgentCommandPopupProps {
 /**
  * Icons, by name, for the agents that exist.
  *
- * A lookup rather than a dynamic import: there are two, they are in the bundle already, and
- * `lucide-react`'s dynamic form pulls the whole icon set into a content script that is
- * injected on every page load.
+ * A lookup rather than a dynamic import: there are a handful, they are in the bundle
+ * already, and `lucide-react`'s dynamic form pulls the whole icon set into a content script
+ * that is injected on every page load.
+ *
+ * ⚠️ Must cover every `icon` in `agents/registry.ts` — a missing one silently falls back to
+ * `Bot`, so the Browser rows would look like the Better Sidebar row. Same list as
+ * `AgentSwitcher`.
  */
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Bot,
   FolderOpen,
+  Globe,
 };
 
 const AgentCommandItem: React.FC<{

@@ -86,7 +86,7 @@ export class ResultHandoff {
    * way, so pressing Enter in the composer is picked up exactly like our own click.
    */
   async deliver(text: string, autoSend: boolean): Promise<boolean> {
-    if (useBrowserAgent.getState().running === 'browser') {
+    if (this.ctx.store.activeAgentId === 'browser') {
       await useBrowserAgent.getState().refresh();
       text = safeBrowserText(text);
     }

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { DEFAULT_SETTINGS, isChromeBuild, publicData, type AgentKind, type BrowserRequest, type BrowserSettings, type PlanPreview } from '@/shared/browser-agent/contracts';
+import { DEFAULT_SETTINGS, isChromeBuild, publicData, type BrowserRequest, type BrowserSettings, type PlanPreview } from '@/shared/browser-agent/contracts';
 
 export async function browserRequest<T = unknown>(payload: BrowserRequest): Promise<T> {
   const response = await browser.runtime.sendMessage({ type: 'BROWSER_AGENT', payload });
@@ -7,13 +7,11 @@ export async function browserRequest<T = unknown>(payload: BrowserRequest): Prom
   return response.data as T;
 }
 interface State {
-  selected: AgentKind; running: AgentKind; settings: BrowserSettings; ready: boolean;
-  select: (kind: AgentKind) => void; setRunning: (kind: AgentKind) => void;
+  settings: BrowserSettings; ready: boolean;
   refresh: () => Promise<void>;
 }
 export const useBrowserAgent = create<State>((set) => ({
-  selected: 'data', running: 'data', settings: DEFAULT_SETTINGS, ready: false,
-  select: selected => set({ selected }), setRunning: running => set({ running }),
+  settings: DEFAULT_SETTINGS, ready: false,
   refresh: async () => {
     if (!isChromeBuild()) return;
     try { set({ settings: await browserRequest<BrowserSettings>({ action: 'settings' }), ready: true }); }
@@ -31,8 +29,8 @@ export function initializeBrowserAgent() {
 }
 
 /** Called only by the approval stage; commit is never exposed as a model tool. */
-export async function prepareBrowserCall(tool: string, params: Record<string, string>) {
-  if (useBrowserAgent.getState().running !== 'browser') throw new Error('Start Browser Agent before using browser tools.');
+export async function prepareBrowserCall(tool: string, params: Record<string, string>, agentId: string) {
+  if (agentId !== 'browser') throw new Error('Start Browser Agent before using browser tools.');
   return browserRequest<PlanPreview>({ action: 'prepare', tool, params });
 }
 export function safeBrowserText(text: string) {
