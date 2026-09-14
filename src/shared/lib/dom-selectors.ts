@@ -54,6 +54,27 @@ export const GEMINI_SELECTORS = {
 export const AISTUDIO_SELECTORS = {
   /** Sidebar toggle button in top toolbar */
   toggleSidebar: 'ms-playground-toolbar .toolbar-left button',
+  /**
+   * Collapse button in the redesigned navbar's own header.
+   *
+   * The redesign moved AI Studio's collapse control out of the top toolbar and
+   * into the navbar itself, which is exactly the part we hide — so the sidebar
+   * has to grow its own button and forward the click here.
+   *
+   * This is the *collapse* direction only. Once collapsed the navbar is out of
+   * the layout entirely, this button with it, and `toggleSidebar` above is what
+   * brings it back.
+   */
+  collapseNavbar: 'ms-navbar-v2 .navbar-header > button',
+  /**
+   * The navbar, either generation, and the inner element that carries the
+   * `collapsed` class.
+   *
+   * AI Studio marks the state on the navbar's first child rather than on the
+   * navbar itself; `Layout.tsx` watches the same element to keep our wrapper's
+   * width in step with it.
+   */
+  navbar: 'ms-navbar, ms-navbar-v2',
   /** Close run-settings panel (last button inside the right section, only when panel is open) */
   closeRunSettings: 'ms-right-side-panel ms-run-settings .right>button:last-child',
   /** Toggle run-settings panel button in toolbar */
@@ -135,9 +156,45 @@ export function isGeminiTemporaryChat(): boolean {
 }
 
 /**
+ * Whether the AI Studio navbar is currently collapsed.
+ *
+ * Read from the DOM, not from our own state: the user can collapse from the
+ * native toolbar too, and there is no event to hear about it.
+ */
+export function isAIStudioNavbarCollapsed(): boolean {
+  const navbar = document.querySelector(AISTUDIO_SELECTORS.navbar);
+  return navbar?.firstElementChild?.classList.contains('collapsed') ?? false;
+}
+
+/**
+ * Collapse the AI Studio navbar via its own header button.
+ *
+ * Works on a `display: none` navbar because synthetic `click()` skips hit
+ * testing — nothing here is positioned, so the button needs no geometry.
+ */
+export function collapseAIStudioNavbar(): boolean {
+  return clickFirst(AISTUDIO_SELECTORS.collapseNavbar);
+}
+
+/**
  * Toggle the AI Studio native sidebar.
+ *
+ * The two directions live in two different places now, which is why this reads
+ * the state first instead of clicking one button twice. The redesign moved
+ * collapsing into the navbar's own header, and once collapsed the navbar — that
+ * button included — is gone from the layout, so expanding is only reachable from
+ * the top toolbar.
+ *
+ * Ordering matters, not just correctness: `toolbar-left`'s first button is
+ * whatever AI Studio puts there, and while the navbar is expanded that is no
+ * longer the sidebar toggle. Checking the collapsed state keeps us from clicking
+ * some unrelated control. The toolbar is still the fallback when the header
+ * button cannot be found, which is how the legacy `ms-navbar` gets toggled.
  */
 export function toggleAIStudioSidebar(): boolean {
+  if (!document.querySelector(AISTUDIO_SELECTORS.navbar)) return false;
+
+  if (!isAIStudioNavbarCollapsed() && collapseAIStudioNavbar()) return true;
   return clickFirst(AISTUDIO_SELECTORS.toggleSidebar);
 }
 

@@ -336,6 +336,7 @@
     "switchToOriginalUI": "元のサイドバーに切り替え",
     "temporaryChat": "一時チャット",
     "toggleMenu": "メニューを切り替え",
+    "collapseSidebar": "サイドバーを閉じる",
     "account": "アカウント",
     "signIn": "ログイン",
     "enterCompactMode": "クリックしてコンパクトモードにする",

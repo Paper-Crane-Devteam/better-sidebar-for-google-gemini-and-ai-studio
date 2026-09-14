@@ -14,6 +14,7 @@ import { useSettingsStore } from '@/shared/lib/settings-store';
 import { initAiStudioThemeSync, bindAiStudioShadowRootToTheme } from '@/themes/platforms/aistudio';
 import { useExclusiveContextMenuStore } from '../shared/components/ui/exclusive-context-menu';
 import { registerPlatformDomAdapter } from '@/shared/lib/platform-dom-adapter';
+import { AISTUDIO_SELECTORS } from '@/shared/lib/dom-selectors';
 import { aistudioDomAdapter } from './lib/aistudio-dom-adapter';
 
 /**
@@ -34,8 +35,7 @@ export async function initAiStudioOverlay(mainStyles: string): Promise<void> {
   const style = document.createElement('style');
   style.id = 'better-sidebar-for-google-ai-studio-navbar-hider';
   style.textContent = `
-    ms-navbar,
-    ms-navbar-v2 {
+    ${AISTUDIO_SELECTORS.navbar} {
       display: none !important;
       position: absolute !important;
       left: -9999px !important;
@@ -45,7 +45,7 @@ export async function initAiStudioOverlay(mainStyles: string): Promise<void> {
   document.head.appendChild(style);
 
   try {
-    const navbar = await waitForElement('ms-navbar, ms-navbar-v2');
+    const navbar = await waitForElement(AISTUDIO_SELECTORS.navbar);
     if (navbar) {
       (navbar as HTMLElement).style.display = 'none';
       (navbar as HTMLElement).style.position = 'absolute';
@@ -64,7 +64,7 @@ export async function initAiStudioOverlay(mainStyles: string): Promise<void> {
 
   const syncSidebarWithNavbar = async () => {
     try {
-      const navbar = await waitForElement('ms-navbar, ms-navbar-v2');
+      const navbar = await waitForElement(AISTUDIO_SELECTORS.navbar);
       if (!navbar) return;
       const firstChild = navbar.firstElementChild;
       if (!firstChild) return;

@@ -25,7 +25,8 @@
  */
 
 import React, { useCallback, useRef, useState } from 'react';
-import { Loader2, Upload } from 'lucide-react';
+import { FilePlus, Loader2, Upload } from 'lucide-react';
+import { Button } from '@/shared/components/ui/button';
 import { cn } from '@/shared/lib/utils/utils';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { modal } from '@/shared/lib/modal';
@@ -351,19 +352,59 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({ onBack }) => {
           />
         )}
 
-        {/* Empty state, over the mounted-but-empty tree. `pointer-events-none` so the
-            drop target underneath still receives the drag this text is inviting. */}
+        {/*
+          Empty state, over the mounted-but-empty tree.
+
+          `pointer-events-none` on the wrapper so the drop target underneath still
+          receives the drag this text is inviting; the two buttons opt back in with
+          `pointer-events-auto`, since a button that cannot be clicked is worse than
+          no button.
+
+          The buttons repeat what the header's `+` menu already offers, and that
+          repetition is the point: an empty tree is the one moment where the next
+          step is genuinely unclear, and the menu behind a `+` icon is not
+          discoverable enough to count as an answer. They are gone when the tree is
+          only empty because of a search — the fix there is to clear the search, not
+          to add a file.
+        */}
         {!loading && !error && data.length === 0 && (
-          <p className="pointer-events-none absolute inset-x-0 top-0 px-3 py-4 text-xs text-muted-foreground">
-            {isFiltered
-              ? t('agent.workspace.noMatches', {
-                  defaultValue: 'No files match that search.',
-                })
-              : t('agent.workspace.empty', {
-                  defaultValue:
-                    'No files yet. Drop files here, or ask the agent to write something.',
-                })}
-          </p>
+          <div className="pointer-events-none absolute inset-x-0 top-0 flex flex-col items-start gap-3 px-3 py-4">
+            <p className="text-xs text-muted-foreground">
+              {isFiltered
+                ? t('agent.workspace.noMatches', {
+                    defaultValue: 'No files match that search.',
+                  })
+                : t('agent.workspace.empty', {
+                    defaultValue:
+                      'No files yet. Drop files here, or ask the agent to write something.',
+                  })}
+            </p>
+
+            {!isFiltered && (
+              <div className="pointer-events-auto flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 gap-1.5 px-2.5 text-xs"
+                  onClick={() => transfer.pickFiles('')}
+                >
+                  <Upload className="h-3.5 w-3.5" />
+                  {t('agent.workspace.importFiles', {
+                    defaultValue: 'Import files…',
+                  })}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 gap-1.5 px-2.5 text-xs"
+                  onClick={() => void createFile('')}
+                >
+                  <FilePlus className="h-3.5 w-3.5" />
+                  {t('agent.workspace.newFile', { defaultValue: 'New file' })}
+                </Button>
+              </div>
+            )}
+          </div>
         )}
 
         {/* Drop affordance. `pointer-events-none` so it cannot swallow the drop it is

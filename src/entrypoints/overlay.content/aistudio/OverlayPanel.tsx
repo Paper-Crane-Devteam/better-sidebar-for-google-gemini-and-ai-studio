@@ -16,6 +16,7 @@ import {
   Search,
   ScrollText,
   Bot,
+  Menu,
 } from 'lucide-react';
 import { UIcon } from '@/shared/components/ui/icon';
 import { SqlExecutor } from '../shared/components/menu/SqlExecutor';
@@ -45,7 +46,10 @@ import {
   AccountButton,
   AISTUDIO_ACCOUNT,
 } from '../shared/components/AccountButton';
-
+import {
+  AISTUDIO_SELECTORS,
+  collapseAIStudioNavbar,
+} from '@/shared/lib/dom-selectors';
 
 export const OverlayPanel = ({ className }: { className?: string }) => {
   const moduleConfig = useModuleConfig();
@@ -104,7 +108,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
       'better-sidebar-for-google-ai-studio-navbar-hider',
     ) as HTMLStyleElement;
     const navbars = Array.from(
-      document.querySelectorAll('ms-navbar, ms-navbar-v2'),
+      document.querySelectorAll(AISTUDIO_SELECTORS.navbar),
     ) as HTMLElement[];
     const wrapper = document.getElementById(
       'better-sidebar-for-google-ai-studio-sidebar-wrapper',
@@ -245,6 +249,33 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
           compactMode ? 'hidden' : ''
         }`}
       >
+        {/*
+          Collapse, at the top where AI Studio's own collapse button now lives.
+          One-way on purpose: collapsing takes this rail off screen along with the
+          native navbar, so there is never a moment where this button is visible and
+          the navbar is already collapsed. Expanding is the toolbar's job, and the
+          hotkey's — see `toggleAIStudioSidebar`.
+        */}
+        <SimpleTooltip
+          content={t('tooltip.collapseSidebar', {
+            defaultValue: 'Collapse sidebar',
+          })}
+        >
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => collapseAIStudioNavbar()}
+            className="sidebar-btn transition-all"
+          >
+            {/* Same hamburger as Gemini's toggle, in the same top-of-rail slot.
+                The two platforms differ in what the click does — this one only
+                collapses — but that is not worth a different icon: someone using
+                both should not have to relearn where the button is. */}
+            <Menu className="sidebar-icon" />
+          </Button>
+        </SimpleTooltip>
+        <div className="h-2" />
+
         <SimpleTooltip content={t('tabs.files')}>
           <Button
             variant={activeTab === 'files' ? 'secondary' : 'ghost'}
