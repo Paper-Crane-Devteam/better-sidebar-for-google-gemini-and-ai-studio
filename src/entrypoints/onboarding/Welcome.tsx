@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { ArrowDown, ArrowUpRight, Check, FolderOpen, Search, Bookmark, Play, Sparkles } from 'lucide-react';
 import { PLATFORM_CONFIG } from '@/shared/types/platform';
 import './welcome.css';
@@ -9,7 +8,6 @@ const TUTORIAL_URL = `https://www.youtube.com/watch?v=${TUTORIAL_ID}`;
 type Props = { t: (key: string) => string };
 
 export default function Welcome({ t }: Props) {
-  const [playing, setPlaying] = useState(false);
   const platforms = [PLATFORM_CONFIG.gemini, PLATFORM_CONFIG.aistudio].filter(p => p.supported);
   const features = [
     { icon: FolderOpen, key: 'organize' },
@@ -54,7 +52,9 @@ export default function Welcome({ t }: Props) {
         </section>
         <section id="tutorial" className="welcome-tutorial" aria-labelledby="tutorial-title">
           <div className="welcome-tutorial-copy"><p className="welcome-eyebrow">02 / {t('onboarding.watch')}</p><h2 id="tutorial-title">{t('onboarding.tutorialTitle')}</h2><p>{t('onboarding.tutorialBody')}</p><a href={TUTORIAL_URL} target="_blank" rel="noreferrer" className="welcome-text-link">{t('onboarding.openYoutube')}<ArrowUpRight size={16} aria-hidden="true" /></a><small>{t('onboarding.videoNote')}</small><div><a href="https://papercranedev.com/better-sidebar/guide/getting-started" target="_blank" rel="noopener noreferrer" className="welcome-text-link">{t('about.userGuide')}<ArrowUpRight size={16} aria-hidden="true" /></a></div></div>
-          <div className="welcome-video">{playing ? <iframe src={`https://www.youtube-nocookie.com/embed/${TUTORIAL_ID}?autoplay=1&rel=0`} title={t('onboarding.tutorialTitle')} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen /> : <button className="welcome-video-poster" onClick={() => setPlaying(true)} aria-label={t('onboarding.watch')}><img src="/onboarding/overview.webp" alt="" loading="lazy" /><span className="welcome-play"><Play size={26} fill="currentColor" aria-hidden="true" /></span><span className="welcome-video-label">{t('onboarding.watch')} · YouTube</span></button>}</div>
+          {/* No inline iframe: YouTube's player returns error 153 on chrome-extension:// pages,
+              which send no HTTPS referrer for its config request. Open a real tab instead. */}
+          <div className="welcome-video"><a className="welcome-video-poster" href={TUTORIAL_URL} target="_blank" rel="noreferrer" aria-label={t('onboarding.watch')}><img src="/onboarding/overview.webp" alt="" loading="lazy" /><span className="welcome-play"><Play size={26} fill="currentColor" aria-hidden="true" /></span><span className="welcome-video-label">{t('onboarding.watch')} · YouTube<ArrowUpRight size={14} aria-hidden="true" /></span></a></div>
         </section>
         <details className="welcome-help"><summary>{t('onboarding.help')}</summary><p>{t('onboarding.uiUpdateNote')}</p><p>{t('onboarding.feedbackNote')}</p></details>
       </main>

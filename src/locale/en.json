@@ -699,7 +699,7 @@
     "tutorialTitle": "A little tour. A head start.",
     "tutorialBody": "See Better Sidebar in action, then follow along in your own workspace. Pause and come back whenever you need.",
     "openYoutube": "Open on YouTube",
-    "videoNote": "The player loads only when you click. If playback is unavailable here, open the tutorial on YouTube.",
+    "videoNote": "The tutorial opens in a new YouTube tab, since extension pages can't host the player.",
     "help": "Need a hand?",
     "footerNote": "Made for a more thoughtful workflow."
   },
