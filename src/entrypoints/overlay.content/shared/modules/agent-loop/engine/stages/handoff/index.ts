@@ -22,6 +22,7 @@ import type { LoopContext } from '../../context';
 import { toolCallRecorder } from '../../../records';
 import { isStaged, stageResults, type StagedShape } from './staging';
 import { waitForSend, type SendOutcome } from './send-watcher';
+import { safeBrowserText, useBrowserAgent } from '../../../../browser-agent/client';
 
 export { formatResults, wrapForAI, RESULT_OPEN_TAG } from './formatter';
 
@@ -86,6 +87,10 @@ export class ResultHandoff {
    * way, so pressing Enter in the composer is picked up exactly like our own click.
    */
   async deliver(text: string, autoSend: boolean): Promise<boolean> {
+    if (useBrowserAgent.getState().running === 'browser') {
+      await useBrowserAgent.getState().refresh();
+      text = safeBrowserText(text);
+    }
     this.ctx.setStatus('sending');
     console.log('[AgentLoop] Inserting results into editor, length:', text.length);
 

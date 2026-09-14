@@ -5,6 +5,8 @@
  */
 
 import type { ParsedToolCall } from '../types';
+import { isBrowserTool, isBrowserWrite } from '@/shared/browser-agent/contracts';
+import { browserRequest, useBrowserAgent } from '../../browser-agent/client';
 import { mcpRegistry } from '../mcp/registry';
 import { getSkillById, getEnabledSkills } from '../skills/skill-registry';
 import { useAgentLoopStore } from '../agent-loop-store';
@@ -29,6 +31,13 @@ export async function executeToolCall(toolCall: ParsedToolCall): Promise<string>
 }
 
 async function runToolCall(toolCall: ParsedToolCall): Promise<string> {
+  const browserMode = useBrowserAgent.getState().running === 'browser';
+  if (isBrowserTool(toolCall.name)) {
+    if (!browserMode) return 'ERROR: Browser tools require a Browser Agent task.';
+    if (isBrowserWrite(toolCall.name)) return 'ERROR: Browser writes require a prepared plan and explicit approval through the engine.';
+    return JSON.stringify(await browserRequest({ action: 'read', tool: toolCall.name, params: toolCall.params }));
+  }
+  if (browserMode && toolCall.name !== 'complete_task') return 'ERROR: Only browser tools and complete_task are available in Browser Agent.';
   // ── 1. Meta-tool: activate_skill ─────────────────────────────────────
   if (toolCall.name === 'activate_skill') {
     const skillId = toolCall.params.skill_id;

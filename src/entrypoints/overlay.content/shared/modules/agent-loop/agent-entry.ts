@@ -11,11 +11,23 @@
 import type { Skill } from './skills/types';
 import { getSkillsForPopup, getSkillById } from './skills/skill-registry';
 import i18n from '@/locale/i18n';
+import { isChromeBuild, type AgentKind } from '@/shared/browser-agent/contracts';
+import { useBrowserAgent } from '../browser-agent/client';
 
 /** Sentinel id for "run the agent, let it pick a skill itself" */
 export const AGENT_AUTO_ID = '__agent_auto__';
+export const BROWSER_AUTO_ID = '__browser_agent__';
+export function browserEntryNeedsPermission(id: string) {
+  const caps = useBrowserAgent.getState().settings.capabilities;
+  if (id === '__browser_tabs__') return !caps.includes('tabs.read');
+  if (id === '__browser_groups__') return !caps.includes('tabGroups.read');
+  if (id === '__browser_bookmarks__') return !caps.includes('bookmarks.read');
+  return id === BROWSER_AUTO_ID && !caps.some(c => c.endsWith('.read'));
+}
 
 export interface AgentEntry {
+  agentKind?: AgentKind;
+  focus?: string;
   id: string;
   title: string;
   description: string;
@@ -24,6 +36,16 @@ export interface AgentEntry {
   capsuleContent: string;
   /** The skill to preload, or undefined for the auto entry */
   skill?: Skill;
+}
+
+function browserEntries(): AgentEntry[] {
+  if (!isChromeBuild()) return [];
+  return [
+    [BROWSER_AUTO_ID, 'Browser Agent', '整理 Chrome 标签页、标签组和收藏夹'],
+    ['__browser_tabs__', '整理标签页', 'Organize tabs in the current window.'],
+    ['__browser_groups__', '管理标签组', 'Organize tab groups in the current window.'],
+    ['__browser_bookmarks__', '整理收藏夹', 'Organize bookmarks using titles and URLs.'],
+  ].map(([id, title, focus]) => ({ id, title, focus, description: browserEntryNeedsPermission(id) ? '🔒 尚未授权 · 点击打开权限设置' : focus, icon: 'Globe', capsuleContent: title, agentKind: 'browser' }));
 }
 
 function getAutoEntry(): AgentEntry {
@@ -49,11 +71,13 @@ function toEntry(skill: Skill): AgentEntry {
 
 /** All entries: auto first, then enabled skills. */
 export function getAgentEntries(): AgentEntry[] {
-  return [getAutoEntry(), ...getSkillsForPopup().map(toEntry)];
+  return [getAutoEntry(), ...browserEntries(), ...getSkillsForPopup().map(toEntry)];
 }
 
 /** Resolve an entry by id (works for both the auto sentinel and skill ids). */
 export function getAgentEntryById(id: string): AgentEntry | undefined {
+  const browser = browserEntries().find(e => e.id === id);
+  if (browser) return browser;
   if (id === AGENT_AUTO_ID) return getAutoEntry();
   const skill = getSkillById(id);
   return skill ? toEntry(skill) : undefined;

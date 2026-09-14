@@ -19,6 +19,8 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { useAgentLoopStore } from '../../agent-loop/agent-loop-store';
 import { getToolLabel } from '../../agent-loop/tool-labels';
 import type { ApprovalScope } from '../../agent-loop/types';
+import { isBrowserWrite } from '@/shared/browser-agent/contracts';
+import { BrowserPlanPreview } from '../../browser-agent/BrowserPlanPreview';
 
 export const AgentApproval: React.FC = () => {
   const { t } = useI18n();
@@ -29,7 +31,7 @@ export const AgentApproval: React.FC = () => {
 
   if (!pendingApproval) return null;
 
-  const { toolName, description, params, risk, remaining, resolve } = pendingApproval;
+  const { toolName, description, params, risk, remaining, resolve, browserPlan } = pendingApproval;
   const isWrite = risk === 'write';
   const detail = params.query || params.summary || params.ids || '';
   /** What the AI said it's doing, falling back to a label when it said nothing. */
@@ -83,6 +85,7 @@ export const AgentApproval: React.FC = () => {
 
       {/* The headline: which step this is. */}
       <p className="text-sm font-medium leading-relaxed text-foreground">{summary}</p>
+      {browserPlan && <BrowserPlanPreview plan={browserPlan} />}
 
       {/* What it will actually do, in the user's language. Shown in full rather than
           folded — this is the decision, not a detail behind it. Capped in height because
@@ -165,7 +168,7 @@ export const AgentApproval: React.FC = () => {
               <Play className="h-3 w-3" />
               {t('agent.approve.run', { defaultValue: 'Run' })}
             </Button>
-            {remaining > 0 && (
+            {!isBrowserWrite(toolName) && remaining > 0 && (
               <Button
                 size="sm"
                 variant="outline"
@@ -188,13 +191,13 @@ export const AgentApproval: React.FC = () => {
               {t('agent.approve.reject', { defaultValue: 'Reject' })}
             </Button>
           </div>
-          <button
+          {!isBrowserWrite(toolName) && <button
             type="button"
             onClick={() => decide(true, 'task')}
             className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
           >
             {t('agent.approve.allTask', { defaultValue: "Don't ask again for this task" })}
-          </button>
+          </button>}
         </div>
       )}
     </div>

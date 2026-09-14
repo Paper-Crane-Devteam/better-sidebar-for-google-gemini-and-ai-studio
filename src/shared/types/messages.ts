@@ -1,6 +1,7 @@
 import { Folder, Tag, Prompt, PromptFolder } from './db';
 
 export type ExtensionMessage = (
+  | { type: 'BROWSER_AGENT'; payload: import('../browser-agent/contracts').BrowserRequest }
   | { type: 'GET_FOLDERS' }
   | {
       type: 'CREATE_FOLDER';

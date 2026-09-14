@@ -22,8 +22,10 @@ import React from 'react';
 import { Switch } from '@/shared/components/ui/switch';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useAgentPolicyStore } from '../../agent-loop/agent-policy-store';
+import { useBrowserAgent } from '../../browser-agent/client';
 
 export const AgentPolicyControls: React.FC = () => {
+  const browserMode = useBrowserAgent(s => s.running === 'browser');
   const { t } = useI18n();
   const autoRunReads = useAgentPolicyStore((s) => s.autoRunReads);
   const setAutoRunReads = useAgentPolicyStore((s) => s.setAutoRunReads);
@@ -32,6 +34,7 @@ export const AgentPolicyControls: React.FC = () => {
   const autoContinue = useAgentPolicyStore((s) => s.autoContinue);
   const setAutoContinue = useAgentPolicyStore((s) => s.setAutoContinue);
 
+  if (browserMode) return <p className="rounded border border-border/40 p-3 text-xs text-muted-foreground">Browser Agent：纯读取无需批准；所有改动逐批批准，自动执行与极速模式不适用。</p>;
   return (
     <div className="space-y-2 rounded-md border border-border/40 p-3">
       <div className="flex items-center justify-between gap-2">

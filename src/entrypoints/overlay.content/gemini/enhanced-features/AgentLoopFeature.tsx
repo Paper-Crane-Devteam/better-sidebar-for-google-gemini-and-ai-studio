@@ -10,6 +10,7 @@
  */
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { browserRequest, initializeBrowserAgent, useBrowserAgent } from '@/entrypoints/overlay.content/shared/modules/browser-agent/client';
 import { usePegasusStore } from '@/shared/lib/pegasus-store';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { showCapsuleDetailModal } from '@/entrypoints/overlay.content/shared/lib/capsule-modal';
@@ -46,7 +47,7 @@ import {
 import { assembleFinalPrompt } from '@/entrypoints/overlay.content/shared/modules/agent-loop/prompts/prompt-assembler';
 import { getEnabledSkills } from '@/entrypoints/overlay.content/shared/modules/agent-loop/skills/skill-registry';
 import { initMCPRegistry } from '@/entrypoints/overlay.content/shared/modules/agent-loop/mcp/setup';
-import { getAgentEntryById } from '@/entrypoints/overlay.content/shared/modules/agent-loop/agent-entry';
+import { getAgentEntryById, browserEntryNeedsPermission } from '@/entrypoints/overlay.content/shared/modules/agent-loop/agent-entry';
 import {
   buildToolCallFingerprint,
   buildToolCallKey,
@@ -88,6 +89,7 @@ function isComposerHeldByEngine(): boolean {
 }
 
 export const AgentLoopFeature: React.FC = () => {
+  useEffect(initializeBrowserAgent, []);
   const { t } = useI18n();
   const slashCommandEnabled = usePegasusStore(
     (s) => s.enhancedFeatures.gemini.slashCommand,
@@ -372,6 +374,11 @@ export const AgentLoopFeature: React.FC = () => {
 
     console.log('[AgentLoop] Auto-pickup: detected unexecuted tool calls in idle state, starting session');
 
+    const lastEntryId = [...messages].reverse().find(m => m.promptId)?.promptId;
+    const kind = lastEntryId ? getAgentEntryById(lastEntryId)?.agentKind ?? 'data' : 'data';
+    useBrowserAgent.getState().setRunning(kind);
+    useBrowserAgent.getState().select(kind);
+
     const engine = new AgentLoopEngine(adapter);
     engineRef.current = engine;
     setActiveEngine(engine);
@@ -386,6 +393,11 @@ export const AgentLoopFeature: React.FC = () => {
   function handleConfirmSelection() {
     const entry = getSelectedEntryRef.current();
     if (!entry) return;
+    if (entry.agentKind === 'browser' && browserEntryNeedsPermission(entry.id)) {
+      close();
+      void browserRequest({ action: 'open-settings' }).catch(e => toast.warning(e.message));
+      return;
+    }
 
     const adapter = getAdapter();
     const editor = adapter?.getEditor();
@@ -510,6 +522,10 @@ export const AgentLoopFeature: React.FC = () => {
       if (!entry) {
         return abort(`unknown entry "${entryId}"`, i18n.t('agent.send.staleCapsule'));
       }
+      if (entry.agentKind === 'browser' && browserEntryNeedsPermission(entry.id)) {
+        void browserRequest({ action: 'open-settings' }).catch(e => toast.warning(e.message));
+        return abort('browser permission missing', '请先开启 Browser Agent 读取权限，然后重新发送。');
+      }
 
       /**
        * Assembled before the editor is touched. It used to run after
@@ -520,6 +536,8 @@ export const AgentLoopFeature: React.FC = () => {
       let basePrompt: string;
       try {
         basePrompt = assembleFinalPrompt({
+          agentKind: entry.agentKind,
+          focus: entry.focus,
           selectedSkill: entry.skill,
           allSkills: getEnabledSkills(),
           platform: getCurrentPlatformId(),
@@ -570,7 +588,11 @@ export const AgentLoopFeature: React.FC = () => {
       // engine if the message actually went out — otherwise it would sit waiting
       // for a response to a prompt that was never delivered.
       adapter.triggerSend({ humanDelay: false }).then((sent) => {
-        if (sent) startAgentEngine({ title });
+        if (sent) {
+          useBrowserAgent.getState().setRunning(entry.agentKind ?? 'data');
+          useBrowserAgent.getState().select(entry.agentKind ?? 'data');
+          startAgentEngine({ title });
+        }
         else console.warn('[AgentLoop] Initial prompt was not sent, engine not started');
       });
 
@@ -714,6 +736,8 @@ export const AgentLoopFeature: React.FC = () => {
        * presses would stage the same payload twice.
        */
       useAgentRecordStore.setState({ owed: null });
+      // Browser audit is independent and never creates SQL-ledger owed rows.
+      useBrowserAgent.getState().setRunning('data');
 
       const engine = new AgentLoopEngine(adapter);
       engineRef.current = engine;

@@ -17,6 +17,7 @@
  */
 
 import type { ParsedToolCall, ToolRisk } from './types';
+import { isBrowserTool, isBrowserWrite } from '@/shared/browser-agent/contracts';
 import { useAgentLoopStore } from './agent-loop-store';
 import { useAgentPolicyStore } from './agent-policy-store';
 import { CONTROL_TOOLS, identityParams, isHandoffTool } from './engine/parser/tool-schema';
@@ -48,6 +49,7 @@ export function isControlTool(toolName: string): boolean {
  * first. It is handled by name in `requiresApproval` instead — see there.
  */
 export function getToolRisk(toolCall: ParsedToolCall): ToolRisk {
+  if (isBrowserTool(toolCall.name)) return isBrowserWrite(toolCall.name) ? 'write' : 'read';
   if (isControlTool(toolCall.name)) return 'control';
   if (toolCall.name !== 'execute_sql') return 'read';
   const sql = (toolCall.params.query || '').trim().toUpperCase();
@@ -61,6 +63,7 @@ export function isWriteOperation(toolCall: ParsedToolCall): boolean {
 
 /** Whether this call must wait for the user before it runs */
 export function requiresApproval(toolCall: ParsedToolCall): boolean {
+  if (isBrowserTool(toolCall.name)) return isBrowserWrite(toolCall.name);
   const risk = getToolRisk(toolCall);
   // Outside the switches by construction — there is no operation here to approve.
   if (risk === 'control') return false;
@@ -128,6 +131,15 @@ export function isUnattendedAllowed(): boolean {
  * formatting don't produce a different fingerprint.
  */
 export function buildToolCallFingerprint(toolCall: ParsedToolCall): string {
+  if (isBrowserTool(toolCall.name)) {
+    // Browser labels and URLs are exact values: whitespace inside a string matters.
+    const canonical = (value: unknown): unknown => Array.isArray(value) ? value.map(canonical)
+      : value && typeof value === 'object' ? Object.fromEntries(Object.entries(value).sort(([a], [b]) => a.localeCompare(b)).map(([k, v]) => [k, canonical(v)])) : value;
+    const params = identityParams(toolCall.params);
+    let operations: unknown = params.operations;
+    try { if (params.operations) operations = JSON.parse(params.operations); } catch { /* Validation reports malformed JSON later. */ }
+    return `${toolCall.name}(${JSON.stringify(canonical({ ...params, ...(operations !== undefined ? { operations } : {}) }))})`;
+  }
   // `identityParams` drops the human-facing ones (`change_summary`): they are reworded
   // freely and would give the same effective call a different fingerprint each time,
   // which the join key written into the conversation cannot tolerate.

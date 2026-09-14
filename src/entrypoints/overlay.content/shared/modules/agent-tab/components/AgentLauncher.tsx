@@ -7,7 +7,10 @@
  * chat input for you.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { isChromeBuild } from '@/shared/browser-agent/contracts';
+import { browserRequest, useBrowserAgent, initializeBrowserAgent } from '../../browser-agent/client';
+import { BrowserAgentPanel } from '../../browser-agent/BrowserAgentPanel';
 import { Bot, Keyboard, Lock, Send, Settings, ShieldCheck } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { UIcon } from '@/shared/components/ui/icon';
@@ -15,7 +18,7 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { useAppStore } from '@/shared/lib/store';
 import { useLicenseStore } from '@/shared/lib/license-store';
 import { navigateToNewChat } from '@/shared/lib/navigation';
-import { getAgentEntries, AGENT_AUTO_ID } from '../../agent-loop/agent-entry';
+import { getAgentEntries, AGENT_AUTO_ID, BROWSER_AUTO_ID, browserEntryNeedsPermission } from '../../agent-loop/agent-entry';
 import { agentEventBus } from '../../agent-loop/event-bus';
 import { useAgentLoopStore } from '../../agent-loop/agent-loop-store';
 import { getActiveEngine } from '../../agent-loop/engine/engine-registry';
@@ -23,6 +26,9 @@ import { getActiveEngine } from '../../agent-loop/engine/engine-registry';
 
 
 export const AgentLauncher: React.FC = () => {
+  const agentKind = useBrowserAgent(s => s.selected);
+  useBrowserAgent(s => s.settings);
+  useEffect(initializeBrowserAgent, []);
   const { t } = useI18n();
   const setSettingsOpen = useAppStore((s) => s.setSettingsOpen);
   const tier = useLicenseStore((s) => s.tier);
@@ -49,9 +55,10 @@ export const AgentLauncher: React.FC = () => {
     setUnavailable(null);
   };
 
-  const entries = getAgentEntries();
-  const autoEntry = entries.find((e) => e.id === AGENT_AUTO_ID);
-  const skillEntries = entries.filter((e) => e.id !== AGENT_AUTO_ID);
+  const entries = getAgentEntries().filter(e => (e.agentKind ?? 'data') === agentKind);
+  const autoId = agentKind === 'browser' ? BROWSER_AUTO_ID : AGENT_AUTO_ID;
+  const autoEntry = entries.find((e) => e.id === autoId);
+  const skillEntries = entries.filter((e) => e.id !== autoId);
 
   /**
    * Ask the platform feature to stage the entry. If nothing acknowledges within
@@ -59,6 +66,10 @@ export const AgentLauncher: React.FC = () => {
    * turned off) — say so instead of failing silently.
    */
   const run = (entryId: string, userInput?: string, autoSend = false, onStaged?: () => void) => {
+    if (browserEntryNeedsPermission(entryId)) {
+      void browserRequest({ action: 'open-settings' });
+      return;
+    }
     setUnavailable(null);
     if (busy) {
       setUnavailable('session-busy');
@@ -120,6 +131,12 @@ export const AgentLauncher: React.FC = () => {
 
   return (
     <div className="flex h-full flex-col overflow-y-auto px-4 py-4">
+      {isChromeBuild() && <label className="mb-3 flex items-center gap-2 text-xs">Agent
+        <select aria-label="Agent" value={agentKind} disabled={busy} className="rounded border border-border bg-background px-2 py-1" onChange={e => useBrowserAgent.getState().select(e.target.value as 'data' | 'browser')}>
+          <option value="data">Data Agent</option><option value="browser">Browser Agent</option>
+        </select>
+      </label>}
+      {agentKind === 'browser' && <BrowserAgentPanel />}
       {/* Intro */}
       <div className="mb-4 flex items-start gap-3">
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10">
@@ -130,7 +147,7 @@ export const AgentLauncher: React.FC = () => {
             {t('agent.launcher.title', { defaultValue: 'Agent' })}
           </h2>
           <p className="text-xs leading-relaxed text-muted-foreground">
-            {t('agent.launcher.subtitle', {
+            {agentKind === 'browser' ? '整理 Chrome 标签页、标签组与收藏夹。' : t('agent.launcher.subtitle', {
               defaultValue: 'Team up with AI to manage your chats, prompts and data.',
             })}
           </p>
@@ -253,14 +270,14 @@ export const AgentLauncher: React.FC = () => {
         <div className="flex items-start gap-2 text-xs text-muted-foreground">
           <ShieldCheck className="mt-1 h-3 w-3 shrink-0" />
           <span>
-            {t('agent.launcher.safety', {
+            {agentKind === 'browser' ? '所有浏览器改动都需要批准，极速模式也不能跳过。' : t('agent.launcher.safety', {
               defaultValue:
                 'Only your local database is touched. Changes are confirmed before they run.',
             })}
           </span>
         </div>
 
-        {!canWrite && (
+        {!canWrite && agentKind !== 'browser' && (
           <div className="flex items-start gap-2 text-xs text-muted-foreground">
             <Lock className="mt-1 h-3 w-3 shrink-0" />
             <span>

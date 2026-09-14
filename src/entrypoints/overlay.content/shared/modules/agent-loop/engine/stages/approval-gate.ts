@@ -20,11 +20,13 @@ import type { ApprovalDecision, ParsedToolCall } from '../../types';
 import type { LoopContext } from '../context';
 import { getToolRisk } from '../../execution-policy';
 import { AbortError } from '../guards/abort';
+import { isBrowserWrite, type PlanPreview } from '@/shared/browser-agent/contracts';
 
 /** Approved with no user present — used when the policy says this call is free */
 export const AUTO_APPROVED: ApprovalDecision = { approved: true, scope: 'once' };
 
 export interface ApprovalRequest {
+  browserPlan?: PlanPreview;
   toolCall: ParsedToolCall;
   fingerprint: string;
   /** How many calls are still queued after this one, for the "rest of this response" option */
@@ -37,7 +39,7 @@ export interface ApprovalRequest {
  */
 export function requestApproval(
   ctx: LoopContext,
-  { toolCall, fingerprint, remaining }: ApprovalRequest,
+  { toolCall, fingerprint, remaining, browserPlan }: ApprovalRequest,
 ): Promise<ApprovalDecision> {
   return new Promise<ApprovalDecision>((resolve, reject) => {
     const signal = ctx.abort.signal;
@@ -61,10 +63,10 @@ export function requestApproval(
       cleanup();
 
       // Widen the approval before returning, so the calls behind this one don't ask
-      if (decision.approved && decision.scope === 'round') {
+      if (!isBrowserWrite(toolCall.name) && decision.approved && decision.scope === 'round') {
         ctx.store.setApproveRestOfRound(true);
       }
-      if (decision.approved && decision.scope === 'task') {
+      if (!isBrowserWrite(toolCall.name) && decision.approved && decision.scope === 'task') {
         ctx.store.setSpeedMode(true);
       }
 
@@ -93,6 +95,7 @@ export function requestApproval(
     // Published last: the UI can answer synchronously, and cleanup has to be able
     // to recognise this handler by then.
     ctx.store.setPendingApproval({
+      browserPlan,
       fingerprint,
       toolName: toolCall.name,
       description: toolCall.description,

@@ -1,0 +1,7 @@
+:root { font-family: system-ui, sans-serif; color-scheme: light dark; font-size: 14px; }
+body { margin: 0; background: Canvas; color: CanvasText; }
+main { max-width: 520px; padding: 24px; margin: auto; }
+h1 { font-size: 22px; margin: 0 0 8px; } h2 { font-size: 15px; margin: 24px 0 12px; }
+p { line-height: 1.65; opacity: .75; font-size: 12px; }
+label { display: flex; gap: 10px; align-items: center; padding: 8px 0; }
+input { accent-color: #5a67d8; } button { padding: 8px 24px; cursor: pointer; margin-top: 12px; } .error { color: #d44; opacity: 1; }

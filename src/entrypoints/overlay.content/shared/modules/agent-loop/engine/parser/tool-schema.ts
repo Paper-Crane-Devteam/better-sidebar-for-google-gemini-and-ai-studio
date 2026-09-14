@@ -7,6 +7,8 @@
  */
 
 /** Maximum tool calls honoured in a single AI response */
+import { BROWSER_TOOLS } from '@/shared/browser-agent/contracts';
+
 export const MAX_TOOL_CALLS = 20;
 
 /**
@@ -17,6 +19,7 @@ export const TOOL_TAG = 'bs_agent_tool';
 
 /** Tool names the engine can actually execute */
 export const SUPPORTED_TOOLS = [
+  ...BROWSER_TOOLS,
   'execute_sql',
   'sync_conversation_messages',
   'export',
@@ -26,6 +29,10 @@ export const SUPPORTED_TOOLS = [
 
 /** Params that must be present and non-empty, per tool */
 export const REQUIRED_PARAMS: Record<string, string[]> = {
+  browser_update_tabs: ['operations'],
+  browser_manage_tab_groups: ['operations'],
+  browser_manage_bookmarks: ['operations'],
+  browser_undo_changes: ['batch_id'],
   execute_sql: ['query'],
   sync_conversation_messages: ['conversation_ids'],
   // `format` is deliberately absent: omitting it is how the model says "the user

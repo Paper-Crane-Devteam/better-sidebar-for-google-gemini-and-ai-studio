@@ -26,6 +26,8 @@ import { deliversResultToAI, isHandoffTool } from '../parser/tool-schema';
 import { formatSectionHeading } from './handoff/formatter';
 import { AUTO_APPROVED, requestApproval } from './approval-gate';
 import { toolCallRecorder } from '../../records';
+import { isBrowserTool, isBrowserWrite, type PlanPreview } from '@/shared/browser-agent/contracts';
+import { browserRequest, prepareBrowserCall, safeBrowserText } from '../../../browser-agent/client';
 
 export type ExecuteOutcome =
   /** Round finished; feed these sections back to the AI */
@@ -105,8 +107,23 @@ export async function executeTools(
     }
 
     // ── Gate: does the user have to say go? ────────────────────────────────
+    let browserPlan: PlanPreview | undefined;
+    if (isBrowserWrite(toolCall.name)) {
+      try {
+        browserPlan = await prepareBrowserCall(toolCall.name, toolCall.params);
+        ctx.abort.check();
+      } catch (error) {
+        ctx.abort.check();
+        const body = `ERROR: ${safeBrowserText((error as Error).message)}`;
+        results.push(section(toolCall, key, body));
+        trouble.push(`${toolCall.name} (plan failed)`);
+        ctx.store.addResult({ toolName: toolCall.name, success: false, result: body, timestamp: Date.now() });
+        continue;
+      }
+    }
     const decision = requiresApproval(toolCall)
       ? await requestApproval(ctx, {
+          browserPlan,
           toolCall,
           fingerprint,
           remaining: toolCalls.length - index - 1,
@@ -114,6 +131,7 @@ export async function executeTools(
       : AUTO_APPROVED;
 
     if (!decision.approved) {
+      if (browserPlan) void browserRequest({ action: 'cancel', planId: browserPlan.id });
       // Reported as a tool result rather than aborting the round: the AI has to
       // learn this specific call was refused, and why, or its next move is the same
       // statement again.
@@ -144,7 +162,7 @@ export async function executeTools(
       // `record`, not `settle`: a refusal skips `begin` — nothing ran, so there was
       // no window to guard — but it still needs a row, because "you turned this down"
       // is an outcome the card must be able to show after a reload.
-      void toolCallRecorder.record(
+      if (!isBrowserTool(toolCall.name)) void toolCallRecorder.record(
         {
           key,
           round: ctx.round,
@@ -174,7 +192,7 @@ export async function executeTools(
      * exists anywhere. A row left at `running` is how the next page load knows to say
      * "this may have gone through" instead of quietly offering to run it again.
      */
-    await toolCallRecorder.begin({
+    if (!isBrowserTool(toolCall.name)) await toolCallRecorder.begin({
       key,
       round: ctx.round,
       orderIndex: index,
@@ -184,7 +202,17 @@ export async function executeTools(
       isWrite: getToolRisk(toolCall) === 'write',
     });
 
-    const result = await executeToolCall(toolCall);
+    let result: string;
+    if (browserPlan) {
+      const cancel = () => { void browserRequest({ action: 'cancel', planId: browserPlan!.id }); };
+      ctx.abort.signal.addEventListener('abort', cancel);
+      try {
+        ctx.abort.check();
+        const outcome = await browserRequest<{ status: string }>({ action: 'commit', planId: browserPlan.id });
+        result = `${outcome.status === 'applied' ? '' : 'ERROR: '}${JSON.stringify(outcome)}`;
+      } catch (error) { result = `ERROR: ${safeBrowserText((error as Error).message)}`; }
+      finally { ctx.abort.signal.removeEventListener('abort', cancel); }
+    } else result = await executeToolCall(toolCall);
     const success = isSuccess(result);
 
     ctx.events.emit('tool:executed', {
@@ -218,7 +246,7 @@ export async function executeTools(
           timestamp: Date.now(),
         });
         const haltedSection = section(toolCall, key, `${body}\n\n${failure.message}`);
-        void toolCallRecorder.settle(key, { status: 'failed', resultBody: body });
+        if (!isBrowserTool(toolCall.name)) void toolCallRecorder.settle(key, { status: 'failed', resultBody: body });
         results.push(haltedSection);
         return halt(ctx, results, 'Too many failures in a row. Review the errors above, then retry.');
       }
@@ -253,7 +281,7 @@ export async function executeTools(
      * body produced a card offering to send the AI its own `__TASK_COMPLETE__` marker,
      * one message after the task had visibly finished.
      */
-    void toolCallRecorder.settle(key, {
+    if (!isBrowserTool(toolCall.name)) void toolCallRecorder.settle(key, {
       status: success ? 'ok' : 'failed',
       resultBody: deliversResultToAI(toolCall.name) ? body : null,
     });

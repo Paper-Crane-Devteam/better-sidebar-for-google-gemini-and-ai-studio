@@ -6,7 +6,7 @@ import path from 'node:path';
 export default defineConfig({
   srcDir: 'src',
   modules: ['@wxt-dev/module-react'],
-  manifest: {
+  manifest: ({ browser: targetBrowser }) => ({
     name: '__MSG_extensionName__',
     description: '__MSG_extensionDescription__',
     default_locale: 'en',
@@ -26,6 +26,7 @@ export default defineConfig({
       'offscreen',
       'identity',
     ],
+    optional_permissions: targetBrowser === 'chrome' ? ['tabs', 'tabGroups', 'bookmarks'] : [],
     host_permissions: [
       'https://aistudio.google.com/*',
       'https://gemini.google.com/*',
@@ -76,7 +77,7 @@ export default defineConfig({
         ],
       },
     ],
-  },
+  }),
   zip: {
     // Drop orphaned KaTeX font files (~0.78 MB). scripts/postcss-woff2-only.mjs
     // strips the woff/truetype sources from katex's @font-face rules, but Vite

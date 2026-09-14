@@ -42,6 +42,8 @@ import {
   isControlTool,
 } from '../../execution-policy';
 import { getToolLabel } from '../../tool-labels';
+import { isBrowserWrite } from '@/shared/browser-agent/contracts';
+import { BrowserPlanPreview } from '../../../browser-agent/BrowserPlanPreview';
 
 interface ToolCallWidgetProps {
   toolName?: string;
@@ -308,6 +310,7 @@ export const ToolCallWidget: React.FC<ToolCallWidgetProps> = ({
           still reachable either way by expanding the card. */}
       {isPending && (
         <div className="space-y-2 bg-background/60 px-3 py-2">
+          {pendingApproval?.browserPlan && <BrowserPlanPreview plan={pendingApproval.browserPlan} />}
           {changeSummary ? (
             <div className="max-h-[240px] overflow-y-auto rounded border border-border/40 bg-background/50 px-2.5 py-2">
               <MarkdownRenderer className="text-xs text-foreground">
@@ -380,7 +383,7 @@ export const ToolCallWidget: React.FC<ToolCallWidgetProps> = ({
                 <Play className="h-3 w-3" /> {t('agent.approve.run', { defaultValue: 'Run' })}
               </button>
               {/* Only when there is actually a rest to approve */}
-              {(pendingApproval?.remaining ?? 0) > 0 && (
+              {!isBrowserWrite(toolName) && (pendingApproval?.remaining ?? 0) > 0 && (
                 <button
                   type="button"
                   onClick={() => decide(true, 'round')}

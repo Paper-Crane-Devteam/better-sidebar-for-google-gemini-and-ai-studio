@@ -162,6 +162,7 @@ export interface ApprovalDecision {
  * dialog describing it second-hand.
  */
 export interface PendingApproval {
+  browserPlan?: import('@/shared/browser-agent/contracts').PlanPreview;
   fingerprint: string;
   toolName: string;
   description?: string;

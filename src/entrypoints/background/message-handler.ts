@@ -6,6 +6,7 @@ import type { MessageSender } from './types';
 import { ensureDbReady } from './db';
 import { detectPlatform, Platform } from '@/shared/types/platform';
 import { ensureDbForTab, removeTab } from './tab-profile-map';
+import { handleBrowserAgent } from './handlers/browser-agent';
 import {
   handleFolders,
   handleConversations,
@@ -55,6 +56,7 @@ export async function handleMessage(
   sender: MessageSender,
 ): Promise<ExtensionResponse> {
   try {
+    if (message.type === 'BROWSER_AGENT') return await handleBrowserAgent(message.payload, sender);
     // The DB bridge broadcasts these to the offscreen document, and
     // runtime.sendMessage reaches every extension context including this one.
     // Answer immediately: they are none of our business, and queueing them

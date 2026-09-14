@@ -12,6 +12,7 @@ import { getCurrentPlatformId } from '../adapters/adapter-factory';
 import { INBOX_FOLDER_ID, SNIPPET_INBOX_ID, PROMPT_INBOX_ID } from '@/shared/constants/inbox';
 import { getSoulPrompt } from './soul';
 import { generateToolSchemaPrompt } from '../mcp/schema-generator';
+import { browserPrompt } from '../../browser-agent/prompt';
 
 // ─── Placeholder Resolution ──────────────────────────────────────────────────
 
@@ -64,6 +65,8 @@ function generateSkillsSummary(skills: Skill[], activeSkill?: Skill): string {
 // ─── Main Assembly ───────────────────────────────────────────────────────────
 
 export interface AssembleOptions {
+  agentKind?: 'data' | 'browser';
+  focus?: string;
   /** User explicitly chose a skill from popup (null = free-form / AI will choose) */
   selectedSkill?: Skill;
   /** All enabled skills (for generating summary) */
@@ -79,6 +82,7 @@ export interface AssembleOptions {
  * Plus, when a skill was pre-selected, its full instructions appended at the end.
  */
 export function assembleFinalPrompt(options: AssembleOptions): string {
+  if (options.agentKind === 'browser') return browserPrompt(options.focus);
   const { selectedSkill, allSkills, platform } = options;
 
   // The picked skill has to appear in the list even if it is disabled — the user
