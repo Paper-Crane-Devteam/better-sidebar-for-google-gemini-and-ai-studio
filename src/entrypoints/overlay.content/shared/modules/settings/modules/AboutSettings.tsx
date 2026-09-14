@@ -47,6 +47,16 @@ export const AboutSettings = () => {
 
             <div className="grid gap-2">
               <a
+                href="https://papercranedev.com/better-sidebar/guide/getting-started"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm text-blue-500 hover:underline"
+              >
+                {t('about.userGuide')}
+                <ExternalLink className="h-3 w-3" aria-hidden="true" />
+              </a>
+
+              <a
                 href="https://github.com/Paper-Crane-Devteam/better-sidebar-for-google-ai-studio"
                 target="_blank"
                 rel="noopener noreferrer"

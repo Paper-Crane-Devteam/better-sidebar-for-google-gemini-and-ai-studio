@@ -217,7 +217,8 @@
     "license": "Licença",
     "sourceCode": "Código Fonte",
     "githubRepository": "Repositório GitHub",
-    "viewChangelog": "Ver registro de alterações"
+    "viewChangelog": "Ver registro de alterações",
+    "userGuide": "Guia de primeiros passos"
   },
   "sponsor": {
     "title": "Compartilhar",
@@ -691,7 +692,30 @@
     "openSourceNote": "Gratuito e de código aberto, criado e mantido por um desenvolvedor independente. Obrigado pelo seu apoio!",
     "loginRequired": "Faça login na plataforma de IA primeiro — a barra lateral é ativada na página da plataforma após o login.",
     "uiUpdateNote": "Se a barra lateral parar de funcionar, provavelmente é devido a uma atualização da interface da plataforma. Atualize a extensão ou aguarde uma correção — vou resolver o mais rápido possível!",
-    "feedbackNote": "Encontrou um bug? Use o recurso de feedback integrado a qualquer momento — vou resolver imediatamente. Por favor, não deixe uma avaliação negativa sem entrar em contato primeiro!"
+    "feedbackNote": "Encontrou um bug? Use o recurso de feedback integrado a qualquer momento — vou resolver imediatamente. Por favor, não deixe uma avaliação negativa sem entrar em contato primeiro!",
+    "ready": "Tudo pronto",
+    "headline": "Menos desordem.",
+    "headlineAccent": "Mais possibilidades.",
+    "intro": "Um lugar para suas conversas do Gemini e AI Studio. Organize o que importa, encontre ideias e guarde seus melhores prompts.",
+    "watch": "Ver tutorial",
+    "previewAlt": "Better Sidebar no Gemini",
+    "previewCaption": "Suas conversas, bem organizadas",
+    "basics": "Comece pelo essencial",
+    "organizeTitle": "Um lugar para cada conversa",
+    "organizeBody": "Agrupe conversas em pastas e adicione etiquetas para organizar seus projetos.",
+    "findTitle": "Encontre boas ideias",
+    "findBody": "Pesquise no histórico e volte ao conteúdo que vale a pena guardar.",
+    "reuseTitle": "Guarde seus melhores prompts",
+    "reuseBody": "Salve prompts úteis na biblioteca e reutilize quando precisar.",
+    "startLabel": "Comece aqui",
+    "choose": "Escolha sua plataforma",
+    "firstStep": "Entre na sua conta e abra o Better Sidebar na plataforma. Crie uma pasta para organizar suas conversas.",
+    "tutorialTitle": "Um tour para começar.",
+    "tutorialBody": "Veja o Better Sidebar em ação e experimente na sua página. Pause o vídeo e volte quando quiser.",
+    "openYoutube": "Abrir no YouTube",
+    "videoNote": "O player só carrega após o clique. Se não funcionar aqui, abra o tutorial no YouTube.",
+    "help": "Precisa de ajuda?",
+    "footerNote": "Para trabalhar com mais clareza."
   },
   "guidedTour": {
     "next": "Próximo",

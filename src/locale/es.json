@@ -217,7 +217,8 @@
     "license": "Licencia",
     "sourceCode": "Código Fuente",
     "githubRepository": "Repositorio de GitHub",
-    "viewChangelog": "Ver registro de cambios"
+    "viewChangelog": "Ver registro de cambios",
+    "userGuide": "Guía de inicio"
   },
   "sponsor": {
     "title": "Compartir",
@@ -691,7 +692,30 @@
     "openSourceNote": "Gratuito y de código abierto, creado y mantenido por un desarrollador independiente. ¡Gracias por tu apoyo!",
     "loginRequired": "Primero inicia sesión en la plataforma de IA — la barra lateral se activa en la página de la plataforma después de iniciar sesión.",
     "uiUpdateNote": "Si la barra lateral deja de funcionar, probablemente se deba a una actualización de la interfaz de la plataforma. Actualiza la extensión o espera una corrección — ¡lo arreglaré lo antes posible!",
-    "feedbackNote": "¿Encontraste un error? Usa la función de feedback integrada en cualquier momento — lo resolveré de inmediato. ¡Por favor, no dejes una mala reseña sin contactarnos primero!"
+    "feedbackNote": "¿Encontraste un error? Usa la función de feedback integrada en cualquier momento — lo resolveré de inmediato. ¡Por favor, no dejes una mala reseña sin contactarnos primero!",
+    "ready": "Todo listo",
+    "headline": "Menos desorden.",
+    "headlineAccent": "Más posibilidades.",
+    "intro": "Un lugar para tus conversaciones de Gemini y AI Studio. Organiza lo importante, encuentra ideas y guarda tus mejores prompts.",
+    "watch": "Ver el tutorial",
+    "previewAlt": "Better Sidebar en Gemini",
+    "previewCaption": "Tus conversaciones, bien organizadas",
+    "basics": "Empieza por lo esencial",
+    "organizeTitle": "Un lugar para cada chat",
+    "organizeBody": "Agrupa conversaciones en carpetas y añade etiquetas para organizar tus proyectos.",
+    "findTitle": "Encuentra buenas ideas",
+    "findBody": "Busca en tu historial y vuelve al contenido que merece la pena conservar.",
+    "reuseTitle": "Guarda tus mejores prompts",
+    "reuseBody": "Conserva los prompts útiles en tu biblioteca y reutilízalos cuando los necesites.",
+    "startLabel": "Empieza aquí",
+    "choose": "Elige tu plataforma",
+    "firstStep": "Inicia sesión y abre Better Sidebar en la plataforma. Crea tu primera carpeta para organizar los chats.",
+    "tutorialTitle": "Un recorrido para empezar.",
+    "tutorialBody": "Descubre Better Sidebar en acción y pruébalo en tu página. Pausa el vídeo y vuelve cuando quieras.",
+    "openYoutube": "Abrir en YouTube",
+    "videoNote": "El reproductor solo se carga al hacer clic. Si no funciona aquí, abre el tutorial en YouTube.",
+    "help": "¿Necesitas ayuda?",
+    "footerNote": "Para trabajar con más claridad."
   },
   "guidedTour": {
     "next": "Siguiente",

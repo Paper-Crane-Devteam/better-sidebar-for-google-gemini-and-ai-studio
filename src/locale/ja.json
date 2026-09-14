@@ -217,7 +217,8 @@
     "license": "ライセンス",
     "sourceCode": "ソースコード",
     "githubRepository": "GitHub リポジトリ",
-    "viewChangelog": "更新履歴を見る"
+    "viewChangelog": "更新履歴を見る",
+    "userGuide": "使い方ガイド"
   },
   "sponsor": {
     "title": "友達にシェア",
@@ -691,7 +692,30 @@
     "openSourceNote": "無料かつオープンソース、個人開発者が制作・メンテナンスしています。ご支援ありがとうございます！",
     "loginRequired": "まず AI プラットフォームにログインしてください。ログイン後、プラットフォームのページでサイドバーが有効になります。",
     "uiUpdateNote": "サイドバーが動作しなくなった場合、プラットフォームの UI 更新が原因の可能性があります。拡張機能を更新するか、修正をお待ちください。できるだけ早く対応します！",
-    "feedbackNote": "バグを見つけましたか？内蔵のフィードバック機能からいつでもお知らせください。すぐに対応します。ご連絡いただく前に低評価を付けないでいただけると助かります！"
+    "feedbackNote": "バグを見つけましたか？内蔵のフィードバック機能からいつでもお知らせください。すぐに対応します。ご連絡いただく前に低評価を付けないでいただけると助かります！",
+    "ready": "準備完了",
+    "headline": "会話をすっきり。",
+    "headlineAccent": "アイデアを自由に。",
+    "intro": "Gemini と AI Studio の会話を整理。大切な内容をすばやく見つけ、お気に入りのプロンプトをいつでも使えます。",
+    "watch": "使い方を見る",
+    "previewAlt": "Gemini 上の Better Sidebar の実際の画面",
+    "previewCaption": "会話を、心地よく整理",
+    "basics": "基本機能から始めましょう",
+    "organizeTitle": "会話に居場所を",
+    "organizeBody": "フォルダとタグで、プロジェクトごとに会話を整理できます。",
+    "findTitle": "アイデアをすぐに発見",
+    "findBody": "過去の会話を検索して、残しておきたいアイデアに戻れます。",
+    "reuseTitle": "プロンプトを手元に",
+    "reuseBody": "便利なプロンプトをライブラリに保存し、必要なときに再利用できます。",
+    "startLabel": "ここからスタート",
+    "choose": "使うプラットフォームを選択",
+    "firstStep": "ログイン後、プラットフォーム上で Better Sidebar を開きましょう。まずは会話用のフォルダを作ってみてください。",
+    "tutorialTitle": "動画で、はじめの一歩。",
+    "tutorialBody": "Better Sidebar の使い方を見ながら、自分のページで試してみましょう。いつでも一時停止して見返せます。",
+    "openYoutube": "YouTube で開く",
+    "videoNote": "クリックするとプレーヤーが読み込まれます。再生できない場合は YouTube でご覧ください。",
+    "help": "お困りですか？",
+    "footerNote": "AI との会話を、もっと快適に。"
   },
   "guidedTour": {
     "next": "次へ",

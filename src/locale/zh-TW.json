@@ -217,7 +217,8 @@
     "license": "授權",
     "sourceCode": "原始碼",
     "githubRepository": "GitHub 儲存庫",
-    "viewChangelog": "查看更新日誌"
+    "viewChangelog": "查看更新日誌",
+    "userGuide": "使用教學"
   },
   "sponsor": {
     "title": "分享給朋友",
@@ -675,7 +676,30 @@
     "openSourceNote": "免費開源，由一位獨立開發者維護。感謝你的支持！",
     "loginRequired": "請先登入 AI 平台 — 側邊欄會在你登入平台頁面後自動啟動。",
     "uiUpdateNote": "如果側邊欄突然無法使用，很可能是平台 UI 更新導致的。請更新擴充功能或稍等修復，我會第一時間處理！",
-    "feedbackNote": "遇到問題？隨時使用內建的回饋功能告訴我，我會第一時間修復。請不要直接給差評哦！"
+    "feedbackNote": "遇到問題？隨時使用內建的回饋功能告訴我，我會第一時間修復。請不要直接給差評哦！",
+    "ready": "準備就緒",
+    "headline": "讓聊天井井有條，",
+    "headlineAccent": "讓靈感自由生長。",
+    "intro": "為 Gemini 和 AI Studio 的對話打造一個舒適的家。整理重要內容，快速找回想法，讓好用的提示詞隨手可得。",
+    "watch": "觀看入門教學",
+    "previewAlt": "Better Sidebar 在 Gemini 中的實際介面",
+    "previewCaption": "你的對話，整理得恰到好處",
+    "basics": "從基本功能開始",
+    "organizeTitle": "給每段對話一個家",
+    "organizeBody": "用資料夾歸納對話，再加上標籤，讓不同專案各就各位。",
+    "findTitle": "好想法，隨時找回",
+    "findBody": "搜尋歷史對話，快速回到值得保留的思路與內容。",
+    "reuseTitle": "把好用的提示詞留下",
+    "reuseBody": "將常用提示詞收進提示詞庫，下次需要時輕鬆重用。",
+    "startLabel": "從這裡開始",
+    "choose": "選擇你常用的平台",
+    "firstStep": "登入後，在平台頁面開啟 Better Sidebar。不妨先建立資料夾，整理你的聊天。",
+    "tutorialTitle": "看一遍，上手更輕鬆。",
+    "tutorialBody": "跟著教學認識 Better Sidebar，再到自己的頁面動手試試。隨時暫停，需要時再回來。",
+    "openYoutube": "在 YouTube 中開啟",
+    "videoNote": "點擊後才會載入播放器。如果這裡無法播放，可前往 YouTube 觀看。",
+    "help": "需要一點協助？",
+    "footerNote": "讓每一次 AI 對話更有條理。"
   },
   "guidedTour": {
     "next": "下一步",

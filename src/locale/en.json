@@ -223,7 +223,8 @@
     "license": "License",
     "sourceCode": "Source Code",
     "githubRepository": "GitHub Repository",
-    "viewChangelog": "View Changelog"
+    "viewChangelog": "View Changelog",
+    "userGuide": "Getting started guide"
   },
   "sponsor": {
     "title": "Share with Friends",
@@ -677,7 +678,30 @@
     "openSourceNote": "Free & open-source, built and maintained by a solo developer. Thank you for your support!",
     "loginRequired": "Please log in to the AI platform first — the sidebar activates on the platform page after you sign in.",
     "uiUpdateNote": "If the sidebar stops working, it's likely due to a platform UI update. Please update the extension or wait for a fix — I'll patch it ASAP!",
-    "feedbackNote": "Run into a bug? Use the built-in feedback feature anytime — I'll get on it right away. Please don't leave a bad review before reaching out!"
+    "feedbackNote": "Run into a bug? Use the built-in feedback feature anytime — I'll get on it right away. Please don't leave a bad review before reaching out!",
+    "ready": "Ready to explore",
+    "headline": "Less clutter.",
+    "headlineAccent": "More possibility.",
+    "intro": "A calmer home for your Gemini and AI Studio conversations. Organize what matters, find it faster, and keep your best prompts close.",
+    "watch": "Watch the tutorial",
+    "previewAlt": "Better Sidebar running alongside Gemini",
+    "previewCaption": "Your conversations, beautifully organized",
+    "basics": "Start with the essentials",
+    "organizeTitle": "Give every chat a home",
+    "organizeBody": "Group conversations into folders and add tags to keep projects together.",
+    "findTitle": "Find the good stuff",
+    "findBody": "Search your conversation history and return to the ideas you want to keep.",
+    "reuseTitle": "Keep your best prompts",
+    "reuseBody": "Save useful prompts in your library and reuse them when inspiration strikes.",
+    "startLabel": "Start here",
+    "choose": "Choose where to begin",
+    "firstStep": "Once signed in, open Better Sidebar on the platform page. Start by creating a folder for your chats.",
+    "tutorialTitle": "A little tour. A head start.",
+    "tutorialBody": "See Better Sidebar in action, then follow along in your own workspace. Pause and come back whenever you need.",
+    "openYoutube": "Open on YouTube",
+    "videoNote": "The player loads only when you click. If playback is unavailable here, open the tutorial on YouTube.",
+    "help": "Need a hand?",
+    "footerNote": "Made for a more thoughtful workflow."
   },
   "guidedTour": {
     "next": "Next",
