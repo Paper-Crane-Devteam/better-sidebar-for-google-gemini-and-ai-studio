@@ -1,6 +1,5 @@
 export const CAPABILITIES = ['tabs.read', 'tabs.write', 'tabGroups.read', 'tabGroups.write', 'bookmarks.read', 'bookmarks.write'] as const;
 export type Capability = typeof CAPABILITIES[number];
-export type AgentKind = 'data' | 'browser';
 export interface BrowserSettings { capabilities: Capability[]; shareFullUrls: boolean }
 export const DEFAULT_SETTINGS: BrowserSettings = { capabilities: [], shareFullUrls: true };
 export const READ_TOOLS = ['browser_list_tabs', 'browser_list_tab_groups', 'browser_list_bookmarks', 'browser_query_changes'] as const;
