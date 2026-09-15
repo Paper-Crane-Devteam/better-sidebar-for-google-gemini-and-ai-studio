@@ -44,6 +44,24 @@ Tips:
     createdAt: 0,
     updatedAt: 0,
   },
+  /*
+   * PARKED — "Sync Missing Messages". Kept, not deleted, as a fallback.
+   *
+   * The premise this skill was written on no longer holds. Transcripts used to reach the
+   * database only while the user had the conversation open, so anything they had not
+   * visited since installing sat there as a bare title, and asking the agent to walk the
+   * tab through them was the only way to fill it in. The idle history backfill
+   * (`content/shared/backfill/runner.ts`) now fetches those transcripts straight from the
+   * platform's own endpoint, a few conversations at a time, without navigating anywhere —
+   * so the gap closes by itself and there is nothing left for the user to ask for.
+   *
+   * Uncomment this together with `syncProvider` in `mcp/builtin-mcp.ts` if the platform
+   * changes its API out from under the backfill: the navigate-and-scroll path costs the
+   * user their tab for minutes, but it reads the same DOM a person does, so it keeps
+   * working when the endpoint does not. The i18n keys (`agent.skills.syncMessages.*`) and
+   * the tool's own plumbing — `tools/sync/`, `HANDOFF_TOOLS`, the approval carve-out in
+   * `execution-policy.ts` — are all still in place; only the two registrations are off.
+   *
   {
     id: 'builtin-find-empty-chats',
     type: 'builtin',
@@ -124,6 +142,7 @@ Notes:
     createdAt: 0,
     updatedAt: 0,
   },
+  */
   {
     id: 'builtin-export-chats',
     type: 'builtin',

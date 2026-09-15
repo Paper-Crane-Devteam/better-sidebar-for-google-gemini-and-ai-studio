@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppStore } from '@/shared/lib/store';
 import { useModalStore } from '@/shared/lib/modal';
+import { openMessageSyncModal } from '../../message-sync/MessageSyncModal';
 import {
   ChevronRight,
   ChevronDown,
@@ -20,11 +21,7 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import type { Message } from '@/shared/types/db';
 import AIStudioIcon from '@/assets/icons/aistudio.png';
 import GeminiIcon from '@/assets/icons/gemini.svg';
-import {
-  detectPlatform,
-  PLATFORM_CONFIG,
-  Platform,
-} from '@/shared/types/platform';
+import { PLATFORM_CONFIG, Platform } from '@/shared/types/platform';
 
 export interface SearchResultItem {
   id: string;
@@ -419,32 +416,12 @@ export const SearchResults = ({
         <div className="text-sm text-muted-foreground mb-2">
           {t('search.noResults', { query: activeQuery })}
         </div>
+        {/* The old version of this explained, in prose, that only visited chats are
+            indexed — true, and no help. The status dialog says the same thing and
+            then lets the user fix it, which is what someone staring at an empty
+            result actually wants. */}
         <button
-          onClick={() =>
-            useModalStore.getState().open({
-              title: t('search.indexingInfoTitle'),
-              content: (
-                <div className="space-y-4 text-sm text-muted-foreground text-left">
-                  <p className="leading-relaxed">
-                    {t('search.indexingInfoIntro')}
-                  </p>
-                  {detectPlatform() === Platform.AI_STUDIO && (
-                    <div className="rounded-md bg-secondary/40 p-3 text-xs">
-                      <p className="font-medium text-foreground mb-2">
-                        {t('search.indexingHowTo')}
-                      </p>
-                      <ul className="list-disc pl-4 space-y-1.5">
-                        <li>{t('search.indexingImport')}</li>
-                        <li>{t('search.indexingScan')}</li>
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              ),
-              type: 'info',
-              confirmText: t('search.understood'),
-            })
-          }
+          onClick={openMessageSyncModal}
           className="text-xs text-blue-500 hover:text-blue-600 hover:underline font-medium inline-flex items-center gap-1"
         >
           <Info className="w-3 h-3" />

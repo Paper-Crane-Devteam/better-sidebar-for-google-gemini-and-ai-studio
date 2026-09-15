@@ -1,7 +1,8 @@
 import React from 'react';
 import { Button } from '@/shared/components/ui/button';
 import { Separator } from '../../../components/ui/separator';
-import { AlertTriangle, ChevronDown } from 'lucide-react';
+import { AlertTriangle, ChevronDown, Info } from 'lucide-react';
+import { openMessageSyncModal } from '../../message-sync/MessageSyncModal';
 import { Switch } from '@/shared/components/ui/switch';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { usePegasusStore } from '@/shared/lib/pegasus-store';
@@ -172,7 +173,7 @@ export const GeneralSettings = () => {
         <div className="grid gap-4 py-4">
           {(platform === Platform.GEMINI ||
             platform === Platform.AI_STUDIO) && (
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex items-start justify-between gap-4">
               <div className="space-y-0.5 min-w-0">
                 <span className="text-sm font-medium">
                   {t('settings.backfillHistory')}
@@ -180,8 +181,16 @@ export const GeneralSettings = () => {
                 <p className="text-xs text-muted-foreground">
                   {t('settings.backfillHistoryDescription')}
                 </p>
+                <button
+                  onClick={openMessageSyncModal}
+                  className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-blue-500 hover:text-blue-600 hover:underline"
+                >
+                  <Info className="h-3 w-3" />
+                  {t('settings.backfillStatusLink')}
+                </button>
               </div>
               <Switch
+                className="mt-0.5 shrink-0"
                 checked={backfillHistory ?? false}
                 onCheckedChange={setBackfillHistory}
               />

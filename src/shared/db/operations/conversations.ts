@@ -239,6 +239,35 @@ export const conversationRepo = {
   },
 
   /**
+   * Every conversation with how many messages we hold for it, missing ones first.
+   *
+   * Backs the "message status" dialog, which exists to answer one question: why
+   * can't I find this chat when I search? A row with zero messages is the answer,
+   * and putting those at the top means the user does not have to hunt for them.
+   *
+   * Unlike `getBackfillCandidates` this reports the whole list rather than what is
+   * worth fetching — it is a status view, so a chat that is fully synced still has
+   * to appear, saying so.
+   */
+  getMessageSyncStatus: async (
+    platform: string,
+  ): Promise<{ id: string; title: string | null; message_count: number }[]> => {
+    // `last_active_at` orders the result but is not selected: the dialog shows a
+    // title and a count, and a date it does not display is just a wider payload.
+    return (await runQuery(
+      `SELECT c.id,
+              c.title,
+              (SELECT COUNT(*) FROM messages m WHERE m.conversation_id = c.id) AS message_count
+       FROM conversations c
+       WHERE c.platform = ?
+         AND ${VISIBLE}
+         AND c.notebook_id IS NULL
+       ORDER BY (message_count = 0) DESC, c.last_active_at DESC`,
+      [platform],
+    )) as { id: string; title: string | null; message_count: number }[];
+  },
+
+  /**
    * Conversations whose transcript we do not have, or no longer have in full.
    *
    * Two ways in:

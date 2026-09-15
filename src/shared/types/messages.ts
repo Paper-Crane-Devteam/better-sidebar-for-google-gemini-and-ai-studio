@@ -296,6 +296,11 @@ export type ExtensionMessage = (
       };
     }
   | {
+      /** Every conversation and how many messages we hold, for the status dialog. */
+      type: 'GET_MESSAGE_SYNC_STATUS';
+      payload: { platform: string };
+    }
+  | {
       /**
        * Conversations whose transcript is missing or incomplete, for the silent
        * backfill scheduler. `excludeIds` carries the caller's cooldown record so

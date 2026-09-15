@@ -84,6 +84,7 @@
     "behavior": "Behavior",
     "backfillHistory": "Fill in chat history in the background",
     "backfillHistoryDescription": "Quietly fetches the messages of chats you have not opened in this browser, so search and the agent can see them. Runs a few chats at a time while the tab is idle, so a large history takes a while to fill in.",
+    "backfillStatusLink": "Still can't find a chat? See which ones are missing their messages",
     "skipDeleteConfirm": "Delete conversations without confirmation",
     "skipDeleteConfirmDescription": "Danger: a single conversation is deleted immediately and permanently, with no confirmation dialog and no way to undo. It is removed here and on the platform. Batch delete still asks for confirmation.",
     "defaultSyncFolder": "Default Sync Folder",
@@ -606,13 +607,7 @@
     "jumpToConversation": "Jump to chat",
     "searching": "Searching...",
     "resultsSummary": "{{count}} results in {{files}} chats",
-    "indexingInfoTitle": "Search Indexing Info",
-    "indexingInfoIntro": "The extension only records and indexes chats visited after installation. Previous history is not searchable by default.",
-    "indexingHowTo": "To search older chats:",
-    "indexingImport": "Import History: Use the import feature to load your chat history.",
-    "indexingScan": "Scan Library: Ensure the Explorer has scanned and imported your library to index all titles.",
     "whyNoOlder": "Why can't I find older chats?",
-    "understood": "Understood",
     "context": "Context",
     "modelResponse": "Model's Response",
     "userPrompt": "User's Prompt",
@@ -622,6 +617,32 @@
     "allConversations": "All chats",
     "currentConversationOnly": "Current chat",
     "notInConversation": "Open a chat to use this filter"
+  },
+  "backfillStatus": {
+    "title": "Chat message status",
+    "intro": "Search looks inside the messages of a chat, not just its title. A chat's messages are saved when you open it, so chats you have never opened in this browser show up here with none. Syncing fetches them for you, without opening anything.",
+    "missingCount": "{{count}} of {{total}} chats have no messages yet",
+    "allSynced": "All {{count}} chats have their messages",
+    "colChat": "Chat",
+    "colMessages": "Messages",
+    "none": "None",
+    "sync": "Sync",
+    "retry": "Retry",
+    "reallyEmpty": "No messages",
+    "syncAll": "Sync all {{count}} missing",
+    "stop": "Stop",
+    "progress": "Syncing {{done}} of {{total}}",
+    "progressFailed": "{{count}} failed",
+    "pageRange": "{{from}}–{{to}} of {{total}}",
+    "prevPage": "Previous",
+    "nextPage": "Next",
+    "nothingToSync": "Every chat already has its messages",
+    "loadFailed": "Could not read the chat list",
+    "batchDone": "Synced {{count}} chats",
+    "batchDoneWithFailures": "Synced {{count}} chats, {{failed}} could not be fetched",
+    "batchWarnTitle": "Sync all missing chats?",
+    "batchWarnBody": "This fetches one chat at a time with a short pause between them, so a long list takes a while. Many requests in a row can make Google slow you down or ask you to sign in again. Nothing is lost if that happens — the sync just stops and you can pick it up later. If you would rather not watch it, the background option does the same work in small doses over time.",
+    "batchWarnConfirm": "Start syncing"
   },
   "importHistory": {
     "selectZipHint": "Select the ZIP file downloaded from Google Drive containing your chat history.",
@@ -1205,10 +1226,6 @@
         "export": {
           "label": "Batch export & archive",
           "text": "Export all chats in my 'Work' folder from March onwards to Markdown format, one file per chat, and pack them in a zip. If any chat doesn't have its messages synced yet, let me know before exporting."
-        },
-        "sync": {
-          "label": "Sync missing records",
-          "text": "Check how many chats only have a title with no saved messages. Give me the total first, ordered by most recent, and then sync the contents of the latest 20 chats so they appear in searches and exports."
         },
         "prompts": {
           "label": "Refactor prompt library",

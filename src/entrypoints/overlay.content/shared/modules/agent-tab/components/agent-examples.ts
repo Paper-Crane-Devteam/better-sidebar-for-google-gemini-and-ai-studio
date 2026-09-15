@@ -13,7 +13,7 @@
  * the part nobody guesses. They are kept long on purpose.
  *
  * One per module the agent can reach, so the list doubles as the feature inventory:
- * conversations, search, export, sync, prompts, snippets, workspace files, stats.
+ * conversations, search, export, prompts, snippets, workspace files, stats.
  */
 
 export interface AgentExample {
@@ -55,14 +55,10 @@ export const AGENT_EXAMPLES: AgentExample[] = [
       'conversation, zipped. If any of them have no messages recorded yet, tell me which before ' +
       'you export the rest.',
   },
-  {
-    icon: 'RefreshCw',
-    key: 'sync',
-    label: 'Fill in missing messages',
-    text:
-      'Check how many conversations are just a title with no messages saved. Give me the total ' +
-      'and the most recent ones first, then sync the latest 20 so search and export can see them.',
-  },
+  // The "fill in missing messages" example is gone: the idle history backfill
+  // (`content/shared/backfill/runner.ts`) fetches those transcripts by API on its own,
+  // so there is nothing left for the user to ask for. The agent-side sync tool is kept
+  // as a fallback — see the commented-out skill in `agent-loop/skills/builtin-skills.ts`.
   {
     icon: 'Wand2',
     key: 'prompts',

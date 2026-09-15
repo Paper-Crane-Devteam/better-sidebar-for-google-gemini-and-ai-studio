@@ -78,6 +78,7 @@
     "behavior": "行为",
     "backfillHistory": "后台补全聊天记录",
     "backfillHistoryDescription": "静默拉取你在此浏览器中没有打开过的对话的消息，让搜索和智能体也能读到它们。趁标签页空闲时每次只处理少量对话，所以历史较多时需要一段时间才能补完。",
+    "backfillStatusLink": "还是搜不到？看看哪些对话缺消息",
     "skipDeleteConfirm": "删除对话时不再确认",
     "skipDeleteConfirmDescription": "危险：单个对话将被立即永久删除，不会弹出确认框，也无法撤销。本插件和平台上的数据都会被删除。批量删除仍会询问确认。",
     "defaultSyncFolder": "默认同步文件夹",
@@ -619,13 +620,7 @@
     "jumpToConversation": "跳转到对话",
     "searching": "搜索中...",
     "resultsSummary": "{{files}} 个聊天中共 {{count}} 条结果",
-    "indexingInfoTitle": "搜索索引说明",
-    "indexingInfoIntro": "扩展仅会记录并索引安装后访问的对话，默认无法搜索更早的历史记录。",
-    "indexingHowTo": "要搜索更早的对话：",
-    "indexingImport": "导入历史：使用导入功能加载对话历史。",
-    "indexingScan": "扫描库：确保资源管理器已扫描并导入库以索引所有标题。",
     "whyNoOlder": "为什么找不到更早的对话？",
-    "understood": "知道了",
     "context": "上下文",
     "modelResponse": "模型回复",
     "userPrompt": "用户提问",
@@ -635,6 +630,32 @@
     "allConversations": "所有对话",
     "currentConversationOnly": "仅当前对话",
     "notInConversation": "请先打开一个对话才能使用此筛选"
+  },
+  "backfillStatus": {
+    "title": "对话消息状态",
+    "intro": "搜索是在对话的消息内容里找，不只是看标题。消息是在你打开对话的时候才保存下来的，所以你在这个浏览器里从没打开过的对话，这里会显示没有消息。点同步就能把消息取回来，不用真的去打开。",
+    "missingCount": "{{total}} 个对话中，有 {{count}} 个还没有消息",
+    "allSynced": "{{count}} 个对话的消息都齐了",
+    "colChat": "对话",
+    "colMessages": "消息数",
+    "none": "无",
+    "sync": "同步",
+    "retry": "重试",
+    "reallyEmpty": "没有消息",
+    "syncAll": "同步全部 {{count}} 个",
+    "stop": "停止",
+    "progress": "正在同步 {{done}} / {{total}}",
+    "progressFailed": "{{count}} 个失败",
+    "pageRange": "第 {{from}}–{{to}} 个，共 {{total}} 个",
+    "prevPage": "上一页",
+    "nextPage": "下一页",
+    "nothingToSync": "所有对话的消息都已经齐了",
+    "loadFailed": "读取对话列表失败",
+    "batchDone": "已同步 {{count}} 个对话",
+    "batchDoneWithFailures": "已同步 {{count}} 个对话，{{failed}} 个没取到",
+    "batchWarnTitle": "同步所有缺失消息的对话？",
+    "batchWarnBody": "会一个一个取，中间留一点间隔，所以对话多的时候要等一会儿。连续请求太多，Google 可能会限速或者要求你重新登录。真遇上也不会丢数据，同步停下来就行，之后随时可以接着来。如果不想守着看，设置里的后台补全会把同样的活儿分散开慢慢做。",
+    "batchWarnConfirm": "开始同步"
   },
   "importHistory": {
     "selectZipHint": "选择从 Google 云端硬盘下载的、包含聊天记录的 ZIP 文件。",
@@ -1199,10 +1220,6 @@
         "export": {
           "label": "批量导出存档",
           "text": "把「工作」文件夹里 3 月以后的对话全部导出为 Markdown 格式，每个对话单独存一个文件，最后打包成 zip。如果有对话还没同步消息内容，在导出前先列出来告诉我。"
-        },
-        "sync": {
-          "label": "同步缺失记录",
-          "text": "帮我查下有多少对话是只有标题而没存下消息的。先告诉我总数，把最近的排在前面，然后帮我同步最近 20 个对话的消息内容，以确保后续搜索和导出时能包含它们。"
         },
         "prompts": {
           "label": "重构提示词库",

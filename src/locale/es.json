@@ -78,6 +78,7 @@
     "behavior": "Comportamiento",
     "backfillHistory": "Completar el historial de chats en segundo plano",
     "backfillHistoryDescription": "Obtiene discretamente los mensajes de los chats que no has abierto en este navegador, para que la búsqueda y el agente puedan verlos. Procesa unos pocos chats a la vez mientras la pestaña está inactiva, así que un historial extenso tarda un rato en completarse.",
+    "backfillStatusLink": "¿Sigues sin encontrar una conversación? Mira a cuáles les faltan mensajes",
     "skipDeleteConfirm": "Eliminar conversaciones sin confirmación",
     "skipDeleteConfirmDescription": "Peligro: una conversación individual se elimina de inmediato y de forma permanente, sin diálogo de confirmación y sin posibilidad de deshacer. Se elimina aquí y en la plataforma. La eliminación por lotes sigue pidiendo confirmación.",
     "defaultSyncFolder": "Carpeta de Sincronización Predeterminada",
@@ -616,13 +617,7 @@
     "jumpToConversation": "Ir a la conversación",
     "searching": "Buscando...",
     "resultsSummary": "{{count}} resultados en {{files}} chats",
-    "indexingInfoTitle": "Información del índice de búsqueda",
-    "indexingInfoIntro": "La extensión solo registra e indexa conversaciones visitadas después de la instalación. El historial anterior no es buscable por defecto.",
-    "indexingHowTo": "Para buscar conversaciones antiguas:",
-    "indexingImport": "Importar historial: usa la función de importación para cargar tu historial de conversaciones.",
-    "indexingScan": "Escanear biblioteca: asegúrate de que el Explorador haya escaneado e importado tu biblioteca para indexar todos los títulos.",
     "whyNoOlder": "¿Por qué no encuentro conversaciones antiguas?",
-    "understood": "Entendido",
     "context": "Contexto",
     "modelResponse": "Respuesta del modelo",
     "userPrompt": "Mensaje del usuario",
@@ -632,6 +627,32 @@
     "allConversations": "Todas las conversaciones",
     "currentConversationOnly": "Conversación actual",
     "notInConversation": "Abre una conversación para usar este filtro"
+  },
+  "backfillStatus": {
+    "title": "Estado de los mensajes",
+    "intro": "La búsqueda mira dentro de los mensajes de una conversación, no solo en su título. Los mensajes se guardan cuando abres la conversación, así que las que nunca has abierto en este navegador aparecen aquí sin ninguno. Sincronizar los recupera por ti, sin necesidad de abrir nada.",
+    "missingCount": "{{count}} de {{total}} conversaciones aún no tienen mensajes",
+    "allSynced": "Las {{count}} conversaciones tienen sus mensajes",
+    "colChat": "Conversación",
+    "colMessages": "Mensajes",
+    "none": "Ninguno",
+    "sync": "Sincronizar",
+    "retry": "Reintentar",
+    "reallyEmpty": "Sin mensajes",
+    "syncAll": "Sincronizar las {{count}} que faltan",
+    "stop": "Detener",
+    "progress": "Sincronizando {{done}} de {{total}}",
+    "progressFailed": "{{count}} con error",
+    "pageRange": "{{from}}–{{to}} de {{total}}",
+    "prevPage": "Anterior",
+    "nextPage": "Siguiente",
+    "nothingToSync": "Todas las conversaciones ya tienen sus mensajes",
+    "loadFailed": "No se pudo leer la lista de conversaciones",
+    "batchDone": "{{count}} conversaciones sincronizadas",
+    "batchDoneWithFailures": "{{count}} conversaciones sincronizadas, {{failed}} no se pudieron recuperar",
+    "batchWarnTitle": "¿Sincronizar todas las conversaciones que faltan?",
+    "batchWarnBody": "Se recupera una conversación a la vez con una pequeña pausa entre ellas, así que una lista larga tarda un rato. Muchas peticiones seguidas pueden hacer que Google te limite la velocidad o te pida iniciar sesión de nuevo. Si eso ocurre no se pierde nada: la sincronización simplemente se detiene y puedes continuar más tarde. Si prefieres no estar pendiente, la opción en segundo plano hace lo mismo poco a poco.",
+    "batchWarnConfirm": "Empezar a sincronizar"
   },
   "importHistory": {
     "selectZipHint": "Selecciona el archivo ZIP descargado de Google Drive que contiene tu historial de chat.",
@@ -1199,10 +1220,6 @@
         "export": {
           "label": "Exportar y archivar",
           "text": "Exporta todos los chats de mi carpeta «Trabajo» desde marzo a formato Markdown, un archivo por chat, y comprímelos en un zip. Si algún chat aún no tiene sus mensajes sincronizados, dímelo antes de empezar a exportar."
-        },
-        "sync": {
-          "label": "Sincronizar mensajes",
-          "text": "Comprueba cuántos chats tienen solo el título pero ningún mensaje guardado. Dame primero el número total, ordenados por los más recientes, y luego sincroniza los últimos 20 para que aparezcan en las búsquedas y exportaciones."
         },
         "prompts": {
           "label": "Limpiar biblioteca de prompts",

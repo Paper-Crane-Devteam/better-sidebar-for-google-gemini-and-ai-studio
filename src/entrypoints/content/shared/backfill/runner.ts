@@ -15,44 +15,33 @@
  *
  * The pacing is the design, not a detail. This is unattended traffic on the user's
  * own session, so it stays at a rate a person could plausibly produce: a few
- * conversations every few minutes, one request at a time, nothing while the user
+ * conversations every half minute, one request at a time, nothing while the user
  * is mid-generation, and only ever from one tab. See `constants/backfill.ts`.
+ *
+ * The fetch-and-store step itself lives in `shared/lib/backfill/sync.ts`, shared
+ * with the status dialog where the user syncs a chat by hand.
  */
 
 import {
   BACKFILL_CYCLE_MS,
   BACKFILL_GAP_MS,
+  BACKFILL_MANUAL_ACTIVITY_EVENT,
   BACKFILL_PER_CYCLE,
   BACKFILL_QUIET_AFTER_GENERATE_MS,
   BACKFILL_STALE_SLACK_SEC,
   BACKFILL_START_DELAY_MS,
-  type BackfillFetchResult,
 } from '@/shared/constants/backfill';
 import { useSettingsStore } from '@/shared/lib/settings-store';
+import { syncConversationMessages } from '@/shared/lib/backfill/sync';
 import type { Platform } from '@/shared/types/platform';
 import { trace } from '@/shared/lib/trace';
 import { BackfillLedger } from './ledger';
 import { BackfillLock } from './lock';
-import { requestTranscript } from './bridge';
 
 export interface BackfillCandidate {
   id: string;
   last_active_at: number | null;
   message_count: number;
-}
-
-export interface BackfillAdapter {
-  platform: Platform;
-  /** The main-world event this platform answers backfill requests on. */
-  fetchEvent: string;
-  /**
-   * Persist a fetched transcript.
-   *
-   * Platform-specific because the two APIs return different things: Gemini gives
-   * stable per-message ids and real timestamps, so its messages can be upserted;
-   * AI Studio gives neither, so its transcript can only be written wholesale.
-   */
-  save(candidate: BackfillCandidate, result: BackfillFetchResult): Promise<void>;
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -68,23 +57,28 @@ export class BackfillRunner {
   private started = false;
   private armed = false;
   private cycleRunning = false;
-  private lastGenerateAt = 0;
+  /** Until when the page is considered busy on the user's behalf. */
+  private quietUntil = 0;
 
-  constructor(private readonly adapter: BackfillAdapter) {
-    this.ledger = new BackfillLedger(adapter.platform);
-    this.lock = new BackfillLock(adapter.platform);
+  constructor(private readonly platform: Platform) {
+    this.ledger = new BackfillLedger(platform);
+    this.lock = new BackfillLock(platform);
   }
 
   start(): void {
     if (this.started) return;
     this.started = true;
 
-    // A generation in flight is the one moment the page is genuinely busy on the
-    // user's behalf. Tracked by event rather than by asking, because the signal
-    // originates in the main world and this is where it lands.
-    window.addEventListener('BETTER_SIDEBAR_GENERATE_START', () => {
-      this.lastGenerateAt = Date.now();
-    });
+    // Two things mean "not now", and both arrive as DOM events because neither
+    // originates in this module: a generation the user started (dispatched from the
+    // main world), and the status dialog fetching transcripts itself (dispatched
+    // from the overlay). The second one matters as much as the first — without it a
+    // manual batch and this scheduler would double the request rate between them.
+    const standDown = () => {
+      this.quietUntil = Date.now() + BACKFILL_QUIET_AFTER_GENERATE_MS;
+    };
+    window.addEventListener('BETTER_SIDEBAR_GENERATE_START', standDown);
+    window.addEventListener(BACKFILL_MANUAL_ACTIVITY_EVENT, standDown);
 
     // Hand the lock back on the way out so a sibling tab can pick up straight
     // away instead of waiting out the TTL.
@@ -110,12 +104,12 @@ export class BackfillRunner {
       this.timer = null;
       this.startTimer = null;
       void this.lock.release();
-      console.log(`[Backfill] Disabled for ${this.adapter.platform}`);
+      console.log(`[Backfill] Disabled for ${this.platform}`);
       return;
     }
 
     console.log(
-      `[Backfill] Armed for ${this.adapter.platform} — first pass in ${Math.round(
+      `[Backfill] Armed for ${this.platform} — first pass in ${Math.round(
         BACKFILL_START_DELAY_MS / 1000,
       )}s, then ${BACKFILL_PER_CYCLE} chat(s) every ${Math.round(BACKFILL_CYCLE_MS / 1000)}s`,
     );
@@ -135,8 +129,8 @@ export class BackfillRunner {
     if (this.cycleRunning) return;
     if (!useSettingsStore.getState().backfillHistory) return;
     if (!navigator.onLine) return;
-    if (Date.now() - this.lastGenerateAt < BACKFILL_QUIET_AFTER_GENERATE_MS) {
-      trace('[Backfill] Skipping cycle — generation in progress');
+    if (Date.now() < this.quietUntil) {
+      trace('[Backfill] Skipping cycle — page is busy');
       return;
     }
     if (!(await this.lock.acquire())) {
@@ -159,7 +153,7 @@ export class BackfillRunner {
     if (candidates.length === 0) return;
 
     console.log(
-      `[Backfill] ${candidates.length} conversation(s) to fill in (${this.adapter.platform})`,
+      `[Backfill] ${candidates.length} conversation(s) to fill in (${this.platform})`,
     );
 
     // A run of conversations that all come back with nothing is far more likely to
@@ -174,8 +168,8 @@ export class BackfillRunner {
       // Re-checked inside the loop: a cycle spans minutes, and the user may have
       // switched the setting off or started a generation since it began.
       if (!useSettingsStore.getState().backfillHistory) return;
-      if (Date.now() - this.lastGenerateAt < BACKFILL_QUIET_AFTER_GENERATE_MS) {
-        trace('[Backfill] Stopping batch — generation started');
+      if (Date.now() < this.quietUntil) {
+        trace('[Backfill] Stopping batch — page became busy');
         return;
       }
 
@@ -196,15 +190,15 @@ export class BackfillRunner {
    * `abort` means the problem is not with this conversation.
    *
    * A request builder that has not learned its parameters yet, an HTTP failure, a
-   * timeout — those describe the page or the session, and letting them mark
-   * conversations as unproductive would put a cooldown on the entire library the
-   * first time a token went stale. The next cycle is no worse off for having
-   * stopped.
+   * timeout, a database that refused the write — those describe the page or the
+   * session, and letting them mark conversations as unproductive would put a
+   * cooldown on the entire library the first time a token went stale. The next
+   * cycle is no worse off for having stopped.
    */
   private async processOne(
     candidate: BackfillCandidate,
   ): Promise<'saved' | 'unproductive' | 'abort'> {
-    const result = await requestTranscript(this.adapter.fetchEvent, candidate.id);
+    const result = await syncConversationMessages(this.platform, candidate.id);
 
     if (!result.ok) {
       if (result.reason === 'not-ready') {
@@ -224,8 +218,7 @@ export class BackfillRunner {
       return 'abort';
     }
 
-    const messages = result.messages ?? [];
-    if (messages.length === 0) {
+    if (result.stored === 0) {
       // A real, successful answer that happens to be empty. Cool the conversation
       // down or it stays a candidate forever.
       trace(`[Backfill] ${candidate.id} has no messages`);
@@ -233,42 +226,33 @@ export class BackfillRunner {
       return 'unproductive';
     }
 
-    try {
-      await this.adapter.save(candidate, result);
-
-      // A conversation that already had messages was picked for looking stale, and
-      // "stale" is a weak signal: `last_active_at` comes from the list endpoint,
-      // which does not always supply one — the sync then substitutes the current
-      // time, and the row looks permanently newer than its own newest message.
-      // Re-reading it returns the same transcript and leaves it looking exactly as
-      // stale, so without a cooldown it would come back every cycle forever.
-      //
-      // Refreshes that genuinely find new turns settle the condition on their own
-      // and leave the candidate set regardless, so the entry costs them nothing.
-      if (candidate.message_count === 0) {
-        await this.ledger.clear(candidate.id);
-      } else {
-        await this.ledger.recordAttempt(candidate.id);
-      }
-
-      console.log(
-        `[Backfill] Stored ${messages.length} message(s) for ${candidate.id}` +
-          (result.pages && result.pages > 1 ? ` (${result.pages} pages)` : ''),
-      );
-      return 'saved';
-    } catch (err) {
-      // The transcript is fine; the database refused it. That is not the
-      // conversation's fault either, and retrying it next cycle is cheap.
-      console.warn(`[Backfill] Failed to store ${candidate.id}`, err);
-      return 'abort';
+    // A conversation that already had messages was picked for looking stale, and
+    // "stale" is a weak signal: `last_active_at` comes from the list endpoint,
+    // which does not always supply one — the sync then substitutes the current
+    // time, and the row looks permanently newer than its own newest message.
+    // Re-reading it returns the same transcript and leaves it looking exactly as
+    // stale, so without a cooldown it would come back every cycle forever.
+    //
+    // Refreshes that genuinely find new turns settle the condition on their own
+    // and leave the candidate set regardless, so the entry costs them nothing.
+    if (candidate.message_count === 0) {
+      await this.ledger.clear(candidate.id);
+    } else {
+      await this.ledger.recordAttempt(candidate.id);
     }
+
+    console.log(
+      `[Backfill] Stored ${result.stored} message(s) for ${candidate.id}` +
+        (result.pages && result.pages > 1 ? ` (${result.pages} pages)` : ''),
+    );
+    return 'saved';
   }
 
   private async getCandidates(): Promise<BackfillCandidate[]> {
     const response = await browser.runtime.sendMessage({
       type: 'GET_BACKFILL_CANDIDATES',
       payload: {
-        platform: this.adapter.platform,
+        platform: this.platform,
         limit: BACKFILL_PER_CYCLE,
         staleSlackSec: BACKFILL_STALE_SLACK_SEC,
         excludeIds: await this.ledger.cooldownIds(),

@@ -77,14 +77,39 @@ export const BACKFILL_GAP_MS = 3_000;
 /** Pause between two pages of the same conversation. */
 export const BACKFILL_PAGE_GAP_MS = 1_500;
 
+/**
+ * Pause between conversations when the user asks for a batch by hand.
+ *
+ * Slower than the idle path's per-conversation gap even though someone is sitting
+ * there watching. The idle path is self-limiting — three chats, then it sleeps —
+ * whereas a manual run goes until the list is empty, so the sustained rate is the
+ * whole story. At four seconds it is roughly a quarter of the requests per minute
+ * that the idle scheduler produces in its bursts, which is the right trade for
+ * something that might run for hundreds of conversations without pausing.
+ */
+export const BACKFILL_MANUAL_GAP_MS = 4_000;
+
 /** Turns requested per page. The Gemini UI asks for 10; 100 is accepted and keeps most chats to a single request. */
 export const BACKFILL_PAGE_SIZE = 100;
 
 /** Hard stop on pagination, so a malformed cursor cannot loop. */
 export const BACKFILL_MAX_PAGES = 20;
 
-/** Skip a cycle if the user started a generation within this window. */
+/** Skip a cycle while the page is busy on the user's behalf, for this long after the last sign of it. */
 export const BACKFILL_QUIET_AFTER_GENERATE_MS = 60_000;
+
+/**
+ * The status dialog announcing that it is fetching something itself.
+ *
+ * Keeps the idle scheduler out of the way, so a manual batch and the background
+ * pass cannot double the request rate between them. Sent repeatedly during a batch
+ * rather than as a start/end pair — the scheduler reads it as "busy for the next
+ * minute", which means a dialog closed mid-batch leaves nothing to clean up.
+ *
+ * A DOM event because the two live in different content scripts and share no
+ * module state.
+ */
+export const BACKFILL_MANUAL_ACTIVITY_EVENT = 'BETTER_SIDEBAR_BACKFILL_MANUAL';
 
 /**
  * How long a lock heartbeat stays valid.

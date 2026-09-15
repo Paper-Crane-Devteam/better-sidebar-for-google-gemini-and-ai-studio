@@ -78,6 +78,7 @@
     "behavior": "動作",
     "backfillHistory": "チャット履歴をバックグラウンドで補完する",
     "backfillHistoryDescription": "このブラウザで開いていないチャットのメッセージを静かに取得し、検索やエージェントから参照できるようにします。タブがアイドル状態のときに少しずつ処理するため、履歴が多い場合は時間がかかります。",
+    "backfillStatusLink": "まだ見つかりませんか？メッセージが未取得の会話を確認",
     "skipDeleteConfirm": "確認なしで会話を削除する",
     "skipDeleteConfirmDescription": "危険: 単一の会話は確認ダイアログなしで即座に完全に削除され、元に戻すことはできません。この拡張機能とプラットフォームの両方から削除されます。一括削除では引き続き確認を求めます。",
     "defaultSyncFolder": "デフォルト同期フォルダ",
@@ -616,13 +617,7 @@
     "jumpToConversation": "会話に移動",
     "searching": "検索中...",
     "resultsSummary": "{{files}} 件のチャットで {{count}} 件の結果",
-    "indexingInfoTitle": "検索インデックス情報",
-    "indexingInfoIntro": "拡張機能はインストール後に訪問した会話のみ記録・インデックスします。以前の履歴はデフォルトでは検索できません。",
-    "indexingHowTo": "古い会話を検索するには：",
-    "indexingImport": "履歴のインポート：インポート機能で会話履歴を読み込みます。",
-    "indexingScan": "ライブラリのスキャン：エクスプローラーがライブラリをスキャンしてインポートし、すべてのタイトルをインデックスしていることを確認してください。",
     "whyNoOlder": "古い会話が見つからない理由",
-    "understood": "了解",
     "context": "コンテキスト",
     "modelResponse": "モデルの応答",
     "userPrompt": "ユーザーのプロンプト",
@@ -632,6 +627,32 @@
     "allConversations": "すべての会話",
     "currentConversationOnly": "現在の会話のみ",
     "notInConversation": "このフィルターを使うには会話を開いてください"
+  },
+  "backfillStatus": {
+    "title": "会話メッセージの状態",
+    "intro": "検索はタイトルだけでなく、会話の中のメッセージも対象にします。メッセージは会話を開いたときに保存されるため、このブラウザで開いたことのない会話はここでメッセージなしと表示されます。同期すれば、実際に開かなくてもメッセージを取得できます。",
+    "missingCount": "{{total}} 件のうち {{count}} 件の会話にまだメッセージがありません",
+    "allSynced": "{{count}} 件すべての会話にメッセージがそろっています",
+    "colChat": "会話",
+    "colMessages": "メッセージ",
+    "none": "なし",
+    "sync": "同期",
+    "retry": "再試行",
+    "reallyEmpty": "メッセージなし",
+    "syncAll": "未取得の {{count}} 件をすべて同期",
+    "stop": "停止",
+    "progress": "同期中 {{done}} / {{total}}",
+    "progressFailed": "{{count}} 件失敗",
+    "pageRange": "{{total}} 件中 {{from}}–{{to}} 件",
+    "prevPage": "前へ",
+    "nextPage": "次へ",
+    "nothingToSync": "すべての会話にすでにメッセージがそろっています",
+    "loadFailed": "会話の一覧を読み込めませんでした",
+    "batchDone": "{{count}} 件の会話を同期しました",
+    "batchDoneWithFailures": "{{count}} 件の会話を同期しました（{{failed}} 件は取得できませんでした）",
+    "batchWarnTitle": "未取得の会話をすべて同期しますか？",
+    "batchWarnBody": "会話を 1 件ずつ、少し間隔を空けて取得するため、件数が多い場合は時間がかかります。短時間に多くのリクエストを送ると、Google 側で速度が制限されたり、再度のログインを求められることがあります。その場合もデータは失われず、同期が止まるだけで後から続けられます。見守るのが面倒なときは、バックグラウンドの設定を使うと同じ作業を少しずつ進められます。",
+    "batchWarnConfirm": "同期を開始"
   },
   "importHistory": {
     "selectZipHint": "Google ドライブからダウンロードしたチャット履歴を含む ZIP ファイルを選択してください。",
@@ -1199,10 +1220,6 @@
         "export": {
           "label": "一括エクスポート",
           "text": "「仕事」フォルダにある3月以降の会話をすべて Markdown でエクスポートして。会話ごとに1ファイルにして zip でまとめて。もしメッセージが未同期の会話があれば、エクスポートの前に教えて。"
-        },
-        "sync": {
-          "label": "欠落した履歴の同期",
-          "text": "タイトルだけでメッセージ本文が保存されていない会話がいくつあるか調べて。まず総数を教えて、新しい順に並べた上で、最近の20件を同期して。検索やエクスポートの対象に含めたいから。"
         },
         "prompts": {
           "label": "プロンプトの整理",

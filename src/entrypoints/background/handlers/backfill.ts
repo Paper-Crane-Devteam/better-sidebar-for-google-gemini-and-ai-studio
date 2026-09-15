@@ -15,6 +15,16 @@ export async function handleBackfill(
   _sender: MessageSender,
 ): Promise<ExtensionResponse | null> {
   switch (message.type) {
+    case 'GET_MESSAGE_SYNC_STATUS': {
+      try {
+        const rows = await conversationRepo.getMessageSyncStatus(
+          message.payload.platform,
+        );
+        return { success: true, data: rows };
+      } catch (e: unknown) {
+        return { success: false, error: (e as Error).message };
+      }
+    }
     case 'GET_BACKFILL_CANDIDATES': {
       try {
         const { platform, limit, staleSlackSec, excludeIds } = message.payload;
