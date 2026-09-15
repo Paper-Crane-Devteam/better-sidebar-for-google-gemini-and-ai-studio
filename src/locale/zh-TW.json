@@ -76,6 +76,8 @@
     "bottomLeft": "左下角",
     "bottomRight": "右下角",
     "behavior": "行為",
+    "backfillHistory": "背景補全聊天記錄",
+    "backfillHistoryDescription": "靜默抓取你在此瀏覽器中沒有開啟過的對話的訊息，讓搜尋和智能代理也能讀到它們。趁標籤頁閒置時每次只處理少量對話，所以歷史較多時需要一段時間才能補完。",
     "skipDeleteConfirm": "刪除對話時不再確認",
     "skipDeleteConfirmDescription": "危險：單一對話將被立即永久刪除，不會彈出確認框，也無法復原。本擴充功能和平台上的資料都會被刪除。批次刪除仍會詢問確認。",
     "defaultSyncFolder": "預設同步資料夾",

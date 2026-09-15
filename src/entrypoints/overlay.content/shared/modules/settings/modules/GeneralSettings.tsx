@@ -23,6 +23,8 @@ export const GeneralSettings = () => {
     setShortcutVisible,
     skipDeleteConfirm,
     setSkipDeleteConfirm,
+    backfillHistory,
+    setBackfillHistory,
   } = useSettingsStore();
 
   const { language, setLanguage } = usePegasusStore();
@@ -168,6 +170,23 @@ export const GeneralSettings = () => {
         <h3 className="text-lg font-medium">{t('settings.behavior')}</h3>
         <Separator />
         <div className="grid gap-4 py-4">
+          {(platform === Platform.GEMINI ||
+            platform === Platform.AI_STUDIO) && (
+            <div className="flex items-center justify-between gap-4">
+              <div className="space-y-0.5 min-w-0">
+                <span className="text-sm font-medium">
+                  {t('settings.backfillHistory')}
+                </span>
+                <p className="text-xs text-muted-foreground">
+                  {t('settings.backfillHistoryDescription')}
+                </p>
+              </div>
+              <Switch
+                checked={backfillHistory ?? false}
+                onCheckedChange={setBackfillHistory}
+              />
+            </div>
+          )}
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-4">
               <div className="space-y-0.5 min-w-0">

@@ -5,6 +5,7 @@ import { scanLibrary } from './tasks/scan-library';
 import { autoSyncHandler } from './tasks/scan-library/sync-library';
 import { apiScanner } from './tasks/scan-library/scan-api';
 import { promptCreateScanner } from './tasks/scan-prompt-create';
+import { aiStudioBackfillRunner } from './tasks/backfill-messages';
 import { Platform } from '@/shared/types/platform';
 import { detectAccount } from '../shared/detect-account';
 
@@ -15,8 +16,9 @@ import { detectAccount } from '../shared/detect-account';
 export async function initAiStudio() {
   console.log('Better Sidebar: AI Studio Content Script Initialized');
 
-  // Profile check: detect current account and verify against profile (non-blocking)
-  (async () => {
+  // Profile check: detect current account and verify against profile (non-blocking).
+  // Resolves false when the account is unbound, i.e. no database is safe to write to.
+  const profileReady = (async (): Promise<boolean> => {
     try {
       const username = await detectAccount(Platform.AI_STUDIO);
       if (username) {
@@ -33,6 +35,7 @@ export async function initAiStudio() {
               detail: response.data,
             }),
           );
+          return false;
         } else if (response?.data?.action === 'switched') {
           console.log(
             'Better Sidebar: Profile switched to',
@@ -40,13 +43,22 @@ export async function initAiStudio() {
           );
         }
       }
+      return true;
     } catch (e) {
       console.warn(
         'Better Sidebar: Profile check failed, continuing anyway',
         e,
       );
+      return true; // On error, assume safe (legacy behavior)
     }
   })();
+
+  // Silent history backfill, gated behind the profile check: it writes
+  // transcripts, and writing them into an unresolved profile's database is the one
+  // outcome worse than not having them.
+  profileReady.then((canWrite) => {
+    if (canWrite) aiStudioBackfillRunner.start();
+  });
 
   // Start auto-sync handler to automatically sync conversations as they load
   autoSyncHandler.start();

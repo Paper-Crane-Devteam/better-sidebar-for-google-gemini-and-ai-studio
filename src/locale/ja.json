@@ -76,6 +76,8 @@
     "bottomLeft": "左下",
     "bottomRight": "右下",
     "behavior": "動作",
+    "backfillHistory": "チャット履歴をバックグラウンドで補完する",
+    "backfillHistoryDescription": "このブラウザで開いていないチャットのメッセージを静かに取得し、検索やエージェントから参照できるようにします。タブがアイドル状態のときに少しずつ処理するため、履歴が多い場合は時間がかかります。",
     "skipDeleteConfirm": "確認なしで会話を削除する",
     "skipDeleteConfirmDescription": "危険: 単一の会話は確認ダイアログなしで即座に完全に削除され、元に戻すことはできません。この拡張機能とプラットフォームの両方から削除されます。一括削除では引き続き確認を求めます。",
     "defaultSyncFolder": "デフォルト同期フォルダ",

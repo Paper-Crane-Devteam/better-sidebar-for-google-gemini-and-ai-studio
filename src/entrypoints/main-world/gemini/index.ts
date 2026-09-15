@@ -13,9 +13,14 @@ import { handleRenameNotebookResponse } from './interceptors/rename-notebook';
 import { handleCreateNotebookResponse } from './interceptors/create-notebook';
 import { handleDownloadResponse } from './interceptors/download';
 import { geminiRequestBuilder } from './lib/request-builder';
+import { initGeminiBackfillFetcher } from './lib/backfill-fetcher';
 
 export function initGeminiInterceptors() {
   console.log('Better Sidebar: Main World Script (Gemini) Initialized');
+
+  // Serves the content script's silent-backfill requests. Registered here, but
+  // it only ever answers; nothing happens unless the scheduler asks.
+  initGeminiBackfillFetcher();
 
   // Expose request builder for content script via custom events
   globalThis.addEventListener('GEMINI_API_EXECUTE', async (e: Event) => {

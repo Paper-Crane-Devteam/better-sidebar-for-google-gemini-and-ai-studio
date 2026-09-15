@@ -296,6 +296,20 @@ export type ExtensionMessage = (
       };
     }
   | {
+      /**
+       * Conversations whose transcript is missing or incomplete, for the silent
+       * backfill scheduler. `excludeIds` carries the caller's cooldown record so
+       * the exclusion happens in SQL rather than after the LIMIT.
+       */
+      type: 'GET_BACKFILL_CANDIDATES';
+      payload: {
+        platform: string;
+        limit?: number;
+        staleSlackSec?: number;
+        excludeIds?: string[];
+      };
+    }
+  | {
       type: 'GET_MESSAGE_SCROLL_INDEX';
       payload: { messageId: string; conversationId: string };
     }

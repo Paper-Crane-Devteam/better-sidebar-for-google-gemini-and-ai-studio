@@ -9,6 +9,7 @@ import { handleCreatePromptResponse } from './interceptors/create';
 import { handleDeletePromptResponse } from './interceptors/delete';
 import { observeGenerateContentStream } from './interceptors/generate-content';
 import { aiStudioRequestBuilder } from './lib/request-builder';
+import { initAiStudioBackfillFetcher } from './lib/backfill-fetcher';
 import i18n from '@/locale/i18n';
 
 /**
@@ -85,6 +86,10 @@ const showUpdateToast = throttle(
 
 export function initAiStudioInterceptors() {
   console.log('Better Sidebar: Main World Script (AI Studio) Initialized');
+
+  // Serves the content script's silent-backfill requests. Registered here, but
+  // it only ever answers; nothing happens unless the scheduler asks.
+  initAiStudioBackfillFetcher();
 
   // Cache pending create title from overlay content script (different JS context).
   // The overlay dispatches BETTER_SIDEBAR_SET_PENDING_TITLE via DOM CustomEvent.

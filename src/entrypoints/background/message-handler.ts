@@ -24,6 +24,7 @@ import {
   handleSnippets,
   handleNotionProxy,
   handleBackup,
+  handleBackfill,
   handleAgentLedger,
   handleWorkspace,
   handleDocument,
@@ -45,6 +46,7 @@ const handlers = [
   handleNotionProxy,
   handleGdriveSync,
   handleBackup,
+  handleBackfill,
   handleAgentLedger,
 ];
 

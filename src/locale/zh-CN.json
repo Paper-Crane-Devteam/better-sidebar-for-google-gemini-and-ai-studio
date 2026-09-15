@@ -76,6 +76,8 @@
     "bottomLeft": "左下角",
     "bottomRight": "右下角",
     "behavior": "行为",
+    "backfillHistory": "后台补全聊天记录",
+    "backfillHistoryDescription": "静默拉取你在此浏览器中没有打开过的对话的消息，让搜索和智能体也能读到它们。趁标签页空闲时每次只处理少量对话，所以历史较多时需要一段时间才能补完。",
     "skipDeleteConfirm": "删除对话时不再确认",
     "skipDeleteConfirmDescription": "危险：单个对话将被立即永久删除，不会弹出确认框，也无法撤销。本插件和平台上的数据都会被删除。批量删除仍会询问确认。",
     "defaultSyncFolder": "默认同步文件夹",

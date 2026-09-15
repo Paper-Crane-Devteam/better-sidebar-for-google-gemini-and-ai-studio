@@ -238,6 +238,68 @@ export const conversationRepo = {
     );
   },
 
+  /**
+   * Conversations whose transcript we do not have, or no longer have in full.
+   *
+   * Two ways in:
+   *
+   *  - No messages at all. The normal capture path is an interception, so a
+   *    conversation only gets a transcript once the user opens it — everything
+   *    the library scan listed but nobody visited lands here.
+   *  - `last_active_at` newer than the newest message we hold, by more than
+   *    `staleSlackSec`. That is a chat continued somewhere this browser could not
+   *    see it. The slack absorbs the 0–5s drift observed between the list
+   *    endpoint's timestamp and the message timestamps; without it every
+   *    conversation would look stale.
+   *
+   * Notebook chats are excluded: they are served by a different endpoint than the
+   * one the backfill knows how to call.
+   *
+   * `excludeIds` is how the caller applies its own cooldown record. It is done in
+   * SQL rather than by filtering the result, so a handful of permanently
+   * unproductive conversations cannot sit at the head of the list and starve
+   * everything behind them.
+   *
+   * Written with correlated subqueries rather than the more obvious
+   * `LEFT JOIN messages … GROUP BY c.id … HAVING COUNT(*) = 0`. The scheduler asks
+   * this question every half minute, and the join form has to visit every message
+   * row in the profile to answer it, where `NOT EXISTS` stops at the first one and
+   * rides the `(conversation_id, id)` primary key. On a library that is already
+   * filled in — the steady state, and the one that runs forever — almost every
+   * conversation is rejected by that single index probe, and the two remaining
+   * subqueries only run for the handful of rows that survive.
+   */
+  getBackfillCandidates: async (
+    platform: string,
+    options: { limit?: number; staleSlackSec?: number; excludeIds?: string[] } = {},
+  ): Promise<{ id: string; last_active_at: number | null; message_count: number }[]> => {
+    const { limit = 10, staleSlackSec = 900, excludeIds = [] } = options;
+
+    const exclusion =
+      excludeIds.length > 0
+        ? `AND c.id NOT IN (${excludeIds.map(() => '?').join(',')})`
+        : '';
+
+    return (await runQuery(
+      `SELECT c.id,
+              c.last_active_at,
+              (SELECT COUNT(*) FROM messages m WHERE m.conversation_id = c.id) AS message_count
+       FROM conversations c
+       WHERE c.platform = ?
+         AND ${VISIBLE}
+         AND c.notebook_id IS NULL
+         ${exclusion}
+         AND (
+           NOT EXISTS (SELECT 1 FROM messages m WHERE m.conversation_id = c.id)
+           OR c.last_active_at >
+              (SELECT MAX(m.timestamp) FROM messages m WHERE m.conversation_id = c.id) + ?
+         )
+       ORDER BY (message_count = 0) DESC, c.last_active_at DESC
+       LIMIT ?`,
+      [platform, ...excludeIds, staleSlackSec, limit],
+    )) as { id: string; last_active_at: number | null; message_count: number }[];
+  },
+
   getDeletedIds: async (platform?: string): Promise<string[]> => {
     if (platform) {
       const result = await runQuery(

@@ -82,6 +82,8 @@
     "bottomLeft": "Bottom Left",
     "bottomRight": "Bottom Right",
     "behavior": "Behavior",
+    "backfillHistory": "Fill in chat history in the background",
+    "backfillHistoryDescription": "Quietly fetches the messages of chats you have not opened in this browser, so search and the agent can see them. Runs a few chats at a time while the tab is idle, so a large history takes a while to fill in.",
     "skipDeleteConfirm": "Delete conversations without confirmation",
     "skipDeleteConfirmDescription": "Danger: a single conversation is deleted immediately and permanently, with no confirmation dialog and no way to undo. It is removed here and on the platform. Batch delete still asks for confirmation.",
     "defaultSyncFolder": "Default Sync Folder",

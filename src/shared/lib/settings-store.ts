@@ -16,6 +16,15 @@ interface SettingsState {
   compactModeHintShown: boolean;
   autoScanLibrary: boolean;
   /**
+   * Fill in the transcripts of conversations that were never opened in this
+   * browser, in the background, while the tab is idle.
+   *
+   * Off by default: it is unattended traffic against the platform on the user's
+   * own session, so it should be something they chose rather than something they
+   * discover. See `constants/backfill.ts` for the pacing it implies.
+   */
+  backfillHistory: boolean;
+  /**
    * When true, deleting a single conversation happens immediately without a
    * confirmation dialog. Batch delete and folder delete always confirm.
    * Defaults to false because the deletion is irreversible.
@@ -67,6 +76,7 @@ interface SettingsState {
   setCompactMode: (enabled: boolean) => void;
   setCompactModeHintShown: (shown: boolean) => void;
   setAutoScanLibrary: (enabled: boolean) => void;
+  setBackfillHistory: (enabled: boolean) => void;
   setSkipDeleteConfirm: (enabled: boolean) => void;
   setOverlayPosition: (position: { x: number; y: number }) => void;
   setExplorerViewMode: (mode: 'tree' | 'timeline') => void;
@@ -151,6 +161,7 @@ export const useSettingsStore = create<SettingsState>()(
       compactMode: false,
       compactModeHintShown: false,
       autoScanLibrary: false,
+      backfillHistory: false,
       skipDeleteConfirm: false,
       overlayPosition: { ...DEFAULT_OVERLAY_POSITION },
       lastSelectedGemId: null,
@@ -193,6 +204,7 @@ export const useSettingsStore = create<SettingsState>()(
       setCompactModeHintShown: (compactModeHintShown) =>
         set({ compactModeHintShown }),
       setAutoScanLibrary: (autoScanLibrary) => set({ autoScanLibrary }),
+      setBackfillHistory: (backfillHistory) => set({ backfillHistory }),
       setSkipDeleteConfirm: (skipDeleteConfirm) => set({ skipDeleteConfirm }),
       setOverlayPosition: (overlayPosition) => set({ overlayPosition }),
       setExplorerViewMode: (viewMode) =>

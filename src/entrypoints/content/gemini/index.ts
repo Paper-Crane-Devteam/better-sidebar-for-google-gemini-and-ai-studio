@@ -12,6 +12,7 @@ import { scanGems } from './tasks/scan-gems';
 import { notebookListScanner, scanNotebooks } from './tasks/scan-notebooks';
 
 import { syncConversations } from './tasks/sync-conversations';
+import { geminiBackfillRunner } from './tasks/backfill-messages';
 import { initImageProcessor } from './tasks/process-images';
 import { detectAccount } from '../shared/detect-account';
 import { getExternalUrl } from '@/entrypoints/overlay.content/shared/utils';
@@ -100,6 +101,18 @@ export async function initGemini() {
   } else {
     window.addEventListener('load', () => startSync());
   }
+
+  // Silent history backfill.
+  //
+  // Gated behind the profile check for the same reason as the sync above — it
+  // writes transcripts, and writing them into an unresolved profile's database is
+  // the one outcome worse than not having them — but deliberately *not* behind
+  // `load`. Gemini holds subresources open long enough that `load` can be a minute
+  // or more after the page is usable, and the backfill already waits out its own
+  // grace period before touching anything.
+  profileReady.then((canWrite) => {
+    if (canWrite) geminiBackfillRunner.start();
+  });
 
   window.addEventListener('GEMINI_CHAT_DELETE', async (event: any) => {
     const { id } = event.detail;

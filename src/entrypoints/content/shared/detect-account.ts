@@ -7,9 +7,20 @@ import { trace } from '@/shared/lib/trace';
 
 import { Platform } from '@/shared/types/platform';
 
+/** Gap between polls. Fine-grained enough to feel instant, coarse enough to be free. */
+const POLL_INTERVAL_MS = 100;
+
 /**
  * Wait for a DOM element with a timeout.
- * Polls via requestAnimationFrame, gives up after `timeoutMs`.
+ *
+ * Polls with `setTimeout`, not `requestAnimationFrame`. Chrome stops servicing
+ * animation frames entirely in a hidden tab, so the rAF version never advanced
+ * there — it did not even reach its own deadline check, so it never resolved and
+ * never rejected. Everything waiting on account detection (the Gemini library
+ * sync, the silent history backfill) simply never started in a background tab.
+ *
+ * Background `setTimeout` is throttled, so the timeout can overshoot by up to a
+ * minute when the tab is hidden. Late is a different thing from never.
  */
 function waitForSelector(
   selector: string,
@@ -21,7 +32,7 @@ function waitForSelector(
       const el = document.querySelector(selector);
       if (el) return resolve(el);
       if (Date.now() > deadline) return resolve(null);
-      requestAnimationFrame(check);
+      setTimeout(check, POLL_INTERVAL_MS);
     };
     check();
   });

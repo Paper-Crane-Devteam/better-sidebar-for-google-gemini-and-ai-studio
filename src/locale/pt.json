@@ -76,6 +76,8 @@
     "bottomLeft": "Inferior Esquerdo",
     "bottomRight": "Inferior Direito",
     "behavior": "Comportamento",
+    "backfillHistory": "Preencher o histórico de conversas em segundo plano",
+    "backfillHistoryDescription": "Busca discretamente as mensagens das conversas que você não abriu neste navegador, para que a busca e o agente possam vê-las. Processa poucas conversas por vez enquanto a aba está inativa, então um histórico grande leva um tempo para ser preenchido.",
     "skipDeleteConfirm": "Excluir conversas sem confirmação",
     "skipDeleteConfirmDescription": "Perigo: uma conversa individual é excluída imediatamente e permanentemente, sem diálogo de confirmação e sem como desfazer. Ela é removida aqui e na plataforma. A exclusão em lote continua pedindo confirmação.",
     "defaultSyncFolder": "Pasta de Sincronização Padrão",
