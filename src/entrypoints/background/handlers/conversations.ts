@@ -12,6 +12,7 @@ import { notifyDataUpdated } from '../notify';
 import { resolveGemNotebookFolderId, resolveSyncFolderId } from './resolve-sync-folder';
 import { isInboxFolder } from '@/shared/constants/inbox';
 import { triggerAutoSync, triggerPageLoadSync } from './gdrive-sync';
+import { withConversationLock } from './conversation-write-lock';
 
 export async function handleConversations(
   message: ExtensionMessage,
@@ -35,66 +36,72 @@ export async function handleConversations(
       } = message.payload;
       const platform = convoData.platform ?? message.platform ?? 'aistudio';
 
-      // Both placement rules below turn on whether this row already exists, so it is
-      // looked up once rather than per rule.
-      const existing = await conversationRepo.getById(convoData.id);
+      // Held across the whole write: a MOVE_CONVERSATION for this same id follows
+      // one millisecond behind on a new chat, and it must not reach the row until
+      // the row exists. See conversation-write-lock.ts.
+      await withConversationLock(convoData.id, async () => {
+        // Both placement rules below turn on whether this row already exists, so it
+        // is looked up once rather than per rule.
+        const existing = await conversationRepo.getById(convoData.id);
 
-      // A branch belongs where its parent belongs. Gemini's branch endpoint reports
-      // the source conversation, so the fork can inherit folder and gem/notebook
-      // membership instead of landing in the inbox away from the chat it came from.
-      //
-      // Only for a genuinely new row: re-applying this later would drag a branch back
-      // to the parent's folder after the user had filed it somewhere else.
-      const isNewBranch = !!branchedFrom && !existing;
-      if (isNewBranch) {
-        const parent = await conversationRepo.getById(branchedFrom!);
-        if (parent) {
-          convoData.folder_id = convoData.folder_id ?? parent.folder_id;
-          convoData.gem_id = convoData.gem_id ?? parent.gem_id;
-          convoData.notebook_id = convoData.notebook_id ?? parent.notebook_id;
-          convoData.type = convoData.type ?? parent.type;
+        // A branch belongs where its parent belongs. Gemini's branch endpoint reports
+        // the source conversation, so the fork can inherit folder and gem/notebook
+        // membership instead of landing in the inbox away from the chat it came from.
+        //
+        // Only for a genuinely new row: re-applying this later would drag a branch
+        // back to the parent's folder after the user had filed it somewhere else.
+        const isNewBranch = !!branchedFrom && !existing;
+        if (isNewBranch) {
+          const parent = await conversationRepo.getById(branchedFrom!);
+          if (parent) {
+            convoData.folder_id = convoData.folder_id ?? parent.folder_id;
+            convoData.gem_id = convoData.gem_id ?? parent.gem_id;
+            convoData.notebook_id = convoData.notebook_id ?? parent.notebook_id;
+            convoData.type = convoData.type ?? parent.type;
+          }
         }
-      }
 
-      // Resolve folder_id when not provided — ensures conversations never land at root.
-      // This covers gem/notebook chats dispatched from PromptCreateScanner (folder_id=null).
-      // If the UI layer later issues a MOVE_CONVERSATION (e.g. user explicitly picked a
-      // folder via pendingEntry), that will override this value.
-      //
-      // Existing conversation: leave folder_id null so COALESCE preserves current value.
-      //
-      // Temporary chats are excluded: they are never listed, so filing one is at best
-      // a no-op and at worst leaves it sitting in the Inbox if the flag is ever lost.
-      if (!convoData.folder_id && !existing && !convoData.is_temporary) {
-        // New conversation: resolve gem/notebook default folder → inbox fallback
-        convoData.folder_id = await resolveGemNotebookFolderId(
-          platform,
-          convoData.gem_id,
-          convoData.notebook_id,
-        );
-      }
-
-      await conversationRepo.save({ ...convoData, platform });
-      if (messages?.length) {
-        if (replaceAfterMessageId) {
-          // Regeneration: delete all messages after the anchor message, then insert new ones
-          await messageRepo.deleteAfterMessage(convoData.id, replaceAfterMessageId);
-          await messageRepo.bulkInsert(convoData.id, messages);
-        } else {
-          await messageRepo.deleteByConversationId(convoData.id);
-          await messageRepo.bulkInsert(convoData.id, messages);
+        // Resolve folder_id when not provided — ensures conversations never land at
+        // root. This covers gem/notebook chats dispatched from PromptCreateScanner
+        // (folder_id=null). If the UI layer later issues a MOVE_CONVERSATION (e.g.
+        // user explicitly picked a folder via pendingEntry), that will override this
+        // value — the lock is what makes "later" actually mean later.
+        //
+        // Existing conversation: leave folder_id null so COALESCE preserves current value.
+        //
+        // Temporary chats are excluded: they are never listed, so filing one is at best
+        // a no-op and at worst leaves it sitting in the Inbox if the flag is ever lost.
+        if (!convoData.folder_id && !existing && !convoData.is_temporary) {
+          // New conversation: resolve gem/notebook default folder → inbox fallback
+          convoData.folder_id = await resolveGemNotebookFolderId(
+            platform,
+            convoData.gem_id,
+            convoData.notebook_id,
+          );
         }
-      }
 
-      // SAVE_CONVERSATION deliberately stays quiet in general — it fires on every
-      // generated turn, and refreshing the whole tree that often would thrash the
-      // UI. A new branch is the opposite case: it is a one-off, and it is the only
-      // way a conversation appears without the user navigating, so without this the
-      // row exists but the tree keeps looking stale until a reload.
-      if (isNewBranch) {
-        await notifyDataUpdated();
-        triggerAutoSync();
-      }
+        await conversationRepo.save({ ...convoData, platform });
+        if (messages?.length) {
+          if (replaceAfterMessageId) {
+            // Regeneration: delete all messages after the anchor message, then insert new ones
+            await messageRepo.deleteAfterMessage(convoData.id, replaceAfterMessageId);
+            await messageRepo.bulkInsert(convoData.id, messages);
+          } else {
+            await messageRepo.deleteByConversationId(convoData.id);
+            await messageRepo.bulkInsert(convoData.id, messages);
+          }
+        }
+
+        // SAVE_CONVERSATION deliberately stays quiet in general — it fires on every
+        // generated turn, and refreshing the whole tree that often would thrash the
+        // UI. A new branch is the opposite case: it is a one-off, and it is the only
+        // way a conversation appears without the user navigating, so without this the
+        // row exists but the tree keeps looking stale until a reload.
+        if (isNewBranch) {
+          await notifyDataUpdated();
+          triggerAutoSync();
+        }
+      });
 
       return { success: true };
     }
@@ -171,12 +178,17 @@ export async function handleConversations(
       return { success: true };
     }
     case 'MOVE_CONVERSATION': {
-      let targetFolderId = message.payload.folderId;
-      // If moving to an inbox folder, resolve it first to handle legacy/missing folders
-      if (targetFolderId && isInboxFolder(targetFolderId)) {
-        targetFolderId = await resolveSyncFolderId(message.platform ?? 'aistudio');
-      }
-      await conversationRepo.move(message.payload.id, targetFolderId);
+      // Queued behind any in-flight SAVE_CONVERSATION for the same id. On a new chat
+      // filed from a folder, the SAVE that creates the row is sent a millisecond
+      // earlier, and an UPDATE that arrives first matches nothing at all.
+      await withConversationLock(message.payload.id, async () => {
+        let targetFolderId = message.payload.folderId;
+        // If moving to an inbox folder, resolve it first to handle legacy/missing folders
+        if (targetFolderId && isInboxFolder(targetFolderId)) {
+          targetFolderId = await resolveSyncFolderId(message.platform ?? 'aistudio');
+        }
+        await conversationRepo.move(message.payload.id, targetFolderId);
+      });
       triggerAutoSync();
       return { success: true };
     }
