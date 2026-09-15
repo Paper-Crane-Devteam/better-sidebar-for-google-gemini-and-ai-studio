@@ -23,12 +23,21 @@ export interface HotkeyDefinition {
   defaultBinding: HotkeyBinding;
   /** Platforms this hotkey is available on. If omitted, available on all. */
   platforms?: ('gemini' | 'aistudio')[];
+  /**
+   * Fire even while the caret sits in an input, textarea or contenteditable.
+   *
+   * Off by default: a shortcut that steals keys from the composer is worse than
+   * one that is briefly unavailable. Reserved for shortcuts whose whole point is
+   * to be reachable mid-typing, such as the command palette.
+   */
+  allowInInput?: boolean;
 }
 
 /** All available shortcut action IDs */
 export type HotkeyActionId =
   // General
   | 'toggleSidebar'
+  | 'openCommandPalette'
   | 'newConversation'
   | 'openSearch'
   | 'openSettings'
@@ -56,6 +65,15 @@ export const HOTKEY_DEFINITIONS: Record<HotkeyActionId, HotkeyDefinition> = {
     labelKey: 'hotkeys.toggleSidebar',
     category: 'general',
     defaultBinding: 'Alt+Shift+S',
+  },
+  openCommandPalette: {
+    id: 'openCommandPalette',
+    labelKey: 'hotkeys.openCommandPalette',
+    category: 'general',
+    // ⌘K on macOS, Ctrl+K elsewhere — `keyEventToBindingString` folds metaKey
+    // into "Ctrl", so one binding string covers both platforms.
+    defaultBinding: 'Ctrl+K',
+    allowInInput: true,
   },
   newConversation: {
     id: 'newConversation',
@@ -251,13 +269,22 @@ export const useHotkeyStore = create<HotkeyState>()(
     {
       name: 'better-sidebar-hotkeys',
       storage: createJSONStorage(() => storage),
-      version: 3,
+      version: 4,
       migrate: (persistedState: any, version: number) => {
         // v1/v2 → v3: switchOriginalUI changed from Alt+Shift+O to Alt+Shift+Q
         if (version < 3) {
           return { bindings: getDefaultBindings() };
         }
-        return persistedState;
+        // v3 → v4: openCommandPalette was added. Layer defaults underneath the
+        // stored map so new actions get their binding without discarding the
+        // customisations the user already made.
+        return {
+          ...persistedState,
+          bindings: {
+            ...getDefaultBindings(),
+            ...(persistedState?.bindings ?? {}),
+          },
+        };
       },
     },
   ),

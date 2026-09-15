@@ -15,6 +15,8 @@ import { ProfilePickerDialog } from '@/entrypoints/overlay.content/shared/compon
 import { RatingPromptDialog } from '@/entrypoints/overlay.content/shared/modules/feedback/RatingPromptDialog';
 import { PowerPackPaywall } from '@/shared/components/PowerPackPaywall';
 import { HotkeyCheatsheet } from '@/entrypoints/overlay.content/shared/components/HotkeyCheatsheet';
+import { CommandPalette } from '@/entrypoints/overlay.content/shared/modules/command-palette';
+import { useHotkeyListener } from '@/shared/hooks/useHotkeyListener';
 import { useAppStore } from '@/shared/lib/store';
 import { useInitConversationMessages } from '@/shared/hooks/useInitConversationMessages';
 import { useModelStream } from '@/shared/hooks/useModelStream';
@@ -27,6 +29,12 @@ import { useModelStream } from '@/shared/hooks/useModelStream';
 export const AIStudioEnhancedFeatures = () => {
   const isSettingsOpen = useAppStore((s) => s.ui.overlay.isSettingsOpen);
   const setIsSettingsOpen = useAppStore((s) => s.setSettingsOpen);
+
+  // Shortcuts belong to this tree, not to the panel: the panel unmounts when the
+  // user switches back to the original sidebar, and the shortcut that switches
+  // back has to survive that. Registration is refcounted, so the copy in
+  // OverlayPanel does not double up.
+  useHotkeyListener();
 
   // Initialize the shared conversation messages store (DB fetch, interceptor, DOM observer)
   useInitConversationMessages();
@@ -52,6 +60,7 @@ export const AIStudioEnhancedFeatures = () => {
       <RatingPromptDialog />
       <PowerPackPaywall />
       <HotkeyCheatsheet />
+      <CommandPalette />
       <GlobalModal />
       <GlobalPopoverPicker />
       <GlobalToast />

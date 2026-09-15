@@ -43,7 +43,8 @@
     "collapseAll": "Collapse All",
     "sortByDate": "Sort by Date",
     "sortAlphabetically": "Sort Alphabetically",
-    "aiStudio": "AI Studio"
+    "aiStudio": "AI Studio",
+    "openCommandPalette": "Open Command Palette"
   },
   "explorer": {
     "noConversations": "No chats found.",
@@ -82,9 +83,9 @@
     "bottomLeft": "Bottom Left",
     "bottomRight": "Bottom Right",
     "behavior": "Behavior",
-    "backfillHistory": "Fill in chat history in the background",
-    "backfillHistoryDescription": "Quietly fetches the messages of chats you have not opened in this browser, so search and the agent can see them. Runs a few chats at a time while the tab is idle, so a large history takes a while to fill in.",
-    "backfillStatusLink": "Still can't find a chat? See which ones are missing their messages",
+    "backfillHistory": "Background Chat Sync",
+    "backfillHistoryDescription": "Automatically fetches messages from unopened chats in the background, making them available for search and the AI agent. This runs quietly while the tab is idle.",
+    "backfillStatusLink": "Missing some chats? Check sync status here.",
     "skipDeleteConfirm": "Delete conversations without confirmation",
     "skipDeleteConfirmDescription": "Danger: a single conversation is deleted immediately and permanently, with no confirmation dialog and no way to undo. It is removed here and on the platform. Batch delete still asks for confirmation.",
     "defaultSyncFolder": "Default Sync Folder",
@@ -317,7 +318,8 @@
     "myStuff": "My Stuff",
     "gems": "Gems",
     "notebooks": "Notebooks",
-    "originalUI": "Switch to Original Sidebar"
+    "originalUI": "Switch to Original Sidebar",
+    "openCommandPalette": "Open Command Palette"
   },
   "overlay": {
     "settingsPageComingSoon": "Settings Page Coming Soon",
@@ -619,30 +621,30 @@
     "notInConversation": "Open a chat to use this filter"
   },
   "backfillStatus": {
-    "title": "Chat message status",
-    "intro": "Search looks inside the messages of a chat, not just its title. A chat's messages are saved when you open it, so chats you have never opened in this browser show up here with none. Syncing fetches them for you, without opening anything.",
-    "missingCount": "{{count}} of {{total}} chats have no messages yet",
-    "allSynced": "All {{count}} chats have their messages",
+    "title": "Message Sync Status",
+    "intro": "To enable full-text search, the extension needs to read your chat messages. Chats you haven't opened yet in this browser will show as unsynced. You can manually sync them here without opening each one.",
+    "missingCount": "{{count}} of {{total}} chats are waiting to sync.",
+    "allSynced": "All {{count}} chats are fully synced.",
     "colChat": "Chat",
     "colMessages": "Messages",
-    "none": "None",
+    "none": "Unsynced",
     "sync": "Sync",
     "retry": "Retry",
-    "reallyEmpty": "No messages",
-    "syncAll": "Sync all {{count}} missing",
+    "reallyEmpty": "Empty",
+    "syncAll": "Sync all {{count}} chats",
     "stop": "Stop",
-    "progress": "Syncing {{done}} of {{total}}",
+    "progress": "Syncing: {{done}} / {{total}}",
     "progressFailed": "{{count}} failed",
-    "pageRange": "{{from}}–{{to}} of {{total}}",
+    "pageRange": "{{from}} - {{to}} of {{total}}",
     "prevPage": "Previous",
     "nextPage": "Next",
-    "nothingToSync": "Every chat already has its messages",
-    "loadFailed": "Could not read the chat list",
-    "batchDone": "Synced {{count}} chats",
-    "batchDoneWithFailures": "Synced {{count}} chats, {{failed}} could not be fetched",
-    "batchWarnTitle": "Sync all missing chats?",
-    "batchWarnBody": "This fetches one chat at a time with a short pause between them, so a long list takes a while. Many requests in a row can make Google slow you down or ask you to sign in again. Nothing is lost if that happens — the sync just stops and you can pick it up later. If you would rather not watch it, the background option does the same work in small doses over time.",
-    "batchWarnConfirm": "Start syncing"
+    "nothingToSync": "All chats are already synced.",
+    "loadFailed": "Failed to load chat list.",
+    "batchDone": "Successfully synced {{count}} chats.",
+    "batchDoneWithFailures": "Synced {{count}} chats ({{failed}} failed).",
+    "batchWarnTitle": "Sync all unsynced chats?",
+    "batchWarnBody": "This will fetch messages one by one. For a large number of chats, it may take some time. Too many requests might cause Google to temporarily rate-limit you or ask you to sign in again. If that happens, the sync will pause and you can resume later. Alternatively, you can enable the background sync option in settings to let it run automatically.",
+    "batchWarnConfirm": "Start Syncing"
   },
   "importHistory": {
     "selectZipHint": "Select the ZIP file downloaded from Google Drive containing your chat history.",
@@ -1155,6 +1157,7 @@
     "categoryNavigation": "Tab Navigation",
     "categoryActions": "Actions",
     "toggleSidebar": "Toggle Sidebar",
+    "openCommandPalette": "Open Command Palette",
     "newConversation": "New Chat",
     "openSearch": "Open Search",
     "openSettings": "Open Settings",
@@ -1185,6 +1188,25 @@
     "hide": "Hide this icon",
     "hideTitle": "Hide Shortcut Helper?",
     "hideConfirm": "You can re-enable it in Settings → UI Controls → Element Visibility."
+  },
+  "commandPalette": {
+    "placeholder": "Search chats, jump anywhere, run a command...",
+    "empty": "No results found",
+    "emptyHint": "Try a shorter keyword or part of a chat title.",
+    "groupRecent": "Recent Chats",
+    "groupConversations": "Chats",
+    "groupActions": "Quick Actions",
+    "groupSettings": "Settings",
+    "searchMessages": "Search messages for \"{{query}}\"",
+    "searchMessagesHint": "Full-text search across all chats",
+    "toggleCompactMode": "Toggle Compact Mode",
+    "switchToTimeline": "Switch to timeline view",
+    "switchToTree": "Switch to tree view",
+    "stateOn": "Currently ON",
+    "stateOff": "Currently OFF",
+    "hintNavigate": "Navigate",
+    "hintOpen": "Open",
+    "hintClose": "Close"
   },
   "agentLoop": {
     "resultCapsulePrefix": "Result"

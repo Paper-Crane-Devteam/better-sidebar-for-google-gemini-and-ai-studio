@@ -24,6 +24,8 @@ import { ProfilePickerDialog } from '@/entrypoints/overlay.content/shared/compon
 import { RatingPromptDialog } from '@/entrypoints/overlay.content/shared/modules/feedback/RatingPromptDialog';
 import { PowerPackPaywall } from '@/shared/components/PowerPackPaywall';
 import { HotkeyCheatsheet } from '@/entrypoints/overlay.content/shared/components/HotkeyCheatsheet';
+import { CommandPalette } from '@/entrypoints/overlay.content/shared/modules/command-palette';
+import { useHotkeyListener } from '@/shared/hooks/useHotkeyListener';
 import { TourPromptDialog } from '@/entrypoints/overlay.content/shared/modules/guided-tour/TourPromptDialog';
 import { GuidedTour } from '@/entrypoints/overlay.content/shared/modules/guided-tour/GuidedTour';
 import { useGuidedTour } from '@/entrypoints/overlay.content/shared/modules/guided-tour/useGuidedTour';
@@ -39,6 +41,12 @@ export const GeminiEnhancedFeatures = () => {
   const setIsSettingsOpen = useAppStore((s) => s.setSettingsOpen);
   const isSidebarExpanded = useAppStore((s) => s.ui.overlay.isSidebarExpanded);
   const guidedTour = useGuidedTour();
+
+  // Shortcuts belong to this tree, not to the panel: the panel unmounts when the
+  // user switches back to the original sidebar, and the shortcut that switches
+  // back has to survive that. Registration is refcounted, so the copy in
+  // OverlayPanel does not double up.
+  useHotkeyListener();
 
   // Initialize the shared conversation messages store (DB fetch, interceptor, DOM observer)
   useInitConversationMessages();
@@ -75,6 +83,7 @@ export const GeminiEnhancedFeatures = () => {
       <RatingPromptDialog />
       <PowerPackPaywall />
       <HotkeyCheatsheet />
+      <CommandPalette />
       {guidedTour.showPrompt && isSidebarExpanded && (
         <TourPromptDialog
           isOpen={guidedTour.showPrompt}

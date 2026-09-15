@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
 import {
   useHotkeyStore,
+  HOTKEY_DEFINITIONS,
   HotkeyActionId,
   keyEventToBindingString,
 } from '@/shared/lib/hotkey-store';
+import { useCommandPaletteStore } from '@/shared/lib/command-palette-store';
 import { useAppStore } from '@/shared/lib/store';
 import { usePegasusStore } from '@/shared/lib/pegasus-store';
 import { navigateToNewChat } from '@/shared/lib/navigation';
@@ -36,6 +38,14 @@ const actionHandlers: Record<HotkeyActionId, () => void> = {
   toggleSidebar: () => {
     if (detectPlatform() === Platform.AI_STUDIO) toggleAIStudioSidebar();
     else toggleGeminiSidebar();
+  },
+
+  /**
+   * Toggle, not open: ⌘K is muscle memory for "get me out of here" as much as
+   * "get me somewhere", and pressing it twice should leave the page as it was.
+   */
+  openCommandPalette: () => {
+    useCommandPaletteStore.getState().toggle();
   },
 
   newConversation: () => {
@@ -147,50 +157,72 @@ function buildBindingMap(): Map<string, HotkeyActionId> {
   return map;
 }
 
+// ─── Dispatcher ──────────────────────────────────────────────────────────────
+
+function handleKeyDown(e: KeyboardEvent) {
+  // Skip if a hotkey recorder is active
+  if ((window as any).__BETTER_SIDEBAR_HOTKEY_RECORDING__) return;
+
+  // Convert event to binding string
+  const bindingStr = keyEventToBindingString(e);
+  if (!bindingStr) return;
+
+  // Look up action
+  const actionId = buildBindingMap().get(bindingStr);
+  if (!actionId) return;
+
+  // Typing wins over shortcuts, unless the action opted in. Checked after the
+  // lookup so an opted-in binding stays live inside the composer while every
+  // other binding still yields to it.
+  // activeElement is walked through shadow roots — our own UI lives in one.
+  if (!HOTKEY_DEFINITIONS[actionId]?.allowInInput) {
+    const active = getDeepActiveElement();
+    if (active && isEditableElement(active)) return;
+  }
+
+  // Prevent default browser behavior and execute
+  e.preventDefault();
+  e.stopPropagation();
+
+  const handler = actionHandlers[actionId];
+  if (handler) handler();
+}
+
 // ─── Hook ────────────────────────────────────────────────────────────────────
 
 /**
+ * Refcount, so several mount points can ask for hotkeys without the dispatcher
+ * running twice. Two callers is the normal case: the enhanced-features tree
+ * (always mounted, keeps shortcuts alive while our sidebar is switched off) and
+ * the overlay panel (remounted whenever the sidebar layout changes).
+ *
+ * Without this, a toggle-style action would fire twice and cancel itself out.
+ */
+let listenerRefs = 0;
+
+/**
  * Mounts a global keydown listener that dispatches hotkey actions.
- * Call this once in each platform's top-level layout component.
+ * Safe to call from more than one component — only one listener is installed.
  *
  * Design decisions:
  * - Reads bindings from store on each keypress (always up-to-date, no subscription needed)
- * - Ignores events when user is typing in input/textarea/contenteditable
+ * - Ignores events when user is typing, unless the action sets `allowInInput`
  * - Ignores events when the settings hotkey recorder is active
  * - Uses capture phase to run before other listeners
  */
 export function useHotkeyListener() {
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Skip if user is typing in an input field
-      // Use activeElement which pierces shadow DOM via .shadowRoot?.activeElement
-      const active = getDeepActiveElement();
-      if (active && isEditableElement(active)) return;
-
-      // Skip if a hotkey recorder is active
-      if ((window as any).__BETTER_SIDEBAR_HOTKEY_RECORDING__) return;
-
-      // Convert event to binding string
-      const bindingStr = keyEventToBindingString(e);
-      if (!bindingStr) return;
-
-      // Look up action
-      const bindingMap = buildBindingMap();
-      const actionId = bindingMap.get(bindingStr);
-      if (!actionId) return;
-
-      // Prevent default browser behavior and execute
-      e.preventDefault();
-      e.stopPropagation();
-
-      const handler = actionHandlers[actionId];
-      if (handler) handler();
-    };
-
     // Use capture phase so we can intercept before other handlers
-    document.addEventListener('keydown', handleKeyDown, true);
+    if (listenerRefs === 0) {
+      document.addEventListener('keydown', handleKeyDown, true);
+    }
+    listenerRefs += 1;
+
     return () => {
-      document.removeEventListener('keydown', handleKeyDown, true);
+      listenerRefs -= 1;
+      if (listenerRefs === 0) {
+        document.removeEventListener('keydown', handleKeyDown, true);
+      }
     };
   }, []);
 }
