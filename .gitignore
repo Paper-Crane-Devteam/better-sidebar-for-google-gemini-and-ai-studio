@@ -40,3 +40,5 @@ misc/
 .env
 .env.local
 .env.*.local
+# X API credentials for scripts/xpost.mjs
+.env.x
