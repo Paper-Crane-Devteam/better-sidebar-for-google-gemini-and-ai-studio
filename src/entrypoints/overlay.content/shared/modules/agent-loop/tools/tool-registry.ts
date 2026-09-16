@@ -10,6 +10,12 @@
  * The refusal text differs per reason on purpose. "Not available to this agent" tells the
  * model to stop and report; "the user turned it off" invites it to ask. Collapsing them into
  * one message had the agent retrying a tool it was never going to get.
+ *
+ * ⚠️ **One tool family does not arrive here at all: browser writes.** They are two calls with
+ * a human in between (prepare → approve → commit), so the engine drives them directly and this
+ * function never sees them. Their MCP entries still exist — that is what makes them ownable,
+ * refusable and visible in the prompt — and their `execute` refuses, on the reasoning that
+ * anything reaching it has bypassed the approval. See `tools/browser-tools.ts`.
  */
 
 import type { ParsedToolCall } from '../types';
@@ -19,8 +25,6 @@ import { useAgentLoopStore } from '../agent-loop-store';
 import { assembleSkillActivation } from '../prompts/prompt-assembler';
 import { getAgent } from '../agents/registry';
 import type { AgentId } from '../agents/types';
-import { isBrowserTool, isBrowserWrite } from '@/shared/browser-agent/contracts';
-import { browserRequest } from '../../browser-agent/client';
 
 /**
  * Execute a parsed tool call and return the result string.
@@ -42,12 +46,6 @@ export async function executeToolCall(toolCall: ParsedToolCall): Promise<string>
 
 async function runToolCall(toolCall: ParsedToolCall): Promise<string> {
   const agentId: AgentId = useAgentLoopStore.getState().activeAgentId;
-  if (isBrowserTool(toolCall.name)) {
-    if (agentId !== 'browser') return 'ERROR: Browser tools require a Browser Agent task.';
-    if (isBrowserWrite(toolCall.name)) return 'ERROR: Browser writes require a prepared plan and explicit approval through the engine.';
-    return JSON.stringify(await browserRequest({ action: 'read', tool: toolCall.name, params: toolCall.params }));
-  }
-  if (agentId === 'browser' && toolCall.name !== 'complete_task') return 'ERROR: Only browser tools and complete_task are available in Browser Agent.';
 
   // ── 1. Meta-tool: activate_skill ─────────────────────────────────────
   if (toolCall.name === 'activate_skill') {
@@ -55,13 +53,25 @@ async function runToolCall(toolCall: ParsedToolCall): Promise<string> {
   }
 
   // ── 2. Is this tool available to the running agent? ──────────────────
-  const refusal = mcpRegistry.refusalReason(toolCall.name, agentId);
-  if (refusal) {
-    return describeRefusal(toolCall.name, refusal, agentId);
-  }
+  const refusal = toolRefusal(toolCall.name);
+  if (refusal) return refusal;
 
   // ── 3. Delegate to the MCP registry ──────────────────────────────────
   return mcpRegistry.execute(toolCall.name, toolCall.params, agentId);
+}
+
+/**
+ * The refusal this call would get right now, or null if it may run.
+ *
+ * Exported for the browser writes, which the engine executes itself and which therefore never
+ * reach `runToolCall`. Without this they would skip the ownership check entirely — a Better
+ * Sidebar session that emitted `browser_close_tabs` would have gone straight to building an
+ * approval plan for it. One function so the wording cannot drift between the two paths.
+ */
+export function toolRefusal(toolName: string): string | null {
+  const agentId: AgentId = useAgentLoopStore.getState().activeAgentId;
+  const reason = mcpRegistry.refusalReason(toolName, agentId);
+  return reason ? describeRefusal(toolName, reason, agentId) : null;
 }
 
 function activateSkill(skillId: string | undefined, agentId: AgentId): string {

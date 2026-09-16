@@ -3,9 +3,11 @@
  *
  * Descriptions are written for the model, not for a docs page: each one says when to
  * reach for the tool and what the common mistake is, because that is what changes
- * behaviour. `write_file` carries a `change_summary` for the same reason
- * `execute_sql` does — it is what the user reads in the approval card, and they
- * cannot be expected to review a file body.
+ * behaviour.
+ *
+ * ⚠️ The exception is `change_summary`, which is described in one line and left at that.
+ * Earlier versions specified its format and told the model the user would decide from it;
+ * both made the writing worse. See `souls/shared.ts`.
  */
 
 import type { ToolDefinition } from '../types';
@@ -69,10 +71,7 @@ export const writeFileProvider: ToolDefinition = {
         change_summary: {
           type: 'string',
           description:
-            'One plain-language sentence describing what this file is and whether it ' +
-            'replaces existing content. This is what the user reads when deciding ' +
-            'whether to allow the write, so do not paste the content here. ' +
-            'Example: "Creates notes/plan.md with the 5-step migration outline."',
+            'A short note on what this file is and whether it replaces existing content.',
         },
       },
       required: ['path', 'content'],
@@ -107,10 +106,7 @@ export const editFileProvider: ToolDefinition = {
         },
         change_summary: {
           type: 'string',
-          description:
-            'One plain-language sentence describing what this edit changes, for the ' +
-            'user\'s approval card. Example: "Renames the getUser function to fetchUser ' +
-            'in api.ts."',
+          description: 'A short note on what this edit changes.',
         },
       },
       required: ['path', 'old_string', 'new_string'],
@@ -227,9 +223,7 @@ export const manageFilesProvider: ToolDefinition = {
         change_summary: {
           type: 'string',
           description:
-            'One plain-language sentence naming what will be removed or moved, and ' +
-            'how much, for the user\'s approval card. Deletion cannot be undone. ' +
-            'Example: "Deletes the drafts/ folder and the 3 files in it."',
+            'A short note naming what will be removed or moved. Deletion cannot be undone.',
         },
       },
       required: ['action'],

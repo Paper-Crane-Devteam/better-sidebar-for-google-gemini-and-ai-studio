@@ -1,5 +1,4 @@
-import { browserRequest, initializeBrowserAgent } from '@/entrypoints/overlay.content/shared/modules/browser-agent/client';
-import { browserEntryNeedsPermission } from '@/entrypoints/overlay.content/shared/modules/agent-loop/agent-entry';
+import { initializeBrowserAgent } from '@/entrypoints/overlay.content/shared/modules/agent-loop/browser/browser-store';
 /**
  * AgentLoopFeature — AI Studio entry point for Agent Loop.
  *
@@ -221,11 +220,13 @@ export const AgentLoopFeature: React.FC = () => {
     const textarea = getTextarea();
     if (!entry || !textarea) return;
 
-    // Picking a browser row the user has not granted yet opens the permission window
-    // instead of writing a marker that could only fail at send time.
-    if (browserEntryNeedsPermission(entry.id)) {
+    // An agent that cannot run yet resolves its own blocker — for the Browser agent, that
+    // opens the permission window — instead of writing a marker that could only fail at send
+    // time, several steps away from the thing the user has to fix.
+    const blocked = entry.agent.unavailable?.();
+    if (blocked) {
       close();
-      void browserRequest({ action: 'open-settings' }).catch((e) => toast.warning(e.message));
+      blocked.resolve();
       return;
     }
 
@@ -338,10 +339,13 @@ export const AgentLoopFeature: React.FC = () => {
 
     const entry = match.entry;
 
-    // A marker typed by hand, or granted permission that was revoked since it was picked.
-    if (entry.agent.id === 'browser' && browserEntryNeedsPermission(entry.id)) {
-      void browserRequest({ action: 'open-settings' }).catch((e) => toast.warning(e.message));
-      return abort('browser permission missing', '请先开启 Browser Agent 读取权限，然后重新发送。');
+    // Checked again here: a marker typed by hand never passed the check above, and a permission
+    // can be revoked from Chrome's own UI between picking the row and pressing send.
+    const blocked = entry.agent.unavailable?.();
+    if (blocked) {
+      blocked.resolve();
+      // Already localized — the same sentence the `>` row shows.
+      return abort(`${entry.agent.id} agent unavailable`, blocked.reason);
     }
 
     /**
@@ -353,7 +357,6 @@ export const AgentLoopFeature: React.FC = () => {
     try {
       basePrompt = assembleFinalPrompt({
         agentId: entry.agent.id,
-        focus: entry.focus,
         platform: getCurrentPlatformId(),
       });
     } catch (err) {

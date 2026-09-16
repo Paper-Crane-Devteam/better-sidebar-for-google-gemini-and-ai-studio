@@ -1,5 +1,4 @@
-import { browserRequest, initializeBrowserAgent } from '@/entrypoints/overlay.content/shared/modules/browser-agent/client';
-import { browserEntryNeedsPermission } from '@/entrypoints/overlay.content/shared/modules/agent-loop/agent-entry';
+import { initializeBrowserAgent } from '@/entrypoints/overlay.content/shared/modules/agent-loop/browser/browser-store';
 /**
  * AgentLoopFeature — Gemini entry point for Agent Loop.
  *
@@ -264,9 +263,18 @@ export const AgentLoopFeature: React.FC = () => {
   function handleConfirmSelection() {
     const entry = getSelectedEntryRef.current();
     if (!entry) return;
-    if (browserEntryNeedsPermission(entry.id)) {
+
+    /**
+     * An agent that cannot run yet resolves its own blocker instead of writing a capsule.
+     *
+     * The Browser agent's case: no Chrome permission granted. Writing the marker anyway would
+     * put a capsule in the composer that can only fail at send time, several steps later and
+     * nowhere near the thing the user has to fix.
+     */
+    const blocked = entry.agent.unavailable?.();
+    if (blocked) {
       close();
-      void browserRequest({ action: 'open-settings' }).catch(e => toast.warning(e.message));
+      blocked.resolve();
       return;
     }
 
@@ -394,10 +402,18 @@ export const AgentLoopFeature: React.FC = () => {
         return abort(`unknown entry "${entryId}"`, i18n.t('agent.send.staleCapsule'));
       }
 
-      // A capsule picked before the permission was revoked, or one the user typed by hand.
-      if (entry.agent.id === 'browser' && browserEntryNeedsPermission(entry.id)) {
-        void browserRequest({ action: 'open-settings' }).catch((e) => toast.warning(e.message));
-        return abort('browser permission missing', '请先开启 Browser Agent 读取权限，然后重新发送。');
+      /**
+       * Checked again here, not only at pick time.
+       *
+       * A capsule outlives the grant it was created under — Chrome permissions are revocable
+       * from Chrome's own UI, with no event we see — and a marker typed by hand never passed
+       * the first check at all.
+       */
+      const blocked = entry.agent.unavailable?.();
+      if (blocked) {
+        blocked.resolve();
+        // `blocked.reason` is already localized — it is the same sentence the `>` row shows.
+        return abort(`${entry.agent.id} agent unavailable`, blocked.reason);
       }
 
       /**
@@ -410,7 +426,6 @@ export const AgentLoopFeature: React.FC = () => {
       try {
         basePrompt = assembleFinalPrompt({
           agentId: entry.agent.id,
-          focus: entry.focus,
           platform: getCurrentPlatformId(),
         });
       } catch (err) {

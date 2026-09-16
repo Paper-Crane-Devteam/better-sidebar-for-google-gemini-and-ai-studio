@@ -137,10 +137,10 @@ function repairFinalProse(json: string): string {
 /**
  * Escape raw newlines and tabs that ended up *inside* a JSON string.
  *
- * The failure this exists for arrived with `change_summary`, which asks for markdown —
- * bullet lists, blank lines between paragraphs. To put that in a JSON string the model
- * has to write `\\n` escapes, and over a multi-paragraph value it regularly writes a
- * real line break instead:
+ * The failure this exists for arrived with `change_summary`, the one param whose value is
+ * prose the model composes freely — so it is the one that reaches for bullet lists and
+ * blank lines. To put those in a JSON string it has to write `\\n` escapes, and over a
+ * multi-line value it regularly writes a real line break instead:
  *
  *     "params": {"query": "DELETE ...", "change_summary": "Deletes 3 folders:
  *     - Work
@@ -217,7 +217,7 @@ export function describeJsonFault(block: string): string | null {
     return (
       'a param value contained a real line break. Inside a JSON string those must be written ' +
       'as `\\n` — a literal newline is invalid JSON and discards the entire tool call. This ' +
-      'usually happens in `change_summary`: keep the markdown, but escape every line break'
+      'usually happens in `change_summary`: write it however you like, but escape the line breaks'
     );
   }
   return null;

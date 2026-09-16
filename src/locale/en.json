@@ -1353,7 +1353,8 @@
       "autoWritesHint": "You can undo a task's changes afterwards, but only until the next one starts",
       "autoContinue": "Keep going on its own",
       "autoContinueHint": "Off means you press Enter after every step",
-      "sendHint": "Steps you approve are sent on automatically. Turn this off to press Enter yourself each time."
+      "sendHint": "Steps you approve are sent on automatically. Turn this off to press Enter yourself each time.",
+      "browserFixed": "Reading your tabs and bookmarks never needs approval. Every change does, one batch at a time — that cannot be switched off."
     },
     "approve": {
       "readTitle": "Approve this query?",
@@ -1405,7 +1406,17 @@
       "grepFiles": "Searching in files",
       "manageFiles": "Reorganizing files",
       "docRead": "Reading a document",
-      "docEdit": "Marking up a document"
+      "docEdit": "Marking up a document",
+      "listTabs": "Looking at your tabs",
+      "listTabGroups": "Looking at your tab groups",
+      "listBookmarks": "Looking through your bookmarks",
+      "queryChanges": "Checking what it changed",
+      "arrangeTabs": "Rearranging tabs",
+      "closeTabs": "Closing tabs",
+      "manageTabGroups": "Reorganizing tab groups",
+      "arrangeBookmarks": "Reorganizing bookmarks",
+      "deleteBookmarks": "Deleting bookmarks",
+      "undoChanges": "Undoing an earlier change"
     },
     "sync": {
       "progress": "Fetching conversation content — {{current}}/{{total}}",
@@ -1604,6 +1615,113 @@
     },
     "switcher": {
       "label": "Choose an agent"
+    },
+    "browserIntro": {
+      "title": "Let AI tidy up your tabs and bookmarks",
+      "about": "About the Browser Agent",
+      "howToUseTitle": "How to Use Browser Agent",
+      "howToUseContent": "Browser Agent works on your Chrome windows: open tabs, tab groups and bookmarks. It sees titles and addresses, not page contents.\n\nHow to use:\nType >Browser Agent in the chat input, then describe what you want tidied — for example \"group these tabs by topic and collapse the ones I'm not using\" or \"file the loose bookmarks into folders\".\n\nWhat it can do:\n- Tabs: open, focus, reorder, move between windows, pin.\n- Tab groups: create, rename, recolor, collapse, dissolve.\n- Bookmarks: create folders, rename, and move things between them.\n- Closing tabs and deleting bookmarks are separate permissions, off unless you turn them on.\n\nHow approval works:\nReading needs no confirmation. Every change is shown to you first as the actual tabs or bookmarks it would touch, and applied only after you approve that specific batch. There is no setting that skips this. Anything it does is recorded on this machine, and most of it can be undone from this panel.\n\n💡 Tip: \"Organize my tabs\" never means closing them. If you want things gone, say so — otherwise it will gather them into a group or a folder and leave the decision to you."
+    },
+    "browser": {
+      "needsPermission": "🔒 Not authorized yet · click to open permissions",
+      "panel": {
+        "approvalNote": "Every change is approved, sorting included.",
+        "permissions": "Allowed: {{list}}",
+        "noPermissions": "Permissions: none granted yet",
+        "urlsShared": "Full URLs: readable by the AI.",
+        "urlsRedacted": "Full URLs: redacted.",
+        "auditNote": "The audit record stays on this machine.",
+        "openSettings": "Permissions and privacy",
+        "viewHistory": "Local records",
+        "noHistory": "No records to show. Reading history needs the matching permission too.",
+        "detail": "Detail",
+        "previewUndo": "Preview undo",
+        "changeDetail": "Changed objects",
+        "truncated": "Each step shows its first 100 changes. The full record stays on this machine and the agent can page through it.",
+        "approveUndo": "Approve and undo",
+        "cancel": "Cancel",
+        "before": "Before",
+        "after": "After",
+        "outcome": "{{status}}: {{completed}}/{{planned}}. {{error}}"
+      },
+      "status": {
+        "applied": "Done",
+        "failed": "Stopped",
+        "applying": "Running",
+        "unknown": "Outcome uncertain — check the browser",
+        "undone": "Undone"
+      },
+      "preview": {
+        "scope": "{{count}} operations · this approval covers only the batch below",
+        "undoPrefix": "Undo: ",
+        "objects": "{{count}} objects affected",
+        "firstHundred": " (first 100 shown)",
+        "untitled": "Untitled",
+        "inThisWindow": "in this window",
+        "inWindow": "in window {{n}}",
+        "inGroup": "in group {{name}}",
+        "inUnnamedGroup": "in an unnamed group",
+        "unnamed": "unnamed",
+        "inFolder": "in {{name}}",
+        "atPosition": "position {{n}}",
+        "pinned": "pinned",
+        "collapsed": "collapsed",
+        "otherWindow": "in another window",
+        "otherFolder": "in another folder",
+        "otherGroup": "in another group",
+        "unchangedPlace": "no details to show",
+        "current": "Now",
+        "restoreTo": "Restore to",
+        "absent": "does not exist",
+        "lossy": "This batch removes things. Closing a tab can only be undone by reopening its address — forms, scroll position and page state are not guaranteed. Deleting a folder deletes everything in it, and a restored bookmark is a new copy rather than the original. Approved on its own, every time; no setting can run it unattended.",
+        "warning": "This approval covers only the operations above. Nothing here is closed or deleted — those are separate tools with their own permission.",
+        "undoWarning": "Undo needs approval too, and stops as soon as it finds an external change. Closing a tab can only be undone by reopening its address — forms, scroll position and page state are not guaranteed. A restored bookmark is a new copy rather than the original."
+      },
+      "op": {
+        "create": "Create",
+        "activate": "Switch to",
+        "move": "Move / reorder",
+        "pin": "Pinned state",
+        "close": "Close",
+        "update": "Change",
+        "delete": "Delete",
+        "ungroup": "Remove from group"
+      },
+      "field": {
+        "pinned": "Pinned",
+        "collapsed": "Collapsed",
+        "title": "Title",
+        "url": "Address",
+        "color": "Color",
+        "position": "Position",
+        "folder": "Destination folder",
+        "group": "Group",
+        "window": "Destination window"
+      },
+      "color": {
+        "grey": "Grey",
+        "blue": "Blue",
+        "red": "Red",
+        "yellow": "Yellow",
+        "green": "Green",
+        "pink": "Pink",
+        "purple": "Purple",
+        "cyan": "Cyan",
+        "orange": "Orange"
+      },
+      "settings": {
+        "title": "Browser Agent",
+        "group": {
+          "organize": "Organize",
+          "organizeNote": "Reorder, pin, group and rename tabs and bookmarks.",
+          "remove": "Delete",
+          "removeNote": "Close tabs and remove bookmarks."
+        },
+        "denied": "Not granted. The switch stays off.",
+        "urlToggle": "Let the AI read full URLs",
+        "urlHelp": "On: the full link is sent to the current AI conversation. Off: only the scheme and host — path, query and fragment stay hidden. Addresses already sent cannot be recalled.",
+        "done": "Done"
+      }
     },
     "workspaceIntro": {
       "title": "Collaborate with AI on your Workspace documents",

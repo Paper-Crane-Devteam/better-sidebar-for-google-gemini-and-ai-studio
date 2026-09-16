@@ -13,7 +13,7 @@
 
 import type { ParsedToolCall } from '../../types';
 import type { LoopContext } from '../context';
-import { executeToolCall } from '../../tools/tool-registry';
+import { executeToolCall, toolRefusal } from '../../tools/tool-registry';
 import { parseCompleteTaskSignal } from '../../tools/complete-task';
 import { PAYWALL_SIGNAL } from '../../tools/paywall-signal';
 import {
@@ -26,8 +26,13 @@ import { deliversResultToAI, isHandoffTool } from '../parser/tool-schema';
 import { formatSectionHeading } from './handoff/formatter';
 import { AUTO_APPROVED, requestApproval } from './approval-gate';
 import { toolCallRecorder } from '../../records';
-import { isBrowserTool, isBrowserWrite, type PlanPreview } from '@/shared/browser-agent/contracts';
-import { browserRequest, prepareBrowserCall, safeBrowserText } from '../../../browser-agent/client';
+import { isBrowserWrite, type PlanPreview } from '@/shared/browser-agent/contracts';
+import {
+  cancelBrowserPlan,
+  commitBrowserPlan,
+  prepareBrowserPlan,
+  safeBrowserText,
+} from '../../browser/browser-store';
 
 export type ExecuteOutcome =
   /** Round finished; feed these sections back to the AI */
@@ -106,18 +111,42 @@ export async function executeTools(
       results.push(`### ⚠️ Loop Warning\n${loopCheck.message}`);
     }
 
-    // ── Gate: does the user have to say go? ────────────────────────────────
+    /**
+     * ── Plan: a browser write is resolved against the live browser before it is offered ──
+     *
+     * The one tool family whose approval is not built from what the model *said*. `prepare`
+     * turns `operations` into the actual tabs and bookmarks they name, so the user approves
+     * objects rather than a claim about them — and a plan that cannot be built (a tab that
+     * closed since the read, a revoked permission) fails here, before anyone is asked.
+     *
+     * ⚠️ Every exit path from here on has to dispose of the plan: it holds a snapshot in the
+     * background, and an abandoned one is a batch the user never agreed to sitting armed.
+     */
     let browserPlan: PlanPreview | undefined;
     if (isBrowserWrite(toolCall.name)) {
-      try {
-        browserPlan = await prepareBrowserCall(toolCall.name, toolCall.params, ctx.store.activeAgentId);
-        ctx.abort.check();
-      } catch (error) {
-        ctx.abort.check();
-        const body = `ERROR: ${safeBrowserText((error as Error).message)}`;
-        results.push(section(toolCall, key, body));
+      // Ownership first. Because this path skips `runToolCall`, the check that stops one
+      // agent reaching for another's tools has to be made here explicitly — otherwise a
+      // Better Sidebar session emitting `browser_close_tabs` would get an approval card.
+      let failure = toolRefusal(toolCall.name);
+
+      if (!failure) {
+        try {
+          browserPlan = await prepareBrowserPlan(toolCall.name, toolCall.params);
+        } catch (error) {
+          failure = `ERROR: ${safeBrowserText((error as Error).message)}`;
+        }
+      }
+      ctx.abort.check();
+
+      if (failure) {
+        results.push(section(toolCall, key, failure));
         trouble.push(`${toolCall.name} (plan failed)`);
-        ctx.store.addResult({ toolName: toolCall.name, success: false, result: body, timestamp: Date.now() });
+        ctx.store.addResult({
+          toolName: toolCall.name,
+          success: false,
+          result: failure,
+          timestamp: Date.now(),
+        });
         continue;
       }
     }
@@ -131,7 +160,7 @@ export async function executeTools(
       : AUTO_APPROVED;
 
     if (!decision.approved) {
-      if (browserPlan) void browserRequest({ action: 'cancel', planId: browserPlan.id });
+      if (browserPlan) cancelBrowserPlan(browserPlan.id);
       // Reported as a tool result rather than aborting the round: the AI has to
       // learn this specific call was refused, and why, or its next move is the same
       // statement again.
@@ -162,7 +191,7 @@ export async function executeTools(
       // `record`, not `settle`: a refusal skips `begin` — nothing ran, so there was
       // no window to guard — but it still needs a row, because "you turned this down"
       // is an outcome the card must be able to show after a reload.
-      if (!isBrowserTool(toolCall.name)) void toolCallRecorder.record(
+      void toolCallRecorder.record(
         {
           key,
           round: ctx.round,
@@ -191,8 +220,16 @@ export async function executeTools(
      * case nothing else can reconstruct: the database already changed and no result
      * exists anywhere. A row left at `running` is how the next page load knows to say
      * "this may have gone through" instead of quietly offering to run it again.
+     *
+     * ⚠️ **Browser calls are filed here too.** They used to be skipped, on the reasoning
+     * that the browser keeps its own audit journal — but that journal is keyed by batch,
+     * not by tool call, so nothing joined it back to the card. The result was a card
+     * reading "not run" next to tabs that had visibly been rearranged, which is an
+     * invitation to ask the AI to do it again. Worse, the ledger is what stops auto-pickup
+     * from re-running a write after a reload (`pickup.ts`), so their absence left a
+     * committed batch eligible to be applied a second time.
      */
-    if (!isBrowserTool(toolCall.name)) await toolCallRecorder.begin({
+    await toolCallRecorder.begin({
       key,
       round: ctx.round,
       orderIndex: index,
@@ -204,14 +241,19 @@ export async function executeTools(
 
     let result: string;
     if (browserPlan) {
-      const cancel = () => { void browserRequest({ action: 'cancel', planId: browserPlan!.id }); };
+      // Stop pressed mid-commit cancels the plan. The batch itself is not interruptible once
+      // the background starts applying it — this cancels a plan that has not got that far.
+      const cancel = () => cancelBrowserPlan(browserPlan!.id);
       ctx.abort.signal.addEventListener('abort', cancel);
       try {
         ctx.abort.check();
-        const outcome = await browserRequest<{ status: string }>({ action: 'commit', planId: browserPlan.id });
+        const outcome = await commitBrowserPlan(browserPlan.id);
         result = `${outcome.status === 'applied' ? '' : 'ERROR: '}${JSON.stringify(outcome)}`;
-      } catch (error) { result = `ERROR: ${safeBrowserText((error as Error).message)}`; }
-      finally { ctx.abort.signal.removeEventListener('abort', cancel); }
+      } catch (error) {
+        result = `ERROR: ${safeBrowserText((error as Error).message)}`;
+      } finally {
+        ctx.abort.signal.removeEventListener('abort', cancel);
+      }
     } else result = await executeToolCall(toolCall);
     const success = isSuccess(result);
 
@@ -246,7 +288,7 @@ export async function executeTools(
           timestamp: Date.now(),
         });
         const haltedSection = section(toolCall, key, `${body}\n\n${failure.message}`);
-        if (!isBrowserTool(toolCall.name)) void toolCallRecorder.settle(key, { status: 'failed', resultBody: body });
+        void toolCallRecorder.settle(key, { status: 'failed', resultBody: body });
         results.push(haltedSection);
         return halt(ctx, results, 'Too many failures in a row. Review the errors above, then retry.');
       }
@@ -281,7 +323,7 @@ export async function executeTools(
      * body produced a card offering to send the AI its own `__TASK_COMPLETE__` marker,
      * one message after the task had visibly finished.
      */
-    if (!isBrowserTool(toolCall.name)) void toolCallRecorder.settle(key, {
+    void toolCallRecorder.settle(key, {
       status: success ? 'ok' : 'failed',
       resultBody: deliversResultToAI(toolCall.name) ? body : null,
     });

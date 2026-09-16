@@ -21,7 +21,6 @@ import { getAgent } from '../agents/registry';
 import type { AgentId } from '../agents/types';
 import { getEnabledSkillsForAgent } from '../skills/skill-registry';
 import { generateToolSchemaPrompt } from '../mcp/schema-generator';
-import { browserPrompt } from '../../browser-agent/prompt';
 
 // ─── Placeholder Resolution ──────────────────────────────────────────────────
 
@@ -71,13 +70,19 @@ function generateSkillsSummary(skills: Skill[]): string {
 export interface AssembleOptions {
   /** Which agent this session runs as. */
   agentId: AgentId;
-  focus?: string;
   /** Current platform. */
   platform: PlatformId | null;
 }
 
+/**
+ * ⚠️ No per-agent branch here, and there must not be one.
+ *
+ * The Browser agent used to be assembled by its own function, short-circuited at the top of
+ * this one — which meant it silently skipped the protocol blocks every other agent shares and
+ * grew a second, drifting copy of the tool-call format. An agent supplies a `buildSoul`; that
+ * is the entire extension point.
+ */
 export function assembleFinalPrompt(options: AssembleOptions): string {
-  if (options.agentId === 'browser') return browserPrompt(options.focus);
   const { agentId, platform } = options;
   const agent = getAgent(agentId);
 

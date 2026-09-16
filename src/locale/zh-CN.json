@@ -1335,7 +1335,8 @@
       "autoContinue": "自己往下走",
       "autoContinueHint": "关掉后，每一步都要你按回车",
       "sendHint": "你确认过的步骤仍会等你按回车；只有不用确认的步骤才会自动发送。",
-      "taskApproved": "本次任务已全部放行 — 点击可停止"
+      "taskApproved": "本次任务已全部放行 — 点击可停止",
+      "browserFixed": "读你的标签页和书签不需要批准。改动一定要，而且一批一批地问 —— 这条关不掉。"
     },
     "approve": {
       "readTitle": "允许执行这个查询？",
@@ -1387,7 +1388,17 @@
       "grepFiles": "搜索文件内容",
       "manageFiles": "管理文件",
       "docRead": "读取文档",
-      "docEdit": "标注文档"
+      "docEdit": "标注文档",
+      "listTabs": "查看标签页",
+      "listTabGroups": "查看标签组",
+      "listBookmarks": "翻看书签",
+      "queryChanges": "核对改过什么",
+      "arrangeTabs": "整理标签页",
+      "closeTabs": "关闭标签页",
+      "manageTabGroups": "整理标签组",
+      "arrangeBookmarks": "整理书签",
+      "deleteBookmarks": "删除书签",
+      "undoChanges": "撤销之前的改动"
     },
     "sync": {
       "progress": "正在获取对话内容 — {{current}}/{{total}}",
@@ -1598,6 +1609,104 @@
       "workspace": {
         "name": "工作区",
         "description": "读写和编辑工作区里的文件与文档"
+      },
+      "browser": {
+        "name": "Browser Agent",
+        "description": "整理 Chrome 标签页、标签组与收藏夹"
+      }
+    },
+    "browserIntro": {
+      "title": "让 AI 帮你收拾标签页和书签",
+      "about": "关于浏览器助手",
+      "howToUseTitle": "浏览器助手怎么用",
+      "howToUseContent": "浏览器助手处理的是你的 Chrome 窗口：打开的标签页、标签组和书签。它能看到标题和网址，看不到页面内容。\n\n怎么用：\n在聊天输入框里打 >Browser Agent，然后说你想怎么收拾 —— 比如「把这些标签页按主题分组，用不到的折叠起来」或者「把散着的书签归到文件夹里」。\n\n它能做什么：\n- 标签页：打开、切换、重新排序、跨窗口移动、固定。\n- 标签组：新建、改名、换颜色、折叠、解散。\n- 书签：新建文件夹、改名、在文件夹之间移动。\n- 关闭标签页和删除书签是单独的权限，不开就没有。\n\n批准是怎么走的：\n读取不需要确认。每一次改动都会先把真正会动到的标签页或书签摆给你看，你批准了这一批才会执行。没有任何设置能跳过这一步。它做过的事都记在本机，大部分可以在这个面板里撤销。\n\n💡 提示：「整理一下我的标签页」从来不等于关掉它们。想清掉就明说 —— 不然它会把它们收进一个组或一个文件夹，把决定留给你。"
+    },
+    "browser": {
+      "needsPermission": "🔒 尚未授权 · 点击打开权限设置",
+      "panel": {
+        "approvalNote": "所有改动都需批准，包括排序。",
+        "permissions": "已允许：{{list}}",
+        "noPermissions": "权限：尚未授权",
+        "urlsShared": "完整 URL：允许 AI 读取。",
+        "urlsRedacted": "完整 URL：已脱敏。",
+        "auditNote": "审计记录仅留本机。",
+        "openSettings": "权限与隐私设置",
+        "viewHistory": "查看本机记录",
+        "noHistory": "暂无可查看的记录；历史读取也需要对应权限。",
+        "detail": "明细",
+        "previewUndo": "预览撤销",
+        "changeDetail": "变更明细",
+        "truncated": "每步最多展示前 100 个变更；完整记录保存在本机，可由 Agent 分页查询。",
+        "approveUndo": "批准并撤销",
+        "cancel": "取消",
+        "before": "之前",
+        "after": "之后",
+        "outcome": "{{status}}：{{completed}}/{{planned}}。{{error}}"
+      },
+      "status": {
+        "applied": "已完成",
+        "failed": "已停止",
+        "applying": "执行中",
+        "unknown": "结果不确定，请检查浏览器",
+        "undone": "已撤销"
+      },
+      "preview": {
+        "scope": "{{count}} 项操作 · 批准仅适用于下面这一批",
+        "undoPrefix": "撤销：",
+        "objects": "涉及 {{count}} 个对象",
+        "firstHundred": "（前 100 个如下）",
+        "untitled": "无标题",
+        "window": "当前窗口 {{id}}",
+        "position": "原位置 {{index}}",
+        "folder": "原目录 {{id}}",
+        "object": "对象 #{{id}}",
+        "current": "当前",
+        "restoreTo": "恢复为",
+        "absent": "不存在",
+        "lossy": "这一批会删除东西。关闭的标签页只能靠重新打开链接来恢复，表单内容、滚动位置和页面状态都无法保证。删除文件夹会连里面的内容一起删掉，恢复收藏夹会生成新的 ID。这类操作每次都要单独批准，任何设置都不能让它自动执行。",
+        "warning": "这次批准只覆盖上面这些操作。这里不会关闭或删除任何东西——那是另外的工具，需要单独授权。",
+        "undoWarning": "撤销也需要批准；发现外部变化就停止。关闭标签只尽力重新打开 URL，不能保证恢复表单、滚动位置或页面运行状态。恢复收藏夹会生成新 ID。"
+      },
+      "op": {
+        "create": "创建",
+        "activate": "激活",
+        "move": "移动 / 排序",
+        "pin": "固定状态",
+        "close": "关闭",
+        "update": "修改",
+        "delete": "删除",
+        "ungroup": "取消分组"
+      },
+      "field": {
+        "tab_id": "标签",
+        "tab_ids": "标签",
+        "group_id": "组",
+        "window_id": "目标窗口",
+        "index": "位置（从 0 开始）",
+        "pinned": "固定",
+        "collapsed": "折叠",
+        "title": "标题",
+        "id": "对象",
+        "parent_id": "目标目录",
+        "url": "地址",
+        "color": "颜色",
+        "windowId": "窗口",
+        "groupId": "组",
+        "parentId": "目录",
+        "active": "激活"
+      },
+      "settings": {
+        "title": "Browser Agent",
+        "group": {
+          "organize": "整理",
+          "organizeNote": "排序、固定、分组，重命名标签页和收藏夹。",
+          "remove": "删除",
+          "removeNote": "关闭标签页、移除收藏夹项目。"
+        },
+        "denied": "未授权，开关保持关闭。",
+        "urlToggle": "允许 AI 读取完整 URL",
+        "urlHelp": "开启：完整链接会发送到当前 AI 对话。关闭：只提供协议和域名，隐藏路径、参数与片段。已经发送的地址无法收回。",
+        "done": "完成"
       }
     },
     "switcher": {

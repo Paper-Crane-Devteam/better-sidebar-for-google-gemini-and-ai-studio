@@ -53,8 +53,23 @@ export interface AgentDefinition {
    *
    * `workspace` puts the file tree in the tab, because for that agent the files *are* the
    * subject and hiding them behind a separate tab makes the agent feel like it is working
-   * somewhere you cannot see.
+   * somewhere you cannot see. `browser` shows what it is permitted to touch and the journal
+   * of what it has already done, for the same reason.
    */
   tabContent: 'launcher' | 'workspace' | 'browser';
   buildSoul(context: SoulContext): string;
+  /**
+   * Why this agent cannot run yet, and the one action that fixes it. Null when it can.
+   *
+   * Exists so that "the agent needs something first" is a property of the agent rather than a
+   * branch in the `>` popup and in both platforms' send paths. The Browser agent is the case
+   * that needed it — it is useless until the user grants Chrome permissions — and it was
+   * originally written as three `id === '__browser_tabs__'` checks scattered across the entry
+   * list and the composer.
+   *
+   * ⚠️ Checked at pick time *and* again at send time. A capsule can outlive the grant it was
+   * created under: permissions are revocable from Chrome's own UI, and a marker typed by hand
+   * never passed the first check at all.
+   */
+  unavailable?(): { reason: string; resolve: () => void } | null;
 }

@@ -88,7 +88,7 @@ export const browserAuditRepo = {
   },
 
   /** Only the fields a batch changes after it is written: its verdict and its undo link. */
-  patch: async (id: string, updates: { status?: Batch['status']; error?: string | null; undoneBy?: string }): Promise<void> => {
+  patch: async (id: string, updates: { status?: Batch['status']; error?: string | null; undoneBy?: string | null }): Promise<void> => {
     const columns: Record<string, unknown> = {};
     if (updates.status !== undefined) columns.status = updates.status;
     if (updates.error !== undefined) columns.error = updates.error;

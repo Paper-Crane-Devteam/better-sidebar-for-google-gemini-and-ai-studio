@@ -1,20 +1,29 @@
 /**
- * The two agents, and how to look one up.
+ * The agents, and how to look one up.
  *
- * A plain array rather than a registration call: both agents ship in the build, the order
- * is the order the `>` list shows them in, and a static list means "which agents exist" is
- * answerable by reading one file.
+ * A plain array rather than a registration call: they all ship in the build, the order is the
+ * order the `>` list shows them in, and a static list means "which agents exist" is answerable
+ * by reading one file.
+ *
+ * ⚠️ One conditional entry: the Browser agent is Chrome-only, because `chrome.tabGroups` has
+ * no Firefox equivalent. It drops out of the array entirely rather than appearing greyed out —
+ * a row that can never be picked is worse than no row.
  */
 
 import i18n from '@/locale/i18n';
 import { BUILTIN_MCP_ID } from '../mcp/builtin-mcp';
 import { WORKSPACE_MCP_ID } from '../mcp/workspace-mcp';
 import { DOCUMENT_MCP_ID } from '../mcp/document-mcp';
+import { BROWSER_MCP_ID } from '../mcp/browser-mcp';
 import { buildBetterSidebarSoul } from '../prompts/souls/bettersidebar-soul';
 import { buildWorkspaceSoul } from '../prompts/souls/workspace-soul';
+import { buildBrowserSoul } from '../prompts/souls/browser-soul';
 import type { AgentDefinition, AgentId } from './types';
 import { isChromeBuild } from '@/shared/browser-agent/contracts';
-import { browserPrompt } from '../../browser-agent/prompt';
+import {
+  browserAgentNeedsPermission,
+  openBrowserAgentSettings,
+} from '../browser/browser-store';
 
 /**
  * The agent a session runs as when nothing says otherwise.
@@ -33,6 +42,11 @@ export const DEFAULT_AGENT_ID: AgentId = 'bettersidebar';
  * would turn every historical agent turn into an unrecognised entry and lose its cards.
  *
  * `builtin-workspace-agent` was the skill this agent used to be, for the same reason.
+ *
+ * The four `__browser_*__` ids were the Browser agent's pre-aimed shortcut rows — "Organize
+ * tabs", "Manage tab groups", "Organize bookmarks" — which the `>` list no longer offers,
+ * because the only choice worth making there is *which of your things this is about* and all
+ * four answered that identically. They resolve to the one Browser agent.
  */
 const LEGACY_AGENT_IDS: Record<string, AgentId> = {
   __agent_auto__: 'bettersidebar',
@@ -62,15 +76,29 @@ export const AGENTS: AgentDefinition[] = [
     tabContent: 'workspace',
     buildSoul: buildWorkspaceSoul,
   },
-  ...(isChromeBuild() ? [{
-    id: 'browser' as const,
-    name: 'Browser Agent',
-    description: 'Organize Chrome tabs, tab groups and bookmarks',
-    icon: 'Globe',
-    mcpServerIds: [],
-    tabContent: 'browser' as const,
-    buildSoul: () => browserPrompt(),
-  }] : []),
+  // Chrome only — see the file header.
+  ...(isChromeBuild()
+    ? [
+        {
+          id: 'browser' as const,
+          name: 'Browser Agent',
+          description: 'Organize Chrome tabs, tab groups and bookmarks',
+          icon: 'Globe',
+          mcpServerIds: [BROWSER_MCP_ID],
+          tabContent: 'browser' as const,
+          buildSoul: buildBrowserSoul,
+          unavailable: () =>
+            browserAgentNeedsPermission()
+              ? {
+                  reason: i18n.t('agent.browser.needsPermission', {
+                    defaultValue: '🔒 Not authorized yet · click to open permissions',
+                  }),
+                  resolve: () => void openBrowserAgentSettings(),
+                }
+              : null,
+        },
+      ]
+    : []),
 ];
 
 /** Resolve an id, tolerating the ids that used to mean something else. Never throws. */

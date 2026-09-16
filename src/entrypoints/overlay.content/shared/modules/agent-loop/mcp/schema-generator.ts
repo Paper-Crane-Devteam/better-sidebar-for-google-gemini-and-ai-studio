@@ -20,10 +20,16 @@ export function generateToolSchemaPrompt(agentId: AgentId): string {
   let output = '';
 
   for (const server of servers) {
+    // `promptTools` where a server has one: the tools that are registered but not currently
+    // permitted are real, and stay callable-in-principle, but telling the model about one it
+    // will only be refused for costs a round and reads as a broken tool. See `mcp/types.ts`.
+    const tools = server.promptTools?.() ?? server.tools;
+    if (tools.length === 0) continue;
+
     output += `## MCP: ${server.name}\n`;
     output += `${server.description}\n\n`;
 
-    for (const tool of server.tools) {
+    for (const tool of tools) {
       const { schema } = tool;
       output += `### ${schema.name}\n`;
       output += `${schema.description}\n`;

@@ -85,22 +85,31 @@ Firefox 的 `tabGroups`、`tabs`、`bookmarks`、`sessions` 都在
 |---|---|---|---|
 | `tabs.read` | tabs | 标题、URL、窗口、位置、固定、组关系、重复标记 | 读 |
 | `tabs.arrange` | tabs | 排序、移窗口、固定/取消固定、激活、新建标签 | 低损 |
-| `tabs.close` | tabs + sessions | 关闭标签，以及恢复自己关掉的标签 | 有损 |
-| `groups.read` | tabGroups | 组的标题、颜色、折叠状态、位置 | 读 |
-| `groups.write` | tabGroups | 分组、取消分组、改名、改色、折叠、移动组 | 低损 |
+| `tabs.close` | tabs（+ sessions，随 §6 的 `sessions.restore` 一起申请） | 关闭标签，以及恢复自己关掉的标签 | 有损 |
+| `tabGroups.read` | tabGroups | 组的标题、颜色、折叠状态、位置 | 读 |
+| `tabGroups.write` | tabGroups | 分组、取消分组、改名、改色、折叠、移动组 | 低损 |
 | `bookmarks.read` | bookmarks | 读取和搜索 | 读 |
 | `bookmarks.arrange` | bookmarks | 新建、重命名、移动 | 低损 |
 | `bookmarks.delete` | bookmarks | 删除 | 有损 |
 
+⚠️ 能力 id 的**前缀就是浏览器权限名**（`tabs` / `tabGroups` / `bookmarks`），
+`permissionsFor()` 直接由前缀推出要申请哪个权限。所以组能力叫 `tabGroups.*` 而不是 `groups.*`：
+省掉一张「能力前缀 → 权限名」的映射表，也让「改了能力名却忘了改权限名」这类错不可能发生。
+
 依赖关系（勾选时自动带上，取消时自动收回下游）：
 
 ```
-tabs.arrange  → tabs.read
-tabs.close    → tabs.read
-groups.read   → tabs.read              （组只有配上成员才有意义）
-groups.write  → groups.read, tabs.arrange
-bookmarks.*   → bookmarks.read
+tabs.arrange    → tabs.read, tabGroups.read
+tabs.close      → tabs.read, tabGroups.read
+tabGroups.read  → tabs.read                    （组只有配上成员才有意义）
+tabGroups.write → tabGroups.read, tabs.arrange
+bookmarks.*     → bookmarks.read
 ```
+
+⚠️ 标签侧的两档都带上 `tabGroups.read`，因为标签批次的快照要记组关系：
+一个标签被移进/移出组，如果快照里没有 `groupId`，这个变化既描述不出来也退不回去。
+（代价是「只想让它排排序」的用户也要授 `tabGroups` 权限；Chrome 授这个权限不弹窗。
+Firefox 138 以下没有 `tabGroups`，届时按 §2 的探测让标签能力也一起隐藏。）
 
 ⚠️ `tabs.close` 单独成一档而不是并进 `tabs.arrange`，是因为它是标签侧**唯一**真正有损的操作，
 而它恰好也是「整理」这个词最容易被理解成的动作。把它和「换个位置」放在同一个开关后面，
@@ -121,7 +130,7 @@ bookmarks.*   → bookmarks.read
 
 | 档位 | 范围选项 | 能被设置豁免吗 |
 |---|---|---|
-| 低损（arrange / groups.write） | 本批 / 本次任务 | 能：`autoRunWrites` 和 `speedMode` 对它有效 |
+| 低损（arrange / tabGroups.write） | 本批 / 本次任务 | 能：`autoRunWrites` 和 `speedMode` 对它有效 |
 | 有损（tabs.close / bookmarks.delete） | 只有本批 | 不能：忽略一切自动执行开关 |
 
 ⚠️ 低损必须允许「本次任务放行」。整理 80 个标签在冲突重算后可能变成三四次提交，
@@ -163,19 +172,31 @@ bookmarks.*   → bookmarks.read
 ```ts
 interface PlanPreview {
   id: string;
+  count: number;                  // 操作数
   tier: 'low' | 'lossy';          // §4 的档位，UI 据此决定能不能给「本次任务放行」
-  expiresAt: number;
-  summary: PreviewSection[];      // 按结果分组，见下
-  lossy: LossyItem[];             // 有损项单独一段，永远展开
-  untouched: number;              // 范围内但不动的对象数
-  aiExplanation?: string;         // AI 的 change_summary，渲染成 markdown
+  undo: boolean;                  // 这是不是一次撤销（决定用哪段收尾警告）
+  items: PreviewItem[];
 }
-interface PreviewSection {
-  kind: 'group_create' | 'group_update' | 'reorder' | 'move_window' | 'pin' | 'bookmark_create' | 'bookmark_move' | 'bookmark_rename';
-  label: string;                  // 「新建组：待读（黄）」
-  objects: PreviewObject[];       // 最多列 20 个，其余压成计数
-  objectCount: number;
+interface PreviewItem {
+  type: string;                   // close / move / create …，UI 翻译
+  details: Record<string, string | number | boolean>;  // 操作参数，已解析成人话
+  targets: PreviewTarget[];       // 真正会被动到的对象，最多 100 个
+  targetCount: number;
+  undo?: boolean;
+  changes?: PreviewChange[];      // 撤销才有：每个对象的现状 → 恢复后
 }
+/** 位置，不含任何 id */
+interface Placement {
+  window?: number;                // 第几个窗口（1 起），只有一个窗口时不给
+  hostWindow?: boolean;           // 就是侧边栏所在的窗口
+  group?: string;                 // 标签组名，'' = 用户没起名
+  folder?: string;                // 书签所在文件夹名
+  position?: number;              // 第几个（1 起）
+  pinned?: boolean;
+  url?: string;
+}
+type PreviewTarget = Placement & { title: string };
+type PreviewChange = { title: string; from?: Placement; to?: Placement };
 ```
 
 规则：
@@ -185,7 +206,28 @@ interface PreviewSection {
   和「只看到 52 个标签被动了」是完全不同的信息量。
 - 不出现 `tab_id`、`index`、`groupId` 这类内部标识。对象用标题 + 地址指认，
   位置用「移到『待读』组末尾」这类相对说法。
-- 所有文案走 i18n，不在组件里硬编码中文。
+  ⚠️ **这条曾经只写在文档里，代码没执行。** 预览一度把 snapshot 行原样交给组件渲染，
+  于是卡片上出现 `#66 · was at 7 · was in 1`——书签的 Chrome id、0 起算的数组下标、
+  父文件夹的 **id**。三个用户从没见过也查不到的数字，出现在唯一要他授权的界面上。
+  操作参数那段更糟：`Object: 53` 是 `field.id` 这个标签套在上一行刚点名过的同一个书签的 id 上。
+  现在 id 一律在 background 里解析（`Placement`，全量 snapshot 在手，是精确解析不是猜），
+  组件只渲染名字、序数和 1 起算的位置。id 仍然存在——批准靠它绑定对象——只是它不描述任何东西，
+  所以不给人看。
+  ⚠️ 窗口没有名字，只能给序数，按 window id 排序（≈ 打开顺序），保证同一张卡片里
+  「窗口 2」始终指同一个窗口；**只有一个窗口时连序数都不给**，
+  「窗口 1」在没有窗口 2 的时候是纯噪音。侧边栏自己所在的窗口说「当前窗口」，比任何序数都好懂。
+  ⚠️ 移动的**目标**文件夹不是 target。它以前和被移动的书签一起被匹配进 `targets`，
+  两者混在一张列表里分不出谁是谁；`create` 更是只有目标文件夹一条，
+  于是卡片声称「1 个对象受影响」然后点名了错的那个。现在目标是 `details.folder`。
+- 标签组颜色走 `agent.browser.color.*` 翻译。Chrome 给的是英文色名，
+  中文界面里夹一个 `cyan` 正是这张卡片要消灭的东西。
+- 所有文案走 i18n（`agent.browser.*`，`useI18n()` + `defaultValue` 英文兜底），不在组件里硬编码中文。
+  改文案只动 `src/locale/en.json`，其余语言由 hook 补齐。
+  ⚠️ **背景 service worker 不产出用户文案。** `PlanPreview` 以前带一个 `warning` 字段，
+  两段面向用户的段落是在 SW 里拼的——那是整个项目唯一拿不到 locale 的上下文。现在预览只回结构化字段，
+  措辞和别的字符串放在一起。⚠️ 布尔值渲染成 `✓ / —`，不为两个词加十四条翻译。
+  ⚠️ `BROWSER_SHORTCUTS` 里 `title` 是 key，`focus` 不是——后者是拼进 prompt 给模型读的，
+  故意保持英文。
 - 恢复限制写在对应的段落上，不写在全局脚注 —— 只有关标签那段需要「无法恢复表单和滚动位置」，
   贴在有损段里用户才会读。
 
@@ -200,7 +242,7 @@ AI 说不准真实数量。有损批次必须带 `change_summary`，缺失就拒
 
 | AI 的意图 | 默认路径 | 需要什么 |
 |---|---|---|
-| 关掉这些标签 | 移入「待清理」组并折叠 | `groups.write`（低损） |
+| 关掉这些标签 | 移入「待清理」组并折叠 | `tabGroups.write`（低损） |
 | 关掉这些标签（没有组能力） | 存入「待清理」书签目录，标签保持打开 | `bookmarks.arrange`（低损） |
 | 删掉这个书签目录 | 移入「待清理」书签目录 | `bookmarks.arrange`（低损） |
 | 真的关闭 / 真的删除 | 逐批批准的有损操作 | `tabs.close` / `bookmarks.delete` |
@@ -326,11 +368,11 @@ AI 说不准真实数量。有损批次必须带 `change_summary`，缺失就拒
 | 工具 | 能力 | 档位 |
 |---|---|---|
 | `browser_list_tabs` | tabs.read | 读 |
-| `browser_list_tab_groups` | groups.read | 读 |
+| `browser_list_tab_groups` | tabGroups.read | 读 |
 | `browser_list_bookmarks` | bookmarks.read | 读 |
 | `browser_query_changes` | 按记录类型对应的读能力 | 读 |
 | `browser_arrange_tabs` | tabs.arrange | 低损 |
-| `browser_manage_tab_groups` | groups.write | 低损 |
+| `browser_manage_tab_groups` | tabGroups.write | 低损 |
 | `browser_arrange_bookmarks` | bookmarks.arrange | 低损 |
 | `browser_close_tabs` | tabs.close | 有损 |
 | `browser_delete_bookmarks` | bookmarks.delete | 有损 |
@@ -340,6 +382,13 @@ AI 说不准真实数量。有损批次必须带 `change_summary`，缺失就拒
 权限注入是 1:1，批准 UI 不需要先解析 `operations` 才知道该不该提供「本次任务放行」，
 而「把 5 个关闭混进一批移动里」在协议层就不可能发生。工具名同时也是 prompt 里最显眼的标记，
 比藏在 JSON 里的 `"type":"close"` 更难被模型忽略。
+
+⚠️ **这张表的 schema 由 `mcp/providers/browser-provider.ts` 提供，进 prompt 的那段是
+`mcp/schema-generator.ts` 自动生成的**，不是手写的一大段字符串。第一版是手写的，代价是
+`<bs_agent_tool>` 的格式说明在项目里长出了第二份、并且已经和真的解析器对不上了。
+
+上表里没被授权的行不会出现在 prompt 里（`promptTools()`），但**仍然注册着** —— 前者是为了别让模型
+调一个必然被拒的工具，后者是为了重载会话时还能从对话里的调用反推出这是 Browser agent。
 
 读工具的形态：
 
@@ -353,8 +402,28 @@ AI 说不准真实数量。有损批次必须带 `change_summary`，缺失就拒
 
 ## 11. 本机审计与撤销
 
-独立 IndexedDB（`browser-agent-local-v1`），不接入业务 SQLite、不进 Drive 同步、不进备份、
-不在任何导出里。Data Agent 的 SQL 碰不到它。按 Chrome/Firefox 配置文件存，与插件业务库同 profile。
+存在**业务 SQLite 里**（`browser_agent_batches` + `browser_agent_steps`），跟着当前 profile 的库走。
+两张表都不在 `SYNC_TABLES` 里，所以不进 Drive 同步；本机整库导出会带上它们，由保留策略限制体积。
+
+⚠️ **不为它单开数据库。** 早期版本开过一个 `browser-agent-local-v1`（手写 IndexedDB），
+理由是把审计放在 `execute_sql` 够不到的地方。代价是第二套存储引擎：没有 migration 机制、
+没有保留策略、记录是整批 blob 因而每记一步都要重写此前所有已写过的快照。而它防的那件事并不成立
+——agent 没有任何动机去删自己的审计痕迹，插件其它任何地方也不是按「它可能会」设计的。
+`journalReady()` 会顺手 `deleteDatabase` 掉遗留的那个库。
+
+⚠️ **一步是一行。** 作为嵌套 JSON 时，记录第 N 步意味着连同第 1..N-1 步一起重新序列化，
+写入量随批次长度平方增长。所以仓库层（`operations/browserAgent.ts`）对外只有
+`insert` / `patch` / `insertStep` / `updateStep` 这类窄动作，没有 `save(batch)`；
+handler 内存里仍然拿一个完整 `Batch` 当工作模型，落盘只走这些窄口。
+
+⚠️ **设置和标签备注不在这里。** 权限与 URL 开关放 `chrome.storage.local`——它是 Chrome
+配置文件级的事实，而且权限窗口没有 tab、也就没有对应的 profile 数据库，不能被挡在数据库打开后面。
+（备注按 §1 已推迟；它曾放在 `chrome.storage.session`，因为「只在本次浏览器会话有效」
+正是那个存储的属性，不需要自己用 epoch key 维护。）
+
+⚠️ **账本跟着 profile 数据库走。** 两个 tab 登录不同账号就是两份账本，
+`ensureDbForTab(owner)` 保证一次请求落在它自己那个 tab 的 profile 上。
+换账号后查不到旧记录，但不会写错地方。
 
 **只存撤销和事后核实需要的东西**：
 
@@ -447,13 +516,22 @@ UI 分工沿用 Agent 现有的三处，不新建路径：
 
 | 位置 | 内容 |
 |---|---|
-| Agent Tab | Data / Browser selector、权限设置入口、本机记录与撤销入口 |
-| `>` 弹层 | 整理标签页 / 管理标签组 / 整理收藏夹；缺能力时直接打开权限设置 |
+| Agent Tab | AgentSwitcher 里的第三段、权限设置入口、本机记录与撤销入口 |
+| `>` 弹层 | **一行**「Browser Agent」；权限没给时那一行的描述换成提示，点它直接开权限设置 |
 | 聊天流卡片 + Dock | 预览与批准，两处同一个 resolve，谁先答谁算 |
 
-运行期间禁止切换 Agent 类型。Browser Agent 只加载浏览器 prompt、浏览器工具和 `complete_task`；
-Data Agent 看不到浏览器工具。权限设置是独立扩展窗口（`permissions.request()` 需要用户手势，
-且它不能是 AI 可触发的动作）。
+⚠️ **`>` 里曾经有四行**（Browser Agent + 整理标签页 / 管理标签组 / 整理收藏夹），已经删掉。
+那三行各自往 prompt 里塞一句 `focus`，看着像四个选择，可对「这件事跟你的哪样东西有关」给出的
+是同一个答案 —— 而那三句话用户自己打得出来。历史 id 仍在 `LEGACY_AGENT_IDS` 里解析。
+
+运行期间禁止切换 Agent。Browser Agent 只拿到 `builtin-browser` 这一个 server 加上共享的
+`builtin-core`（`complete_task` + `activate_skill`），归属检查在 `mcp/registry.ts`，
+和另外两个 agent 走同一套 —— 没有「Browser 专用」的分支。权限设置是独立扩展窗口
+（`permissions.request()` 需要用户手势，且它不能是 AI 可触发的动作）。
+
+代码落在哪，见 `agent-loop-architecture.md` 的「加一个 agent 要碰的地方」。要点是**没有
+独立模块**：soul 在 `prompts/souls/browser-soul.ts`，工具在 `mcp/providers/browser-provider.ts`
++ `tools/browser-tools.ts`，领域状态在 `agent-loop/browser/`，面板在 `agent-tab/browser/`。
 
 ## 14. 实施顺序与验收
 

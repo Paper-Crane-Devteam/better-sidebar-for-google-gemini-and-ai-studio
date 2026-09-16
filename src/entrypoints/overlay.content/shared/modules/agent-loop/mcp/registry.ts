@@ -17,7 +17,6 @@
 
 import type { AgentId } from '../agents/types';
 import type { MCPServer, ToolDefinition, ToolSchema } from './types';
-import { isBrowserTool, isChromeBuild } from '@/shared/browser-agent/contracts';
 
 /** Servers every agent gets. Registered with no owner list. */
 const SHARED = 'shared' as const;
@@ -119,8 +118,6 @@ class MCPRegistry {
     const owners = new Set<AgentId>();
 
     for (const name of toolNames) {
-      // Browser tools use the approval-plan executor rather than a direct MCP writer.
-      if (isChromeBuild() && isBrowserTool(name)) owners.add('browser');
       for (const server of this.servers) {
         if (!server.tools.some((t) => t.schema.name === name)) continue;
         const claim = this.ownership.get(server.id);

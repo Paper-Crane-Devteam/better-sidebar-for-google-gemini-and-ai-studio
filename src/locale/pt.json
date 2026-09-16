@@ -1335,7 +1335,8 @@
       "autoContinue": "Seguir sozinho",
       "autoContinueHint": "Se estiver desligado, você precisa pressionar Enter em cada etapa",
       "sendHint": "Uma etapa que você aprova ainda espera você pressionar Enter — só as etapas sem supervisão se enviam sozinhas.",
-      "taskApproved": "Aprovando tudo nesta tarefa — clique para parar"
+      "taskApproved": "Aprovando tudo nesta tarefa — clique para parar",
+      "browserFixed": "Ler suas abas e favoritos nunca precisa de aprovação. Toda alteração precisa, um lote por vez — e isso não pode ser desligado."
     },
     "approve": {
       "readTitle": "Aprovar esta consulta?",
@@ -1387,7 +1388,17 @@
       "viewPrompt": "Clique para ver o prompt completo",
       "systemPrompt": "Prompt do sistema",
       "resultsTitle": "Resultados das ferramentas",
-      "promptTitle": "Conteúdo do prompt"
+      "promptTitle": "Conteúdo do prompt",
+      "listTabs": "Vendo suas abas",
+      "listTabGroups": "Vendo seus grupos de abas",
+      "listBookmarks": "Procurando nos seus favoritos",
+      "queryChanges": "Verificando o que foi alterado",
+      "arrangeTabs": "Reorganizando abas",
+      "closeTabs": "Fechando abas",
+      "manageTabGroups": "Reorganizando grupos de abas",
+      "arrangeBookmarks": "Reorganizando favoritos",
+      "deleteBookmarks": "Excluindo favoritos",
+      "undoChanges": "Desfazendo uma alteração anterior"
     },
     "sync": {
       "progress": "Buscando o conteúdo da conversa — {{current}}/{{total}}",
@@ -1585,6 +1596,104 @@
       "workspace": {
         "name": "Espaço de trabalho",
         "description": "Leia, escreva e edite arquivos e documentos do seu espaço de trabalho"
+      },
+      "browser": {
+        "name": "Browser Agent",
+        "description": "Organiza abas, grupos de abas e favoritos do Chrome"
+      }
+    },
+    "browserIntro": {
+      "title": "Deixe a IA organizar suas abas e favoritos",
+      "about": "Sobre o Browser Agent",
+      "howToUseTitle": "Como usar o Browser Agent",
+      "howToUseContent": "O Browser Agent trabalha nas suas janelas do Chrome: abas abertas, grupos de abas e favoritos. Ele vê títulos e endereços, não o conteúdo das páginas.\n\nComo usar:\nDigite >Browser Agent no chat e descreva o que quer organizar — por exemplo «agrupe estas abas por tema e recolha as que não estou usando» ou «guarde os favoritos soltos em pastas».\n\nO que ele pode fazer:\n- Abas: abrir, alternar, reordenar, mover entre janelas, fixar.\n- Grupos de abas: criar, renomear, mudar a cor, recolher, desfazer.\n- Favoritos: criar pastas, renomear e mover itens entre elas.\n- Fechar abas e excluir favoritos são permissões separadas, desligadas até você ativá-las.\n\nComo funciona a aprovação:\nLeitura não pede confirmação. Toda alteração é mostrada antes, com as abas ou os favoritos reais que seriam afetados, e só é aplicada depois que você aprova aquele lote específico. Nenhuma configuração pula essa etapa. Tudo o que ele faz fica registrado nesta máquina, e a maior parte pode ser desfeita neste painel.\n\n💡 Dica: «organize minhas abas» nunca significa fechá-las. Se quiser remover algo, diga — caso contrário ele vai reuni-las em um grupo ou uma pasta e deixar a decisão com você."
+    },
+    "browser": {
+      "needsPermission": "🔒 Sem autorização · clique para abrir as permissões",
+      "panel": {
+        "approvalNote": "Toda mudança é aprovada, inclusive a ordenação.",
+        "permissions": "Permitido: {{list}}",
+        "noPermissions": "Permissões: nenhuma concedida ainda",
+        "urlsShared": "URLs completas: a IA pode ler.",
+        "urlsRedacted": "URLs completas: ocultadas.",
+        "auditNote": "O registro de auditoria fica neste computador.",
+        "openSettings": "Permissões e privacidade",
+        "viewHistory": "Registros locais",
+        "noHistory": "Nenhum registro para mostrar. Ler o histórico também exige a permissão correspondente.",
+        "detail": "Detalhe",
+        "previewUndo": "Pré-visualizar desfazer",
+        "changeDetail": "Objetos alterados",
+        "truncated": "Cada etapa mostra suas primeiras 100 mudanças. O registro completo fica neste computador e o agente pode percorrê-lo por páginas.",
+        "approveUndo": "Aprovar e desfazer",
+        "cancel": "Cancelar",
+        "before": "Antes",
+        "after": "Depois",
+        "outcome": "{{status}}: {{completed}}/{{planned}}. {{error}}"
+      },
+      "status": {
+        "applied": "Concluído",
+        "failed": "Interrompido",
+        "applying": "Em execução",
+        "unknown": "Resultado incerto — verifique o navegador",
+        "undone": "Desfeito"
+      },
+      "preview": {
+        "scope": "{{count}} operações · esta aprovação cobre apenas o lote abaixo",
+        "undoPrefix": "Desfazer: ",
+        "objects": "{{count}} objetos afetados",
+        "firstHundred": " (primeiros 100 exibidos)",
+        "untitled": "Sem título",
+        "window": "na janela {{id}}",
+        "position": "estava em {{index}}",
+        "folder": "estava em {{id}}",
+        "object": "Objeto nº {{id}}",
+        "current": "Agora",
+        "restoreTo": "Restaurar para",
+        "absent": "não existe",
+        "lossy": "Este lote remove itens. Uma aba fechada só pode ser recuperada reabrindo a URL: formulários, posição de rolagem e estado da página não são garantidos. Excluir uma pasta exclui tudo o que está nela, e restaurar favoritos cria novos IDs. É aprovado separadamente todas as vezes; nenhuma configuração o executa sem supervisão.",
+        "warning": "Esta aprovação cobre apenas as operações acima. Nada aqui é fechado ou excluído: isso fica em ferramentas separadas, com permissão própria.",
+        "undoWarning": "Desfazer também precisa de aprovação e para assim que encontra uma mudança externa. Fechar uma aba só pode ser desfeito reabrindo a URL — formulários, posição de rolagem e estado da página não são garantidos. Restaurar favoritos cria novos IDs."
+      },
+      "op": {
+        "create": "Criar",
+        "activate": "Ir para",
+        "move": "Mover / reordenar",
+        "pin": "Estado de fixação",
+        "close": "Fechar",
+        "update": "Alterar",
+        "delete": "Excluir",
+        "ungroup": "Remover do grupo"
+      },
+      "field": {
+        "tab_id": "Aba",
+        "tab_ids": "Abas",
+        "group_id": "Grupo",
+        "window_id": "Janela de destino",
+        "index": "Posição (a partir de 0)",
+        "pinned": "Fixada",
+        "collapsed": "Recolhido",
+        "title": "Título",
+        "id": "Objeto",
+        "parent_id": "Pasta de destino",
+        "url": "Endereço",
+        "color": "Cor",
+        "windowId": "Janela",
+        "groupId": "Grupo",
+        "parentId": "Pasta",
+        "active": "Ativa"
+      },
+      "settings": {
+        "title": "Browser Agent",
+        "group": {
+          "organize": "Organizar",
+          "organizeNote": "Reordenar, fixar, agrupar e renomear abas e favoritos.",
+          "remove": "Excluir",
+          "removeNote": "Fechar abas e remover favoritos."
+        },
+        "denied": "Não concedido. A chave permanece desligada.",
+        "urlToggle": "Permitir que a IA leia URLs completas",
+        "urlHelp": "Ligado: o link completo é enviado à conversa de IA atual. Desligado: apenas o esquema e o host; caminho, parâmetros e fragmento ficam ocultos. Endereços já enviados não podem ser retirados.",
+        "done": "Concluir"
       }
     },
     "switcher": {

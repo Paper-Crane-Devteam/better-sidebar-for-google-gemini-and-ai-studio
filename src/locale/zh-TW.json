@@ -1335,7 +1335,8 @@
       "autoContinue": "自己往下走",
       "autoContinueHint": "關閉後，每一步都要你按 Enter",
       "sendHint": "你確認過的步驟仍會等你按 Enter；只有不用確認的步驟才會自動送出。",
-      "taskApproved": "本次任務已全部允許 — 點擊可停止"
+      "taskApproved": "本次任務已全部允許 — 點擊可停止",
+      "browserFixed": "讀你的分頁和書籤不需要批准。變更一定要，而且一批一批地問 —— 這條關不掉。"
     },
     "approve": {
       "readTitle": "允許執行這個查詢？",
@@ -1387,7 +1388,17 @@
       "viewPrompt": "點擊查看完整提示詞",
       "systemPrompt": "系統提示詞",
       "resultsTitle": "工具結果",
-      "promptTitle": "提示詞內容"
+      "promptTitle": "提示詞內容",
+      "listTabs": "查看分頁",
+      "listTabGroups": "查看分頁群組",
+      "listBookmarks": "翻看書籤",
+      "queryChanges": "核對改過什麼",
+      "arrangeTabs": "整理分頁",
+      "closeTabs": "關閉分頁",
+      "manageTabGroups": "整理分頁群組",
+      "arrangeBookmarks": "整理書籤",
+      "deleteBookmarks": "刪除書籤",
+      "undoChanges": "復原之前的變更"
     },
     "sync": {
       "progress": "正在取得對話內容 — {{current}}/{{total}}",
@@ -1585,6 +1596,104 @@
       "workspace": {
         "name": "工作區",
         "description": "讀寫與編輯工作區中的檔案與文件"
+      },
+      "browser": {
+        "name": "Browser Agent",
+        "description": "整理 Chrome 分頁、分頁群組與書籤"
+      }
+    },
+    "browserIntro": {
+      "title": "讓 AI 幫你收拾分頁和書籤",
+      "about": "關於瀏覽器助手",
+      "howToUseTitle": "瀏覽器助手怎麼用",
+      "howToUseContent": "瀏覽器助手處理的是你的 Chrome 視窗：開著的分頁、分頁群組和書籤。它看得到標題和網址，看不到頁面內容。\n\n怎麼用：\n在聊天輸入框裡打 >Browser Agent，然後說你想怎麼收拾 —— 例如「把這些分頁按主題分組，用不到的收起來」或者「把散著的書籤歸到資料夾裡」。\n\n它能做什麼：\n- 分頁：開啟、切換、重新排序、跨視窗移動、釘選。\n- 分頁群組：新增、改名、換顏色、收合、解散。\n- 書籤：新增資料夾、改名、在資料夾之間搬移。\n- 關閉分頁和刪除書籤是獨立的權限，沒開就沒有。\n\n批准是怎麼走的：\n讀取不需要確認。每一次變更都會先把真正會動到的分頁或書籤攤給你看，你批准了這一批才會執行。沒有任何設定能跳過這一步。它做過的事都記在本機，大部分可以在這個面板裡復原。\n\n💡 提示：「整理一下我的分頁」從來不等於關掉它們。想清掉就直說 —— 不然它會把它們收進一個群組或一個資料夾，把決定留給你。"
+    },
+    "browser": {
+      "needsPermission": "🔒 尚未授權 · 點擊開啟權限設定",
+      "panel": {
+        "approvalNote": "所有變更都需核准，包括排序。",
+        "permissions": "已允許：{{list}}",
+        "noPermissions": "權限：尚未授權",
+        "urlsShared": "完整 URL：允許 AI 讀取。",
+        "urlsRedacted": "完整 URL：已去識別化。",
+        "auditNote": "稽核記錄僅留在本機。",
+        "openSettings": "權限與隱私設定",
+        "viewHistory": "檢視本機記錄",
+        "noHistory": "暫無可檢視的記錄；讀取歷史也需要對應權限。",
+        "detail": "明細",
+        "previewUndo": "預覽還原",
+        "changeDetail": "變更明細",
+        "truncated": "每步最多顯示前 100 筆變更；完整記錄保存在本機，可由 Agent 分頁查詢。",
+        "approveUndo": "核准並還原",
+        "cancel": "取消",
+        "before": "之前",
+        "after": "之後",
+        "outcome": "{{status}}：{{completed}}/{{planned}}。{{error}}"
+      },
+      "status": {
+        "applied": "已完成",
+        "failed": "已停止",
+        "applying": "執行中",
+        "unknown": "結果不確定，請檢查瀏覽器",
+        "undone": "已還原"
+      },
+      "preview": {
+        "scope": "{{count}} 項操作 · 核准僅適用於下面這一批",
+        "undoPrefix": "還原：",
+        "objects": "涉及 {{count}} 個物件",
+        "firstHundred": "（前 100 個如下）",
+        "untitled": "無標題",
+        "window": "目前視窗 {{id}}",
+        "position": "原位置 {{index}}",
+        "folder": "原資料夾 {{id}}",
+        "object": "物件 #{{id}}",
+        "current": "目前",
+        "restoreTo": "還原為",
+        "absent": "不存在",
+        "lossy": "這一批會刪除東西。關閉的分頁只能靠重新開啟連結來復原，表單內容、捲動位置和頁面狀態都無法保證。刪除資料夾會連裡面的內容一起刪掉，還原書籤會產生新的 ID。這類操作每次都要單獨批准，任何設定都不能讓它自動執行。",
+        "warning": "這次批准只涵蓋上面這些操作。這裡不會關閉或刪除任何東西——那是另外的工具，需要單獨授權。",
+        "undoWarning": "還原也需要核准；發現外部變更就停止。關閉分頁只會盡力重新開啟 URL，無法保證還原表單、捲動位置或頁面執行狀態。還原書籤會產生新 ID。"
+      },
+      "op": {
+        "create": "建立",
+        "activate": "切換至",
+        "move": "移動 / 排序",
+        "pin": "釘選狀態",
+        "close": "關閉",
+        "update": "修改",
+        "delete": "刪除",
+        "ungroup": "取消分組"
+      },
+      "field": {
+        "tab_id": "分頁",
+        "tab_ids": "分頁",
+        "group_id": "群組",
+        "window_id": "目標視窗",
+        "index": "位置（從 0 開始）",
+        "pinned": "釘選",
+        "collapsed": "收合",
+        "title": "標題",
+        "id": "物件",
+        "parent_id": "目標資料夾",
+        "url": "網址",
+        "color": "顏色",
+        "windowId": "視窗",
+        "groupId": "群組",
+        "parentId": "資料夾",
+        "active": "使用中"
+      },
+      "settings": {
+        "title": "Browser Agent",
+        "group": {
+          "organize": "整理",
+          "organizeNote": "排序、釘選、分組，重新命名分頁和書籤。",
+          "remove": "刪除",
+          "removeNote": "關閉分頁、移除書籤。"
+        },
+        "denied": "未授權，開關保持關閉。",
+        "urlToggle": "允許 AI 讀取完整 URL",
+        "urlHelp": "開啟：完整連結會傳送到目前的 AI 對話。關閉：只提供協定和網域，隱藏路徑、參數與片段。已傳送的網址無法收回。",
+        "done": "完成"
       }
     },
     "switcher": {

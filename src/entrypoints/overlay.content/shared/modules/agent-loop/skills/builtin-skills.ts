@@ -790,8 +790,8 @@ PPTX doc_edit ops:
 Operations run sequentially. Re-read after structural edits before using old slide numbers.
 An invalid op aborts the entire batch without saving. Custom shows/sections block structural
 edits; signed packages and nonstandard/Strict namespaces are unsupported. No tracked changes
-in PowerPoint; edits are direct and backed up under .history. Explain before/after snippets
-in change_summary. Report applied/skipped and backupPath, and ask the user to review layout
+in PowerPoint; edits are direct and backed up under .history.
+Report applied/skipped and backupPath, and ask the user to review layout
 in PowerPoint/WPS since this tool does not render or resize text boxes. Creating a new PPTX
 from Markdown is not implemented.
 `,

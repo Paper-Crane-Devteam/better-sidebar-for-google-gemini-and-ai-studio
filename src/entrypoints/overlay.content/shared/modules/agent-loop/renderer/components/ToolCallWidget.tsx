@@ -43,7 +43,7 @@ import {
 } from '../../execution-policy';
 import { getToolLabel } from '../../tool-labels';
 import { isBrowserWrite } from '@/shared/browser-agent/contracts';
-import { BrowserPlanPreview } from '../../../browser-agent/BrowserPlanPreview';
+import { BrowserPlanPreview } from '../../browser/BrowserPlanPreview';
 import { isImeComposing } from '@/entrypoints/overlay.content/shared/lib/ime';
 
 interface ToolCallWidgetProps {

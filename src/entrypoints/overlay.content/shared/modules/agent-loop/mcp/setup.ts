@@ -8,16 +8,30 @@
  */
 
 import { mcpRegistry } from './registry';
+import type { MCPServer } from './types';
 import { CORE_MCP } from './core-mcp';
 import { BUILTIN_MCP } from './builtin-mcp';
 import { WORKSPACE_MCP, WORKSPACE_MCP_ID } from './workspace-mcp';
 import { DOCUMENT_MCP, DOCUMENT_MCP_ID } from './document-mcp';
+import { BROWSER_MCP } from './browser-mcp';
 import { AGENTS } from '../agents/registry';
-import type { AgentId } from '../agents/types';
+import type { AgentDefinition, AgentId } from '../agents/types';
 import { useAgentConfigStore } from '../agent-config-store';
+import { isChromeBuild } from '@/shared/browser-agent/contracts';
 
-/** Every builtin server that belongs to an agent, by id. */
-const OWNED_SERVERS = [BUILTIN_MCP, WORKSPACE_MCP, DOCUMENT_MCP];
+/**
+ * Every builtin server that belongs to an agent.
+ *
+ * ⚠️ The browser one is Chrome-only, and it drops out of this list rather than registering
+ * and refusing everything: `chrome.tabGroups` has no Firefox equivalent, and an agent whose
+ * only server is absent correctly ends up with no tools to offer.
+ */
+const OWNED_SERVERS: MCPServer[] = [
+  BUILTIN_MCP,
+  WORKSPACE_MCP,
+  DOCUMENT_MCP,
+  ...(isChromeBuild() ? [BROWSER_MCP] : []),
+];
 
 /**
  * Servers the user cannot switch off.
@@ -27,22 +41,25 @@ const OWNED_SERVERS = [BUILTIN_MCP, WORKSPACE_MCP, DOCUMENT_MCP];
  */
 const REQUIRED_SERVER_IDS: readonly string[] = [CORE_MCP.id];
 
+/** Register one server under whichever agents claim it. */
+function register(server: MCPServer): void {
+  const owners = AGENTS.filter((a: AgentDefinition) => a.mcpServerIds.includes(server.id)).map(
+    (a) => a.id as AgentId,
+  );
+  if (owners.length === 0) {
+    console.warn(
+      `[AgentLoop] MCP server "${server.id}" is not listed by any agent, so nothing ` +
+        'can call its tools. Add it to an agent in agents/registry.ts.',
+    );
+  }
+  mcpRegistry.registerServer({ ...server }, owners);
+}
+
 export function initMCPRegistry(): void {
   // Shared: no owner list, so every agent gets it.
   mcpRegistry.registerServer({ ...CORE_MCP });
 
-  for (const server of OWNED_SERVERS) {
-    const owners = AGENTS.filter((a) => a.mcpServerIds.includes(server.id)).map(
-      (a) => a.id as AgentId,
-    );
-    if (owners.length === 0) {
-      console.warn(
-        `[AgentLoop] MCP server "${server.id}" is not listed by any agent, so nothing ` +
-          'can call its tools. Add it to an agent in agents/registry.ts.',
-      );
-    }
-    mcpRegistry.registerServer({ ...server }, owners);
-  }
+  for (const server of OWNED_SERVERS) register(server);
 
   syncMCPEnabledState();
 }

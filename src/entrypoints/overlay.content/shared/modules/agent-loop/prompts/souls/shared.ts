@@ -41,7 +41,7 @@ Rules for tool call format:
 - The \`<bs_agent_tool>\` wrapper is REQUIRED, inside the fence
 - Inside must be a valid JSON object with "name", "description", and "params" fields
 - "description" is REQUIRED — a short human-readable explanation
-- Escape quotes inside all JSON strings (including summary/change_summary); use Chinese quotation marks 「…」 in prose to avoid nested double quotes. Do not Markdown-escape tag names or tool names.
+- Every param value must be valid inside a JSON string: escape quotes, and escape line breaks as \\n. A real newline discards the whole call, the operation with it. Do not Markdown-escape tag names or tool names.
 - A param that takes a list is a real JSON array: \`"ids": ["a", "b"]\`. Never a quoted string \`"ids": "[...]"\` — the inner quotes come out unescaped and the entire tool call is discarded unparsed
 - You can output multiple fenced tool calls in one response (executed in order). Give each
   its own fence rather than putting several in one.
@@ -51,22 +51,24 @@ Rules for tool call format:
 /**
  * `change_summary` on anything that changes the user's data.
  *
- * Phrased around "the person who has to say yes" rather than around a tool name, because
- * both agents have write tools and the approval card is the same card.
+ * ⚠️ **Deliberately says nothing about how to write it.** The earlier version specified
+ * markdown, asked for plain language, and framed the param as the thing the user reads *in
+ * order to decide* — and all three made the result worse. Told it was writing the decision
+ * itself, the model produced defensive, mechanically complete bullet lists; a small popup is
+ * the wrong place for that, and nobody read them.
+ *
+ * The summary is a label on the operation, not the case for it. One line naming what changes
+ * is enough, and what "enough" means is the model's call — it can see the operation and we
+ * cannot. The approval card is not left with nothing either way: it shows the statement, and
+ * for browser batches an object-level preview the extension builds itself.
  */
 export function changeSummaryBlock(): string {
-  return `## Every write must explain itself
+  return `## Say what a write changes
 
-Any tool call that **changes** something — a row, a file, a document — must carry a
-\`change_summary\` param: markdown, in plain language, saying what the user's data will
-look like afterwards. Reads change nothing and need none.
+Any tool call that **changes** something — a row, a file, a document, a tab — takes a
+\`change_summary\` param: a short note naming what changes. Reads need none.
 
-**Write it for the person who has to say yes.** They are shown this text and asked to
-allow or refuse, and they generally cannot read the SQL or the file body themselves.
-
-⚠️ **Escape every line break as \`\\n\`.** \`change_summary\` sits inside a JSON string, and
-a real line break there is invalid JSON — it throws away the whole tool call, the
-operation included.`;
+How much to say is up to you.`;
 }
 
 /** How results arrive, and the marker to ignore. */

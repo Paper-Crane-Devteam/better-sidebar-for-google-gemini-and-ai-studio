@@ -1,26 +1,31 @@
 /**
  * Agent entries — what the `>` popup and the Agent tab launcher offer.
  *
- * ## It used to be skills, and now it is agents
+ * ## One row per agent, and nothing else
  *
- * The list has been through two shapes. First there were two triggers: `>` picked a skill,
- * `!` ran without one. Then one list whose first row was "let the AI decide" and whose rest
- * were skills. Now it is **one row per agent**, and skills are gone from it entirely.
+ * The list has been through three shapes. First two triggers: `>` picked a skill, `!` ran
+ * without one. Then one list whose first row was "let the AI decide" and whose rest were
+ * skills. Then agents, but with the Browser agent contributing four rows — itself plus
+ * "Organize tabs", "Manage tab groups", "Organize bookmarks", each carrying a `focus` string
+ * that was quietly appended to the prompt.
  *
- * Why: picking a skill up front meant committing to an approach before seeing any data, and
- * the wrong guess cost the whole session — a run started from "Export Conversations" that
- * turned out to need a sync had to be abandoned. The running agent calls `activate_skill`
- * itself now, once it knows what the task actually is.
+ * All of that is gone. Picking a skill up front meant committing to an approach before seeing
+ * any data, and the wrong guess cost the whole session. The pre-aimed browser rows had a
+ * different problem: they looked like four choices but answered the same question the same
+ * way, so the list implied a decision that did not exist — and "Organize tabs" is a sentence
+ * the user could simply type.
  *
- * What the user chooses instead is genuinely a decision only they can make: **which of
- * their things this is about.** Their conversations, or their files.
+ * What is left is genuinely a decision only they can make: **which of their things this is
+ * about.** Their conversations, their files, or their browser. One row each.
+ *
+ * ⚠️ It follows that this module is agent-agnostic. Anything an entry has to say about a
+ * specific agent — the Browser agent's "not authorized yet", for instance — comes from that
+ * agent's own definition (`AgentDefinition.unavailable`), never from a branch here.
  */
 
 import i18n from '@/locale/i18n';
 import { AGENTS, getAgent, localizedAgent, normalizeAgentId } from './agents/registry';
 import type { AgentDefinition, AgentId } from './agents/types';
-import { isChromeBuild } from '@/shared/browser-agent/contracts';
-import { useBrowserAgent } from '../browser-agent/client';
 
 /**
  * Legacy sentinel for "run the agent, let it pick a skill itself".
@@ -30,23 +35,8 @@ import { useBrowserAgent } from '../browser-agent/client';
  * maps it onto the Better Sidebar agent.
  */
 export const AGENT_AUTO_ID = '__agent_auto__';
-export const BROWSER_AUTO_ID = '__browser_agent__';
-const BROWSER_SHORTCUTS = [
-  ['__browser_tabs__', '整理标签页', 'Organize tabs in the current window.'],
-  ['__browser_groups__', '管理标签组', 'Organize tab groups in the current window.'],
-  ['__browser_bookmarks__', '整理收藏夹', 'Organize bookmarks using titles and URLs.'],
-] as const;
-
-export function browserEntryNeedsPermission(id: string) {
-  const caps = useBrowserAgent.getState().settings.capabilities;
-  if (id === '__browser_tabs__') return !caps.includes('tabs.read');
-  if (id === '__browser_groups__') return !caps.includes('tabGroups.read');
-  if (id === '__browser_bookmarks__') return !caps.includes('bookmarks.read');
-  return (id === 'browser' || id === BROWSER_AUTO_ID) && !caps.some(c => c.endsWith('.read'));
-}
 
 export interface AgentEntry {
-  focus?: string;
   /** The agent id. Goes into the capsule and the prompt marker. */
   id: string;
   title: string;
@@ -56,22 +46,31 @@ export interface AgentEntry {
    * Text the capsule stores, and the text stripped back out to recover what the user typed
    * around it.
    *
-   * Equal to the title for an agent, which is what makes the round trip exact: the capsule
-   * shows `>Workspace`, expands to `Workspace`, and removing that leaves the user's own
-   * words. When entries were skills this held the entire skill prompt, so expansion dumped
-   * thousands of characters into the composer before they were stripped again.
+   * Equal to the title, which is what makes the round trip exact: the capsule shows
+   * `>Workspace`, expands to `Workspace`, and removing that leaves the user's own words. When
+   * entries were skills this held the entire skill prompt, so expansion dumped thousands of
+   * characters into the composer before they were stripped again.
    */
   capsuleContent: string;
   /** The agent this entry runs. */
   agent: AgentDefinition;
 }
 
+/**
+ * One agent as a row.
+ *
+ * The description is where an unavailable agent explains itself, rather than the row being
+ * hidden or disabled. Hiding it means the user cannot discover the feature at all; disabling
+ * it means the click that would tell them what is missing does nothing. So the row stays
+ * clickable and says what is wrong, and picking it runs `unavailable().resolve` — which for
+ * the Browser agent opens the permissions window.
+ */
 function toEntry(agent: AgentDefinition): AgentEntry {
   const localized = localizedAgent(agent);
   return {
     id: localized.id,
     title: localized.name,
-    description: browserEntryNeedsPermission(localized.id) ? '🔒 尚未授权 · 点击打开权限设置' : localized.description,
+    description: localized.unavailable?.()?.reason ?? localized.description,
     icon: localized.icon,
     capsuleContent: localized.name,
     agent: localized,
@@ -80,24 +79,17 @@ function toEntry(agent: AgentDefinition): AgentEntry {
 
 /** Every agent, in display order. */
 export function getAgentEntries(): AgentEntry[] {
-  return AGENTS.flatMap(agent => [toEntry(agent), ...(agent.id === 'browser' ? BROWSER_SHORTCUTS.map(([id]) => getAgentEntryById(id)!) : [])]);
+  return AGENTS.map(toEntry);
 }
 
 /**
  * Resolve an entry by id.
  *
- * Never returns undefined for a *known* id shape — `getAgent` falls back to the default
- * agent for anything unrecognised, including the old skill ids that historical markers
- * still carry. A conversation from before this change renders as a Better Sidebar session,
- * which is what it was.
+ * Never returns undefined for a *known* id shape — `getAgent` falls back to the default agent
+ * for anything unrecognised, including the old skill and shortcut ids that historical markers
+ * still carry. A conversation from before this change renders as the agent it was.
  */
 export function getAgentEntryById(id: string): AgentEntry | undefined {
-  const shortcut = isChromeBuild() ? BROWSER_SHORTCUTS.find(([key]) => key === id) : undefined;
-  if (shortcut) {
-    const [, title, focus] = shortcut;
-    return { ...toEntry(getAgent('browser')), id, title, focus, capsuleContent: title,
-      description: browserEntryNeedsPermission(id) ? '🔒 尚未授权 · 点击打开权限设置' : focus };
-  }
   return toEntry(getAgent(id));
 }
 
@@ -109,8 +101,8 @@ export function agentIdFromEntry(id: string): AgentId {
 /**
  * Match entries against the popup's query.
  *
- * With two rows there is nothing to page through, so an empty query returns both and a
- * query returns whatever matches — including nothing, which correctly closes the popup and
+ * With three rows there is nothing to page through, so an empty query returns all of them and
+ * a query returns whatever matches — including nothing, which correctly closes the popup and
  * lets the user type a message that happens to start with `>`.
  */
 export function searchAgentEntries(query: string): AgentEntry[] {

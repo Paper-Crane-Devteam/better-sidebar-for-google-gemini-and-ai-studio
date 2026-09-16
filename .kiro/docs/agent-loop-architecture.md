@@ -50,7 +50,7 @@ src/entrypoints/overlay.content/shared/
 │   │   ├── recovery.ts            # ★ 把未送达的行重新拼回 payload
 │   │   ├── execution-policy.ts    # requiresApproval / shouldAutoSend / getToolRisk
 │   │   │                          #   buildToolCallKey ★ 是 wire format，见「join key」
-│   │   ├── agent-entry.ts         # ★ `>` 列表数据源：auto 条目 + skills
+│   │   ├── agent-entry.ts         # ★ `>` 列表数据源：一行一个 agent，不含 skill
 │   │   ├── event-bus.ts           # 类型安全事件总线
 │   │   ├── useAgentTrigger.ts     # `>` 前缀检测
 │   │   ├── AgentCommandPopup.tsx  # `>` 弹出选择列表
@@ -79,15 +79,25 @@ src/entrypoints/overlay.content/shared/
 │   │   │       ├── index.ts            # parseToolCalls
 │   │   │       ├── tool-schema.ts      # ★ SUPPORTED_TOOLS / REQUIRED_PARAMS
 │   │   │       └── fallbacks.ts        # Gemini 吞格式时的兜底解析
+│   │   ├── agents/                # ★ 有哪些 agent：registry.ts + types.ts（AgentDefinition）
 │   │   ├── renderer/              # 聊天流内的定制渲染 + 工具卡片
-│   │   ├── prompts/               # soul.ts + prompt-assembler.ts
+│   │   ├── prompts/               # prompt-assembler.ts + souls/（一个 agent 一个 soul）
 │   │   ├── skills/                # builtin-skills + skill-registry
 │   │   ├── mcp/                   # MCP registry + providers（工具真正的注册处）
-│   │   └── tools/                 # execute-sql / export / sync / complete-task
-│   ├── agent-tab/                 # 侧边栏 Agent Tab —— 只有启动器，永不变样
-│   │   ├── AgentTab.tsx           # <AgentLauncher /> ⇆ <WorkspaceView />
+│   │   ├── tools/                 # execute-sql / export / sync / complete-task / workspace / browser
+│   │   ├── workspace/             # Workspace agent 的领域状态（binding / file-viewer）
+│   │   └── browser/               # Browser agent 的领域状态
+│   │       ├── browser-store.ts        # ★ 权限与设置的镜像 + 唯一的 background 出口
+│   │       └── BrowserPlanPreview.tsx  # ★ 批准预览（dock 和卡片共用，所以不在 agent-tab 里）
+│   ├── agent-tab/                 # 侧边栏 Agent Tab —— 一个 agent 一个面板，永不变样
+│   │   ├── AgentTab.tsx           # 顶部 AgentSwitcher + 三个面板之一
+│   │   ├── workspace/             # Workspace 面板：文件树
+│   │   ├── browser/BrowserView.tsx        # Browser 面板：权限摘要 + 本地流水 + 撤销
 │   │   └── components/
+│   │       ├── AgentSwitcher.tsx          # ★ 只换面板，不换正在跑的会话
 │   │       ├── AgentLauncher.tsx          # 布局 + 工作区/设置入口 + 不可用提示
+│   │       ├── WorkspaceIntro.tsx         # 文件树上方那一行（含问号弹窗）
+│   │       ├── BrowserIntro.tsx           # 同上，Browser 面板的那一行
 │   │       ├── LauncherCta.tsx            # 「输入框打 > 」三步图示（唯一入口）
 │   │       ├── LauncherExamples.tsx       # 范例句轮播（7s 自动轮换，hover 暂停+出箭头）
 │   │       └── agent-examples.ts          # 范例句数据：每个模块一条，故意写得很细
@@ -123,7 +133,7 @@ src/entrypoints/overlay.content/gemini/OverlayPanel.tsx   # 渲染 <AgentTab />
 | 符号 | 归属 | 说明 |
 |------|------|------|
 | `/` | slash-command | Snippets / prompt 库 |
-| `>` | agent-loop | Agent 条目：第一项是 auto（AI 自己选 skill），其余是 skills |
+| `>` | agent-loop | **一行一个 agent**，没有 skill 也没有快捷条目 |
 
 `!` 触发符已移除。它等价于"不预选 skill 的 agent"，却需要第二个 `useEditorIntegration` 实例，
 而 `registerBeforeSendHandler` 是模块级单槽，两个实例只有一个能接管发送按钮点击。
@@ -1137,17 +1147,66 @@ if (full.length > MAX_MESSAGE_LENGTH) full = full.substring(0, MAX_MESSAGE_LENGT
 `## Database Schema` 一段就 7636 字符（占 1/4），是最该动的地方。新增 tool schema 前
 先想清楚：schema 是**每一轮**都进 prompt 的，而放进 skill 的内容是按需加载的。
 
-## 两个 agent：Better Sidebar 与 Workspace
+## 三个 agent：Better Sidebar / Workspace / Browser
 
-`>` 弹出的列表现在**一行一个 agent**，不再有 skill。
+`>` 弹出的列表**一行一个 agent**，不再有 skill，也不再有「预先瞄准某类对象」的快捷条目。
 
 | agent | 操作对象 | MCP | Agent tab 显示 |
 |------|------|------|------|
 | `bettersidebar` | 扩展自己的数据（对话/文件夹/标签/提示词/片段） | `builtin-bettersidebar`（sql/sync/export） | launcher |
 | `workspace` | 工作区里的文件与文档 | `builtin-workspace`（Files）+ `builtin-documents` | 简介 + 文件树 |
+| `browser` | Chrome 的标签页 / 标签组 / 书签（Chrome only） | `builtin-browser`（Tabs & Bookmarks） | 简介 + 权限摘要 + 本地流水 |
 
-两者都拿到 `builtin-core`（`complete_task` + `activate_skill`）。⚠️ **core 不可关、也不按 agent 列**
+三者都拿到 `builtin-core`（`complete_task` + `activate_skill`）。⚠️ **core 不可关、也不按 agent 列**
 —— 少了它的 agent 不是「能力弱一点」，是一个只能靠 Stop 退出的死循环。
+
+### 加一个 agent 要碰的地方（就这几个，别再加特例）
+
+1. `agents/types.ts` 的 `AgentId` 加一个 id —— ⚠️ 这是 wire format，见「旧 id 必须继续解析」
+2. `prompts/souls/<id>-soul.ts` 写 soul，协议块从 `souls/shared.ts` 取，别自己写一套
+3. `mcp/<id>-mcp.ts` + `mcp/providers/<id>-provider.ts`，然后挂进 `mcp/setup.ts` 的 `OWNED_SERVERS`
+4. `tools/<id>-tools.ts` 放真正干活的函数（返回字符串、**不 throw**，照 `workspace-tools.ts`）
+5. `agents/registry.ts` 加一条 `AgentDefinition`
+6. `engine/parser/tool-schema.ts` 的 `SUPPORTED_TOOLS` / `REQUIRED_PARAMS` 登记工具名
+7. `tool-labels.ts` 给每个工具一句人话，否则卡片上写「Running a step」
+8. Agent tab 的面板（`tabContent`）+ `agent.agents.<id>.name/description` 两个 i18n key
+
+⚠️ **`prompt-assembler.ts` 和 `tool-registry.ts` 里不许出现 `agentId === '<id>'`。** Browser agent
+第一版就是这么写的：assembler 顶上一句短路，于是它绕过了所有共享协议块，`<bs_agent_tool>` 的格式
+说明在代码里长出了第二份、而且已经和真的解析器对不上了。agent 的扩展点只有 `buildSoul` 一个。
+
+### 唯一的例外：browser 的写是两段式
+
+别的工具都是一次 `execute`。Browser 的写不行 —— 它中间夹着一个人：
+
+```
+prepare（后台按真实对象解析 operations）→ 用户批准这一批 → commit
+```
+
+所以 `engine/stages/execute-tools.ts` 里对 `isBrowserWrite` 有一段专门的代码，它**不走**
+`tool-registry.executeToolCall`。三个后果，都得记住：
+
+- 归属检查得在那里手动做一次（`toolRefusal()`，从 tool-registry 导出，就是为了两条路措辞一致）。
+  少了它，一个 Better Sidebar 会话吐出 `browser_close_tabs` 会直接弹出批准卡。
+- provider 里那些写工具的 `execute` 是**故意留着并且会拒绝**的，不是没写完：能走到那儿说明有人绕过了
+  批准，静默执行是最坏的结果。
+- prepare 出来的 plan 在后台占着一份快照，**从 prepare 之后的每条退出路径都要处理掉它**
+  （拒绝 / abort / 报错），否则就是一批用户没答应过的操作一直上着膛。
+
+批准看的是 `BrowserPlanPreview`（后台从真实对象生成，权威），`change_summary` 只是旁边那句人话。
+
+### agent 可能「还不能用」——这是 agent 自己的属性
+
+`AgentDefinition.unavailable?()` 返回 `{ reason, resolve }` 或 null。Browser agent 用它表达
+「Chrome 权限还没给」：`reason` 直接顶替 `>` 列表里那一行的描述，点这一行就执行 `resolve`
+（打开权限窗口）而**不是**写入 capsule。
+
+⚠️ **pick 时和 send 时都要查。** capsule 会比授权活得久 —— 权限能从 Chrome 自己的 UI 撤销、我们收不到
+事件，而手打的标记根本没经过第一道检查。少了第二次检查的症状是：一个只能在发送那一刻失败的
+capsule，报错的地方离用户要修的东西隔着好几步。
+
+早期版本把这件事写成了散落在 `agent-entry.ts` 和两个平台 `AgentLoopFeature` 里的
+`id === '__browser_tabs__'` 判断，共 5 处。
 
 ### agent 不是 skill
 
@@ -1179,12 +1238,21 @@ prompt 里，模型经常抓错那一套。现在的分界：
 prompt 里没有 schema，它写出来的任何 SQL 都是对着没见过的表猜的——挡在这里，最坏结果是浪费一轮，
 不挡就是写坏用户数据。
 
+还有第三个问题，只有 Browser agent 有：**工具存在，但此刻没被允许**（Chrome 权限没给）。
+`MCPServer.promptTools?()` 就是为它加的 —— `tools` 是全集，`promptTools()` 是进 prompt 的子集。
+
+⚠️ **两者不能合并成一个会伸缩的 `tools`。** `tools` 要回答的是「这个工具存不存在、归谁」，而重载
+会话（auto-pickup / 补发欠账）靠的正是「从对话里的调用反推当时是哪个 agent」（`agentForTools`）——
+一个跟着权限缩水的列表会让昨天那次会话变成无法识别的调用。而反过来，把没授权的工具也写进 prompt，
+模型会调它、被拒、然后当成 bug 重试。
+
 ### soul 拆成三块
 
 ```
 prompts/souls/shared.ts              ← 协议：工具格式 / 结果怎么回来 / 一轮怎么结束 / 预算
 prompts/souls/bettersidebar-soul.ts  ← schema + 平台过滤 + inbox id + SQL 规则
 prompts/souls/workspace-soul.ts      ← 工作区是什么 + 8 条防静默出错的规则
+prompts/souls/browser-soul.ts        ← 能碰到什么 + 逐批批准 + 隐私（URL 脱敏那段随设置变）
 ```
 
 判断一段该放哪的准则：**提到表、文件、工具名或领域概念的，就是 agent 自己的**。
@@ -1198,6 +1266,10 @@ prompts/souls/workspace-soul.ts      ← 工作区是什么 + 8 条防静默出�
 `[#bs-agent:__agent_auto__#]` 写在每一条历史 agent 消息里，`builtin-workspace-agent` 也一样。
 `normalizeAgentId` 把它们映射到真 agent（分别是 bettersidebar / workspace），
 ⚠️ 不这么做的话所有历史 agent 轮次都会变成无法识别的条目、卡片全部丢失。
+
+Browser agent 那四个也在表里：`__browser_agent__` / `__browser_tabs__` / `__browser_groups__` /
+`__browser_bookmarks__`，全部映射到 `browser`。后三个是已经删掉的快捷条目 —— 它们看着像四个选择，
+其实对「这件事跟你的哪样东西有关」给出的是同一个答案，而「整理标签页」是用户自己打得出来的一句话。
 
 ### 「没调用工具」不再弹卡
 
@@ -1453,7 +1525,7 @@ scrollHeight 9478 → 30698   ← 高度是在滚过去的时候才被量出来�
 ### 新增一个 Tool
 
 1. `mcp/providers/` 下创建 provider（schema + execute）
-2. 挂到 `mcp/builtin-mcp.ts` 的 `tools` 数组
+2. 挂到所属 server 的 `tools` 数组（`builtin-mcp.ts` / `workspace-mcp.ts` / …）
 3. `engine/parser/tool-schema.ts` 的 `SUPPORTED_TOOLS` + `REQUIRED_PARAMS` 注册
 3.5. 如果新加的 param 是**给人看的**（像 `change_summary`），加进 `NON_IDENTITY_PARAMS`
    —— 否则它会参与重复调用检测和 join key，见「它不能参与谁是同一个调用的判定」

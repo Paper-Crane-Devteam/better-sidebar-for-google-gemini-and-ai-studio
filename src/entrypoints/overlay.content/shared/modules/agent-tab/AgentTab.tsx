@@ -17,6 +17,7 @@
  * |---|---|
  * | Better Sidebar | the launcher — what this is, how to start, examples |
  * | Workspace | a short intro, then the file tree itself |
+ * | Browser Agent | a short intro, then what it may touch and what it has already done |
  *
  * ⚠️ **The switcher changes the panel, not a running session.** An agent is fixed for the
  * life of a session (the prompt was built from it, and the tool layer enforces its
@@ -38,7 +39,8 @@ import { SplitNewChatButton } from '@/shared/components/ui/split-new-chat-button
 import { UIcon } from '@/shared/components/ui/icon';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { navigateToNewChat } from '@/shared/lib/navigation';
-import { BrowserAgentLauncher } from '../browser-agent/BrowserAgentLauncher';
+import { BrowserIntro } from './components/BrowserIntro';
+import { BrowserView } from './browser/BrowserView';
 
 export const AgentTab: React.FC = () => {
   const { t } = useI18n();
@@ -74,9 +76,18 @@ export const AgentTab: React.FC = () => {
         <AgentSwitcher selected={selectedAgentId} onSelect={setSelectedAgentId} />
       </div>
 
-      {agent.tabContent === 'browser' ? <BrowserAgentLauncher /> : agent.tabContent === 'workspace' ? (
-        // `min-h-0` is what lets the file tree scroll instead of pushing the flex parent
-        // past the viewport — without it the tree grows and the switcher slides off screen.
+      {/*
+        One panel per agent, and the two non-launcher ones share a shape: a permanent one-line
+        intro, then the thing the agent works on. `min-h-0` is what lets that second part scroll
+        instead of pushing the flex parent past the viewport — without it the content grows and
+        the switcher slides off screen.
+      */}
+      {agent.tabContent === 'browser' ? (
+        <div className="flex min-h-0 flex-1 flex-col">
+          <BrowserIntro />
+          <BrowserView />
+        </div>
+      ) : agent.tabContent === 'workspace' ? (
         <div className="flex min-h-0 flex-1 flex-col">
           <WorkspaceIntro />
           <div className="min-h-0 flex-1">

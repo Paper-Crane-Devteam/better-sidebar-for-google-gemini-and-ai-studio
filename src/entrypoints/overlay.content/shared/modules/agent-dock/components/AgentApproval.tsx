@@ -20,7 +20,7 @@ import { useAgentLoopStore } from '../../agent-loop/agent-loop-store';
 import { getToolLabel } from '../../agent-loop/tool-labels';
 import type { ApprovalScope } from '../../agent-loop/types';
 import { isBrowserWrite } from '@/shared/browser-agent/contracts';
-import { BrowserPlanPreview } from '../../browser-agent/BrowserPlanPreview';
+import { BrowserPlanPreview } from '../../agent-loop/browser/BrowserPlanPreview';
 import { isImeComposing } from '@/entrypoints/overlay.content/shared/lib/ime';
 
 export const AgentApproval: React.FC = () => {

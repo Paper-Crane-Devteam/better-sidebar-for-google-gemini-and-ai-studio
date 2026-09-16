@@ -1335,7 +1335,8 @@
       "autoContinue": "Continuar por su cuenta",
       "autoContinueHint": "Si está desactivado, tendrás que pulsar Enter en cada paso",
       "sendHint": "Un paso que apruebas sigue esperando a que pulses Enter; solo los pasos sin supervisión se envían solos.",
-      "taskApproved": "Aprobando todo en esta tarea: haz clic para detenerlo"
+      "taskApproved": "Aprobando todo en esta tarea: haz clic para detenerlo",
+      "browserFixed": "Leer tus pestañas y marcadores nunca requiere aprobación. Todo cambio sí, de un lote a la vez, y eso no se puede desactivar."
     },
     "approve": {
       "readTitle": "¿Aprobar esta consulta?",
@@ -1387,7 +1388,17 @@
       "viewPrompt": "Haz clic para ver el prompt completo",
       "systemPrompt": "Prompt del sistema",
       "resultsTitle": "Resultados de herramientas",
-      "promptTitle": "Contenido del prompt"
+      "promptTitle": "Contenido del prompt",
+      "listTabs": "Revisando tus pestañas",
+      "listTabGroups": "Revisando tus grupos de pestañas",
+      "listBookmarks": "Buscando en tus marcadores",
+      "queryChanges": "Comprobando qué ha cambiado",
+      "arrangeTabs": "Reorganizando pestañas",
+      "closeTabs": "Cerrando pestañas",
+      "manageTabGroups": "Reorganizando grupos de pestañas",
+      "arrangeBookmarks": "Reorganizando marcadores",
+      "deleteBookmarks": "Eliminando marcadores",
+      "undoChanges": "Deshaciendo un cambio anterior"
     },
     "sync": {
       "progress": "Obteniendo el contenido de la conversación — {{current}}/{{total}}",
@@ -1585,6 +1596,104 @@
       "workspace": {
         "name": "Espacio de trabajo",
         "description": "Lee, escribe y edita archivos y documentos de tu espacio de trabajo"
+      },
+      "browser": {
+        "name": "Browser Agent",
+        "description": "Organiza pestañas, grupos de pestañas y marcadores de Chrome"
+      }
+    },
+    "browserIntro": {
+      "title": "Deja que la IA ordene tus pestañas y marcadores",
+      "about": "Acerca del Browser Agent",
+      "howToUseTitle": "Cómo usar el Browser Agent",
+      "howToUseContent": "El Browser Agent trabaja sobre tus ventanas de Chrome: pestañas abiertas, grupos de pestañas y marcadores. Ve títulos y direcciones, no el contenido de las páginas.\n\nCómo usarlo:\nEscribe >Browser Agent en el chat y describe lo que quieres ordenar: por ejemplo «agrupa estas pestañas por tema y colapsa las que no estoy usando» o «archiva los marcadores sueltos en carpetas».\n\nQué puede hacer:\n- Pestañas: abrir, cambiar de pestaña, reordenar, mover entre ventanas, fijar.\n- Grupos de pestañas: crear, renombrar, cambiar de color, colapsar, deshacer.\n- Marcadores: crear carpetas, renombrar y mover cosas entre ellas.\n- Cerrar pestañas y eliminar marcadores son permisos aparte, desactivados hasta que los actives.\n\nCómo funciona la aprobación:\nLeer no requiere confirmación. Cada cambio se te muestra primero con las pestañas o los marcadores reales a los que afectaría, y solo se aplica cuando apruebas ese lote concreto. Ninguna opción se salta este paso. Todo lo que hace queda registrado en este equipo, y casi todo se puede deshacer desde este panel.\n\n💡 Consejo: «ordena mis pestañas» nunca significa cerrarlas. Si quieres eliminar algo, dilo; de lo contrario las reunirá en un grupo o una carpeta y te dejará la decisión."
+    },
+    "browser": {
+      "needsPermission": "🔒 Sin autorizar · haz clic para abrir los permisos",
+      "panel": {
+        "approvalNote": "Todos los cambios se aprueban, también el orden.",
+        "permissions": "Permitido: {{list}}",
+        "noPermissions": "Permisos: ninguno concedido todavía",
+        "urlsShared": "URL completas: la IA puede leerlas.",
+        "urlsRedacted": "URL completas: ocultas.",
+        "auditNote": "El registro de auditoría se queda en este equipo.",
+        "openSettings": "Permisos y privacidad",
+        "viewHistory": "Registros locales",
+        "noHistory": "No hay registros que mostrar. Leer el historial también requiere el permiso correspondiente.",
+        "detail": "Detalle",
+        "previewUndo": "Previsualizar deshacer",
+        "changeDetail": "Objetos modificados",
+        "truncated": "Cada paso muestra sus primeros 100 cambios. El registro completo se queda en este equipo y el agente puede recorrerlo por páginas.",
+        "approveUndo": "Aprobar y deshacer",
+        "cancel": "Cancelar",
+        "before": "Antes",
+        "after": "Después",
+        "outcome": "{{status}}: {{completed}}/{{planned}}. {{error}}"
+      },
+      "status": {
+        "applied": "Hecho",
+        "failed": "Detenido",
+        "applying": "En curso",
+        "unknown": "Resultado incierto: revisa el navegador",
+        "undone": "Deshecho"
+      },
+      "preview": {
+        "scope": "{{count}} operaciones · esta aprobación cubre solo el lote de abajo",
+        "undoPrefix": "Deshacer: ",
+        "objects": "{{count}} objetos afectados",
+        "firstHundred": " (se muestran los primeros 100)",
+        "untitled": "Sin título",
+        "window": "en la ventana {{id}}",
+        "position": "estaba en {{index}}",
+        "folder": "estaba en {{id}}",
+        "object": "Objeto n.º {{id}}",
+        "current": "Ahora",
+        "restoreTo": "Restaurar a",
+        "absent": "no existe",
+        "lossy": "Este lote elimina elementos. Una pestaña cerrada solo se puede recuperar volviendo a abrir su URL: los formularios, la posición de desplazamiento y el estado de la página no están garantizados. Al eliminar una carpeta se elimina todo su contenido, y al restaurar marcadores se crean IDs nuevos. Se aprueba por separado cada vez; ninguna opción permite ejecutarlo sin supervisión.",
+        "warning": "Esta aprobación cubre solo las operaciones anteriores. Aquí no se cierra ni se elimina nada: para eso hay herramientas aparte con su propio permiso.",
+        "undoWarning": "Deshacer también necesita aprobación y se detiene en cuanto detecta un cambio externo. Cerrar una pestaña solo se puede deshacer volviendo a abrir su URL: los formularios, la posición de desplazamiento y el estado de la página no están garantizados. Restaurar marcadores crea IDs nuevos."
+      },
+      "op": {
+        "create": "Crear",
+        "activate": "Ir a",
+        "move": "Mover / reordenar",
+        "pin": "Estado de fijado",
+        "close": "Cerrar",
+        "update": "Modificar",
+        "delete": "Eliminar",
+        "ungroup": "Quitar del grupo"
+      },
+      "field": {
+        "tab_id": "Pestaña",
+        "tab_ids": "Pestañas",
+        "group_id": "Grupo",
+        "window_id": "Ventana de destino",
+        "index": "Posición (desde 0)",
+        "pinned": "Fijada",
+        "collapsed": "Contraído",
+        "title": "Título",
+        "id": "Objeto",
+        "parent_id": "Carpeta de destino",
+        "url": "Dirección",
+        "color": "Color",
+        "windowId": "Ventana",
+        "groupId": "Grupo",
+        "parentId": "Carpeta",
+        "active": "Activa"
+      },
+      "settings": {
+        "title": "Browser Agent",
+        "group": {
+          "organize": "Organizar",
+          "organizeNote": "Reordenar, fijar, agrupar y renombrar pestañas y marcadores.",
+          "remove": "Eliminar",
+          "removeNote": "Cerrar pestañas y quitar marcadores."
+        },
+        "denied": "No concedido. El interruptor sigue desactivado.",
+        "urlToggle": "Permitir que la IA lea las URL completas",
+        "urlHelp": "Activado: el enlace completo se envía a la conversación de IA actual. Desactivado: solo el esquema y el host; la ruta, los parámetros y el fragmento quedan ocultos. Las direcciones ya enviadas no se pueden retirar.",
+        "done": "Listo"
       }
     },
     "switcher": {

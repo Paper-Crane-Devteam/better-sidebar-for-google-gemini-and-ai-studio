@@ -25,8 +25,20 @@ import { useAgentPolicyStore } from '../../agent-loop/agent-policy-store';
 import { useAgentLoopStore } from '../../agent-loop/agent-loop-store';
 
 export const AgentPolicyControls: React.FC = () => {
-  const browserMode = useAgentLoopStore(s => s.activeAgentId === 'browser');
   const { t } = useI18n();
+  /**
+   * The Browser agent answers to neither data switch, so it does not get them.
+   *
+   * Its rule is fixed in the tool layer: reads never ask, writes always do, one batch at a
+   * time, and no preference can waive it (`requiresApproval`). Drawing switches that the
+   * running agent ignores is worse than drawing none — the user would turn one on and
+   * reasonably conclude the confirmations that keep coming are a bug.
+   *
+   * ⚠️ "Keep going on its own" stays, and that is not an oversight. It is a different axis:
+   * not *whether to ask* but *who presses send* once a step is settled, and it applies here
+   * exactly as it does elsewhere.
+   */
+  const browserMode = useAgentLoopStore((s) => s.activeAgentId === 'browser');
   const autoRunReads = useAgentPolicyStore((s) => s.autoRunReads);
   const setAutoRunReads = useAgentPolicyStore((s) => s.setAutoRunReads);
   const autoRunWrites = useAgentPolicyStore((s) => s.autoRunWrites);
@@ -34,32 +46,42 @@ export const AgentPolicyControls: React.FC = () => {
   const autoContinue = useAgentPolicyStore((s) => s.autoContinue);
   const setAutoContinue = useAgentPolicyStore((s) => s.setAutoContinue);
 
-  if (browserMode) return <p className="rounded border border-border/40 p-3 text-xs text-muted-foreground">Browser Agent：纯读取无需批准；所有改动逐批批准，自动执行与极速模式不适用。</p>;
   return (
     <div className="space-y-2 rounded-md border border-border/40 p-3">
-      <div className="flex items-center justify-between gap-2">
-        <div className="min-w-0">
-          <label className="text-xs text-foreground">
-            {t('agent.policy.autoReads', { defaultValue: 'Run queries without asking' })}
-          </label>
-        </div>
-        <Switch checked={autoRunReads} onCheckedChange={setAutoRunReads} />
-      </div>
+      {browserMode ? (
+        <p className="text-xs leading-relaxed text-muted-foreground">
+          {t('agent.policy.browserFixed', {
+            defaultValue:
+              'Reading your tabs and bookmarks never needs approval. Every change does, one batch at a time — that cannot be switched off.',
+          })}
+        </p>
+      ) : (
+        <>
+          <div className="flex items-center justify-between gap-2">
+            <div className="min-w-0">
+              <label className="text-xs text-foreground">
+                {t('agent.policy.autoReads', { defaultValue: 'Run queries without asking' })}
+              </label>
+            </div>
+            <Switch checked={autoRunReads} onCheckedChange={setAutoRunReads} />
+          </div>
 
-      <div className="flex items-center justify-between gap-2">
-        <div className="min-w-0">
-          <label className="text-xs text-foreground">
-            {t('agent.policy.autoWrites', { defaultValue: 'Change data without asking' })}
-          </label>
-          <p className="text-xs text-muted-foreground">
-            {t('agent.policy.autoWritesHint', {
-              defaultValue:
-                "You can undo a task's changes afterwards, but only until the next one starts",
-            })}
-          </p>
-        </div>
-        <Switch checked={autoRunWrites} onCheckedChange={setAutoRunWrites} />
-      </div>
+          <div className="flex items-center justify-between gap-2">
+            <div className="min-w-0">
+              <label className="text-xs text-foreground">
+                {t('agent.policy.autoWrites', { defaultValue: 'Change data without asking' })}
+              </label>
+              <p className="text-xs text-muted-foreground">
+                {t('agent.policy.autoWritesHint', {
+                  defaultValue:
+                    "You can undo a task's changes afterwards, but only until the next one starts",
+                })}
+              </p>
+            </div>
+            <Switch checked={autoRunWrites} onCheckedChange={setAutoRunWrites} />
+          </div>
+        </>
+      )}
 
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0">

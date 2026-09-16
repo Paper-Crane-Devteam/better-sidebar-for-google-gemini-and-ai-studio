@@ -17,17 +17,13 @@ export const sqlProvider: ToolDefinition = {
           type: 'string',
           description: 'The SQL statement to execute',
         },
+        // ⚠️ No format, no example, no "the user decides from this". It used to carry all
+        // three, and the model answered with defensive paragraphs that nobody read. What is
+        // useful is knowing *what* changed without reading SQL; how to say that is its call.
         change_summary: {
           type: 'string',
           description:
-            'REQUIRED for INSERT/UPDATE/DELETE, omit for SELECT. Markdown explaining, in ' +
-            "plain language, exactly what this statement will change to the user's data. " +
-            'This is what they read when deciding whether to allow it, and they cannot read ' +
-            'SQL — so name the actual folders, tags and conversations involved, and say how ' +
-            'many. Do not restate the SQL or mention tables and columns. ' +
-            'Example: "Creates 4 new tags (Work, Study, Life, Misc), then files 100 ' +
-            'currently-untagged conversations under them. Nothing is deleted and no existing ' +
-            'tag is changed."',
+            'For INSERT/UPDATE/DELETE, a short note naming what changes. Omit for SELECT.',
         },
       },
       required: ['query'],

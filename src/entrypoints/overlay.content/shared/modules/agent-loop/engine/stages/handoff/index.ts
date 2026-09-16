@@ -21,7 +21,7 @@ import type { LoopContext } from '../../context';
 import { toolCallRecorder } from '../../../records';
 import { isStaged, stageResults, type StagedShape } from './staging';
 import { waitForSend, type SendOutcome } from './send-watcher';
-import { safeBrowserText, useBrowserAgent } from '../../../../browser-agent/client';
+import { safeBrowserText, useBrowserAgent } from '../../../browser/browser-store';
 
 export { formatResults, wrapForAI, RESULT_OPEN_TAG } from './formatter';
 
@@ -86,6 +86,15 @@ export class ResultHandoff {
    * way, so pressing Enter in the composer is picked up exactly like our own click.
    */
   async deliver(text: string, autoSend: boolean): Promise<boolean> {
+    /**
+     * ⚠️ The last point at which a URL can still be withheld.
+     *
+     * Everything past this line becomes a permanent message in the user's conversation, which
+     * the AI provider sees — so "don't send my URLs" has to be enforced here rather than at
+     * each tool. The settings are re-read first, deliberately: the redaction switch is in a
+     * separate popup window, and someone who turns it on while a task is mid-flight means it
+     * for the results that have not gone out yet.
+     */
     if (this.ctx.store.activeAgentId === 'browser') {
       await useBrowserAgent.getState().refresh();
       text = safeBrowserText(text);

@@ -54,9 +54,11 @@ export const SUPPORTED_TOOLS = [
 
 /** Params that must be present and non-empty, per tool */
 export const REQUIRED_PARAMS: Record<string, string[]> = {
-  browser_update_tabs: ['operations'],
+  browser_arrange_tabs: ['operations'],
+  browser_close_tabs: ['operations'],
   browser_manage_tab_groups: ['operations'],
-  browser_manage_bookmarks: ['operations'],
+  browser_arrange_bookmarks: ['operations'],
+  browser_delete_bookmarks: ['operations'],
   browser_undo_changes: ['batch_id'],
   execute_sql: ['query'],
   sync_conversation_messages: ['conversation_ids'],

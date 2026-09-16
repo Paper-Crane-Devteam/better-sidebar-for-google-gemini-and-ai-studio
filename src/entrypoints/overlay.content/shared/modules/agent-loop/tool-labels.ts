@@ -55,6 +55,28 @@ export function getToolLabel(toolName: string, t: Translate, query?: string): st
       // still has to accept, and a card that says "Editing your document" overstates what
       // is about to happen to the file.
       return t('agent.tool.docEdit', { defaultValue: 'Marking up a document' });
+    case 'browser_list_tabs':
+      return t('agent.tool.listTabs', { defaultValue: 'Looking at your tabs' });
+    case 'browser_list_tab_groups':
+      return t('agent.tool.listTabGroups', { defaultValue: 'Looking at your tab groups' });
+    case 'browser_list_bookmarks':
+      return t('agent.tool.listBookmarks', { defaultValue: 'Looking through your bookmarks' });
+    case 'browser_query_changes':
+      return t('agent.tool.queryChanges', { defaultValue: 'Checking what it changed' });
+    case 'browser_arrange_tabs':
+      return t('agent.tool.arrangeTabs', { defaultValue: 'Rearranging tabs' });
+    // ⚠️ The two destructive ones are named for what they destroy, not "changing tabs".
+    // Their whole point is being distinguishable at a glance from the tidying tools.
+    case 'browser_close_tabs':
+      return t('agent.tool.closeTabs', { defaultValue: 'Closing tabs' });
+    case 'browser_manage_tab_groups':
+      return t('agent.tool.manageTabGroups', { defaultValue: 'Reorganizing tab groups' });
+    case 'browser_arrange_bookmarks':
+      return t('agent.tool.arrangeBookmarks', { defaultValue: 'Reorganizing bookmarks' });
+    case 'browser_delete_bookmarks':
+      return t('agent.tool.deleteBookmarks', { defaultValue: 'Deleting bookmarks' });
+    case 'browser_undo_changes':
+      return t('agent.tool.undoChanges', { defaultValue: 'Undoing an earlier change' });
     default:
       return t('agent.tool.generic', { defaultValue: 'Running a step' });
   }
