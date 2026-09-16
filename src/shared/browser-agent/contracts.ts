@@ -18,6 +18,16 @@ export function dependencies(cap: Capability): Capability[] {
 export function permissionsFor(caps: Capability[]): ('tabs' | 'tabGroups' | 'bookmarks')[] {
   return [...new Set(caps.map(c => c.split('.')[0] as 'tabs' | 'tabGroups' | 'bookmarks'))];
 }
+/**
+ * Whether a batch of this tool works on tabs (and therefore on ids only this browser
+ * session understands) or on bookmarks (which survive a restart).
+ *
+ * Same question `snapshot()` answers by choosing what to capture, asked from the tool
+ * name alone so the history list can decide whether a batch is still undoable without
+ * loading its snapshot.
+ */
+export const isTabTool = (tool: string) => tool !== 'browser_manage_bookmarks';
+
 export function toolCapability(name: string): Capability | undefined {
   const map: Record<string, Capability> = {
     browser_list_tabs: 'tabs.read', browser_update_tabs: 'tabs.write',
@@ -99,6 +109,20 @@ export interface Batch {
   id: string; owner: number; epoch: string; tool: string; operations: Operation[]; before: Snapshot;
   createdAt: number; status: 'prepared' | 'applying' | 'applied' | 'failed' | 'unknown' | 'undone';
   steps: Step[]; error?: string; undoOf?: string; undoneBy?: string;
+}
+/**
+ * A batch as the history list needs it: everything except the snapshots.
+ *
+ * The list used to be built by loading every batch in full and reading four fields off
+ * each one. With before/after states per step that is the largest read in the module,
+ * performed to render a dozen lines of text.
+ */
+export interface BatchSummary {
+  id: string; epoch: string; tool: string; status: Batch['status']; createdAt: number;
+  error?: string; undoOf?: string; undoneBy?: string;
+  /** Operations planned, steps recorded, and of those the ones that definitely applied. */
+  planned: number; steps: number; applied: number;
+  touchesTabs: boolean;
 }
 export interface PlanPreview { id: string; count: number; items: unknown[]; warning: string }
 export type BrowserRequest =

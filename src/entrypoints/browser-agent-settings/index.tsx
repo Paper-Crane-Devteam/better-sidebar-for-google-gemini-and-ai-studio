@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { CAPABILITIES, DEFAULT_SETTINGS, dependencies, permissionsFor, type BrowserSettings, type Capability } from '@/shared/browser-agent/contracts';
+import { applyCachedExtensionPageTheme, syncExtensionPageTheme, watchExtensionPageTheme } from '@/shared/lib/extension-page-theme';
+import '@/index.scss';
 import './style.css';
+
+// Replay the cached theme before the first paint, then reconcile with the
+// stored preference. This window can stay open while the theme is changed in
+// the sidebar, so it also keeps watching.
+applyCachedExtensionPageTheme();
+void syncExtensionPageTheme();
+watchExtensionPageTheme();
 
 const labels: Record<Capability, string> = { 'tabs.read': '读取标签页', 'tabs.write': '整理标签页与备注', 'tabGroups.read': '读取标签组', 'tabGroups.write': '整理标签组', 'bookmarks.read': '读取收藏夹', 'bookmarks.write': '整理收藏夹' };
 async function request(settings?: BrowserSettings) {

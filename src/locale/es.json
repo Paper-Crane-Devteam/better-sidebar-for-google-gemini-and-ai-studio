@@ -29,7 +29,8 @@
     "gems": "Gems",
     "notebooks": "Notebooks",
     "snippets": "Fragmentos",
-    "spark": "Spark"
+    "spark": "Spark",
+    "agent": "Agent"
   },
   "sidebar": {
     "newConversation": "Nueva Conversación",
@@ -314,6 +315,18 @@
     "notebooks": "Notebooks",
     "originalUI": "Cambiar a Barra Lateral Original",
     "openCommandPalette": "Abrir paleta de comandos"
+  },
+  "iconBar": {
+    "hint": "Desactiva un icono para ocultarlo de la barra lateral o arrástralo para reordenarlo. Los iconos solo se mueven dentro de su propio grupo.",
+    "reorder": "Reordenar iconos…",
+    "reset": "Restablecer valores predeterminados",
+    "locked": "Siempre visible",
+    "moveUp": "Subir",
+    "moveDown": "Bajar",
+    "groupTop": "Alternar",
+    "groupMain": "Pestañas",
+    "groupLinks": "Accesos directos",
+    "groupBottom": "Inferior"
   },
   "overlay": {
     "settingsPageComingSoon": "Página de Configuración Próximamente",

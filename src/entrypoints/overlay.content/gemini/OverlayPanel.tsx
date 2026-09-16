@@ -32,7 +32,7 @@ import { FeedbackTab } from '../shared/modules/feedback/FeedbackTab';
 import { GemsTab } from '../shared/modules/gems/GemsTab';
 import { NotebooksTab } from '../shared/modules/notebooks/NotebooksTab';
 import { SnippetsTab } from '../shared/modules/snippets/SnippetsTab';
-import { SparkTab, isSparkAvailable } from '../shared/modules/spark/SparkTab';
+import { SparkTab } from '../shared/modules/spark/SparkTab';
 import { AgentTab } from '../shared/modules/agent-tab';
 import '@/index.scss';
 import { useAppInit } from '../shared/hooks/useAppInit';
@@ -55,6 +55,11 @@ import {
   AccountButton,
   GEMINI_ACCOUNT,
 } from '../shared/components/AccountButton';
+import {
+  IconBarContextMenu,
+  IconBarGroup,
+  useIconBar,
+} from '../shared/modules/icon-bar';
 
 export const OverlayPanel = ({ className }: { className?: string }) => {
   const moduleConfig = useModuleConfig();
@@ -63,9 +68,8 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
   const { t } = useI18n();
   const { path } = useUrl();
 
-  const shortcuts = useSettingsStore((state) => state.shortcuts);
+  const { visible: visibleIcons, isVisible: isIconVisible } = useIconBar();
   const compactMode = useSettingsStore((state) => state.compactMode);
-  const sparkAvailable = isSparkAvailable();
   const agentBadge = useBadge('tab.agent');
 
   const {
@@ -188,7 +192,214 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
     return <OverlayToggle onToggle={() => setIsFeatureEnabled(true)} />;
   }
 
-
+  /**
+   * Every button the expanded rail can hold, keyed by the ids in the icon-bar
+   * registry. Which of them show, and in what order, is the registry's and the
+   * user's business; this map only says what each one is and does.
+   *
+   * The collapsed rail is not built from this: it is a fixed four-button set that
+   * exists only while Gemini's own sidenav is shut, and reordering something the
+   * user sees for a few seconds at a time would be customisation for its own sake.
+   */
+  const iconNodes: Record<string, React.ReactNode> = {
+    menu: (
+      <SimpleTooltip content={t('tooltip.toggleMenu')}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleMainMenuClick}
+          className="sidebar-btn transition-all"
+        >
+          <Menu className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    files: (
+      <SimpleTooltip content={t('tabs.files')}>
+        <Button
+          variant={activeTab === 'files' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('files')}
+          className="sidebar-btn transition-all"
+          data-tour-id="tour-files"
+        >
+          <Files className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    search: (
+      <SimpleTooltip content={t('tabs.search')}>
+        <Button
+          variant={activeTab === 'search' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('search')}
+          className="sidebar-btn transition-all"
+          data-tour-id="tour-search"
+        >
+          <Search className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    prompts: (
+      <SimpleTooltip content={t('tabs.prompts')}>
+        <Button
+          variant={activeTab === 'prompts' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('prompts')}
+          className="sidebar-btn transition-all"
+          data-tour-id="tour-prompts"
+        >
+          <UIcon icon="tabler:blockquote" className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    agent: (
+      <SimpleTooltip content={t('tabs.agent')}>
+        <Button
+          variant={activeTab === 'agent' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('agent')}
+          className="sidebar-btn transition-all relative"
+          data-tour-id="tour-agent"
+        >
+          <Bot className="sidebar-icon" />
+          <FeatureBadge badgeKey="tab.agent" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    tags: (
+      <SimpleTooltip content={t('tabs.tags')}>
+        <Button
+          variant={activeTab === 'tags' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('tags')}
+          className="sidebar-btn transition-all"
+          data-tour-id="tour-tags"
+        >
+          <Tag className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    favorites: (
+      <SimpleTooltip content={t('tabs.favorites')}>
+        <Button
+          variant={activeTab === 'favorites' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('favorites')}
+          className="sidebar-btn transition-all"
+          data-tour-id="tour-favorites"
+        >
+          <Star className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    snippets: (
+      <SimpleTooltip content={t('tabs.snippets')}>
+        <Button
+          variant={activeTab === 'snippets' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('snippets')}
+          className="sidebar-btn transition-all"
+          data-tour-id="tour-snippets"
+        >
+          <ScrollText className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    gems: (
+      <SimpleTooltip content={t('tabs.gems')}>
+        <Button
+          variant={activeTab === 'gems' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('gems')}
+          className="sidebar-btn transition-all"
+          data-tour-id="tour-gems"
+        >
+          <UIcon icon="tabler:diamond" className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    notebooks: (
+      <SimpleTooltip content={t('tabs.notebooks')}>
+        <Button
+          variant={activeTab === 'notebooks' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('notebooks')}
+          className="sidebar-btn transition-all"
+          data-tour-id="tour-notebooks"
+        >
+          <UIcon icon="tabler:notebook" className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    spark: (
+      <SimpleTooltip content={t('tabs.spark')}>
+        <Button
+          variant={activeTab === 'spark' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('spark')}
+          className="sidebar-btn transition-all"
+          data-tour-id="tour-spark"
+        >
+          <Sparkles className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    myStuff: (
+      <SimpleTooltip content={t('shortcuts.myStuff')}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate('https://gemini.google.com/mystuff')}
+          className="sidebar-btn transition-all"
+          data-tour-id="tour-mystuff"
+        >
+          <Library className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    originalUI: (
+      <SimpleTooltip content={t('shortcuts.originalUI')}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsFeatureEnabled(false)}
+          className="sidebar-btn transition-all"
+          data-tour-id="tour-original-ui"
+        >
+          <LogOut className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    feedback: (
+      <SimpleTooltip content={t('tabs.feedback')}>
+        <Button
+          variant={activeTab === 'feedback' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('feedback')}
+          className="sidebar-btn transition-all"
+          data-tour-id="tour-feedback"
+        >
+          <MessageSquare className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    settings: (
+      <SimpleTooltip content={t('tabs.settings')}>
+        <Button
+          variant={isSettingsOpen ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('settings')}
+          className="sidebar-btn transition-all relative"
+          data-tour-id="tour-settings"
+        >
+          <Settings className="sidebar-icon" />
+          <FeatureBadge badgeKey="settings." group />
+        </Button>
+      </SimpleTooltip>
+    ),
+    account: <AccountButton config={GEMINI_ACCOUNT} />,
+  };
 
   return (
     <div
@@ -197,258 +408,78 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
       {/* Sidebar Tabs — hidden in expanded view when the user opts for a
           clutter-free tree. Kept in collapsed view since it is the only
           entry point there. */}
-      <div
-        className={`sidebar-nav flex flex-col items-center shrink-0 ${
-          isSidebarExpanded && compactMode ? 'hidden' : ''
-        }`}
-      >
-        <SimpleTooltip content={t('tooltip.toggleMenu')}>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleMainMenuClick}
-            className="sidebar-btn transition-all"
+      <IconBarContextMenu>
+        <div
+          className={`sidebar-nav flex flex-col items-center shrink-0 ${
+            isSidebarExpanded && compactMode ? 'hidden' : ''
+          }`}
+        >
+          <IconBarGroup ids={visibleIcons.top} nodes={iconNodes} />
+          <div className="h-2" />
+
+          <div
+            className={
+              !isSidebarExpanded
+                ? 'flex flex-col flex-1 h-full items-center w-full gap-2 pb-2'
+                : 'hidden'
+            }
           >
-            <Menu className="sidebar-icon" />
-          </Button>
-        </SimpleTooltip>
-        <div className="h-2" />
-
-        <div
-          className={
-            !isSidebarExpanded
-              ? 'flex flex-col flex-1 h-full items-center w-full gap-2 pb-2'
-              : 'hidden'
-          }
-        >
-          <SimpleTooltip content={t('tooltip.newChat')}>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => moduleConfig.explorer.onNewChat()}
-              className="sidebar-btn transition-all"
-            >
-              <SquarePen className="sidebar-icon" />
-            </Button>
-          </SimpleTooltip>
-          <div className="flex-1" />
-          {shortcuts?.originalUI && (
-            <SimpleTooltip content={t('shortcuts.originalUI')}>
+            <SimpleTooltip content={t('tooltip.newChat')}>
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setIsFeatureEnabled(false)}
+                onClick={() => moduleConfig.explorer.onNewChat()}
                 className="sidebar-btn transition-all"
               >
-                <LogOut className="sidebar-icon" />
+                <SquarePen className="sidebar-icon" />
               </Button>
             </SimpleTooltip>
-          )}
-          <SimpleTooltip content={t('tabs.settings')}>
-            <Button
-              variant={isSettingsOpen ? 'secondary' : 'ghost'}
-              size="icon"
-              onClick={() => handleTabChange('settings')}
-              className="sidebar-btn transition-all relative"
-            >
-              <Settings className="sidebar-icon" />
-              <FeatureBadge badgeKey="settings." group />
-            </Button>
-          </SimpleTooltip>
-          <AccountButton config={GEMINI_ACCOUNT} />
+            <div className="flex-1" />
+            {isIconVisible('originalUI') && (
+              <SimpleTooltip content={t('shortcuts.originalUI')}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsFeatureEnabled(false)}
+                  className="sidebar-btn transition-all"
+                >
+                  <LogOut className="sidebar-icon" />
+                </Button>
+              </SimpleTooltip>
+            )}
+            <SimpleTooltip content={t('tabs.settings')}>
+              <Button
+                variant={isSettingsOpen ? 'secondary' : 'ghost'}
+                size="icon"
+                onClick={() => handleTabChange('settings')}
+                className="sidebar-btn transition-all relative"
+              >
+                <Settings className="sidebar-icon" />
+                <FeatureBadge badgeKey="settings." group />
+              </Button>
+            </SimpleTooltip>
+            <AccountButton config={GEMINI_ACCOUNT} />
+          </div>
+
+          <div
+            className={
+              isSidebarExpanded
+                ? 'flex flex-col flex-1 h-full items-center w-full gap-2 pb-2'
+                : 'hidden'
+            }
+          >
+            <IconBarGroup ids={visibleIcons.main} nodes={iconNodes} />
+
+            {!!visibleIcons.links?.length && <div className="h-2" />}
+
+            <IconBarGroup ids={visibleIcons.links} nodes={iconNodes} />
+
+            <div className="flex-1" />
+
+            <IconBarGroup ids={visibleIcons.bottom} nodes={iconNodes} />
+          </div>
         </div>
-
-        <div
-          className={
-            isSidebarExpanded
-              ? 'flex flex-col flex-1 h-full items-center w-full gap-2 pb-2'
-              : 'hidden'
-          }
-        >
-          <SimpleTooltip content={t('tabs.files')}>
-            <Button
-              variant={activeTab === 'files' ? 'secondary' : 'ghost'}
-              size="icon"
-              onClick={() => handleTabChange('files')}
-              className="sidebar-btn transition-all"
-              data-tour-id="tour-files"
-            >
-              <Files className="sidebar-icon" />
-            </Button>
-          </SimpleTooltip>
-          <SimpleTooltip content={t('tabs.search')}>
-            <Button
-              variant={activeTab === 'search' ? 'secondary' : 'ghost'}
-              size="icon"
-              onClick={() => handleTabChange('search')}
-              className="sidebar-btn transition-all"
-              data-tour-id="tour-search"
-            >
-              <Search className="sidebar-icon" />
-            </Button>
-          </SimpleTooltip>
-          <SimpleTooltip content={t('tabs.prompts')}>
-            <Button
-              variant={activeTab === 'prompts' ? 'secondary' : 'ghost'}
-              size="icon"
-              onClick={() => handleTabChange('prompts')}
-              className="sidebar-btn transition-all"
-              data-tour-id="tour-prompts"
-            >
-              <UIcon icon="tabler:blockquote" className="sidebar-icon" />
-            </Button>
-          </SimpleTooltip>
-          <SimpleTooltip content="Agent">
-            <Button
-              variant={activeTab === 'agent' ? 'secondary' : 'ghost'}
-              size="icon"
-              onClick={() => handleTabChange('agent')}
-              className="sidebar-btn transition-all relative"
-              data-tour-id="tour-agent"
-            >
-              <Bot className="sidebar-icon" />
-              <FeatureBadge badgeKey="tab.agent" />
-            </Button>
-          </SimpleTooltip>
-          <SimpleTooltip content={t('tabs.tags')}>
-            <Button
-              variant={activeTab === 'tags' ? 'secondary' : 'ghost'}
-              size="icon"
-              onClick={() => handleTabChange('tags')}
-              className="sidebar-btn transition-all"
-              data-tour-id="tour-tags"
-            >
-              <Tag className="sidebar-icon" />
-            </Button>
-          </SimpleTooltip>
-          {shortcuts?.favorites && (
-            <SimpleTooltip content={t('tabs.favorites')}>
-              <Button
-                variant={activeTab === 'favorites' ? 'secondary' : 'ghost'}
-                size="icon"
-                onClick={() => handleTabChange('favorites')}
-                className="sidebar-btn transition-all"
-                data-tour-id="tour-favorites"
-              >
-                <Star className="sidebar-icon" />
-              </Button>
-            </SimpleTooltip>
-          )}
-
-          <SimpleTooltip content={t('tabs.snippets')}>
-            <Button
-              variant={activeTab === 'snippets' ? 'secondary' : 'ghost'}
-              size="icon"
-              onClick={() => handleTabChange('snippets')}
-              className="sidebar-btn transition-all"
-              data-tour-id="tour-snippets"
-            >
-              <ScrollText className="sidebar-icon" />
-            </Button>
-          </SimpleTooltip>
-
-          {((shortcuts?.gems ?? true) || (shortcuts?.notebooks ?? true) || (shortcuts?.myStuff ?? true)) && (
-            <div className="h-2" />
-          )}
-
-          {(shortcuts?.gems ?? true) && (
-            <SimpleTooltip content={t('tabs.gems')}>
-              <Button
-                variant={activeTab === 'gems' ? 'secondary' : 'ghost'}
-                size="icon"
-                onClick={() => handleTabChange('gems')}
-                className="sidebar-btn transition-all"
-                data-tour-id="tour-gems"
-              >
-                <UIcon icon="tabler:diamond" className="sidebar-icon" />
-              </Button>
-            </SimpleTooltip>
-          )}
-
-          {(shortcuts?.notebooks ?? true) && (
-            <SimpleTooltip content={t('tabs.notebooks')}>
-              <Button
-                variant={activeTab === 'notebooks' ? 'secondary' : 'ghost'}
-                size="icon"
-                onClick={() => handleTabChange('notebooks')}
-                className="sidebar-btn transition-all"
-                data-tour-id="tour-notebooks"
-              >
-                <UIcon icon="tabler:notebook" className="sidebar-icon" />
-              </Button>
-            </SimpleTooltip>
-          )}
-
-          {sparkAvailable && (
-            <SimpleTooltip content={t('tabs.spark')}>
-              <Button
-                variant={activeTab === 'spark' ? 'secondary' : 'ghost'}
-                size="icon"
-                onClick={() => handleTabChange('spark')}
-                className="sidebar-btn transition-all"
-                data-tour-id="tour-spark"
-              >
-                <Sparkles className="sidebar-icon" />
-              </Button>
-            </SimpleTooltip>
-          )}
-
-          {(shortcuts?.myStuff ?? true) && (
-            <SimpleTooltip content={t('shortcuts.myStuff')}>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => navigate('https://gemini.google.com/mystuff')}
-                className="sidebar-btn transition-all"
-                data-tour-id="tour-mystuff"
-              >
-                <Library className="sidebar-icon" />
-              </Button>
-            </SimpleTooltip>
-          )}
-
-          <div className="flex-1" />
-
-          {shortcuts?.originalUI && (
-            <SimpleTooltip content={t('shortcuts.originalUI')}>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsFeatureEnabled(false)}
-                className="sidebar-btn transition-all"
-                data-tour-id="tour-original-ui"
-              >
-                <LogOut className="sidebar-icon" />
-              </Button>
-            </SimpleTooltip>
-          )}
-
-          <SimpleTooltip content={t('tabs.feedback')}>
-            <Button
-              variant={activeTab === 'feedback' ? 'secondary' : 'ghost'}
-              size="icon"
-              onClick={() => handleTabChange('feedback')}
-              className="sidebar-btn transition-all"
-              data-tour-id="tour-feedback"
-            >
-              <MessageSquare className="sidebar-icon" />
-            </Button>
-          </SimpleTooltip>
-          <SimpleTooltip content={t('tabs.settings')}>
-            <Button
-              variant={isSettingsOpen ? 'secondary' : 'ghost'}
-              size="icon"
-              onClick={() => handleTabChange('settings')}
-              className="sidebar-btn transition-all relative"
-              data-tour-id="tour-settings"
-            >
-              <Settings className="sidebar-icon" />
-              <FeatureBadge badgeKey="settings." group />
-            </Button>
-          </SimpleTooltip>
-          <AccountButton config={GEMINI_ACCOUNT} />
-        </div>
-      </div>
+      </IconBarContextMenu>
 
       {/* Main Content Area.
           With the icon bar hidden, useGeminiUI already shrank

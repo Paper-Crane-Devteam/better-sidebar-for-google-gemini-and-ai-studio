@@ -29,7 +29,8 @@
     "gems": "Gems",
     "notebooks": "筆記本",
     "snippets": "片段",
-    "spark": "Spark"
+    "spark": "Spark",
+    "agent": "Agent"
   },
   "sidebar": {
     "newConversation": "新增對話",
@@ -314,6 +315,18 @@
     "notebooks": "筆記本",
     "originalUI": "切換到原始側邊欄",
     "openCommandPalette": "開啟命令面板"
+  },
+  "iconBar": {
+    "hint": "關閉開關即可從側邊欄隱藏該圖示，拖曳可調整順序。圖示只能在所屬分組內移動。",
+    "reorder": "調整圖示順序…",
+    "reset": "恢復預設",
+    "locked": "一律顯示",
+    "moveUp": "上移",
+    "moveDown": "下移",
+    "groupTop": "開關",
+    "groupMain": "標籤頁",
+    "groupLinks": "捷徑",
+    "groupBottom": "底部"
   },
   "overlay": {
     "settingsPageComingSoon": "設定頁面即將推出",

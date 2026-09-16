@@ -577,6 +577,59 @@ export const runMigrations = async (db: any) => {
       await db.run('ALTER TABLE agent_sessions ADD COLUMN workspace_id TEXT');
     });
 
+    /**
+     * Browser Agent's audit journal — what it changed in Chrome, and how to put it back.
+     *
+     * Lives here rather than in a database of its own. The first version opened a
+     * separate IndexedDB to keep the journal out of reach of `execute_sql`, which was
+     * not worth what it cost: a second storage engine with no migration mechanism, no
+     * retention story, and records shaped as whole-batch blobs that had to be rewritten
+     * on every step. The threat it defended against is not one we have — the agent has
+     * no reason to erase its own audit trail, and nothing else about the extension is
+     * built on the assumption that it might.
+     *
+     * ⚠️ Neither table is in `SYNC_TABLES`, so nothing here leaves the machine through
+     * Drive. A full local database export *does* include them; see `prune`.
+     *
+     * The steps are their own rows on purpose. As nested JSON, recording step N meant
+     * serialising steps 1..N-1 again — a 30-step batch over a few hundred tabs rewrote
+     * megabytes per step, and every one of those snapshots was already written.
+     */
+    await step('create browser agent audit tables', async () => {
+      await db.run(`
+        CREATE TABLE IF NOT EXISTS browser_agent_batches (
+          id TEXT PRIMARY KEY,
+          owner_tab_id INTEGER NOT NULL,
+          session_epoch TEXT NOT NULL,
+          tool TEXT NOT NULL,
+          operations TEXT NOT NULL,
+          before_state TEXT NOT NULL,
+          status TEXT NOT NULL,
+          error TEXT,
+          undo_of TEXT,
+          undone_by TEXT,
+          created_at INTEGER NOT NULL
+        )
+      `);
+      // The history list and the retention cut both read newest-first.
+      await db.run(
+        'CREATE INDEX IF NOT EXISTS idx_browser_agent_batches_created ON browser_agent_batches(created_at)',
+      );
+      await db.run(`
+        CREATE TABLE IF NOT EXISTS browser_agent_steps (
+          batch_id TEXT NOT NULL,
+          step_index INTEGER NOT NULL,
+          operation TEXT NOT NULL,
+          before_state TEXT NOT NULL,
+          after_state TEXT,
+          changes TEXT,
+          change_count INTEGER NOT NULL DEFAULT 0,
+          status TEXT NOT NULL,
+          PRIMARY KEY (batch_id, step_index)
+        )
+      `);
+    });
+
     // ── One-time data fix (v2.9.0): fix conversation created_at from first message ──
     // A previous bug caused conversations.created_at to be incorrect.
     // For existing users: set created_at = first message's timestamp (MIN(timestamp)).

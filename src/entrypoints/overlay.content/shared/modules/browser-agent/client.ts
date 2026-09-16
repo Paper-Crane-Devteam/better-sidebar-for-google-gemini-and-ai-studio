@@ -22,7 +22,11 @@ export const useBrowserAgent = create<State>((set) => ({
 export function initializeBrowserAgent() {
   void useBrowserAgent.getState().refresh();
   const refresh = () => { void useBrowserAgent.getState().refresh(); };
-  const changed = (changes: Record<string, unknown>) => { if ('browser-agent-settings-version' in changes) refresh(); };
+  // The settings record itself, not a version counter beside it: it lives in
+  // `storage.local` now, so writing it is already an observable event. The refresh still
+  // goes through the background because the granted Chrome permissions are not in storage
+  // — a capability is only real if `permissions.contains` still agrees.
+  const changed = (changes: Record<string, unknown>) => { if ('browser-agent-settings' in changes) refresh(); };
   window.addEventListener('focus', refresh);
   browser.storage.onChanged.addListener(changed);
   return () => { window.removeEventListener('focus', refresh); browser.storage.onChanged.removeListener(changed); };

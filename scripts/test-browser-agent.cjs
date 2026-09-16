@@ -16,15 +16,76 @@ function moduleFrom(file, imports, globals = {}) {
   return module.exports;
 }
 const contracts = moduleFrom('src/shared/browser-agent/contracts.ts', {});
-function harness() {
-  const batches = new Map();
-  let settings = clone(contracts.DEFAULT_SETTINGS);
-  let labels = {};
-  let nextId = 100;
+
+/**
+ * A real SQLite database, and the real repository on top of it.
+ *
+ * The journal used to be a hand-rolled IndexedDB, which the tests replaced with a Map —
+ * so the storage layer was never executed here at all. Now that it is SQL in the
+ * extension's own database, running it for real is cheap (`node:sqlite`, in memory) and
+ * covers the DDL, every statement, and the retention query. `runMigrations` is applied
+ * in full rather than the two CREATE TABLEs in isolation: the point is that the schema
+ * arrives the same way it does in a browser, as one step among many.
+ */
+/**
+ * The real DDL, read out of the real migration.
+ *
+ * Not a copy kept in the test: a schema the tests agree with and the extension does not
+ * is worse than no test. Running `runMigrations` whole would be closer still, but it is
+ * async and every migration before this one needs tables this database has never had —
+ * so the statements are lifted from the one step instead. A rename breaks this loudly,
+ * which is the intended failure mode.
+ */
+const BROWSER_AGENT_DDL = (() => {
+  const source = fs.readFileSync(path.resolve('src/shared/workers/migrations.ts'), 'utf8');
+  const block = source.split("await step('create browser agent audit tables'")[1]?.split('await step(')[0];
+  const statements = block?.match(/db\.run\(\s*(?:`[^`]*`|'[^']*')/g)
+    ?.map(call => call.replace(/^db\.run\(\s*/, '').slice(1, -1));
+  if (!statements?.length) throw new Error('Could not find the browser agent migration step.');
+  return statements;
+})();
+
+function journal() {
+  const { DatabaseSync } = require('node:sqlite');
+  const db = new DatabaseSync(':memory:');
   let failWrite = false;
+  const exec = (sql, bind = []) => {
+    // `prepare` takes one statement; migrations pass whole scripts.
+    if (!bind.length && /;\s*\S/.test(sql.trim().replace(/;\s*$/, ''))) { db.exec(sql); return []; }
+    return db.prepare(sql).all(...bind);
+  };
+  const write = (sql, bind) => { if (failWrite) throw new Error('Disk full'); return exec(sql, bind); };
+  for (const statement of BROWSER_AGENT_DDL) db.exec(statement);
+  const { browserAuditRepo } = moduleFrom('src/shared/db/operations/browserAgent.ts', {
+    '../index': { runQuery: async (sql, bind) => exec(sql, bind), runCommand: async (sql, bind) => { write(sql, bind); } },
+    '@/shared/browser-agent/contracts': contracts,
+  });
+  return { repo: browserAuditRepo, exec, setDiskFailure: value => failWrite = value };
+}
+
+function harness() {
+  const sql = journal();
+  let nextId = 100;
   let onMutation;
+  // Chrome reports a tab that has not committed its navigation as `url: ''` plus a
+  // `pendingUrl`, and swaps them in a moment later. Modelling that is the point: with a
+  // synchronous `url` the backend never sees a tab change address on its own, so every
+  // snapshot comparison looked stable in tests and derailed in a real browser.
+  let queries = 0;
+  let instant;
+  const redirects = new Map();
+  function settleNavigations() {
+    for (const tab of state.tabs) {
+      if (tab.pendingUrl === undefined || queries <= tab.settleAt) continue;
+      tab.url = redirects.get(tab.pendingUrl) ?? tab.pendingUrl;
+      delete tab.pendingUrl; delete tab.settleAt;
+    }
+  }
   const granted = new Set(['tabs', 'tabGroups', 'bookmarks']);
+  // `session` is emptied when the browser closes, `local` is not — the two lifetimes the
+  // labels and the settings respectively need, which is why neither is in the database.
   const session = {};
+  const local = {};
   const state = {
     tabs: [
       { id: 1, windowId: 10, index: 0, title: 'Agent', url: 'https://gemini.google.com/app', active: true, pinned: false, groupId: -1, incognito: false },
@@ -44,26 +105,30 @@ function harness() {
   function children(parent) { return state.bookmarks.filter(n => n.parentId === parent).sort((a, b) => a.index - b.index); }
   const getBookmark = id => { const b = state.bookmarks.find(n => n.id === id); if (!b) throw new Error('No bookmark'); return b; };
   function tree(n) { return { ...n, ...(n.url === undefined ? { children: children(n.id).map(tree) } : {}) }; }
-  const audit = {
-    settings: async () => clone(settings), saveSettings: async s => { settings = clone(s); },
-    all: async () => [...batches.values()].map(clone), get: async id => clone(batches.get(id)),
-    save: async b => { if (failWrite) throw new Error('Disk full'); batches.set(b.id, clone(b)); },
-    labels: async () => clone(labels), saveLabels: async (_, value) => { labels = clone(value); },
-  };
   const chrome = {
     runtime: { id: 'extension-id', getURL: p => `chrome-extension://extension-id/${p}` },
     permissions: { contains: async ({ permissions }) => permissions.every(p => granted.has(p)) },
-    storage: { session: { get: async k => ({ [k]: session[k] }), set: async v => Object.assign(session, v) }, local: { set: async () => {} } },
-    windows: { get: async id => { if (!state.tabs.some(t => t.windowId === id)) throw new Error('No window'); return { incognito: false }; }, create: async () => {} },
+    storage: {
+      session: { get: async k => ({ [k]: session[k] }), set: async v => Object.assign(session, v) },
+      local: { get: async k => ({ [k]: local[k] }), set: async v => Object.assign(local, v) },
+    },
+    windows: {
+      get: async id => { if (!state.tabs.some(t => t.windowId === id)) throw new Error('No window'); return { incognito: false }; },
+      getAll: async () => [], create: async () => {}, update: async () => {},
+    },
     tabs: {
       onRemoved: { addListener() {} }, onUpdated: { addListener() {} }, get: async id => clone(getTab(id)),
-      query: async q => clone(state.tabs.filter(t => q.windowId === undefined || t.windowId === q.windowId)),
+      query: async q => { queries++; settleNavigations(); return clone(state.tabs.filter(t => q.windowId === undefined || t.windowId === q.windowId)); },
       create: async p => {
         if (!state.tabs.some(t => t.windowId === p.windowId)) throw new Error('No window');
         const tabs = state.tabs.filter(t => t.windowId === p.windowId);
         const index = p.index ?? tabs.length;
         tabs.filter(t => t.index >= index).forEach(t => t.index++);
-        const tab = { id: nextId++, title: p.url, url: p.url, windowId: p.windowId, index, active: !!p.active, pinned: !!p.pinned, groupId: -1, incognito: false };
+        const tab = { id: nextId++, title: '', windowId: p.windowId, index, active: !!p.active, pinned: !!p.pinned, groupId: -1, incognito: false,
+          // `instant` is the fast case: the navigation (and any redirect) has already
+          // committed by the time anyone looks. `settleAt` is the slow one — the first
+          // observation still shows the pending address, the next one shows the real one.
+          ...(instant ? { url: redirects.get(p.url) ?? p.url } : { url: '', pendingUrl: p.url, settleAt: queries + 1 }) };
         state.tabs.push(tab); mutation(); return clone(tab);
       },
       remove: async id => { getTab(id); state.tabs = state.tabs.filter(t => t.id !== id); reindexTabs(); mutation(); },
@@ -104,10 +169,19 @@ function harness() {
     },
   };
   const sender = { id: chrome.runtime.id, url: 'https://gemini.google.com/app', tab: { ...state.tabs[0] } };
+  // The real storage module, not a stand-in: it is thin, and what it does is decide which
+  // of the three stores each kind of state belongs in — the thing worth checking.
+  const store = moduleFrom('src/shared/browser-agent/local-store.ts', {
+    '@/shared/db/operations': { browserAuditRepo: sql.repo }, './contracts': contracts,
+  }, { chrome, indexedDB: { deleteDatabase() {} } });
   let backend;
   const reload = () => { backend = moduleFrom('src/entrypoints/background/handlers/browser-agent.ts', {
-    '@/shared/browser-agent/contracts': contracts, '@/shared/browser-agent/local-store': { localAudit: audit },
-  }, { chrome, crypto: webcrypto }); };
+    '@/shared/browser-agent/contracts': contracts, '@/shared/browser-agent/local-store': store,
+    // The journal lives in the profile database, so the handler opens it and switches to
+    // the sender tab's profile before touching it. Both are no-ops here.
+    '../db': { ensureDbReady: async () => {} },
+    '../tab-profile-map': { ensureDbForTab: async () => false, getCurrentDbName: () => 'test-profile' },
+  }, { chrome, crypto: webcrypto, indexedDB: { deleteDatabase() {} } }); };
   reload();
   const call = (payload, from = sender) => backend.handleBrowserAgent(payload, from);
   const grant = async caps => {
@@ -116,8 +190,17 @@ function harness() {
   };
   const prepare = (tool, operations) => call({ action: 'prepare', tool, params: { operations: JSON.stringify(operations) } });
   const commit = plan => call({ action: 'commit', planId: plan.data.id });
-  return { state, batches, granted, call, grant, prepare, commit, reload, sender, session,
-    setDiskFailure: value => failWrite = value, onMutation: fn => onMutation = fn };
+  return { state, granted, call, grant, prepare, commit, reload, sender, session,
+    setDiskFailure: sql.setDiskFailure, onMutation: fn => onMutation = fn,
+    /** The stored row, straight out of SQLite — what a database export would carry. */
+    row: id => sql.exec('SELECT * FROM browser_agent_batches WHERE id = ?', [id])[0],
+    steps: id => sql.exec('SELECT * FROM browser_agent_steps WHERE batch_id = ? ORDER BY step_index', [id]),
+    setStatus: (id, status) => sql.exec('UPDATE browser_agent_batches SET status = ? WHERE id = ?', [status, id]),
+    setAge: (id, createdAt) => sql.exec('UPDATE browser_agent_batches SET created_at = ? WHERE id = ?', [createdAt, id]),
+    orphanSteps: () => sql.exec('SELECT COUNT(*) AS n FROM browser_agent_steps WHERE batch_id NOT IN (SELECT id FROM browser_agent_batches)')[0].n,
+    /** New tabs commit immediately, landing on `to` instead of the requested address. */
+    instantNavigation: (from, to) => { instant = true; if (from) redirects.set(from, to); },
+    address: tab => tab.url || tab.pendingUrl || '' };
 }
 
 test('All browser mutations require approval even in speed/round/auto-write mode; reads never do', () => {
@@ -179,7 +262,9 @@ test('URL switch redacts lists, execution differences and historical changes', a
     { action: 'read', tool: 'browser_list_tabs', params: {} },
     { action: 'read', tool: 'browser_query_changes', params: { batch_id: plan.data.id, step_index: '0' } },
   ]) { const result = await h.call(payload); assert.equal(result.success, true); assert.doesNotMatch(JSON.stringify(result), /token=secret|\/private/); }
-  const stored = h.batches.get(plan.data.id); assert.match(JSON.stringify(stored), /token=secret/);
+  // Redaction is applied on the way out, never on the way in: the journal has to hold the
+  // real address or it cannot reopen the tab it closed.
+  assert.match(JSON.stringify([h.row(plan.data.id), ...h.steps(plan.data.id)]), /token=secret/);
 });
 test('No write occurs when durable preflight logging fails', async () => {
   const h = harness(); await h.grant(['tabs.write']); h.setDiskFailure(true);
@@ -204,9 +289,14 @@ test('An ambiguous API failure is journaled as unknown and never retried', async
 test('Backend restart marks an unfinished journal unknown', async () => {
   const h = harness(); await h.grant(['tabs.write']);
   const plan = await h.prepare('browser_update_tabs', [{ type: 'close', tab_id: 2 }]);
-  h.batches.get(plan.data.id).status = 'applying'; h.reload();
-  await h.call({ action: 'settings' }); assert.equal(h.batches.get(plan.data.id).status, 'unknown');
+  h.setStatus(plan.data.id, 'applying'); h.reload();
+  // `settings` no longer touches the journal, so the sweep happens on the first request
+  // that does. That is the point of the split: the permission window must not have to
+  // wait for a database to open.
+  assert.equal((await h.call({ action: 'settings' })).success, true);
+  assert.equal(h.row(plan.data.id).status, 'applying');
   assert.equal((await h.commit(plan)).success, false);
+  assert.equal(h.row(plan.data.id).status, 'unknown');
 });
 test('Closed tab undo reopens the URL with a new identity and cannot run twice', async () => {
   const h = harness(); await h.grant(['tabGroups.write']);
@@ -214,8 +304,39 @@ test('Closed tab undo reopens the URL with a new identity and cannot run twice',
   const undo = await h.call({ action: 'prepare', tool: 'browser_undo_changes', params: { batch_id: plan.data.id } });
   assert.equal(undo.success, true, undo.error);
   const result = await h.commit(undo); assert.equal(result.data.status, 'applied', JSON.stringify(result));
-  assert.equal(h.state.tabs.length, 3); assert.ok(h.state.tabs.some(t => t.url.includes('token=secret') && t.id !== 2));
+  assert.equal(h.state.tabs.length, 3); assert.ok(h.state.tabs.some(t => h.address(t).includes('token=secret') && t.id !== 2));
   assert.equal((await h.call({ action: 'prepare', tool: 'browser_undo_changes', params: { batch_id: plan.data.id } })).success, false);
+});
+test('A tab committing its navigation is not mistaken for an external change', async () => {
+  const h = harness(); await h.grant(['tabs.write']);
+  // The second step observes the new tab again, by which point Chrome has moved the
+  // address out of pendingUrl. Reading `url` alone made that look like someone else
+  // rearranging the browser, so the batch stopped after step one.
+  const plan = await h.prepare('browser_update_tabs', [{ type: 'create', url: 'https://new.test/page' }, { type: 'move', tab_id: 3, index: 0 }]);
+  const result = await h.commit(plan);
+  assert.equal(result.data.status, 'applied', JSON.stringify(result));
+  assert.equal(result.data.completed, 2);
+  // And the batch stays undoable afterwards: its journal recorded the destination, not
+  // the empty string the tab reported for its first few hundred milliseconds.
+  const undo = await h.call({ action: 'prepare', tool: 'browser_undo_changes', params: { batch_id: plan.data.id } });
+  assert.equal(undo.success, true, undo.error);
+  assert.equal((await h.commit(undo)).data.status, 'applied');
+  assert.ok(!h.state.tabs.some(t => h.address(t) === 'https://new.test/page'));
+});
+test('Undoing a close accepts a reopened tab that lands on a redirect', async () => {
+  const h = harness(); await h.grant(['tabs.write']);
+  const plan = await h.prepare('browser_update_tabs', [{ type: 'close', tab_id: 2 }]);
+  assert.equal((await h.commit(plan)).data.status, 'applied');
+  // Reopening is explicitly best-effort: the extension hands the URL back to Chrome and
+  // the server decides where it lands. That is not a conflict, and reporting it as a
+  // failed restoration also burned the batch's one undo attempt.
+  h.instantNavigation('https://example.com/private?token=secret#fragment', 'https://example.com/login');
+  const undo = await h.call({ action: 'prepare', tool: 'browser_undo_changes', params: { batch_id: plan.data.id } });
+  assert.equal(undo.success, true, undo.error);
+  const result = await h.commit(undo);
+  assert.equal(result.data.status, 'applied', JSON.stringify(result));
+  assert.equal(h.state.tabs.length, 3);
+  assert.ok(h.state.tabs.some(t => h.address(t) === 'https://example.com/login'));
 });
 test('Bookmark directory deletion undo restores the subtree and maps new IDs across steps', async () => {
   const h = harness(); await h.grant(['bookmarks.write']);
@@ -263,6 +384,25 @@ test('Group creation and ungrouping can be undone as approved layout changes', a
   const undo = await h.call({ action: 'prepare', tool: 'browser_undo_changes', params: { batch_id: plan.data.id } });
   assert.equal(undo.success, true, undo.error); const result = await h.commit(undo);
   assert.equal(result.data.status, 'applied', JSON.stringify(result)); assert.equal(h.state.groups.length, 0);
+});
+test('Retention drops expired previews and orphaned steps, but never a batch an undo needs', async () => {
+  const h = harness(); await h.grant(['tabs.write']);
+  const applied = await h.prepare('browser_update_tabs', [{ type: 'close', tab_id: 2 }]);
+  assert.equal((await h.commit(applied)).data.status, 'applied');
+  const undo = await h.call({ action: 'prepare', tool: 'browser_undo_changes', params: { batch_id: applied.data.id } });
+  const abandoned = await h.prepare('browser_update_tabs', [{ type: 'pin', tab_id: 3, pinned: true }]);
+  // A preview nobody approved is dead weight once it can no longer be committed; the plan
+  // expiry and the retention cut use the same number, so this is exactly the window.
+  h.setAge(abandoned.data.id, Date.now() - 700_000);
+  h.setAge(undo.data.id, Date.now() - 700_000);
+  h.setAge(applied.data.id, 0);
+  h.reload(); await h.call({ action: 'read', tool: 'browser_query_changes', params: {} });
+  assert.equal(h.row(abandoned.data.id), undefined);
+  // Kept despite being the oldest row in the table: the undo still points at it, and
+  // losing it turns a refusal the user can act on into "original batch is missing".
+  assert.ok(h.row(applied.data.id));
+  assert.ok(h.steps(applied.data.id).length > 0);
+  assert.equal(h.orphanSteps(), 0);
 });
 test('Invalid or foreign extension messages cannot reach the browser executor', async () => {
   const h = harness(); await h.grant(['tabs.write']);

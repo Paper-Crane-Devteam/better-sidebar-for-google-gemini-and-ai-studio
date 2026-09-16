@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import '@/index.scss';
+import {
+  applyCachedExtensionPageTheme,
+  syncExtensionPageTheme,
+} from '@/shared/lib/extension-page-theme';
 
 /**
  * Lightweight extension page for requesting optional host permissions.
@@ -11,6 +15,12 @@ import '@/index.scss';
  *
  * URL format: chrome-extension://<id>/permissions.html?origins=https://api.notion.com/*
  */
+
+// Replay the cached theme synchronously, before anything is painted, then
+// reconcile with the stored preference. Without this the design tokens are
+// never defined on <html> and the page falls back to unstyled black-on-white.
+applyCachedExtensionPageTheme();
+void syncExtensionPageTheme();
 
 const PermissionsPage = () => {
   const [status, setStatus] = useState<'pending' | 'granted' | 'denied'>('pending');

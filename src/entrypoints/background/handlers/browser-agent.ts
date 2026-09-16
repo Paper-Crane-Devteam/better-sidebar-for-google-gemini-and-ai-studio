@@ -4,13 +4,14 @@ import {
   type Capability, type PlanPreview, type TabState, type BookmarkState,
 } from '@/shared/browser-agent/contracts';
 import { localAudit } from '@/shared/browser-agent/local-store';
+import { ensureDbReady } from '../db';
+import { ensureDbForTab, getCurrentDbName } from '../tab-profile-map';
 import type { MessageSender } from '../types';
 
 let queue: Promise<unknown> = Promise.resolve();
 const cancelled = new Set<string>();
 const active = new Set<string>();
 const owners = new Map<string, number>();
-let initialized: Promise<void> | undefined;
 let epochPromise: Promise<string> | undefined;
 const epoch = () => epochPromise ??= (async () => {
   const key = 'browser-agent-epoch';
@@ -32,16 +33,46 @@ function page<T>(items: T[], params: Record<string, string>) {
   const limit = Math.max(1, Math.min(numberParam(params.limit, 50), 100));
   return { total: items.length, items: items.slice(offset, offset + limit), next_offset: offset + limit < items.length ? offset + limit : null };
 }
-async function initialize() {
-  return initialized ??= (async () => {
-    for (const batch of await localAudit.all()) {
-      if (batch.status === 'applying') {
-        batch.status = 'unknown';
-        batch.error = 'Execution was interrupted. Inspect the browser before attempting another change.';
-        await localAudit.save(batch);
-      }
-    }
-  })();
+/** Profile databases this service-worker life has already swept. */
+const swept = new Set<string>();
+
+/**
+ * Open the right profile's database, then sweep it once.
+ *
+ * Only the journal needs this. Settings and the permission window read
+ * `chrome.storage`, so they must not be parked behind the database opening — that
+ * window is where a user goes when nothing else is working.
+ *
+ * Keyed by database name because the journal lives in the profile database, and two
+ * tabs signed into different accounts are two journals. `ensureDbForTab` is what makes a
+ * request land in the profile its own tab belongs to, so it runs per request while the
+ * sweep runs once per profile.
+ */
+async function journalReady(owner: number | undefined) {
+  await ensureDbReady();
+  await ensureDbForTab(owner);
+  const key = getCurrentDbName() ?? '';
+  if (swept.has(key)) return;
+  swept.add(key);
+  try {
+    discardLegacyStore();
+    await localAudit.markInterrupted('Execution was interrupted. Inspect the browser before attempting another change.');
+    await localAudit.prune();
+  } catch (error) {
+    // Upkeep, not a mechanism. A row stuck at `applying` is still unusable — `commit`
+    // only accepts `prepared` — so failing the caller's request over it buys nothing.
+    console.warn('[BrowserAgent] Journal upkeep failed:', error);
+  }
+}
+
+/**
+ * Drop the database the first version kept its journal in.
+ *
+ * Best-effort and fire-and-forget: it is storage nobody reads any more, and Browser
+ * Agent never shipped, so there is nothing in it worth migrating.
+ */
+function discardLegacyStore() {
+  try { indexedDB.deleteDatabase('browser-agent-local-v1'); } catch { /* Nothing depends on this. */ }
 }
 async function requireCaps(caps: Capability[]) {
   const settings = await localAudit.settings();
@@ -67,11 +98,25 @@ async function bookmarkSnapshot(): Promise<BookmarkState[]> {
   if (rows.length > 10000) throw new Error('This bookmark collection exceeds the first-version planning limit (10,000 items).');
   return rows;
 }
+/**
+ * A tab's address, including one it has not arrived at yet.
+ *
+ * `Tab.url` is the **last committed** URL. A tab created a moment ago has not committed
+ * anything, so `url` is `''` and the destination sits in `pendingUrl` until the
+ * navigation lands. Reading `url` alone therefore gave a freshly created tab one
+ * identity for a few hundred milliseconds and another one afterwards — and every
+ * consistency check in this file compares whole snapshots, so that shift was read as
+ * "someone changed the browser underneath us". It broke three separate things: a batch
+ * stopped at the step after any `create`, a batch that had created a tab could never be
+ * undone, and undoing a `close` reported that the restoration had not matched.
+ */
+const tabUrl = (t: chrome.tabs.Tab) => t.url || t.pendingUrl || '';
+
 async function snapshot(tool: string): Promise<Snapshot> {
   if (tool === 'browser_manage_bookmarks') return { bookmarks: await bookmarkSnapshot() };
-  const labels = await localAudit.labels(await epoch());
+  const labels = await localAudit.labels();
   const tabs = (await chrome.tabs.query({})).filter(t => !t.incognito).map(t => ({
-    id: t.id!, windowId: t.windowId, index: t.index, title: t.title ?? '', url: t.url ?? '',
+    id: t.id!, windowId: t.windowId, index: t.index, title: t.title ?? '', url: tabUrl(t),
     pinned: t.pinned, active: t.active, groupId: t.groupId, label: labels[String(t.id)] ?? '',
   })).sort((a, b) => a.id - b.id);
   if (tabs.length > 2000) throw new Error('Too many open tabs for one plan (limit 2,000).');
@@ -81,11 +126,26 @@ async function snapshot(tool: string): Promise<Snapshot> {
   })).sort((a, b) => a.id - b.id);
   return { tabs, groups };
 }
-/** Titles can update while a page loads; URL and layout still protect object identity. */
-function comparable(s: Snapshot) {
-  return { ...s, tabs: s.tabs?.map(({ title: _title, ...t }) => t) };
+/**
+ * Titles can update while a page loads; URL and layout still protect object identity.
+ *
+ * `reopened` names tabs this run had to re-create. Their address is explicitly
+ * best-effort — we hand the URL back to Chrome and it decides where that lands, so a
+ * redirect (or a page that answers a different path) is a normal outcome, not evidence
+ * that someone else touched the browser. Comparing it would have made "the tab came
+ * back, just not byte-identical" indistinguishable from a real conflict, which is the
+ * one thing this comparison exists to tell apart. Everything else about them — window,
+ * position, pinned state, group, label — is still compared.
+ */
+function comparable(s: Snapshot, reopened?: Set<number>) {
+  return {
+    ...s,
+    tabs: s.tabs?.map(({ title: _title, ...t }) => (reopened?.has(t.id) ? { ...t, url: '' } : t)),
+  };
 }
-function matches(a: Snapshot, b: Snapshot) { return stable(comparable(a)) === stable(comparable(b)); }
+function matches(a: Snapshot, b: Snapshot, reopened?: Set<number>) {
+  return stable(comparable(a, reopened)) === stable(comparable(b, reopened));
+}
 function diff(before: Snapshot, after: Snapshot) {
   return (['tabs', 'groups', 'bookmarks'] as const).flatMap(kind => {
     const a = new Map((before[kind] ?? []).map(n => [String(n.id), n] as const));
@@ -134,9 +194,9 @@ async function apply(tool: string, op: Operation, owner: number) {
       case 'move': await chrome.tabs.move(tabId, { windowId: op.window_id as number | undefined, index: Number(op.index) }); break;
       case 'close': await chrome.tabs.remove(tabId); break;
       case 'label': {
-        const key = await epoch(), labels = await localAudit.labels(key);
+        const labels = await localAudit.labels();
         labels[String(tabId)] = String(op.label);
-        await localAudit.saveLabels(key, labels); break;
+        await localAudit.saveLabels(labels); break;
       }
     }
   } else if (tool === 'browser_manage_tab_groups') {
@@ -188,7 +248,7 @@ async function restoreBookmarks(before: BookmarkState[], after: BookmarkState[],
 }
 
 /** Layout restoration does not claim to restore the runtime state of a closed web page. */
-async function restoreTabs(before: Snapshot, after: Snapshot, remap: Map<string, string>, owner: number) {
+async function restoreTabs(before: Snapshot, after: Snapshot, remap: Map<string, string>) {
   const id = (n: number) => Number(remap.get(`tab:${n}`) ?? n);
   const gid = (n: number) => Number(remap.get(`group:${n}`) ?? n);
   const old = before.tabs!, now = after.tabs!;
@@ -205,9 +265,23 @@ async function restoreTabs(before: Snapshot, after: Snapshot, remap: Map<string,
     if (current.groupId !== -1 && (current.groupId !== gid(t.groupId) || current.windowId !== t.windowId)) await chrome.tabs.ungroup(id(t.id));
     if (!previous || previous.pinned !== t.pinned) await chrome.tabs.update(id(t.id), { pinned: t.pinned });
   }
+  /**
+   * The host tab is reordered here too — it is the one place where that is allowed.
+   *
+   * Forward operations can never move it (`validateTargets`), but they move it *anyway*:
+   * shifting any other tab past it changes its index. Leaving it pinned in place made
+   * restoration unable to converge on the recorded layout — the tab it refused to move
+   * was the one blocking every other tab from reaching its old position — and the run
+   * then failed its own verification with "restoration did not fully match", after
+   * having spent the batch's single undo attempt.
+   *
+   * The position is the only thing being restored, and only to one the browser was
+   * already in: `prepare` rejects any batch where the host's window or group differs
+   * between before and after, so this cannot move it out of its window or into a group.
+   */
   for (const t of [...old].sort((a, b) => a.windowId - b.windowId || a.index - b.index)) {
     const current = await chrome.tabs.get(id(t.id));
-    if (id(t.id) !== owner && (current.windowId !== t.windowId || current.index !== t.index)) await chrome.tabs.move(id(t.id), { windowId: t.windowId, index: t.index });
+    if (current.windowId !== t.windowId || current.index !== t.index) await chrome.tabs.move(id(t.id), { windowId: t.windowId, index: t.index });
   }
   for (const g of before.groups ?? []) {
     const members = old.filter(t => t.groupId === g.id).map(t => id(t.id));
@@ -226,12 +300,15 @@ async function restoreTabs(before: Snapshot, after: Snapshot, remap: Map<string,
       await chrome.tabGroups.update(gid(g.id), { title: g.title, color: g.color as chrome.tabGroups.Color, collapsed: g.collapsed });
     }
   }
-  const key = await epoch(), labels = await localAudit.labels(key);
+  const labels = await localAudit.labels();
   for (const t of old) {
-    labels[String(id(t.id))] = t.label;
+    // Only tabs that actually carried a note: writing `''` for the rest filled the store
+    // with entries that mean "no label", which is what an absent key already means.
+    if (t.label) labels[String(id(t.id))] = t.label;
+    else delete labels[String(id(t.id))];
     if (t.active && !(await chrome.tabs.get(id(t.id))).active) await chrome.tabs.update(id(t.id), { active: true });
   }
-  await localAudit.saveLabels(key, labels);
+  await localAudit.saveLabels(labels);
 }
 function remapped(s: Snapshot, map: Map<string, string>): Snapshot {
   const tab = (n: number) => Number(map.get(`tab:${n}`) ?? n);
@@ -286,7 +363,9 @@ async function prepare(tool: string, params: Record<string, string>, owner: numb
     })) throw new Error('Undo would remove or regroup the Agent host tab.');
   } else for (const op of operations) validateTargets(tool, op, before, owner);
   const batch: Batch = { id: crypto.randomUUID(), owner, epoch: await epoch(), tool, operations, before, createdAt: Date.now(), status: 'prepared', steps: [], ...(undo ? { undoOf: undo.id } : {}) };
-  await localAudit.save(batch);
+  // Awaited before the preview is shown: a plan the journal never accepted must not be
+  // approvable, because approval is what makes it executable.
+  await localAudit.insert(batch);
   return preview(batch, undo);
 }
 async function commit(planId: string, owner: number) {
@@ -301,11 +380,13 @@ async function commit(planId: string, owner: number) {
   if (undo && batch.before.tabs && undoNeedsGroups(undo)) await requireCaps(['tabGroups.write']);
   if (undo?.undoneBy) throw new Error('This batch already has an undo attempt.');
   batch.status = 'applying';
-  await localAudit.save(batch);
-  if (undo) { undo.undoneBy = batch.id; await localAudit.save(undo); }
+  await localAudit.patch(batch.id, { status: batch.status });
+  if (undo) { undo.undoneBy = batch.id; await localAudit.patch(undo.id, { undoneBy: batch.id }); }
   active.add(planId);
   owners.set(planId, owner);
   const map = new Map<string, string>();
+  /** Tabs an earlier step of this undo re-created — their address is best-effort, see `comparable`. */
+  const reopened = () => new Set([...map].filter(([key]) => key.startsWith('tab:')).map(([, id]) => Number(id)));
   let expected = batch.before;
   try {
     for (const [index, op] of batch.operations.entries()) {
@@ -313,17 +394,19 @@ async function commit(planId: string, owner: number) {
       await requireTool(batch.tool);
       if (undo && batch.before.tabs && undoNeedsGroups(undo)) await requireCaps(['tabGroups.write']);
       const before = await snapshot(batch.tool);
-      if (!matches(expected, before)) throw new Error('External changes detected. Remaining steps were stopped.');
+      if (!matches(expected, before, reopened())) throw new Error('External changes detected. Remaining steps were stopped.');
       if (!undo) validateTargets(batch.tool, op, before, owner);
       const step: Batch['steps'][number] = { operation: op, before, status: 'applying' };
       batch.steps.push(step);
-      await localAudit.save(batch);
+      // Its own row, written before the Chrome call. A reload in the middle of a write is
+      // the one situation nothing else can reconstruct, and this row is the only evidence.
+      await localAudit.insertStep(batch.id, index, step);
       if (undo) {
         const original = undo.steps[undo.steps.length - index - 1];
         if (original.before.bookmarks) await restoreBookmarks(original.before.bookmarks, original.after!.bookmarks!, map);
         else {
           // Restoration can change membership, even for a batch originally using tabs.write.
-          await restoreTabs(original.before, original.after!, map, owner);
+          await restoreTabs(original.before, original.after!, map);
         }
       } else await apply(batch.tool, op, owner);
       step.after = await snapshot(batch.tool);
@@ -331,21 +414,30 @@ async function commit(planId: string, owner: number) {
       step.status = 'applied';
       if (undo) {
         const target = remapped(undo.steps[undo.steps.length - index - 1].before, map);
-        if (!matches(target, step.after)) throw new Error('Restoration did not fully match the saved state. Inspect the result before continuing.');
+        if (!matches(target, step.after, reopened())) throw new Error('Restoration did not fully match the saved state. Inspect the result before continuing.');
       }
       expected = step.after;
-      try { await localAudit.save(batch); }
-      catch (error) { step.status = 'unknown'; throw error; }
+      // The outcome of a step that already happened. Failing to record it is exactly the
+      // `unknown` case: the browser moved and we cannot prove where it landed.
+      try { await localAudit.updateStep(batch.id, index, step); }
+      catch (error) {
+        step.status = 'unknown';
+        await localAudit.updateStep(batch.id, index, step).catch(() => { /* Already failing. */ });
+        throw error;
+      }
     }
     batch.status = 'applied';
-    if (undo) { undo.status = 'undone'; await localAudit.save(undo); }
+    if (undo) { undo.status = 'undone'; await localAudit.patch(undo.id, { status: undo.status }); }
   } catch (error) {
     const pending = batch.steps.at(-1);
-    if (pending?.status === 'applying') pending.status = 'unknown';
+    if (pending?.status === 'applying') {
+      pending.status = 'unknown';
+      await localAudit.updateStep(batch.id, batch.steps.length - 1, pending).catch(() => { /* Best effort. */ });
+    }
     batch.status = pending?.status === 'unknown' ? 'unknown' : 'failed';
     batch.error = error instanceof Error ? error.message : 'Browser operation failed.';
   } finally { active.delete(planId); owners.delete(planId); cancelled.delete(planId); }
-  await localAudit.save(batch);
+  await localAudit.patch(batch.id, { status: batch.status, error: batch.error ?? null });
   return { batch_id: batch.id, status: batch.status, error: batch.error, completed: batch.steps.filter(s => s.status === 'applied').length, planned: batch.operations.length, steps: batch.steps.map(s => ({ operation: s.operation, status: s.status, change_count: s.changes?.length ?? 0, changes: s.changes?.slice(0, 10), changes_truncated: (s.changes?.length ?? 0) > 10 })) };
 }
 
@@ -354,8 +446,8 @@ async function read(tool: string, params: Record<string, string>, owner: number)
   await requireTool(tool);
   const windowId = numberParam(params.window_id, (await chrome.tabs.get(owner)).windowId);
   if (tool === 'browser_list_tabs') {
-    const labels = await localAudit.labels(await epoch());
-    return page((await chrome.tabs.query({ windowId })).filter(t => !t.incognito).map(t => ({ id: t.id, window_id: t.windowId, index: t.index, title: t.title, url: t.url, group_id: t.groupId, pinned: t.pinned, active: t.active, label: labels[String(t.id)] ?? '', protected: t.id === owner })), params);
+    const labels = await localAudit.labels();
+    return page((await chrome.tabs.query({ windowId })).filter(t => !t.incognito).map(t => ({ id: t.id, window_id: t.windowId, index: t.index, title: t.title, url: tabUrl(t), group_id: t.groupId, pinned: t.pinned, active: t.active, label: labels[String(t.id)] ?? '', protected: t.id === owner })), params);
   }
   if (tool === 'browser_list_tab_groups') {
     if ((await chrome.windows.get(windowId)).incognito) throw new Error('Private windows are excluded.');
@@ -365,23 +457,31 @@ async function read(tool: string, params: Record<string, string>, owner: number)
     const nodes = params.query ? await chrome.bookmarks.search(params.query.slice(0, 500)) : await chrome.bookmarks.getChildren(params.parent_id || '0');
     return page(nodes.map(n => ({ id: n.id, parent_id: n.parentId, index: n.index, title: n.title, url: n.url, folder: n.url === undefined, managed: !!n.unmodifiable })), params);
   }
-  const records = (await localAudit.all()).filter(b => b.status !== 'prepared' && (!params.batch_id || b.id === params.batch_id)).sort((a, b) => b.createdAt - a.createdAt);
-  const visible = [];
-  const readableKinds = new Set<string>();
-  for (const [kind, cap] of [['tabs', 'tabs.read'], ['groups', 'tabGroups.read'], ['bookmarks', 'bookmarks.read']] as const) {
-    try { await requireCaps([cap]); readableKinds.add(kind); } catch { /* Filter historical entity data too. */ }
+  /**
+   * Which capabilities are readable, asked once.
+   *
+   * This used to be re-asked per record — a settings read plus a `permissions.contains`
+   * for every batch in the list — and the answer cannot differ between two records.
+   */
+  const readable = new Set<Capability>();
+  for (const cap of ['tabs.read', 'tabGroups.read', 'bookmarks.read'] as const) {
+    try { await requireCaps([cap]); readable.add(cap); } catch { /* Revoked capabilities also hide historical data. */ }
   }
-  for (const b of records) {
-    try {
-      const cap = toolCapability(b.tool);
-      if (cap) await requireCaps([cap.replace('.write', '.read') as Capability]);
-      visible.push({ batch_id: b.id, created_at: b.createdAt, tool: b.tool, status: b.status, error: b.error, undo_of: b.undoOf, undone_by: b.undoneBy,
-        can_undo: !b.undoOf && !b.undoneBy && ['applied', 'failed'].includes(b.status) && b.steps.length > 0 && b.steps.every(s => s.status === 'applied') && (!b.before.tabs || b.epoch === await epoch()),
-        completed: b.steps.filter(s => s.status === 'applied').length, planned: b.operations.length,
-        ...(params.batch_id ? { steps: b.steps.map((s, index) => ({ step_index: index, operation: s.operation, status: s.status, change_count: s.changes?.length ?? 0 })),
-          ...(params.step_index !== undefined ? { changes: page((b.steps[numberParam(params.step_index, 0)]?.changes ?? []).filter(c => readableKinds.has(c.kind)), params) } : {}) } : {}),
-      });
-    } catch { /* Revoked capabilities also hide historical data. */ }
+  const readableKinds = new Set(([['tabs', 'tabs.read'], ['groups', 'tabGroups.read'], ['bookmarks', 'bookmarks.read']] as const)
+    .filter(([, cap]) => readable.has(cap)).map(([kind]) => kind));
+  const session = await epoch();
+  const visible = [];
+  for (const b of await localAudit.list(params.batch_id || undefined)) {
+    const cap = toolCapability(b.tool);
+    if (cap && !readable.has(cap.replace('.write', '.read') as Capability)) continue;
+    visible.push({ batch_id: b.id, created_at: b.createdAt, tool: b.tool, status: b.status, error: b.error, undo_of: b.undoOf, undone_by: b.undoneBy,
+      can_undo: !b.undoOf && !b.undoneBy && ['applied', 'failed'].includes(b.status) && b.steps > 0 && b.applied === b.steps && (!b.touchesTabs || b.epoch === session),
+      completed: b.applied, planned: b.planned,
+      // Steps and object-level changes are only loaded when the caller asked for one
+      // batch: they are the two columns that carry snapshots.
+      ...(params.batch_id ? { steps: (await localAudit.listSteps(b.id)).map(s => ({ step_index: s.index, operation: s.operation, status: s.status, change_count: s.changeCount })),
+        ...(params.step_index !== undefined ? { changes: page((await localAudit.stepChanges(b.id, numberParam(params.step_index, 0))).filter(c => readableKinds.has(c.kind as 'tabs' | 'groups' | 'bookmarks')), params) } : {}) } : {}),
+    });
   }
   return page(visible, params.batch_id ? { limit: '1' } : params);
 }
@@ -394,24 +494,31 @@ export async function handleBrowserAgent(request: BrowserRequest, sender: Messag
     const settingsPage = sender.url === chrome.runtime.getURL('browser-agent-settings.html');
     const host = owner !== undefined && !sender.tab?.incognito && ['https://gemini.google.com', 'https://aistudio.google.com'].includes(origin);
     if (sender.id !== chrome.runtime.id || (!host && !(settingsPage && ['settings', 'configure'].includes(request.action)))) throw new Error('Unsupported Browser Agent host.');
-    await initialize();
     if (request.action === 'open-settings') {
-      await chrome.windows.create({ url: chrome.runtime.getURL('browser-agent-settings.html'), type: 'popup', width: 540, height: 720 });
+      // Focus the window already showing this instead of stacking another one: the panel
+      // link is the kind of thing people click twice when the first click seems slow.
+      const existing = (await chrome.windows.getAll({ populate: true, windowTypes: ['popup'] }))
+        .find(w => w.tabs?.some(t => t.url === chrome.runtime.getURL('browser-agent-settings.html')));
+      if (existing?.id !== undefined) await chrome.windows.update(existing.id, { focused: true });
+      else await chrome.windows.create({ url: chrome.runtime.getURL('browser-agent-settings.html'), type: 'popup', width: 540, height: 720 });
       return { success: true };
     }
     if (request.action === 'cancel') {
+      await journalReady(owner);
       const plan = await localAudit.get(request.planId);
       if (!plan || plan.owner !== owner) throw new Error('Unknown plan or wrong host.');
       if (active.has(plan.id) || plan.status === 'applying') cancelled.add(plan.id);
-      else if (plan.status === 'prepared') { plan.status = 'failed'; plan.error = 'Cancelled before execution.'; await localAudit.save(plan); }
+      else if (plan.status === 'prepared') await localAudit.patch(plan.id, { status: 'failed', error: 'Cancelled before execution.' });
       return { success: true };
     }
     if (request.action === 'configure') {
       if (!request.settings || !Array.isArray(request.settings.capabilities) || request.settings.capabilities.some(c => !CAPABILITIES.includes(c)) || typeof request.settings.shareFullUrls !== 'boolean') throw new Error('Invalid settings.');
       const caps = [...new Set(request.settings.capabilities.flatMap(dependencies))];
       if (caps.length && !await chrome.permissions.contains({ permissions: permissionsFor(caps) })) throw new Error('Grant Chrome permissions first.');
+      // The settings themselves now live in `storage.local`, so writing them *is* the
+      // notification every other context needs. The separate version key it used to bump
+      // existed only because the record was in a database nothing could observe.
       await localAudit.saveSettings({ ...request.settings, capabilities: caps });
-      await chrome.storage.local.set({ 'browser-agent-settings-version': Date.now() });
     }
     if (request.action === 'settings' || request.action === 'configure') {
       const settings = await localAudit.settings();
@@ -419,6 +526,9 @@ export async function handleBrowserAgent(request: BrowserRequest, sender: Messag
       for (const cap of settings.capabilities) if (await chrome.permissions.contains({ permissions: permissionsFor(dependencies(cap)) })) capabilities.push(cap);
       return { success: true, data: { ...settings, capabilities } };
     }
+    // Outside the queue: opening a database is not work that needs serialising, and a
+    // cold start would otherwise hold up whatever is already queued behind it.
+    await journalReady(owner);
     const work = async () => {
       const result = request.action === 'read' ? await read(request.tool, request.params, owner!)
         : request.action === 'prepare' ? await prepare(request.tool, request.params, owner!)

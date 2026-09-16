@@ -25,9 +25,32 @@ interface ToolbarPosition {
   left: number;
 }
 
-/** Conversation container selectors (Gemini DOM) */
-const CHAT_CONTAINER_SELECTOR =
-  'infinite-scroller.chat-history, .conversation-container, chat-window';
+/**
+ * The chat transcript, in priority order — the *only* region the toolbar reacts to.
+ *
+ * Deliberately not a comma-separated list: `querySelector('a, b')` returns the first
+ * match in **document order**, not the first selector that matches. The previous
+ * `'infinite-scroller.chat-history, .conversation-container, chat-window'` therefore
+ * resolved to `<chat-window>`, which wraps the composer and the surrounding chrome as
+ * well as the transcript — so selecting text in the input box, the model picker, or a
+ * disclaimer popped the toolbar too. `chat-window` and `.conversation-container` are
+ * both out for that reason (the latter is a single turn, nested inside the scroller).
+ */
+const CHAT_SCROLLER_SELECTORS = [
+  'infinite-scroller.chat-history', // current Gemini markup
+  'chat-window infinite-scroller', // same node, scoped — the sidebar history list is an
+  // `infinite-scroller` too, so never query it bare
+  'chat-window #chat-history', // fallback
+] as const;
+
+/** First selector that resolves, or null. */
+function getChatScroller(): Element | null {
+  for (const selector of CHAT_SCROLLER_SELECTORS) {
+    const el = document.querySelector(selector);
+    if (el) return el;
+  }
+  return null;
+}
 
 export const SelectionToolbarFeature = () => {
   const config = usePegasusStore(
@@ -257,11 +280,14 @@ export const SelectionToolbarFeature = () => {
         return;
       }
 
-      // Only show toolbar if selection is within the chat conversation area
+      // Only show the toolbar for selections that live entirely inside the transcript.
+      // `commonAncestorContainer` is the whole test we need: a selection that starts in
+      // a turn and runs out into the page has an ancestor above the scroller, so it
+      // fails `contains()` and the toolbar stays down.
       const range = sel.getRangeAt(0);
       const ancestor = range.commonAncestorContainer;
-      const chatContainer = document.querySelector(CHAT_CONTAINER_SELECTOR);
-      if (!chatContainer || !chatContainer.contains(ancestor)) {
+      const chatScroller = getChatScroller();
+      if (!chatScroller || !chatScroller.contains(ancestor)) {
         setVisible(false);
         return;
       }

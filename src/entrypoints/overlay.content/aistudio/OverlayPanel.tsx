@@ -50,6 +50,11 @@ import {
   AISTUDIO_SELECTORS,
   collapseAIStudioNavbar,
 } from '@/shared/lib/dom-selectors';
+import {
+  IconBarContextMenu,
+  IconBarGroup,
+  useIconBar,
+} from '../shared/modules/icon-bar';
 
 export const OverlayPanel = ({ className }: { className?: string }) => {
   const moduleConfig = useModuleConfig();
@@ -59,7 +64,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
   const { path } = useUrl();
 
   const [, setContainer] = useState<HTMLDivElement | null>(null);
-  const shortcuts = useSettingsStore((state) => state.shortcuts);
+  const { visible: visibleIcons } = useIconBar();
   const compactMode = useSettingsStore((state) => state.compactMode);
   const agentBadge = useBadge('tab.agent');
   const {
@@ -238,201 +243,227 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
     window.open(url, '_blank');
   };
 
+  /**
+   * Every button the rail can hold, keyed by the ids in the icon-bar registry.
+   * Which of them show, and in what order, is the registry's and the user's
+   * business; this map only says what each one is and does.
+   */
+  const iconNodes: Record<string, React.ReactNode> = {
+    /*
+      Collapse, at the top where AI Studio's own collapse button now lives.
+      One-way on purpose: collapsing takes this rail off screen along with the
+      native navbar, so there is never a moment where this button is visible and
+      the navbar is already collapsed. Expanding is the toolbar's job, and the
+      hotkey's — see `toggleAIStudioSidebar`.
+    */
+    collapse: (
+      <SimpleTooltip
+        content={t('tooltip.collapseSidebar', {
+          defaultValue: 'Collapse sidebar',
+        })}
+      >
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => collapseAIStudioNavbar()}
+          className="sidebar-btn transition-all"
+        >
+          {/* Same hamburger as Gemini's toggle, in the same top-of-rail slot.
+              The two platforms differ in what the click does — this one only
+              collapses — but that is not worth a different icon: someone using
+              both should not have to relearn where the button is. */}
+          <Menu className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    files: (
+      <SimpleTooltip content={t('tabs.files')}>
+        <Button
+          variant={activeTab === 'files' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('files')}
+          className="sidebar-btn transition-all"
+        >
+          <Files className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    search: (
+      <SimpleTooltip content={t('tabs.search')}>
+        <Button
+          variant={activeTab === 'search' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('search')}
+          className="sidebar-btn transition-all"
+        >
+          <Search className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    prompts: (
+      <SimpleTooltip content={t('tabs.prompts')}>
+        <Button
+          variant={activeTab === 'prompts' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('prompts')}
+          className="sidebar-btn transition-all"
+        >
+          <UIcon icon="tabler:blockquote" className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    agent: (
+      <SimpleTooltip content={t('tabs.agent')}>
+        <Button
+          variant={activeTab === 'agent' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('agent')}
+          className="sidebar-btn transition-all relative"
+        >
+          <Bot className="sidebar-icon" />
+          <FeatureBadge badgeKey="tab.agent" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    favorites: (
+      <SimpleTooltip content={t('tabs.favorites')}>
+        <Button
+          variant={activeTab === 'favorites' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('favorites')}
+          className="sidebar-btn transition-all"
+        >
+          <Star className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    snippets: (
+      <SimpleTooltip content={t('tabs.snippets')}>
+        <Button
+          variant={activeTab === 'snippets' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('snippets')}
+          className="sidebar-btn transition-all"
+        >
+          <ScrollText className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    tags: (
+      <SimpleTooltip content={t('tabs.tags')}>
+        <Button
+          variant={activeTab === 'tags' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('tags')}
+          className="sidebar-btn transition-all"
+        >
+          <Tag className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    build: (
+      <SimpleTooltip content={t('shortcuts.build')}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => handleNavigation('/apps')}
+          className="sidebar-btn transition-all"
+        >
+          <Hammer className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    dashboard: (
+      <SimpleTooltip content={t('shortcuts.dashboard')}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => handleNavigation('/api-keys')}
+          className="sidebar-btn transition-all"
+        >
+          <LayoutDashboard className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    documentation: (
+      <SimpleTooltip content={t('shortcuts.documentation')}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() =>
+            handleExternalLink('https://ai.google.dev/gemini-api/docs')
+          }
+          className="sidebar-btn transition-all"
+        >
+          <BookOpen className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    originalUI: (
+      <SimpleTooltip content={t('shortcuts.originalUI')}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsUIVisible(false)}
+          className="sidebar-btn transition-all"
+        >
+          <LogOut className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    feedback: (
+      <SimpleTooltip content={t('tabs.feedback')}>
+        <Button
+          variant={activeTab === 'feedback' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('feedback')}
+          className="sidebar-btn transition-all"
+        >
+          <MessageSquare className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    settings: (
+      <SimpleTooltip content={t('tabs.settings')}>
+        <Button
+          variant={isSettingsOpen ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('settings')}
+          className="sidebar-btn transition-all relative"
+        >
+          <Settings className="sidebar-icon" />
+          <FeatureBadge badgeKey="settings." group />
+        </Button>
+      </SimpleTooltip>
+    ),
+    account: <AccountButton config={AISTUDIO_ACCOUNT} />,
+  };
+
   return (
     <div
       ref={setContainer}
       className={`flex bg-background text-foreground ${className || 'h-full'} relative`}
     >
       {/* Sidebar Tabs */}
-      <div
-        className={`sidebar-nav flex flex-col items-center bg-muted/20 shrink-0 ${
-          compactMode ? 'hidden' : ''
-        }`}
-      >
-        {/*
-          Collapse, at the top where AI Studio's own collapse button now lives.
-          One-way on purpose: collapsing takes this rail off screen along with the
-          native navbar, so there is never a moment where this button is visible and
-          the navbar is already collapsed. Expanding is the toolbar's job, and the
-          hotkey's — see `toggleAIStudioSidebar`.
-        */}
-        <SimpleTooltip
-          content={t('tooltip.collapseSidebar', {
-            defaultValue: 'Collapse sidebar',
-          })}
+      <IconBarContextMenu>
+        <div
+          className={`sidebar-nav flex flex-col items-center bg-muted/20 shrink-0 ${
+            compactMode ? 'hidden' : ''
+          }`}
         >
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => collapseAIStudioNavbar()}
-            className="sidebar-btn transition-all"
-          >
-            {/* Same hamburger as Gemini's toggle, in the same top-of-rail slot.
-                The two platforms differ in what the click does — this one only
-                collapses — but that is not worth a different icon: someone using
-                both should not have to relearn where the button is. */}
-            <Menu className="sidebar-icon" />
-          </Button>
-        </SimpleTooltip>
-        <div className="h-2" />
+          <IconBarGroup ids={visibleIcons.top} nodes={iconNodes} />
+          {!!visibleIcons.top?.length && <div className="h-2" />}
 
-        <SimpleTooltip content={t('tabs.files')}>
-          <Button
-            variant={activeTab === 'files' ? 'secondary' : 'ghost'}
-            size="icon"
-            onClick={() => handleTabChange('files')}
-            className="sidebar-btn transition-all"
-          >
-            <Files className="sidebar-icon" />
-          </Button>
-        </SimpleTooltip>
-        <SimpleTooltip content={t('tabs.search')}>
-          <Button
-            variant={activeTab === 'search' ? 'secondary' : 'ghost'}
-            size="icon"
-            onClick={() => handleTabChange('search')}
-            className="sidebar-btn transition-all"
-          >
-            <Search className="sidebar-icon" />
-          </Button>
-        </SimpleTooltip>
-        <SimpleTooltip content={t('tabs.prompts')}>
-          <Button
-            variant={activeTab === 'prompts' ? 'secondary' : 'ghost'}
-            size="icon"
-            onClick={() => handleTabChange('prompts')}
-            className="sidebar-btn transition-all"
-          >
-            <UIcon icon="tabler:blockquote" className="sidebar-icon" />
-          </Button>
-        </SimpleTooltip>
-        <SimpleTooltip content="Agent">
-          <Button
-            variant={activeTab === 'agent' ? 'secondary' : 'ghost'}
-            size="icon"
-            onClick={() => handleTabChange('agent')}
-            className="sidebar-btn transition-all relative"
-          >
-            <Bot className="sidebar-icon" />
-            <FeatureBadge badgeKey="tab.agent" />
-          </Button>
-        </SimpleTooltip>
-        {shortcuts?.favorites && (
-          <SimpleTooltip content={t('tabs.favorites')}>
-            <Button
-              variant={activeTab === 'favorites' ? 'secondary' : 'ghost'}
-              size="icon"
-              onClick={() => handleTabChange('favorites')}
-              className="sidebar-btn transition-all"
-            >
-              <Star className="sidebar-icon" />
-            </Button>
-          </SimpleTooltip>
-        )}
-        <SimpleTooltip content={t('tabs.snippets')}>
-          <Button
-            variant={activeTab === 'snippets' ? 'secondary' : 'ghost'}
-            size="icon"
-            onClick={() => handleTabChange('snippets')}
-            className="sidebar-btn transition-all"
-          >
-            <ScrollText className="sidebar-icon" />
-          </Button>
-        </SimpleTooltip>
-        <SimpleTooltip content={t('tabs.tags')}>
-          <Button
-            variant={activeTab === 'tags' ? 'secondary' : 'ghost'}
-            size="icon"
-            onClick={() => handleTabChange('tags')}
-            className="sidebar-btn transition-all"
-          >
-            <Tag className="sidebar-icon" />
-          </Button>
-        </SimpleTooltip>
+          <IconBarGroup ids={visibleIcons.main} nodes={iconNodes} />
+          {!!visibleIcons.links?.length && <div className="h-2" />}
 
-        {(shortcuts?.build ||
-          shortcuts?.dashboard ||
-          shortcuts?.documentation) && <div className="h-2" />}
+          <IconBarGroup ids={visibleIcons.links} nodes={iconNodes} />
 
-        {shortcuts?.build && (
-          <SimpleTooltip content={t('shortcuts.build')}>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleNavigation('/apps')}
-              className="sidebar-btn transition-all"
-            >
-              <Hammer className="sidebar-icon" />
-            </Button>
-          </SimpleTooltip>
-        )}
+          <div className="flex-1" />
 
-        {shortcuts?.dashboard && (
-          <SimpleTooltip content={t('shortcuts.dashboard')}>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleNavigation('/api-keys')}
-              className="sidebar-btn transition-all"
-            >
-              <LayoutDashboard className="sidebar-icon" />
-            </Button>
-          </SimpleTooltip>
-        )}
-
-        {shortcuts?.documentation && (
-          <SimpleTooltip content={t('shortcuts.documentation')}>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() =>
-                handleExternalLink('https://ai.google.dev/gemini-api/docs')
-              }
-              className="sidebar-btn transition-all"
-            >
-              <BookOpen className="sidebar-icon" />
-            </Button>
-          </SimpleTooltip>
-        )}
-
-        <div className="flex-1" />
-
-        {shortcuts?.originalUI && (
-          <SimpleTooltip content={t('shortcuts.originalUI')}>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsUIVisible(false)}
-              className="sidebar-btn transition-all"
-            >
-              <LogOut className="sidebar-icon" />
-            </Button>
-          </SimpleTooltip>
-        )}
-
-        <SimpleTooltip content={t('tabs.feedback')}>
-          <Button
-            variant={activeTab === 'feedback' ? 'secondary' : 'ghost'}
-            size="icon"
-            onClick={() => handleTabChange('feedback')}
-            className="sidebar-btn transition-all"
-          >
-            <MessageSquare className="sidebar-icon" />
-          </Button>
-        </SimpleTooltip>
-        <SimpleTooltip content={t('tabs.settings')}>
-          <Button
-            variant={isSettingsOpen ? 'secondary' : 'ghost'}
-            size="icon"
-            onClick={() => handleTabChange('settings')}
-            className="sidebar-btn transition-all relative"
-          >
-            <Settings className="sidebar-icon" />
-            <FeatureBadge badgeKey="settings." group />
-          </Button>
-        </SimpleTooltip>
-        <AccountButton config={AISTUDIO_ACCOUNT} />
-      </div>
+          <IconBarGroup ids={visibleIcons.bottom} nodes={iconNodes} />
+        </div>
+      </IconBarContextMenu>
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 px-1 pt-1">

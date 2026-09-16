@@ -21,11 +21,15 @@ import {
 import { cn } from '@/shared/lib/utils/utils';
 import { SlidersHorizontal, Settings2, Globe2 } from 'lucide-react';
 import { browser } from 'wxt/browser';
-import { applyCachedPopupTheme, applyPopupTheme } from './theme-boot';
+import {
+  applyCachedExtensionPageTheme,
+  applyExtensionPageTheme,
+  resolveExtensionPageTheme,
+} from '@/shared/lib/extension-page-theme';
 
 // Replay the cached theme synchronously, before anything is painted.
 // Must stay above any `await` so it lands in the first frame.
-applyCachedPopupTheme();
+applyCachedExtensionPageTheme();
 
 type Tab = 'platforms' | 'gemini' | 'aistudio';
 
@@ -112,40 +116,13 @@ const Options = ({ initialEnabledState, detectedPlatform }: OptionsProps) => {
 
   // Resolve the real theme and refresh the boot cache.
   // The `theme-gemini` class and (usually) the correct dark/light state are
-  // already applied by applyCachedPopupTheme() above, so this normally results
-  // in no visual change at all.
+  // already applied by applyCachedExtensionPageTheme() above, so this normally
+  // results in no visual change at all.
   useEffect(() => {
-    if (!customTheme) {
-      applyPopupTheme({ mode: theme, vars: [] });
-      return;
-    }
-
-    // The theme registry pulls in every preset, so keep it off the popup's
-    // critical path and load it only when a custom theme is actually selected.
     let cancelled = false;
-    import('@/themes')
-      .then(({ themeRegistry, refreshThemeRegistry }) => {
-        if (cancelled) return;
-        refreshThemeRegistry();
-        const preset = themeRegistry[customTheme];
-        if (!preset) {
-          applyPopupTheme({ mode: theme, vars: [] });
-          return;
-        }
-        applyPopupTheme({
-          // Custom themes force their own light/dark mode
-          mode: preset.preferredMode === 'dark' ? 'dark' : 'light',
-          // Same variables the overlay panel uses
-          vars: (preset.sidebarVariables ?? []).map(
-            (v) => [v.property, v.value] as [string, string],
-          ),
-        });
-      })
-      .catch((err) => {
-        console.warn('[Popup] Failed to load theme registry:', err);
-        if (!cancelled) applyPopupTheme({ mode: theme, vars: [] });
-      });
-
+    void resolveExtensionPageTheme(theme, customTheme).then((snapshot) => {
+      if (!cancelled) applyExtensionPageTheme(snapshot);
+    });
     return () => {
       cancelled = true;
     };

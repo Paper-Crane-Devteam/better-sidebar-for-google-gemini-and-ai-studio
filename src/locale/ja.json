@@ -29,7 +29,8 @@
     "gems": "Gems",
     "notebooks": "ノートブック",
     "snippets": "スニペット",
-    "spark": "Spark"
+    "spark": "Spark",
+    "agent": "Agent"
   },
   "sidebar": {
     "newConversation": "新しい会話",
@@ -314,6 +315,18 @@
     "notebooks": "ノートブック",
     "originalUI": "元のサイドバーに切り替え",
     "openCommandPalette": "コマンドパレットを開く"
+  },
+  "iconBar": {
+    "hint": "スイッチをオフにするとサイドバーから非表示になります。ドラッグで並び替えできます。アイコンは同じグループ内でのみ移動できます。",
+    "reorder": "アイコンの並び替え…",
+    "reset": "デフォルトに戻す",
+    "locked": "常に表示",
+    "moveUp": "上へ移動",
+    "moveDown": "下へ移動",
+    "groupTop": "切り替え",
+    "groupMain": "タブ",
+    "groupLinks": "ショートカット",
+    "groupBottom": "下部"
   },
   "overlay": {
     "settingsPageComingSoon": "設定ページは近日公開予定",

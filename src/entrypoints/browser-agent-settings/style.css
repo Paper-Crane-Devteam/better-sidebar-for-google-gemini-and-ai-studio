@@ -1,7 +1,84 @@
-:root { font-family: system-ui, sans-serif; color-scheme: light dark; font-size: 14px; }
-body { margin: 0; background: Canvas; color: CanvasText; }
-main { max-width: 520px; padding: 24px; margin: auto; }
-h1 { font-size: 22px; margin: 0 0 8px; } h2 { font-size: 15px; margin: 24px 0 12px; }
-p { line-height: 1.65; opacity: .75; font-size: 12px; }
-label { display: flex; gap: 10px; align-items: center; padding: 8px 0; }
-input { accent-color: #5a67d8; } button { padding: 8px 24px; cursor: pointer; margin-top: 12px; } .error { color: #d44; opacity: 1; }
+/**
+ * Loaded after `@/index.scss` on purpose: these rules are unlayered, so they
+ * outrank Tailwind's `@layer base` preflight without needing `!important`.
+ * Colours come from the shared design tokens, which are defined on
+ * `html.theme-gemini` by the extension page theme boot.
+ */
+
+main {
+  max-width: 520px;
+  padding: 24px;
+  margin: auto;
+}
+
+h1 {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 8px;
+}
+
+h2 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 24px 0 12px;
+}
+
+p {
+  font-size: 12px;
+  line-height: 1.65;
+  margin: 0 0 8px;
+  color: rgb(var(--muted-foreground));
+}
+
+label {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 0;
+  cursor: pointer;
+}
+
+label:has(input:disabled) {
+  cursor: default;
+  opacity: 0.55;
+}
+
+input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  accent-color: rgb(var(--primary));
+  cursor: pointer;
+  margin: 0;
+}
+
+input[type='checkbox']:disabled {
+  cursor: default;
+}
+
+button {
+  margin-top: 16px;
+  padding: 8px 24px;
+  border: none;
+  border-radius: calc(var(--radius) - 4px);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  background: rgb(var(--primary));
+  color: rgb(var(--primary-foreground));
+  transition: opacity 0.15s ease;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button:focus-visible {
+  outline: 2px solid rgb(var(--ring));
+  outline-offset: 2px;
+}
+
+.error {
+  color: rgb(var(--destructive));
+  font-weight: 500;
+}

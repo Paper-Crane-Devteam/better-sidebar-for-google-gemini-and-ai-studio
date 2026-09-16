@@ -39,7 +39,7 @@ export default function Welcome({ t }: Props) {
         </section>
         <section className="welcome-features" aria-label={t('onboarding.basics')}>
           {features.map(({ icon: Icon, key }, i) => <article className={`welcome-feature welcome-feature-${key}`} key={key}>
-            <div className="welcome-feature-top"><Icon size={22} aria-hidden="true" /><span>0{i + 1}</span></div>
+            <div className="welcome-feature-top"><Icon size={22} aria-hidden="true" /></div>
             <h2>{t(`onboarding.${key}Title`)}</h2><p>{t(`onboarding.${key}Body`)}</p>
           </article>)}
         </section>

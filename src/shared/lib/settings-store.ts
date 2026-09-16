@@ -39,18 +39,21 @@ interface SettingsState {
     ignoredFolders: string[];
     enableRightClickRename: boolean;
   };
-  shortcuts: {
-    favorites: boolean;
-    build: boolean;
-    dashboard: boolean;
-    documentation: boolean;
-    images: boolean;
-    apps: boolean;
-    codex: boolean;
-    myStuff: boolean;
-    gems: boolean;
-    notebooks: boolean;
-    originalUI: boolean;
+  /**
+   * User customisation of the sidebar icon bar.
+   *
+   * Which icons exist, which block they sit in and which of them cannot be
+   * hidden is described by the icon-bar registry
+   * (`overlay.content/shared/modules/icon-bar/registry.ts`); this only records
+   * the user's departures from it. Storage is already per-platform — see
+   * `getStorageName` — so ids need no platform prefix.
+   *
+   * `hidden` is authoritative: an icon shows unless its id is listed. `order` is
+   * keyed by block id, and a block missing from it keeps the registry order.
+   */
+  iconBar: {
+    hidden: string[];
+    order: Partial<Record<string, string[]>>;
   };
   integrations: {
     notion: {
@@ -83,10 +86,9 @@ interface SettingsState {
   setExplorerSortOrder: (order: 'alpha' | 'date') => void;
   setExplorerIgnoredFolders: (folders: string[]) => void;
   setExplorerEnableRightClickRename: (enabled: boolean) => void;
-  setShortcutVisible: (
-    key: keyof SettingsState['shortcuts'],
-    visible: boolean,
-  ) => void;
+  setIconVisible: (id: string, visible: boolean) => void;
+  setIconBarOrder: (group: string, ids: string[]) => void;
+  resetIconBar: () => void;
   setLastSelectedGemId: (id: string | null) => void;
   setLastSelectedNotebookId: (id: string | null) => void;
   setNotionConfig: (
@@ -109,6 +111,20 @@ interface SettingsState {
  * corner and collided with page furniture that lives down there.
  */
 export const DEFAULT_OVERLAY_POSITION = { x: 88, y: 56 };
+
+/**
+ * Icon bar state for a fresh profile.
+ *
+ * Favorites starts hidden — it is the one tab whose content is empty until the
+ * user has starred something, so shipping it on would hand every new user a dead
+ * icon. This is not read from the icon-bar registry on purpose: the settings store
+ * also loads in the background worker, where the registry's React icons and DOM
+ * availability probes have no business.
+ */
+const defaultIconBar = (): SettingsState['iconBar'] => ({
+  hidden: ['favorites'],
+  order: {},
+});
 
 const storage: StateStorage = {
   getItem: async (name: string): Promise<string | null> => {
@@ -172,19 +188,7 @@ export const useSettingsStore = create<SettingsState>()(
         ignoredFolders: [],
         enableRightClickRename: true,
       },
-      shortcuts: {
-        favorites: false,
-        build: true,
-        dashboard: true,
-        documentation: true,
-        images: true,
-        apps: true,
-        codex: true,
-        myStuff: true,
-        gems: true,
-        notebooks: true,
-        originalUI: true,
-      },
+      iconBar: defaultIconBar(),
       integrations: {
         notion: {
           apiKey: '',
@@ -217,10 +221,26 @@ export const useSettingsStore = create<SettingsState>()(
         set((state) => ({
           explorer: { ...state.explorer, enableRightClickRename },
         })),
-      setShortcutVisible: (key, visible) =>
+      setIconVisible: (id, visible) =>
+        set((state) => {
+          const hidden = new Set(state.iconBar?.hidden ?? []);
+          if (visible) hidden.delete(id);
+          else hidden.add(id);
+          return {
+            iconBar: {
+              order: state.iconBar?.order ?? {},
+              hidden: [...hidden],
+            },
+          };
+        }),
+      setIconBarOrder: (group, ids) =>
         set((state) => ({
-          shortcuts: { ...state.shortcuts, [key]: visible },
+          iconBar: {
+            hidden: state.iconBar?.hidden ?? [],
+            order: { ...(state.iconBar?.order ?? {}), [group]: ids },
+          },
         })),
+      resetIconBar: () => set({ iconBar: defaultIconBar() }),
       setLastSelectedGemId: (id) => set({ lastSelectedGemId: id }),
       setLastSelectedNotebookId: (id) => set({ lastSelectedNotebookId: id }),
       setNotionConfig: (config) =>
@@ -236,7 +256,7 @@ export const useSettingsStore = create<SettingsState>()(
     {
       name: getStorageName(),
       storage: createJSONStorage(() => storage),
-      version: 10,
+      version: 11,
       partialize: (state) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { themeGridPage, ...rest } = state;
@@ -287,6 +307,23 @@ export const useSettingsStore = create<SettingsState>()(
           if (old && old.x === 16 && old.y === 16) {
             persistedState.overlayPosition = { ...DEFAULT_OVERLAY_POSITION };
           }
+        }
+        if (version < 11) {
+          // The per-icon `shortcuts` booleans became the icon bar's hidden list,
+          // which also covers icons that were never toggleable. Only the `false`
+          // entries carry information — everything absent is visible — so the
+          // rail comes out looking exactly as it did before the upgrade.
+          const legacy = persistedState.shortcuts;
+          const hidden: string[] = [];
+          if (legacy && typeof legacy === 'object') {
+            for (const [id, visible] of Object.entries(legacy)) {
+              if (visible === false) hidden.push(id);
+            }
+          } else {
+            hidden.push(...defaultIconBar().hidden);
+          }
+          persistedState.iconBar = { hidden, order: {} };
+          delete persistedState.shortcuts;
         }
         return persistedState;
       },

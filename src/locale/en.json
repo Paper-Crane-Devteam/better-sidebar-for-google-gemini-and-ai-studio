@@ -29,7 +29,8 @@
     "gems": "Gems",
     "notebooks": "Notebooks",
     "snippets": "Snippets",
-    "spark": "Spark"
+    "spark": "Spark",
+    "agent": "Agent"
   },
   "spark": {
     "tasks": "Tasks",
@@ -320,6 +321,18 @@
     "notebooks": "Notebooks",
     "originalUI": "Switch to Original Sidebar",
     "openCommandPalette": "Open Command Palette"
+  },
+  "iconBar": {
+    "hint": "Turn icons off to hide them from the sidebar, or drag to reorder. Icons stay within their own group.",
+    "reorder": "Reorder Icons…",
+    "reset": "Reset to Default",
+    "locked": "Always visible",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "groupTop": "Toggle",
+    "groupMain": "Tabs",
+    "groupLinks": "Shortcuts",
+    "groupBottom": "Bottom"
   },
   "overlay": {
     "settingsPageComingSoon": "Settings Page Coming Soon",

@@ -1,35 +1,52 @@
-import type { Batch, BrowserSettings } from './contracts';
+/**
+ * Where Browser Agent keeps its three kinds of state — none of which is a database of
+ * its own any more.
+ *
+ * The first version opened `browser-agent-local-v1`, a hand-rolled IndexedDB, for all
+ * three. That bought isolation from `execute_sql` and cost a second storage engine with
+ * no migrations, no retention and whole-batch rewrites. The isolation was defending
+ * against the agent deleting its own audit trail, which is not a thing it has any reason
+ * to do. So each kind of state now lives wherever its lifetime already is:
+ *
+ * | state | home | why there |
+ * |---|---|---|
+ * | settings | `chrome.storage.local` | a Chrome-profile fact, and readable from the permission window, which has no tab and therefore no profile database |
+ * | tab labels | `chrome.storage.session` | scoped to one browser session *by construction* — exactly the rule the labels needed, previously kept by hand with an epoch key per session that was never cleaned up |
+ * | audit journal | the profile's SQLite | see `operations/browserAgent.ts` |
+ *
+ * ⚠️ The journal is now in the database the rest of the extension uses, which means a
+ * **local full-database export carries it**. It is still absent from `SYNC_TABLES`, so
+ * it does not travel to Drive.
+ */
+import { browserAuditRepo } from '@/shared/db/operations';
+import type { BrowserSettings } from './contracts';
 import { DEFAULT_SETTINGS } from './contracts';
 
-// A separate database: deliberately absent from SQL exports, Drive sync and backups.
-let opening: Promise<IDBDatabase> | undefined;
-function database(): Promise<IDBDatabase> {
-  return opening ??= new Promise((resolve, reject) => {
-    const request = indexedDB.open('browser-agent-local-v1', 1);
-    request.onupgradeneeded = () => {
-      request.result.createObjectStore('batches', { keyPath: 'id' });
-      request.result.createObjectStore('settings');
-      request.result.createObjectStore('labels');
-    };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => { opening = undefined; reject(request.error); };
-  });
-}
-async function transaction<T>(store: string, write: boolean, run: (s: IDBObjectStore) => IDBRequest<T>): Promise<T> {
-  const db = await database();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(store, write ? 'readwrite' : 'readonly');
-    const request = run(tx.objectStore(store));
-    tx.oncomplete = () => resolve(request.result);
-    tx.onabort = tx.onerror = () => reject(tx.error ?? request.error ?? new Error('Local audit storage failed.'));
-  });
-}
+const SETTINGS_KEY = 'browser-agent-settings';
+const LABELS_KEY = 'browser-agent-tab-labels';
+
 export const localAudit = {
-  settings: async (): Promise<BrowserSettings> => (await transaction<BrowserSettings | undefined>('settings', false, s => s.get('current'))) ?? structuredClone(DEFAULT_SETTINGS),
-  saveSettings: (settings: BrowserSettings) => transaction('settings', true, s => s.put(settings, 'current')),
-  get: (id: string) => transaction<Batch | undefined>('batches', false, s => s.get(id)),
-  save: (batch: Batch) => transaction('batches', true, s => s.put(batch)),
-  all: () => transaction<Batch[]>('batches', false, s => s.getAll()),
-  labels: async (epoch: string): Promise<Record<string, string>> => (await transaction<Record<string, string> | undefined>('labels', false, s => s.get(epoch))) ?? {},
-  saveLabels: (epoch: string, labels: Record<string, string>) => transaction('labels', true, s => s.put(labels, epoch)),
+  settings: async (): Promise<BrowserSettings> => {
+    const stored = (await chrome.storage.local.get(SETTINGS_KEY))[SETTINGS_KEY];
+    // Merged rather than trusted: a record written by an older build can be missing a
+    // field, and a missing capability list must read as "nothing granted", not undefined.
+    return stored && typeof stored === 'object'
+      ? { ...structuredClone(DEFAULT_SETTINGS), ...(stored as BrowserSettings) }
+      : structuredClone(DEFAULT_SETTINGS);
+  },
+  saveSettings: (settings: BrowserSettings) => chrome.storage.local.set({ [SETTINGS_KEY]: settings }),
+
+  /**
+   * Extension-only notes on tabs, keyed by tab id.
+   *
+   * No epoch parameter: `storage.session` is emptied when the browser closes, which is
+   * the same boundary tab ids stop meaning anything at. Keying by epoch inside a
+   * persistent store meant maintaining that rule ourselves, and leaving one dead record
+   * behind per browser restart, forever.
+   */
+  labels: async (): Promise<Record<string, string>> =>
+    (await chrome.storage.session.get(LABELS_KEY))[LABELS_KEY] as Record<string, string> ?? {},
+  saveLabels: (labels: Record<string, string>) => chrome.storage.session.set({ [LABELS_KEY]: labels }),
+
+  ...browserAuditRepo,
 };

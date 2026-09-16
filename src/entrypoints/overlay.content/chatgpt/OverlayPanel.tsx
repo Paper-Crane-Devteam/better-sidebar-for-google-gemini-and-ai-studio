@@ -36,6 +36,11 @@ import { useModuleConfig } from './useModuleConfig';
 import { detectAccount } from '@/entrypoints/content/shared/detect-account';
 import { Platform } from '@/shared/types/platform';
 import { trace } from '@/shared/lib/trace';
+import {
+  IconBarContextMenu,
+  IconBarGroup,
+  useIconBar,
+} from '../shared/modules/icon-bar';
 
 export const OverlayPanel = ({ className }: { className?: string }) => {
   const moduleConfig = useModuleConfig();
@@ -44,7 +49,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
   const { path } = useUrl();
 
   const [, setContainer] = useState<HTMLDivElement | null>(null);
-  const shortcuts = useSettingsStore((state) => state.shortcuts);
+  const { visible: visibleIcons } = useIconBar();
   const compactMode = useSettingsStore((state) => state.compactMode);
   const {
     fetchData,
@@ -164,7 +169,157 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
     return <OverlayToggle onToggle={() => setOverlayOpen(true)} />;
   }
 
-
+  /**
+   * Every button the rail can hold, keyed by the ids in the icon-bar registry.
+   * Which of them show, and in what order, is the registry's and the user's
+   * business; this map only says what each one is and does.
+   */
+  const iconNodes: Record<string, React.ReactNode> = {
+    files: (
+      <SimpleTooltip content={t('tabs.files')}>
+        <Button
+          variant={activeTab === 'files' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('files')}
+          className="sidebar-btn transition-all"
+        >
+          <Files className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    search: (
+      <SimpleTooltip content={t('tabs.search')}>
+        <Button
+          variant={activeTab === 'search' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('search')}
+          className="sidebar-btn transition-all"
+        >
+          <Search className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    prompts: (
+      <SimpleTooltip content={t('tabs.prompts')}>
+        <Button
+          variant={activeTab === 'prompts' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('prompts')}
+          className="sidebar-btn transition-all"
+        >
+          <UIcon icon="tabler:blockquote" className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    favorites: (
+      <SimpleTooltip content={t('tabs.favorites')}>
+        <Button
+          variant={activeTab === 'favorites' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('favorites')}
+          className="sidebar-btn transition-all"
+        >
+          <Star className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    snippets: (
+      <SimpleTooltip content={t('tabs.snippets')}>
+        <Button
+          variant={activeTab === 'snippets' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('snippets')}
+          className="sidebar-btn transition-all"
+        >
+          <ScrollText className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    tags: (
+      <SimpleTooltip content={t('tabs.tags')}>
+        <Button
+          variant={activeTab === 'tags' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('tags')}
+          className="sidebar-btn transition-all"
+        >
+          <Tag className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    images: (
+      <SimpleTooltip content={t('shortcuts.images')}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => handleNavigation('/images')}
+          className="sidebar-btn transition-all"
+        >
+          <Image className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    apps: (
+      <SimpleTooltip content={t('shortcuts.apps')}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => handleNavigation('/apps')}
+          className="sidebar-btn transition-all"
+        >
+          <LayoutGrid className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    codex: (
+      <SimpleTooltip content={t('shortcuts.codex')}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => handleExternalLink('https://chatgpt.com/codex')}
+          className="sidebar-btn transition-all"
+        >
+          <Code2 className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    originalUI: (
+      <SimpleTooltip content={t('shortcuts.originalUI')}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setOverlayOpen(false)}
+          className="sidebar-btn transition-all"
+        >
+          <LogOut className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    feedback: (
+      <SimpleTooltip content={t('tabs.feedback')}>
+        <Button
+          variant={activeTab === 'feedback' ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('feedback')}
+          className="sidebar-btn transition-all"
+        >
+          <MessageSquare className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+    settings: (
+      <SimpleTooltip content={t('tabs.settings')}>
+        <Button
+          variant={isSettingsOpen ? 'secondary' : 'ghost'}
+          size="icon"
+          onClick={() => handleTabChange('settings')}
+          className="sidebar-btn transition-all"
+        >
+          <Settings className="sidebar-icon" />
+        </Button>
+      </SimpleTooltip>
+    ),
+  };
 
   return (
     <div
@@ -172,153 +327,22 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
       className={`flex bg-background text-foreground ${className || 'h-full'} relative`}
     >
       {/* Sidebar Tabs */}
-      <div
-        className={`sidebar-nav flex flex-col items-center bg-muted/20 shrink-0 ${
-          compactMode ? 'hidden' : ''
-        }`}
-      >
-        <SimpleTooltip content={t('tabs.files')}>
-          <Button
-            variant={activeTab === 'files' ? 'secondary' : 'ghost'}
-            size="icon"
-            onClick={() => handleTabChange('files')}
-            className="sidebar-btn transition-all"
-          >
-            <Files className="sidebar-icon" />
-          </Button>
-        </SimpleTooltip>
-        <SimpleTooltip content={t('tabs.search')}>
-          <Button
-            variant={activeTab === 'search' ? 'secondary' : 'ghost'}
-            size="icon"
-            onClick={() => handleTabChange('search')}
-            className="sidebar-btn transition-all"
-          >
-            <Search className="sidebar-icon" />
-          </Button>
-        </SimpleTooltip>
-        <SimpleTooltip content={t('tabs.prompts')}>
-          <Button
-            variant={activeTab === 'prompts' ? 'secondary' : 'ghost'}
-            size="icon"
-            onClick={() => handleTabChange('prompts')}
-            className="sidebar-btn transition-all"
-          >
-            <UIcon icon="tabler:blockquote" className="sidebar-icon" />
-          </Button>
-        </SimpleTooltip>
-        {shortcuts?.favorites && (
-          <SimpleTooltip content={t('tabs.favorites')}>
-            <Button
-              variant={activeTab === 'favorites' ? 'secondary' : 'ghost'}
-              size="icon"
-              onClick={() => handleTabChange('favorites')}
-              className="sidebar-btn transition-all"
-            >
-              <Star className="sidebar-icon" />
-            </Button>
-          </SimpleTooltip>
-        )}
-        <SimpleTooltip content={t('tabs.snippets')}>
-          <Button
-            variant={activeTab === 'snippets' ? 'secondary' : 'ghost'}
-            size="icon"
-            onClick={() => handleTabChange('snippets')}
-            className="sidebar-btn transition-all"
-          >
-            <ScrollText className="sidebar-icon" />
-          </Button>
-        </SimpleTooltip>
-        <SimpleTooltip content={t('tabs.tags')}>
-          <Button
-            variant={activeTab === 'tags' ? 'secondary' : 'ghost'}
-            size="icon"
-            onClick={() => handleTabChange('tags')}
-            className="sidebar-btn transition-all"
-          >
-            <Tag className="sidebar-icon" />
-          </Button>
-        </SimpleTooltip>
+      <IconBarContextMenu>
+        <div
+          className={`sidebar-nav flex flex-col items-center bg-muted/20 shrink-0 ${
+            compactMode ? 'hidden' : ''
+          }`}
+        >
+          <IconBarGroup ids={visibleIcons.main} nodes={iconNodes} />
+          {!!visibleIcons.links?.length && <div className="h-2" />}
 
-        {(shortcuts?.images || shortcuts?.apps || shortcuts?.codex) && (
-          <div className="h-2" />
-        )}
+          <IconBarGroup ids={visibleIcons.links} nodes={iconNodes} />
 
-        {shortcuts?.images && (
-          <SimpleTooltip content={t('shortcuts.images')}>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleNavigation('/images')}
-              className="sidebar-btn transition-all"
-            >
-              <Image className="sidebar-icon" />
-            </Button>
-          </SimpleTooltip>
-        )}
+          <div className="flex-1" />
 
-        {shortcuts?.apps && (
-          <SimpleTooltip content={t('shortcuts.apps')}>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleNavigation('/apps')}
-              className="sidebar-btn transition-all"
-            >
-              <LayoutGrid className="sidebar-icon" />
-            </Button>
-          </SimpleTooltip>
-        )}
-
-        {shortcuts?.codex && (
-          <SimpleTooltip content={t('shortcuts.codex')}>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleExternalLink('https://chatgpt.com/codex')}
-              className="sidebar-btn transition-all"
-            >
-              <Code2 className="sidebar-icon" />
-            </Button>
-          </SimpleTooltip>
-        )}
-
-        <div className="flex-1" />
-
-        {shortcuts?.originalUI && (
-          <SimpleTooltip content={t('shortcuts.originalUI')}>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setOverlayOpen(false)}
-              className="sidebar-btn transition-all"
-            >
-              <LogOut className="sidebar-icon" />
-            </Button>
-          </SimpleTooltip>
-        )}
-
-        <SimpleTooltip content={t('tabs.feedback')}>
-          <Button
-            variant={activeTab === 'feedback' ? 'secondary' : 'ghost'}
-            size="icon"
-            onClick={() => handleTabChange('feedback')}
-            className="sidebar-btn transition-all"
-          >
-            <MessageSquare className="sidebar-icon" />
-          </Button>
-        </SimpleTooltip>
-        <SimpleTooltip content={t('tabs.settings')}>
-          <Button
-            variant={isSettingsOpen ? 'secondary' : 'ghost'}
-            size="icon"
-            onClick={() => handleTabChange('settings')}
-            className="sidebar-btn transition-all"
-          >
-            <Settings className="sidebar-icon" />
-          </Button>
-        </SimpleTooltip>
-      </div>
+          <IconBarGroup ids={visibleIcons.bottom} nodes={iconNodes} />
+        </div>
+      </IconBarContextMenu>
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">

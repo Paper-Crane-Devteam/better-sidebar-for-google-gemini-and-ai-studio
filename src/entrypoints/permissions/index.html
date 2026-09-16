@@ -1,9 +1,30 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="theme-gemini">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Grant Permission</title>
+    <!--
+      Pre-paint shell. `.theme-gemini` is what defines the design tokens, so it
+      has to be on <html> from the very first frame. `.theme-ready` is added by
+      the app once the real theme is resolved, which switches off the OS-level
+      dark fallback below.
+    -->
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: rgb(var(--background));
+        color: rgb(var(--foreground));
+      }
+      @media (prefers-color-scheme: dark) {
+        html:not(.theme-ready) {
+          --background: 3 3 3;
+          --foreground: 227 227 227;
+        }
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
