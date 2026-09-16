@@ -3,14 +3,17 @@ import debounce from 'lodash/debounce';
 import { browser } from 'wxt/browser';
 
 /**
- * Shortest query worth a database round-trip. One or two characters match almost
- * everything, and below three the repo falls back to a `LIKE '%x%'` table scan.
+ * Shortest query worth a database round-trip.
+ *
+ * Two, not three: a two-character CJK word is an ordinary search, and the Search
+ * tab answers it (below three characters the repo swaps FTS for `LIKE '%x%'`). Any
+ * higher floor here and the palette silently finds nothing for queries that work
+ * fine one tab over. A single character is left out — it scans the whole table to
+ * match almost every message, on every keystroke.
  */
-const MIN_QUERY_LENGTH = 3;
+const MIN_QUERY_LENGTH = 2;
 /** Typing pause before the query is sent. Roughly one keystroke's worth. */
 const DEBOUNCE_MS = 180;
-/** Raw rows kept from a response, before the per-chat dedupe upstream. */
-const HIT_LIMIT = 80;
 
 /** A message row as `messageRepo.search` returns it, narrowed to what we render. */
 export interface MessageHit {
@@ -63,10 +66,11 @@ export function useMessageSearch(query: string): MessageSearchState {
             payload: { query: q, options: {} },
           });
           if (requestId !== latestRequest.current) return;
-          setResult({
-            query: q,
-            hits: response?.success ? (response.data ?? []).slice(0, HIT_LIMIT) : [],
-          });
+          // Every row is kept. The response is already capped by the repo, and
+          // trimming it here would cut before the per-chat dedupe upstream: rows
+          // arrive newest-first, so a burst of hits inside one busy chat would
+          // push every other chat out of the list entirely.
+          setResult({ query: q, hits: response?.success ? (response.data ?? []) : [] });
         } catch (e) {
           if (requestId !== latestRequest.current) return;
           console.error('Better Sidebar: command palette message search failed', e);

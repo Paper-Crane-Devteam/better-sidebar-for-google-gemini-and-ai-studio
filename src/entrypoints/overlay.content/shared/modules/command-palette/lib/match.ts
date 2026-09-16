@@ -1,10 +1,14 @@
 /**
  * Scoring for the command palette's single search box.
  *
- * Kept deliberately small: substring first, subsequence as a fallback. A real
- * fuzzy library would buy little here — the haystacks are chat titles and a
- * fixed list of commands, and CJK titles have no word boundaries for a
- * camel-case/initialism scorer to exploit anyway.
+ * Substring only, deliberately. An earlier version fell back to subsequence
+ * matching — every query character present in order, gaps allowed — which sounds
+ * generous and behaves like a broken filter:
+ *
+ * - CJK titles have no word boundaries, so a two-character query matches almost
+ *   any title long enough to contain both characters somewhere.
+ * - Every row is highlighted now, and a subsequence hit highlights nothing. A row
+ *   with no visible reason for being in the list is worse than a missing row.
  *
  * Higher score = better match. `null` means "no match at all".
  */
@@ -13,28 +17,14 @@ export function scoreMatch(text: string, query: string): number | null {
   if (!text) return null;
 
   const haystack = text.toLowerCase();
-  const needle = query.toLowerCase();
-
-  const index = haystack.indexOf(needle);
+  const index = haystack.indexOf(query.toLowerCase());
+  if (index === -1) return null;
   if (index === 0) return 1000 - Math.min(haystack.length, 200);
-  if (index > 0) {
-    // Matching right after a separator reads as a word start, which is a
-    // stronger signal than landing in the middle of one.
-    const prev = haystack[index - 1];
-    const atWordStart = /[\s\-_/·,.:;([{"'|]/.test(prev);
-    return (atWordStart ? 700 : 500) - Math.min(index, 200);
-  }
 
-  // Subsequence: every query character appears in order, gaps allowed.
-  let cursor = 0;
-  let gaps = 0;
-  for (const char of needle) {
-    const found = haystack.indexOf(char, cursor);
-    if (found === -1) return null;
-    gaps += found - cursor;
-    cursor = found + 1;
-  }
-  return Math.max(1, 200 - gaps);
+  // Matching right after a separator reads as a word start, which is a stronger
+  // signal than landing in the middle of one.
+  const atWordStart = /[\s\-_/·,.:;([{"'|]/.test(haystack[index - 1]);
+  return (atWordStart ? 700 : 500) - Math.min(index, 200);
 }
 
 /**

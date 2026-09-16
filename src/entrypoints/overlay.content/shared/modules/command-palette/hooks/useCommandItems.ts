@@ -23,9 +23,9 @@ export function useCommandItems(query: string): CommandGroup[] {
   const { t } = useI18n();
   const trimmed = query.trim();
 
-  const { recentItems, titleItems, titleMatchedIds } = useConversationItems(trimmed);
+  const { recentItems, matchedItems, listedConversationIds } = useConversationItems(trimmed);
   const { hits, isSearching } = useMessageSearch(trimmed);
-  const messageItems = useMessageItems(hits, trimmed, titleMatchedIds);
+  const messageItems = useMessageItems(hits, trimmed, listedConversationIds);
   const actionItems = useActionItems();
   const settingsItems = useSettingsItems();
 
@@ -62,7 +62,7 @@ export function useCommandItems(query: string): CommandGroup[] {
       {
         id: 'conversations',
         label: t('commandPalette.groupConversations'),
-        items: titleItems,
+        items: matchedItems,
       },
       {
         id: 'messages',
@@ -86,7 +86,7 @@ export function useCommandItems(query: string): CommandGroup[] {
     return groups.filter((group) => group.items.length > 0 || group.isLoading);
   }, [
     recentItems,
-    titleItems,
+    matchedItems,
     messageItems,
     isSearching,
     actionItems,

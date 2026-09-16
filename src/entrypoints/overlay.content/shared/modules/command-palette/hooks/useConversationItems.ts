@@ -2,15 +2,21 @@ import { useMemo } from 'react';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useAppStore } from '@/shared/lib/store';
 import type { Conversation } from '@/shared/lib/store/types';
-import { scoreFields } from '../lib/match';
-import { highlightSegments } from '../lib/highlight';
+import { scoreMatch } from '../lib/match';
+import { buildSnippet, highlightSegments } from '../lib/highlight';
 import { openChat } from '../lib/navigate';
-import type { CommandItem } from '../types';
+import type { CommandItem, HighlightSegment } from '../types';
 
 /** How many chats the palette offers before the user types anything. */
 const RECENT_LIMIT = 5;
-/** Cap on title-matched chat rows once a query narrows things down. */
+/** Cap on matched chat rows once a query narrows things down. */
 const CONVERSATION_LIMIT = 12;
+
+/**
+ * Relative worth of a hit per field. A title hit is what the user meant; a tag
+ * hit is a hint that happens to be attached to the chat.
+ */
+const WEIGHT = { title: 1, description: 0.6, tag: 0.5 } as const;
 
 /** Business timestamp if we have one, falling back to the row's mtime. */
 function activityTime(conversation: Conversation): number {
@@ -21,13 +27,13 @@ export interface ConversationItems {
   /** The "I was just here" shortlist, shown only while the query is empty. */
   recentItems: CommandItem[];
   /** Chats whose title, description or tags matched the query. */
-  titleItems: CommandItem[];
+  matchedItems: CommandItem[];
   /**
-   * Ids covered by `titleItems`. Message hits for these chats are suppressed:
-   * a title match already answers the query, and a body excerpt underneath it
-   * would just be a second, weaker reason for a row that is already there.
+   * Ids covered by `matchedItems`. Message hits for these chats are suppressed:
+   * the chat is already in the list with a visible reason, and repeating it lower
+   * down with a body excerpt reads like a duplicate.
    */
-  titleMatchedIds: Set<string>;
+  listedConversationIds: Set<string>;
 }
 
 /**
@@ -49,15 +55,19 @@ export function useConversationItems(query: string): ConversationItems {
     return map;
   }, [folders]);
 
-  /** conversation id → its tag names, joined for search and display. */
+  /**
+   * conversation id → its tag names. Kept as a list rather than one joined
+   * string so a row can name the tag it matched on.
+   */
   const tagNamesByConversation = useMemo(() => {
     const tagNameById = new Map(tags.map((tag) => [tag.id, tag.name]));
-    const map = new Map<string, string>();
+    const map = new Map<string, string[]>();
     for (const link of conversationTags) {
       const name = tagNameById.get(link.tag_id);
       if (!name) continue;
       const existing = map.get(link.conversation_id);
-      map.set(link.conversation_id, existing ? `${existing} ${name}` : name);
+      if (existing) existing.push(name);
+      else map.set(link.conversation_id, [name]);
     }
     return map;
   }, [tags, conversationTags]);
@@ -79,7 +89,7 @@ export function useConversationItems(query: string): ConversationItems {
       meta: conversation.folder_id
         ? (folderNameById.get(conversation.folder_id) ?? null)
         : null,
-      keywords: tagNamesByConversation.get(conversation.id) ?? null,
+      keywords: tagNamesByConversation.get(conversation.id)?.join(' ') ?? null,
       run: () =>
         openChat({
           id: conversation.id,
@@ -90,44 +100,59 @@ export function useConversationItems(query: string): ConversationItems {
     }));
   }, [sortedConversations, query, folderNameById, tagNamesByConversation, t]);
 
-  const { titleItems, titleMatchedIds } = useMemo(() => {
-    if (!query) return { titleItems: [], titleMatchedIds: new Set<string>() };
+  const { matchedItems, listedConversationIds } = useMemo(() => {
+    if (!query) return { matchedItems: [], listedConversationIds: new Set<string>() };
 
-    const scored: { item: CommandItem; score: number }[] = [];
-    const matchedIds = new Set<string>();
+    const scored: { id: string; item: CommandItem; score: number }[] = [];
 
     for (const conversation of sortedConversations) {
-      const score = scoreFields(
-        [
-          { text: conversation.title, weight: 1 },
-          { text: conversation.description, weight: 0.6 },
-          { text: tagNamesByConversation.get(conversation.id), weight: 0.5 },
-        ],
-        query,
-      );
-      if (score === null) continue;
-
-      // Every scored chat suppresses its message rows, not just the ones that
-      // survive the cap: a chat pushed off the title list reappearing lower down
-      // as a message hit reads like a duplicate.
-      matchedIds.add(conversation.id);
-
       const label = conversation.title || t('common.untitled');
+      const tagNames = tagNamesByConversation.get(conversation.id) ?? [];
+
+      // Scored per field rather than "best of all fields", because the row has to
+      // say *which* field matched — a title with no highlight and no second line
+      // is a result the user cannot account for.
+      const titleScore = scoreMatch(label, query);
+      const descriptionScore = conversation.description
+        ? scoreMatch(conversation.description, query)
+        : null;
+      const matchedTag = tagNames.find((name) => scoreMatch(name, query) !== null);
+      const tagScore = matchedTag ? scoreMatch(matchedTag, query) : null;
+
+      const score = Math.max(
+        titleScore === null ? -1 : titleScore * WEIGHT.title,
+        descriptionScore === null ? -1 : descriptionScore * WEIGHT.description,
+        tagScore === null ? -1 : tagScore * WEIGHT.tag,
+      );
+      if (score < 0) continue;
+
+      /**
+       * The match's evidence. A title hit needs none beyond its own highlight;
+       * anything else has to be shown, or the row looks arbitrary.
+       */
+      let snippet: HighlightSegment[] | null = null;
+      if (titleScore === null) {
+        if (descriptionScore !== null) {
+          snippet = buildSnippet(conversation.description ?? '', query);
+        } else if (matchedTag) {
+          snippet = highlightSegments(`#${matchedTag}`, query);
+        }
+      }
+
       scored.push({
         score,
+        id: conversation.id,
         item: {
           id: `conversations:${conversation.id}`,
           group: 'conversations',
           icon: null,
           label,
-          labelSegments: highlightSegments(label, query),
-          // Deliberately no description: the title is the whole reason this row
-          // is here, and a second line would compete with the message rows below
-          // where a second line actually carries the match.
+          labelSegments: titleScore === null ? null : highlightSegments(label, query),
+          snippet,
           meta: conversation.folder_id
             ? (folderNameById.get(conversation.folder_id) ?? null)
             : null,
-          keywords: tagNamesByConversation.get(conversation.id) ?? null,
+          keywords: tagNames.join(' ') || null,
           run: () =>
             openChat({
               id: conversation.id,
@@ -142,12 +167,16 @@ export function useConversationItems(query: string): ConversationItems {
     // Recency is already the array order, so a stable sort on score alone keeps
     // "most recent wins" as the tiebreaker between equally good matches.
     scored.sort((a, b) => b.score - a.score);
+    const shown = scored.slice(0, CONVERSATION_LIMIT);
 
     return {
-      titleItems: scored.slice(0, CONVERSATION_LIMIT).map((entry) => entry.item),
-      titleMatchedIds: matchedIds,
+      matchedItems: shown.map((entry) => entry.item),
+      // Only the rows that actually made the cut suppress their message hits.
+      // Suppressing every scored chat would make one pushed off by the cap vanish
+      // from the palette twice over.
+      listedConversationIds: new Set(shown.map((entry) => entry.id)),
     };
   }, [sortedConversations, query, folderNameById, tagNamesByConversation, t]);
 
-  return { recentItems, titleItems, titleMatchedIds };
+  return { recentItems, matchedItems, listedConversationIds };
 }
