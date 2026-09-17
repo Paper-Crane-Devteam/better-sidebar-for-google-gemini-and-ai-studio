@@ -1344,7 +1344,7 @@
       "autoContinue": "Continuar por su cuenta",
       "autoContinueHint": "Si está desactivado, tendrás que pulsar Enter en cada paso",
       "sendHint": "Un paso que apruebas sigue esperando a que pulses Enter; solo los pasos sin supervisión se envían solos.",
-      "browserFixed": "Leer tus pestañas y marcadores nunca requiere aprobación. Todo cambio sí, de un lote a la vez, y eso no se puede desactivar."
+      "browserFixed": "La lectura de pestañas y marcadores no requiere confirmación. Por seguridad, todas las modificaciones deben aprobarse por lotes; esta protección no se puede desactivar."
     },
     "approve": {
       "readTitle": "¿Aprobar esta consulta?",
@@ -1626,14 +1626,17 @@
     "agents": {
       "bettersidebar": {
         "name": "Better Sidebar",
+        "shortName": "Sidebar",
         "description": "Organiza conversaciones, carpetas, etiquetas, prompts y fragmentos"
       },
       "workspace": {
         "name": "Espacio de trabajo",
+        "shortName": "Espacio",
         "description": "Lee, escribe y edita archivos y documentos de tu espacio de trabajo"
       },
       "browser": {
         "name": "Browser Agent",
+        "shortName": "Navegador",
         "description": "Organiza pestañas, grupos de pestañas y marcadores de Chrome"
       }
     },
@@ -1644,7 +1647,7 @@
       "title": "Deja que la IA ordene tus pestañas y marcadores",
       "about": "Acerca del Browser Agent",
       "howToUseTitle": "Cómo usar el Browser Agent",
-      "howToUseContent": "El Browser Agent trabaja sobre tus ventanas de Chrome: pestañas abiertas, grupos de pestañas y marcadores. Ve títulos y direcciones, no el contenido de las páginas.\n\nCómo usarlo:\nEscribe >Browser Agent en el chat y describe lo que quieres ordenar: por ejemplo «agrupa estas pestañas por tema y colapsa las que no estoy usando» o «archiva los marcadores sueltos en carpetas».\n\nQué puede hacer:\n- Pestañas: abrir, cambiar de pestaña, reordenar, mover entre ventanas, fijar.\n- Grupos de pestañas: crear, renombrar, cambiar de color, colapsar, deshacer.\n- Marcadores: crear carpetas, renombrar y mover cosas entre ellas.\n- Cerrar pestañas y eliminar marcadores son permisos aparte, desactivados hasta que los actives.\n\nCómo funciona la aprobación:\nLeer no requiere confirmación. Cada cambio se te muestra primero con las pestañas o los marcadores reales a los que afectaría, y solo se aplica cuando apruebas ese lote concreto. Ninguna opción se salta este paso. Todo lo que hace queda registrado en este equipo, y casi todo se puede deshacer desde este panel.\n\n💡 Consejo: «ordena mis pestañas» nunca significa cerrarlas. Si quieres eliminar algo, dilo; de lo contrario las reunirá en un grupo o una carpeta y te dejará la decisión."
+      "howToUseContent": "Browser Agent gestiona tus ventanas de Chrome: pestañas abiertas, grupos de pestañas y marcadores. Por privacidad, solo ve títulos y direcciones URL, nunca el contenido de las páginas.\n\nCómo usarlo:\nEscribe >Browser Agent en el chat y describe lo que quieres organizar, por ejemplo: «agrupa estas pestañas por tema y colapsa las que no estoy usando» o «guarda esta ventana en marcadores y organízalos en carpetas».\n\nQué puede hacer:\n- Pestañas: abrir nuevas pestañas, cambiar, reordenar, mover entre ventanas y fijar.\n- Grupos de pestañas: crear, renombrar, cambiar color, colapsar y disolver.\n- Marcadores: guardar páginas como marcadores, crear carpetas, renombrar y mover entre carpetas.\n- Cerrar pestañas y eliminar marcadores son operaciones sensibles y requieren activación en la configuración.\n\nSeguridad y control:\n- Vista previa antes de aplicar: la lectura no requiere confirmación. Todo cambio muestra primero una lista detallada y solo se aplica cuando la apruebas.\n- Deshacer en cualquier momento: todo queda registrado en este equipo y se puede restaurar desde este panel.\n\n💡 Consejo: «organiza mis pestañas» nunca cerrará páginas. Si deseas eliminar algo, indícalo expresamente; de lo contrario, las agrupará en una carpeta o grupo para que tú decidas."
     },
     "browser": {
       "needsPermission": "🔒 Sin autorizar · haz clic para abrir los permisos",
@@ -1688,8 +1691,8 @@
         "unnamed": "sin nombre",
         "inFolder": "en {{name}}",
         "pinned": "fijada",
-        "lossy": "Este lote elimina elementos. Una pestaña cerrada solo se puede recuperar volviendo a abrir su URL: los formularios, la posición de desplazamiento y el estado de la página no están garantizados. Al eliminar una carpeta se elimina todo su contenido, y al restaurar marcadores se crean IDs nuevos. Se aprueba por separado cada vez; ninguna opción permite ejecutarlo sin supervisión.",
-        "warning": "Esta aprobación cubre solo las operaciones anteriores. Aquí no se cierra ni se elimina nada: para eso hay herramientas aparte con su propio permiso.",
+        "lossy": "Esta operación incluye elementos para cerrar o eliminar. Ten en cuenta que cerrar pestañas descarta datos de formularios no guardados y el estado de la página, y eliminar una carpeta borra todos los marcadores en su interior.",
+        "warning": "Esta aprobación cubre únicamente las operaciones anteriores. Aquí no se cierra ni se elimina nada (esas acciones requieren permisos independientes).",
         "untouched": "{{count}} objetos más no se modifican"
       },
       "op": {
@@ -1727,7 +1730,7 @@
         "title": "Browser Agent",
         "group": {
           "organize": "Organizar",
-          "organizeNote": "Reordenar, fijar, agrupar y renombrar pestañas y marcadores.",
+          "organizeNote": "Permite crear marcadores y carpetas, reordenar, fijar, agrupar y renombrar pestañas y marcadores.",
           "remove": "Eliminar",
           "removeNote": "Cerrar pestañas y quitar marcadores."
         },
@@ -1755,7 +1758,7 @@
         "extra": "{{count}} elementos abiertos o añadidos desde entonces se conservan como están. No se cierra ni elimina nada.",
         "additive": "No se cierra ni se elimina nada. Todo lo más reciente se conserva.",
         "hostGroup": "Esta pestaña es la que ejecuta el agente, así que nunca se mueve dentro ni fuera de un grupo de pestañas. Su grupo se mantiene tal cual; el resto del estado se restaura a su alrededor.",
-        "note": "Una página reabierta vuelve solo a su dirección: las entradas de formularios, la posición de desplazamiento y el estado de la página no se restauran. Un marcador vuelto a añadir es una copia nueva."
+        "note": "Nota: Una página reabierta solo recupera su dirección URL; no se restauran datos de formularios, posición ni estado de la página."
       },
       "examples": {
         "group": {
@@ -1764,7 +1767,7 @@
         },
         "duplicates": {
           "label": "Buscar duplicados",
-          "text": "Busca las pestañas que tengo abiertas más de una vez. Considera dos direcciones como la misma página solo si la consulta y el fragmento también coinciden. Lístalas agrupadas por página, las más antiguas primero, y dime cuántas recuperaría; no las cierres todavía."
+          "text": "Encuentra las pestañas duplicadas (solo si la URL completa coincide). Agrúpalas por página, ordenando las más antiguas primero, y dime cuántas pestañas se liberarían; no las cierres todavía."
         },
         "stash": {
           "label": "Guardar pestañas en marcadores",
@@ -1784,11 +1787,11 @@
         },
         "dedupe": {
           "label": "Cerrar las duplicadas",
-          "text": "Tengo las mismas páginas abiertas varias veces. Cierra las duplicadas y quédate con una de cada una: la copia fijada o agrupada si existe, y si no, la más antigua. Dos direcciones solo cuentan como la misma página si también coinciden la consulta y el fragmento. Muéstrame exactamente qué pestaña conservas y cuáles se van antes de cerrar nada, y haz lo mismo con mis marcadores si el mismo enlace está guardado en más de una carpeta."
+          "text": "Tengo las mismas páginas abiertas varias veces. Cierra las duplicadas y conserva una de cada una (la copia fijada o agrupada si existe, o la más antigua). Solo se consideran iguales si la URL completa coincide. Haz lo mismo con mis marcadores si el mismo enlace está guardado en varias carpetas."
         },
         "deadLinks": {
           "label": "Buscar marcadores rotos",
-          "text": "Revisa los marcadores de mi carpeta Leer más tarde y decide cuáles vale la pena conservar. Abre tú mismo los enlaces cuando el título no diga lo suficiente y señala los que ya no existen: error 404, dominio aparcado o redirección a una página de inicio. Cuéntame lo que encontraste en cada caso con una línea de explicación y elimina solo los que yo confirme."
+          "text": "Revisa los marcadores de mi carpeta «Leer más tarde» para comprobar su validez. Abre los enlaces donde el título no sea claro y señala los rotos (404, dominios caducados o redirecciones inesperadas). Indica el motivo de cada uno y elimina solo los que yo confirme."
         }
       },
       "phrasesTitle": "O simplemente pide",

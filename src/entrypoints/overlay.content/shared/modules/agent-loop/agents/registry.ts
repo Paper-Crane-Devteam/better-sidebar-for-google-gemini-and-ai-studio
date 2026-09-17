@@ -61,6 +61,7 @@ export const AGENTS: AgentDefinition[] = [
   {
     id: 'bettersidebar',
     name: 'Better Sidebar',
+    shortName: 'Sidebar',
     description: 'Organize conversations, folders, tags, prompts and snippets',
     icon: 'Bot',
     mcpServerIds: [BUILTIN_MCP_ID],
@@ -70,6 +71,7 @@ export const AGENTS: AgentDefinition[] = [
   {
     id: 'workspace',
     name: 'Workspace',
+    shortName: 'Workspace',
     description: 'Read, write and edit files and documents in your workspace',
     icon: 'FolderOpen',
     mcpServerIds: [WORKSPACE_MCP_ID, DOCUMENT_MCP_ID],
@@ -82,6 +84,7 @@ export const AGENTS: AgentDefinition[] = [
         {
           id: 'browser' as const,
           name: 'Browser Agent',
+          shortName: 'Browser',
           description: 'Organize Chrome tabs, tab groups and bookmarks',
           icon: 'Globe',
           mcpServerIds: [BROWSER_MCP_ID],
@@ -141,6 +144,9 @@ export function localizedAgent(agent: AgentDefinition): AgentDefinition {
   return {
     ...agent,
     name: i18n.t(`agent.agents.${agent.id}.name`, { defaultValue: agent.name }),
+    shortName: i18n.t(`agent.agents.${agent.id}.shortName`, {
+      defaultValue: agent.shortName ?? agent.name,
+    }),
     description: i18n.t(`agent.agents.${agent.id}.description`, {
       defaultValue: agent.description,
     }),

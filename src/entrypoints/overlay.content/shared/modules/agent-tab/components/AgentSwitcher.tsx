@@ -1,14 +1,13 @@
 /**
  * AgentSwitcher — which agent the Agent tab is showing.
  *
- * A segmented control rather than a dropdown: there are two agents, both fit, and the point
- * is that the user can see the other one exists. A dropdown would hide the Workspace agent
- * behind a click for everyone who never thinks to look.
+ * An accordion segmented control: the active agent smoothly expands to display its icon and
+ * label, while inactive agents collapse into clean icon buttons with rich tooltips. This solves
+ * the cramped width constraint in narrow sidebars while preserving instant discoverability
+ * across all agents.
  *
- * ⚠️ **Switching here does not switch a running session.** An agent is fixed for the life of
- * a session — the prompt was built from it and the tool layer enforces its permissions — so
- * while a task is live this only changes what the panel *shows*. The running agent's row is
- * marked so that difference is visible rather than surprising.
+ * ⚠️ Switching here changes the panel, not a running session. A running agent is indicated
+ * with a spinning indicator even when unselected.
  */
 
 import React from 'react';
@@ -41,7 +40,7 @@ export const AgentSwitcher: React.FC<AgentSwitcherProps> = ({ selected, onSelect
 
   return (
     <div
-      className="flex gap-1 rounded-lg bg-muted/50 p-1"
+      className="flex items-center gap-1 rounded-lg bg-muted/50 p-1"
       role="tablist"
       aria-label={t('agent.switcher.label', { defaultValue: 'Choose an agent' })}
     >
@@ -49,31 +48,47 @@ export const AgentSwitcher: React.FC<AgentSwitcherProps> = ({ selected, onSelect
         const Icon = ICONS[agent.icon] ?? Bot;
         const isSelected = agent.id === selected;
         const isRunning = running && agent.id === runningAgentId;
+        const displayName = agent.shortName ?? agent.name;
 
-        return (
+        const button = (
           <button
             key={agent.id}
             type="button"
             role="tab"
             aria-selected={isSelected}
-            title={agent.description}
             onClick={() => onSelect(agent.id)}
             className={cn(
-              'flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-1.5',
-              'text-xs font-medium transition-colors',
+              'group relative flex h-7 items-center justify-center rounded-md transition-all duration-200 ease-out',
               isSelected
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground',
+                ? 'flex-1 min-w-0 bg-background px-2.5 shadow-sm text-foreground gap-1.5 font-medium'
+                : 'w-8 shrink-0 text-muted-foreground hover:bg-background/40 hover:text-foreground',
             )}
           >
-            <Icon className="h-3.5 w-3.5 shrink-0" />
-            <span className="truncate">{agent.name}</span>
-            {/* Only on the row that is actually working, and only while it is. */}
-            {isRunning && (
-              <Loader2 className="h-3 w-3 shrink-0 animate-spin text-primary" />
+            <Icon className="h-3.5 w-3.5 shrink-0 transition-transform duration-150 group-hover:scale-105" />
+
+            {/* Label and inline spinner for the selected tab */}
+            {isSelected && (
+              <>
+                <span className="truncate text-xs animate-in fade-in-0 duration-150">
+                  {displayName}
+                </span>
+                {isRunning && (
+                  <Loader2 className="h-3 w-3 shrink-0 animate-spin text-primary ml-0.5 animate-in fade-in-0 duration-150" />
+                )}
+              </>
+            )}
+
+            {/* Pulsing indicator for an unselected agent actively running in the background */}
+            {!isSelected && isRunning && (
+              <span className="absolute top-1 right-1 flex h-1.5 w-1.5 pointer-events-none">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
+              </span>
             )}
           </button>
         );
+
+        return button;
       })}
     </div>
   );

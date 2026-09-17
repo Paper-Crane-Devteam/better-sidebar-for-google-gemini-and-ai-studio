@@ -36,6 +36,8 @@ export interface AgentDefinition {
   id: AgentId;
   /** English default. UI resolves `agent.agents.<id>.name` over the top. */
   name: string;
+  /** Short name for compact spaces like the tab switcher. Defaults to `name`. */
+  shortName?: string;
   /** One line, shown under the name in the `>` list and the Agent tab. */
   description: string;
   /** lucide-react icon name. */

@@ -1344,7 +1344,7 @@
       "autoContinue": "Seguir sozinho",
       "autoContinueHint": "Se estiver desligado, você precisa pressionar Enter em cada etapa",
       "sendHint": "Uma etapa que você aprova ainda espera você pressionar Enter — só as etapas sem supervisão se enviam sozinhas.",
-      "browserFixed": "Ler suas abas e favoritos nunca precisa de aprovação. Toda alteração precisa, um lote por vez — e isso não pode ser desligado."
+      "browserFixed": "Ler suas abas e favoritos não requer aprovação. Para proteger seus dados, todas as alterações exigem sua confirmação por lote — essa proteção não pode ser desativada."
     },
     "approve": {
       "readTitle": "Aprovar esta consulta?",
@@ -1626,14 +1626,17 @@
     "agents": {
       "bettersidebar": {
         "name": "Better Sidebar",
+        "shortName": "Sidebar",
         "description": "Organize conversas, pastas, tags, prompts e snippets"
       },
       "workspace": {
         "name": "Espaço de trabalho",
+        "shortName": "Espaço",
         "description": "Leia, escreva e edite arquivos e documentos do seu espaço de trabalho"
       },
       "browser": {
         "name": "Browser Agent",
+        "shortName": "Navegador",
         "description": "Organiza abas, grupos de abas e favoritos do Chrome"
       }
     },
@@ -1644,7 +1647,7 @@
       "title": "Deixe a IA organizar suas abas e favoritos",
       "about": "Sobre o Browser Agent",
       "howToUseTitle": "Como usar o Browser Agent",
-      "howToUseContent": "O Browser Agent trabalha nas suas janelas do Chrome: abas abertas, grupos de abas e favoritos. Ele vê títulos e endereços, não o conteúdo das páginas.\n\nComo usar:\nDigite >Browser Agent no chat e descreva o que quer organizar — por exemplo «agrupe estas abas por tema e recolha as que não estou usando» ou «guarde os favoritos soltos em pastas».\n\nO que ele pode fazer:\n- Abas: abrir, alternar, reordenar, mover entre janelas, fixar.\n- Grupos de abas: criar, renomear, mudar a cor, recolher, desfazer.\n- Favoritos: criar pastas, renomear e mover itens entre elas.\n- Fechar abas e excluir favoritos são permissões separadas, desligadas até você ativá-las.\n\nComo funciona a aprovação:\nLeitura não pede confirmação. Toda alteração é mostrada antes, com as abas ou os favoritos reais que seriam afetados, e só é aplicada depois que você aprova aquele lote específico. Nenhuma configuração pula essa etapa. Tudo o que ele faz fica registrado nesta máquina, e a maior parte pode ser desfeita neste painel.\n\n💡 Dica: «organize minhas abas» nunca significa fechá-las. Se quiser remover algo, diga — caso contrário ele vai reuni-las em um grupo ou uma pasta e deixar a decisão com você."
+      "howToUseContent": "O Browser Agent gerencia as janelas do seu Chrome: abas abertas, grupos de abas e favoritos. Para proteger sua privacidade, ele só vê títulos e URLs, nunca o conteúdo das páginas.\n\nComo usar:\nDigite >Browser Agent no chat e descreva o que deseja organizar, por exemplo: «agrupe estas abas por assunto e recolha as que não estou usando» ou «salve esta janela nos favoritos e organize em pastas».\n\nO que ele pode fazer:\n- Abas: abrir novas abas, alternar, reordenar, mover entre janelas e fixar.\n- Grupos de abas: criar, renomear, mudar cor, recolher e dissolver.\n- Favoritos: salvar páginas como favoritos, criar pastas, renomear e mover entre pastas.\n- Fechar abas e excluir favoritos são ações sensíveis que ficam desligadas até você ativá-las nas configurações.\n\nSegurança e controle:\n- Pré-visualização antes de aplicar: a leitura não requer confirmação. Qualquer alteração gera primeiro uma lista clara e só é aplicada após sua aprovação.\n- Desfaça quando quiser: tudo o que ele faz fica salvo neste computador e pode ser restaurado neste painel.\n\n💡 Dica: «organize minhas abas» nunca fechará abas. Se quiser excluir algo, diga expressamente; caso contrário, ele apenas reunirá em um grupo ou pasta para você decidir."
     },
     "browser": {
       "needsPermission": "🔒 Sem autorização · clique para abrir as permissões",
@@ -1688,8 +1691,8 @@
         "unnamed": "sem nome",
         "inFolder": "em {{name}}",
         "pinned": "fixada",
-        "lossy": "Este lote remove itens. Uma aba fechada só pode ser recuperada reabrindo a URL: formulários, posição de rolagem e estado da página não são garantidos. Excluir uma pasta exclui tudo o que está nela, e restaurar favoritos cria novos IDs. É aprovado separadamente todas as vezes; nenhuma configuração o executa sem supervisão.",
-        "warning": "Esta aprovação cobre apenas as operações acima. Nada aqui é fechado ou excluído: isso fica em ferramentas separadas, com permissão própria.",
+        "lossy": "Esta operação inclui itens para fechar ou excluir. Fechar abas descarta dados não salvos de formulários e o estado da página, e excluir uma pasta remove todos os favoritos contidos nela.",
+        "warning": "Esta aprovação cobre apenas as operações acima. Nada aqui será fechado ou excluído (ações de remoção exigem permissões separadas).",
         "untouched": "outros {{count}} objetos não foram alterados"
       },
       "op": {
@@ -1727,7 +1730,7 @@
         "title": "Browser Agent",
         "group": {
           "organize": "Organizar",
-          "organizeNote": "Reordenar, fixar, agrupar e renomear abas e favoritos.",
+          "organizeNote": "Permite criar favoritos e pastas, reordenar, fixar, agrupar e renomear abas e favoritos.",
           "remove": "Excluir",
           "removeNote": "Fechar abas e remover favoritos."
         },
@@ -1755,7 +1758,7 @@
         "extra": "{{count}} itens abertos ou adicionados desde então são mantidos como estão. Nada é fechado ou excluído.",
         "additive": "Nada é fechado ou excluído. Qualquer item mais recente é mantido.",
         "hostGroup": "Esta aba é a que executa o agente, portanto ela nunca é movida para dentro ou para fora de um grupo de abas. O grupo dela permanece exatamente como está; o restante do estado é restaurado ao redor dela.",
-        "note": "Uma página reaberta volta apenas no seu endereço: entradas de formulários, posição de rolagem e estado da página não são restaurados. Um favorito adicionado de volta é uma nova cópia."
+        "note": "Nota: Uma página reaberta recupera apenas seu endereço URL; dados de formulários, rolagem e estado da página não são restaurados."
       },
       "examples": {
         "group": {
@@ -1764,7 +1767,7 @@
         },
         "duplicates": {
           "label": "Localizar duplicatas",
-          "text": "Localize as abas que estão abertas mais de uma vez. Trate dois endereços como a mesma página apenas se a consulta e o fragmento também coincidirem. Liste-as agrupadas por página, as mais antigas primeiro, e informe quantas seriam liberadas — não as feche ainda."
+          "text": "Encontre as abas abertas mais de uma vez (apenas se a URL completa coincidir). Liste-as agrupadas por página, da mais antiga para a mais recente, e me informe quanto espaço seria liberado — não as feche ainda."
         },
         "stash": {
           "label": "Guardar abas como favoritos",
@@ -1784,11 +1787,11 @@
         },
         "dedupe": {
           "label": "Fechar as duplicadas",
-          "text": "Tenho as mesmas páginas abertas várias vezes. Feche as duplicadas e mantenha uma de cada — a cópia fixada ou agrupada, se houver; caso contrário, a mais antiga. Dois endereços só contam como a mesma página se a query e o fragmento também coincidirem. Mostre exatamente qual aba você vai manter e quais serão fechadas antes de fechar qualquer coisa, e faça o mesmo com meus favoritos se o mesmo link estiver salvo em mais de uma pasta."
+          "text": "Tenho as mesmas páginas abertas várias vezes. Feche as duplicadas e mantenha uma de cada (a cópia fixada ou agrupada, se houver, ou a mais antiga). Considere igual apenas se a URL completa for idêntica. Faça o mesmo com meus favoritos se o mesmo link estiver salvo em várias pastas."
         },
         "deadLinks": {
           "label": "Verificar favoritos quebrados",
-          "text": "Revise os favoritos da minha pasta Ler Depois e avalie quais vale a pena manter. Abra os links você mesmo quando o título não disser o suficiente e aponte os que já não existem: erro 404, domínio estacionado, redirecionamento para a página inicial. Relate o que encontrou em cada caso com uma linha de justificativa e exclua apenas os que eu confirmar."
+          "text": "Verifique a validade dos favoritos na minha pasta «Ler mais tarde». Acesse os links cujo título não seja claro e aponte os que não funcionam mais (404, domínios expirados ou redirecionamentos). Relate cada caso com um motivo breve e exclua apenas os que eu confirmar."
         }
       },
       "phrasesTitle": "Ou simplesmente peça",

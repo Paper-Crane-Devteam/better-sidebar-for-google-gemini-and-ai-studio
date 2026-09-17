@@ -1344,7 +1344,7 @@
       "autoContinue": "Keep going on its own",
       "autoContinueHint": "Off means you press Enter after every step",
       "sendHint": "Steps you approve are sent on automatically. Turn this off to press Enter yourself each time.",
-      "browserFixed": "Reading your tabs and bookmarks never needs approval. Every change does, one batch at a time — that cannot be switched off."
+      "browserFixed": "Reading tabs and bookmarks never requires approval. To protect your browser data, all modifications require your batch approval — this safety policy cannot be switched off."
     },
     "approve": {
       "readTitle": "Approve this query?",
@@ -1626,15 +1626,18 @@
     "agents": {
       "bettersidebar": {
         "name": "Better Sidebar",
+        "shortName": "Sidebar",
         "description": "Organize conversations, folders, tags, prompts and snippets"
       },
       "workspace": {
         "name": "Workspace",
+        "shortName": "Workspace",
         "description": "Read, write and edit files and documents in your workspace"
       },
       "browser": {
         "name": "Browser Agent",
-        "description": "Organize Chrome tabs, tab groups and bookmarks"
+        "shortName": "Browser",
+        "description": "Organize and manage Chrome tabs, tab groups and bookmarks"
       }
     },
     "switcher": {
@@ -1644,7 +1647,7 @@
       "title": "Let AI tidy up your tabs and bookmarks",
       "about": "About the Browser Agent",
       "howToUseTitle": "How to Use Browser Agent",
-      "howToUseContent": "Browser Agent works on your Chrome windows: open tabs, tab groups and bookmarks. It sees titles and addresses, not page contents.\n\nHow to use:\nType >Browser Agent in the chat input, then describe what you want tidied — for example \"group these tabs by topic and collapse the ones I'm not using\" or \"file the loose bookmarks into folders\".\n\nWhat it can do:\n- Tabs: open, focus, reorder, move between windows, pin.\n- Tab groups: create, rename, recolor, collapse, dissolve.\n- Bookmarks: create folders, rename, and move things between them.\n- Closing tabs and deleting bookmarks are separate permissions, off unless you turn them on.\n\nHow approval works:\nReading needs no confirmation. Every change is shown to you first as the actual tabs or bookmarks it would touch, and applied only after you approve that specific batch. There is no setting that skips this. Anything it does is recorded on this machine, and most of it can be undone from this panel.\n\n💡 Tip: \"Organize my tabs\" never means closing them. If you want things gone, say so — otherwise it will gather them into a group or a folder and leave the decision to you."
+      "howToUseContent": "Browser Agent works on your Chrome windows: open tabs, tab groups and bookmarks. It sees titles and addresses, not page contents.\n\nHow to use:\nType >Browser Agent in the chat input, then describe what you want organized — for example \"group these tabs by topic and collapse the ones I am not using\" or \"bookmark this window and organize loose bookmarks into folders\".\n\nWhat it can do:\n- Tabs: open new tabs, switch, reorder, move between windows, pin.\n- Tab groups: create, rename, recolor, collapse, dissolve.\n- Bookmarks: save pages as bookmarks, create folders, rename, and move things between folders.\n- Closing tabs and deleting bookmarks are sensitive operations, off unless you turn them on in settings.\n\nSafe and reversible:\n- Preview before applying: Reading needs no confirmation. Any modification presents a clear preview first, and applies only after you approve it.\n- Undo anytime: All changes are recorded locally and can be restored from the panel at any time.\n\n💡 Tip: \"Organize my tabs\" never means closing them. If you want things removed, say so explicitly — otherwise it will gather them into a group or folder and leave the decision to you."
     },
     "browser": {
       "needsPermission": "Not authorized yet · click to open permissions",
@@ -1688,8 +1691,8 @@
         "unnamed": "unnamed",
         "inFolder": "in {{name}}",
         "pinned": "pinned",
-        "lossy": "This batch removes things. Closing a tab can only be undone by reopening its address — forms, scroll position and page state are not guaranteed. Deleting a folder deletes everything in it, and a restored bookmark is a new copy rather than the original. Approved on its own, every time; no setting can run it unattended.",
-        "warning": "This approval covers only the operations above. Nothing here is closed or deleted — those are separate tools with their own permission.",
+        "lossy": "This operation includes items to close or delete. Note that closing tabs loses unsaved form input and page state, and deleting a folder removes all bookmarks inside it.",
+        "warning": "This approval covers only the operations above. Nothing here is closed or deleted (removal requires separate permissions).",
         "untouched": "{{count}} other objects are not touched"
       },
       "op": {
@@ -1727,7 +1730,7 @@
         "title": "Browser Agent",
         "group": {
           "organize": "Organize",
-          "organizeNote": "Reorder, pin, group and rename tabs and bookmarks.",
+          "organizeNote": "Create bookmarks and folders, reorder, pin, group, and rename tabs and bookmarks.",
           "remove": "Delete",
           "removeNote": "Close tabs and remove bookmarks."
         },
@@ -1755,7 +1758,7 @@
         "extra": "{{count}} things opened or added since are kept as they are. Nothing is closed or deleted.",
         "additive": "Nothing is closed or deleted. Anything newer is kept.",
         "hostGroup": "This tab is the one running the agent, so it is never moved in or out of a tab group. Its group stays exactly as it is; the rest of the state is put back around it.",
-        "note": "A reopened page comes back at its address only — form input, scroll position and page state are not restored. A re-added bookmark is a new copy."
+        "note": "Note: A reopened page restores its URL only — form input, scroll position and page state are not restored."
       },
       "examples": {
         "group": {
@@ -1764,7 +1767,7 @@
         },
         "duplicates": {
           "label": "Find duplicates",
-          "text": "Find the tabs I have open more than once. Treat two addresses as the same page only if the query and fragment match too. List them grouped by page, oldest first, and tell me how many I would get back — do not close them yet."
+          "text": "Find duplicate tabs that are open more than once (only consider them identical if the full URL matches). List them grouped by page with the oldest first, and tell me how many tabs could be freed — do not close them yet."
         },
         "stash": {
           "label": "Park tabs as bookmarks",
@@ -1784,11 +1787,11 @@
         },
         "dedupe": {
           "label": "Close the duplicates",
-          "text": "I have the same pages open several times over. Close the duplicates and keep one of each — the pinned or grouped copy if there is one, otherwise the oldest. Two addresses only count as the same page if the query and fragment match as well. Show me exactly which tab you are keeping and which ones go before you close anything, and do the same for my bookmarks if the same link is saved in more than one folder."
+          "text": "I have the same pages open multiple times. Close the duplicates and keep one of each — the pinned or grouped copy if there is one, otherwise the oldest. Two addresses only count as the same page if the full URL matches. Do the same for my bookmarks if the same link is saved in more than one folder."
         },
         "deadLinks": {
           "label": "Check for broken bookmarks",
-          "text": "Go through the bookmarks in my Read Later folder and work out which ones are worth keeping. Open the links yourself where the title does not tell you enough, and flag the ones that are gone — 404, domain parked, redirected to a homepage. Report what you found for each with a one-line reason, then delete only the ones I confirm."
+          "text": "Check the bookmarks in my Read Later folder for validity. Try loading links where the title is not informative, and flag broken ones (404, expired domains, unexpected redirects). Report each with a brief reason, and delete only the ones I confirm."
         }
       },
       "phrasesTitle": "Or just ask",
