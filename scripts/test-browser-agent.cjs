@@ -299,17 +299,23 @@ test('Browser activity the plan does not depend on no longer invalidates it', as
     assert.equal(h.state.tabs.find(t => t.id === 2).pinned, true);
   }
 });
-test('Activity that moves what the plan depends on still stops it', async () => {
-  for (const churn of ['new tab in the same window', 'the target navigated']) {
-    const h = harness(); await h.grant(['tabs.arrange']);
-    const plan = await h.prepare('browser_arrange_tabs', [{ type: 'move', tab_id: 3, index: 0 }]);
-    // An index is a position in a window's whole order, so a tab appearing in that window
-    // means the approved move would land somewhere else than the preview said.
-    if (churn === 'new tab in the same window') h.state.tabs.push({ id: 5, windowId: 10, index: 3, title: 'New', url: 'https://new.test/', active: false, pinned: false, groupId: -1, incognito: false });
-    else h.state.tabs[2].url = 'https://other.test/somewhere-new';
-    assert.equal((await h.commit(plan)).success, false, churn);
-    assert.equal(h.state.mutations, 0, churn);
-  }
+test('A close is bound to the page that was in the tab; nothing else is bound to a URL', async () => {
+  // Closing is about what is *in* the tab. Someone who approved closing a page has not
+  // approved closing whatever it navigated to in the meantime, and that is the one
+  // operation where being a navigation late destroys something.
+  const h = harness(); await h.grant(['tabs.close', 'tabs.arrange']);
+  const close = await h.prepare('browser_close_tabs', [{ type: 'close', tab_id: 2 }]);
+  h.state.tabs[1].url = 'https://different.test/';
+  assert.equal((await h.commit(close)).success, false);
+  assert.equal(h.state.mutations, 0);
+  // Refused before anything is journalled: nothing was attempted, so there is no verdict.
+  assert.equal(h.steps(close.data.id).length, 0);
+  // A move means *that tab*, so the same churn plus a new tab in the window is not a conflict.
+  const move = await h.prepare('browser_arrange_tabs', [{ type: 'move', tab_id: 3, index: 0 }]);
+  h.state.tabs.push({ id: 5, windowId: 10, index: 3, title: 'New', url: 'https://new.test/', active: false, pinned: false, groupId: -1, incognito: false });
+  h.state.tabs[2].url = 'https://other.test/redirected';
+  assert.equal((await h.commit(move)).data.status, 'applied');
+  assert.equal(h.state.tabs.find(t => t.id === 3).index, 0);
 });
 test('Host tab, incognito tabs and invalid bookmark parent cycles are protected', async () => {
   const h = harness(); await h.grant(['tabs.close', 'bookmarks.arrange', 'bookmarks.delete']);
@@ -328,16 +334,59 @@ test('URL switch redacts lists, execution differences and historical changes', a
   // addresses either way. The detail is fetched on demand, and *that* is where the switch
   // has to hold.
   assert.doesNotMatch(JSON.stringify(commit), /token=secret|\/private/);
-  const open = await h.call({ action: 'read', tool: 'browser_query_changes', params: { batch_id: plan.data.id, step_index: '0' } });
+  const open = await h.call({ action: 'trees', batchId: plan.data.id });
   assert.match(JSON.stringify(open), /token=secret/);
   await h.call({ action: 'configure', settings: { capabilities: ['tabs.arrange'], shareFullUrls: false } });
+  // The trees carry every address in the snapshot, so the switch has to hold there too —
+  // it is the largest payload the journal hands out.
   for (const payload of [
     { action: 'read', tool: 'browser_list_tabs', params: {} },
-    { action: 'read', tool: 'browser_query_changes', params: { batch_id: plan.data.id, step_index: '0' } },
+    { action: 'read', tool: 'browser_query_changes', params: { batch_id: plan.data.id } },
+    { action: 'trees', batchId: plan.data.id },
   ]) { const result = await h.call(payload); assert.equal(result.success, true); assert.doesNotMatch(JSON.stringify(result), /token=secret|\/private/); }
   // Redaction is applied on the way out, never on the way in: the journal has to hold the
   // real address or it cannot reopen the tab it closed.
-  assert.match(JSON.stringify([h.row(plan.data.id), ...h.steps(plan.data.id)]), /token=secret/);
+  assert.match(JSON.stringify(h.row(plan.data.id)), /token=secret/);
+});
+test('Both recorded states are offered as trees, and never with an id in them', async () => {
+  const h = harness(); await h.grant(['tabGroups.write']);
+  const plan = await h.prepare('browser_manage_tab_groups', [{ type: 'create', tab_ids: [2, 3], title: 'Research', color: 'blue' }]);
+  assert.equal((await h.commit(plan)).data.status, 'applied');
+  const trees = await h.call({ action: 'trees', batchId: plan.data.id });
+  assert.equal(trees.success, true, trees.error);
+  // One window, so no ordinal: "window 1" is noise when there is no window 2.
+  const [before] = trees.data.before;
+  assert.equal(before.kind, 'window');
+  assert.equal(before.hostWindow, true);
+  assert.equal(before.window, undefined);
+  // The group exists only in the second tree, and it is a container holding its members
+  // rather than a line mentioning them.
+  assert.ok(!JSON.stringify(trees.data.before).includes('"group"'));
+  const group = trees.data.after.flatMap(w => w.children).find(n => n.kind === 'group');
+  assert.equal(group.title, 'Research');
+  assert.equal(group.color, 'blue');
+  assert.equal(group.children.length, 2);
+  // Keys exist for rendering; nothing the user reads is an id.
+  for (const node of [before, group]) {
+    assert.equal(node.id, undefined);
+    assert.equal(node.groupId, undefined);
+    assert.equal(node.index, undefined);
+  }
+});
+test('A batch that never finished records one state, and only that one can be restored', async () => {
+  const h = harness(); await h.grant(['tabs.arrange']);
+  const plan = await h.prepare('browser_arrange_tabs', [{ type: 'pin', tab_id: 2, pinned: true }]);
+  // Refused in the preflight, so no step ran and there is nothing to call an end state.
+  h.granted.delete('tabs');
+  assert.equal((await h.commit(plan)).success, false);
+  h.granted.add('tabs');
+  assert.equal(h.row(plan.data.id).after_state, null);
+  const [entry] = (await h.call({ action: 'read', tool: 'browser_query_changes', params: { batch_id: plan.data.id } })).data.items;
+  assert.equal(entry.can_restore_before, true);
+  assert.equal(entry.can_restore_after, false);
+  const trees = await h.call({ action: 'trees', batchId: plan.data.id });
+  assert.equal(trees.data.after, undefined);
+  assert.equal((await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id, side: 'after' } })).success, false);
 });
 test('No write occurs when durable preflight logging fails', async () => {
   const h = harness(); await h.grant(['tabs.close']); h.setDiskFailure(true);
@@ -346,10 +395,15 @@ test('No write occurs when durable preflight logging fails', async () => {
 });
 test('Cancellation stops remaining steps and reports partial execution', async () => {
   const h = harness(); await h.grant(['tabs.close']);
-  const plan = await h.prepare('browser_close_tabs', [{ type: 'close', tab_id: 2 }, { type: 'close', tab_id: 3 }]);
+  for (const id of [4, 5, 6]) h.state.tabs.push({ id, windowId: 10, index: h.state.tabs.length, title: `Tab ${id}`, url: `https://tab${id}.test/`, active: false, pinned: false, groupId: -1, incognito: false });
+  const plan = await h.prepare('browser_close_tabs', [2, 3, 4, 5, 6].map(tab_id => ({ type: 'close', tab_id })));
   h.onMutation(() => { void h.call({ action: 'cancel', planId: plan.data.id }); });
   const result = await h.commit(plan);
-  assert.equal(result.data.status, 'failed'); assert.equal(result.data.completed, 1); assert.equal(h.state.tabs.length, 2);
+  // "Stop" promises not to start another step, not to interrupt one already in flight, so
+  // the count is a range: something ran, and not everything did.
+  assert.equal(result.data.status, 'failed');
+  assert.ok(result.data.completed >= 1 && result.data.completed < 5, `completed ${result.data.completed}`);
+  assert.equal(h.state.tabs.length, 6 - result.data.completed);
 });
 test('An ambiguous API failure is journaled as unknown and never retried', async () => {
   const h = harness(); await h.grant(['tabGroups.write']);
@@ -357,7 +411,11 @@ test('An ambiguous API failure is journaled as unknown and never retried', async
   const plan = await h.prepare('browser_manage_tab_groups', [{ type: 'move', group_id: 20, index: 0 }]);
   assert.equal((await h.commit(plan)).data.status, 'unknown');
   assert.equal((await h.commit(plan)).success, false);
-  assert.equal((await h.call({ action: 'prepare', tool: 'browser_undo_changes', params: { batch_id: plan.data.id } })).success, false);
+  // The batch is never retried, but its recorded start state is exactly what someone wants
+  // after an uncertain outcome — an unknown verdict is a reason to offer the way back, not
+  // to withhold it.
+  const restore = await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id } });
+  assert.equal(restore.success, true, restore.error);
 });
 test('Backend restart marks an unfinished journal unknown', async () => {
   const h = harness(); await h.grant(['tabs.arrange']);
@@ -371,148 +429,221 @@ test('Backend restart marks an unfinished journal unknown', async () => {
   assert.equal((await h.commit(plan)).success, false);
   assert.equal(h.row(plan.data.id).status, 'unknown');
 });
-test('Closed tab undo reopens the URL with a new identity and cannot run twice', async () => {
-  const h = harness(); await h.grant(['tabGroups.write', 'tabs.close']);
-  const plan = await h.prepare('browser_close_tabs', [{ type: 'close', tab_id: 2 }]); await h.commit(plan);
-  const undo = await h.call({ action: 'prepare', tool: 'browser_undo_changes', params: { batch_id: plan.data.id } });
-  assert.equal(undo.success, true, undo.error);
-  // Reopening a closed tab creates a tab, so undoing it does not delete anything: the
-  // undo is judged on what *it* does, and this one is reversible.
-  assert.equal(undo.data.tier, 'low');
-  const result = await h.commit(undo); assert.equal(result.data.status, 'applied', JSON.stringify(result));
-  assert.equal(h.state.tabs.length, 3); assert.ok(h.state.tabs.some(t => h.address(t).includes('token=secret') && t.id !== 2));
-  assert.equal((await h.call({ action: 'prepare', tool: 'browser_undo_changes', params: { batch_id: plan.data.id } })).success, false);
+test('Restoring the state before a close reopens the tab, and repeating it changes nothing', async () => {
+  const h = harness(); await h.grant(['tabs.close', 'tabs.arrange']);
+  const plan = await h.prepare('browser_close_tabs', [{ type: 'close', tab_id: 2 }]);
+  assert.equal((await h.commit(plan)).data.status, 'applied');
+  const restore = await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id } });
+  assert.equal(restore.success, true, restore.error);
+  // Putting objects back never removes one, so there is no tier decision to make.
+  assert.equal(restore.data.kind, 'restore');
+  assert.equal(restore.data.tier, 'low');
+  assert.equal(restore.data.effects.reopen, 1);
+  assert.equal((await h.commit(restore)).data.status, 'applied');
+  assert.equal(h.state.tabs.length, 3);
+  assert.ok(h.state.tabs.some(t => h.address(t).includes('token=secret') && t.id !== 2));
+  /*
+    Asked for again, the same state is now already standing: the reopened tab wears the
+    recorded address, so it is adopted rather than opened a second time. Without that,
+    every repeat would leave another copy behind.
+  */
+  const again = await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id } });
+  assert.equal(again.success, true, again.error);
+  assert.equal(again.data.effects.reopen, 0);
+  assert.equal((await h.commit(again)).data.status, 'applied');
+  assert.equal(h.state.tabs.length, 3);
 });
-test('A tab committing its navigation is not mistaken for an external change', async () => {
+test('Restoring leaves everything newer alone, and says how much that is', async () => {
   const h = harness(); await h.grant(['tabs.arrange']);
-  // The second step observes the new tab again, by which point Chrome has moved the
-  // address out of pendingUrl. Reading `url` alone made that look like someone else
-  // rearranging the browser, so the batch stopped after step one.
+  const plan = await h.prepare('browser_arrange_tabs', [{ type: 'move', tab_id: 3, index: 0 }]);
+  assert.equal((await h.commit(plan)).data.status, 'applied');
+  // Two tabs opened afterwards, one of them pinned — the case that decides where the
+  // restored tabs can go at all, since Chrome keeps pinned tabs at the front.
+  h.state.tabs.push({ id: 6, windowId: 10, index: 3, title: 'Later', url: 'https://later.test/', active: false, pinned: false, groupId: -1, incognito: false });
+  h.state.tabs.push({ id: 7, windowId: 10, index: 0, title: 'Sticky', url: 'https://sticky.test/', active: false, pinned: true, groupId: -1, incognito: false });
+  h.state.tabs.filter(t => t.id !== 7).forEach(t => t.index++);
+  const restore = await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id } });
+  assert.equal(restore.success, true, restore.error);
+  assert.equal(restore.data.effects.extra, 2);
+  assert.equal(restore.data.effects.reopen, 0);
+  assert.equal((await h.commit(restore)).data.status, 'applied');
+  // Nothing was closed, and the recorded tabs are back in their recorded order — after the
+  // pinned newcomer, which cannot be displaced.
+  assert.equal(h.state.tabs.length, 5);
+  assert.ok(h.state.tabs.some(t => t.id === 6));
+  const order = h.state.tabs.slice().sort((a, b) => a.index - b.index).map(t => t.id);
+  assert.deepEqual(order.slice(0, 4), [7, 1, 2, 3]);
+});
+test('A restore is journalled as its own batch, and is itself restorable', async () => {
+  const h = harness(); await h.grant(['tabs.arrange']);
+  const plan = await h.prepare('browser_arrange_tabs', [{ type: 'pin', tab_id: 2, pinned: true }]);
+  assert.equal((await h.commit(plan)).data.status, 'applied');
+  const restore = await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id } });
+  assert.equal((await h.commit(restore)).data.status, 'applied');
+  assert.equal(h.state.tabs.find(t => t.id === 2).pinned, false);
+  const row = h.row(restore.data.id);
+  assert.equal(row.restore_of, plan.data.id);
+  assert.equal(row.restore_side, 'before');
+  // The tool recorded is the one whose permission the restore actually spent, not the one
+  // of the batch it came from.
+  assert.equal(row.tool, 'browser_arrange_tabs');
+  // And because it recorded both of its own states, changing your mind again is the same
+  // operation over again rather than a special case.
+  const back = await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: restore.data.id, side: 'before' } });
+  assert.equal(back.success, true, back.error);
+  assert.equal((await h.commit(back)).data.status, 'applied');
+  assert.equal(h.state.tabs.find(t => t.id === 2).pinned, true);
+});
+test('Undoing a close needs organizing, not closing', async () => {
+  // The capability a restore spends is the one it uses: reopening and positioning tabs is
+  // arranging them. Asking for tabs.close to undo a close would be asking for the wrong thing.
+  const h = harness(); await h.grant(['tabs.close']);
+  const plan = await h.prepare('browser_close_tabs', [{ type: 'close', tab_id: 2 }]);
+  assert.equal((await h.commit(plan)).data.status, 'applied');
+  assert.equal((await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id } })).success, false);
+  await h.grant(['tabs.close', 'tabs.arrange']);
+  assert.equal((await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id } })).success, true);
+});
+test('A tab committing its navigation is not mistaken for a different page', async () => {
+  const h = harness(); await h.grant(['tabs.arrange']);
+  // Chrome reports a freshly created tab as `url: ''` with the destination in `pendingUrl`,
+  // then swaps them. A snapshot that read `url` alone would give the tab one identity for a
+  // few hundred milliseconds and another afterwards.
   const plan = await h.prepare('browser_arrange_tabs', [{ type: 'create', url: 'https://new.test/page' }, { type: 'move', tab_id: 3, index: 0 }]);
   const result = await h.commit(plan);
   assert.equal(result.data.status, 'applied', JSON.stringify(result));
   assert.equal(result.data.completed, 2);
-  // And the batch stays undoable afterwards: its journal recorded the destination, not
-  // the empty string the tab reported for its first few hundred milliseconds.
-  const undo = await h.call({ action: 'prepare', tool: 'browser_undo_changes', params: { batch_id: plan.data.id } });
-  assert.equal(undo.success, true, undo.error);
-  // Undoing a creation is a deletion — the one case where the undo is the destructive
-  // direction, and the reason its tier is computed per plan rather than per tool.
-  assert.equal(undo.data.tier, 'lossy');
-  assert.equal((await h.commit(undo)).data.status, 'applied');
-  assert.ok(!h.state.tabs.some(t => h.address(t) === 'https://new.test/page'));
+  // The recorded end state holds the destination, not the empty string, so the created tab
+  // is recognisable in it.
+  const trees = await h.call({ action: 'trees', batchId: plan.data.id });
+  assert.match(JSON.stringify(trees.data.after), /new\.test\/page/);
 });
-test('Undoing a close accepts a reopened tab that lands on a redirect', async () => {
-  const h = harness(); await h.grant(['tabs.close']);
-  const plan = await h.prepare('browser_close_tabs', [{ type: 'close', tab_id: 2 }]);
+test('Restoring a state that no longer fits the browser stops instead of improvising', async () => {
+  const h = harness(); await h.grant(['tabs.arrange']);
+  h.state.tabs.push({ id: 8, windowId: 11, index: 0, title: 'Elsewhere', url: 'https://elsewhere.test/', active: true, pinned: false, groupId: -1, incognito: false });
+  const plan = await h.prepare('browser_arrange_tabs', [{ type: 'move', tab_id: 8, window_id: 11, index: 0 }]);
   assert.equal((await h.commit(plan)).data.status, 'applied');
-  // Reopening is explicitly best-effort: the extension hands the URL back to Chrome and
-  // the server decides where it lands. That is not a conflict, and reporting it as a
-  // failed restoration also burned the batch's one undo attempt.
-  h.instantNavigation('https://example.com/private?token=secret#fragment', 'https://example.com/login');
-  const undo = await h.call({ action: 'prepare', tool: 'browser_undo_changes', params: { batch_id: plan.data.id } });
-  assert.equal(undo.success, true, undo.error);
-  const result = await h.commit(undo);
-  assert.equal(result.data.status, 'applied', JSON.stringify(result));
-  assert.equal(h.state.tabs.length, 3);
-  assert.ok(h.state.tabs.some(t => h.address(t) === 'https://example.com/login'));
+  // The window the recorded state used is gone. Putting its tabs somewhere else would be
+  // inventing a layout the browser was never in.
+  h.state.tabs = h.state.tabs.filter(t => t.windowId !== 11);
+  const restore = await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id } });
+  assert.equal(restore.success, true, restore.error);
+  const result = await h.commit(restore);
+  assert.equal(result.data.status, 'unknown');
+  assert.match(result.data.error, /window/i);
 });
-test('Bookmark directory deletion undo restores the subtree and maps new IDs across steps', async () => {
-  const h = harness(); await h.grant(['bookmarks.delete']);
+test('Restoring a deleted bookmark subtree rebuilds it, parents first', async () => {
+  const h = harness(); await h.grant(['bookmarks.delete', 'bookmarks.arrange']);
   const plan = await h.prepare('browser_delete_bookmarks', [{ type: 'delete', id: '3' }, { type: 'delete', id: '2' }]);
   assert.equal(plan.data.tier, 'lossy');
   assert.equal((await h.commit(plan)).data.status, 'applied'); assert.equal(h.state.bookmarks.length, 2);
-  const undo = await h.call({ action: 'prepare', tool: 'browser_undo_changes', params: { batch_id: plan.data.id } });
-  assert.equal(undo.success, true, undo.error);
-  // Putting things back is the reversible direction, whatever the original batch cost.
-  assert.equal(undo.data.tier, 'low');
-  const result = await h.commit(undo); assert.equal(result.data.status, 'applied', JSON.stringify(result));
+  const restore = await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id } });
+  assert.equal(restore.success, true, restore.error);
+  assert.equal(restore.data.tier, 'low');
+  // The folder and the bookmark inside it: both gone, both rebuilt, parent first.
+  assert.equal(restore.data.effects.create, 2);
+  const result = await h.commit(restore); assert.equal(result.data.status, 'applied', JSON.stringify(result));
   const bookmark = h.state.bookmarks.find(n => n.url); const folder = h.state.bookmarks.find(n => n.title === 'Folder');
   assert.equal(bookmark.title, 'Bookmark'); assert.equal(bookmark.parentId, folder.id); assert.notEqual(folder.id, '2');
+  // Repeating it adopts what is standing rather than building a second copy.
+  const again = await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id } });
+  assert.equal(again.data.effects.create, 0);
+  assert.equal((await h.commit(again)).data.status, 'applied');
+  assert.equal(h.state.bookmarks.filter(n => n.title === 'Folder').length, 1);
 });
-test('Undo refuses external edits and tab IDs from another browser session', async () => {
-  for (const cause of ['edit', 'restart']) {
-    const h = harness(); await h.grant(['tabGroups.write']);
-    const plan = await h.prepare('browser_arrange_tabs', [{ type: 'pin', tab_id: 2, pinned: true }]); await h.commit(plan);
-    if (cause === 'edit') h.state.tabs[1].url = 'https://changed.test/'; else { delete h.session['browser-agent-epoch']; h.reload(); }
-    const undo = await h.call({ action: 'prepare', tool: 'browser_undo_changes', params: { batch_id: plan.data.id } });
-    assert.equal(undo.success, false);
-  }
-});
+test('Tab states cannot be restored across a browser restart; bookmark states can', async () => {
+  const tabs = harness(); await tabs.grant(['tabs.arrange']);
+  const moved = await tabs.prepare('browser_arrange_tabs', [{ type: 'pin', tab_id: 2, pinned: true }]);
+  await tabs.commit(moved);
+  delete tabs.session['browser-agent-epoch']; tabs.reload();
+  // Tab ids are per-session, so the recorded ids no longer name anything.
+  assert.equal((await tabs.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: moved.data.id } })).success, false);
+  const [entry] = (await tabs.call({ action: 'read', tool: 'browser_query_changes', params: { batch_id: moved.data.id } })).data.items;
+  assert.equal(entry.can_restore_before, false);
 
+  const marks = harness(); await marks.grant(['bookmarks.arrange']);
+  const renamed = await marks.prepare('browser_arrange_bookmarks', [{ type: 'update', id: '3', title: 'Renamed' }]);
+  await marks.commit(renamed);
+  delete marks.session['browser-agent-epoch']; marks.reload();
+  const restore = await marks.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: renamed.data.id } });
+  assert.equal(restore.success, true, restore.error);
+  assert.equal((await marks.commit(restore)).data.status, 'applied');
+  assert.equal(marks.state.bookmarks.find(n => n.id === '3').title, 'Bookmark');
+});
+test('Restoring never moves the host tab to another window or group', async () => {
+  const h = harness(); await h.grant(['tabGroups.write']);
+  const plan = await h.prepare('browser_manage_tab_groups', [{ type: 'create', tab_ids: [2, 3], title: 'Research', color: 'blue' }]);
+  assert.equal((await h.commit(plan)).data.status, 'applied');
+  // The user groups the host tab afterwards. Restoring the earlier state would pull it out
+  // of that group, which is the one thing no batch may do to it.
+  h.state.tabs[0].groupId = h.state.groups[0].id;
+  assert.equal((await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id } })).success, false);
+});
+test('Restoring group membership needs group organizing; restoring a plain layout does not', async () => {
+  const grouped = harness(); await grouped.grant(['tabGroups.write']);
+  const plan = await grouped.prepare('browser_manage_tab_groups', [{ type: 'create', tab_ids: [2, 3], title: 'Research', color: 'blue' }]);
+  assert.equal((await grouped.commit(plan)).data.status, 'applied');
+  // The state being restored has tabs in a group, so putting it back means grouping tabs —
+  // asked of the target state, not of what the original batch happened to do.
+  const after = await grouped.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id, side: 'after' } });
+  assert.equal(after.success, true, after.error);
+  await grouped.grant(['tabs.arrange']);
+  assert.equal((await grouped.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id, side: 'after' } })).success, false);
+  // The state before it has no groups at all, so arranging is enough.
+  const before = await grouped.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id, side: 'before' } });
+  assert.equal(before.success, true, before.error);
+  assert.equal((await grouped.commit(before)).data.status, 'applied');
+  assert.equal(grouped.state.groups.length, 0);
+});
+test('A restore refused before it starts leaves the batch restorable', async () => {
+  const h = harness(); await h.grant(['tabs.arrange']);
+  const plan = await h.prepare('browser_arrange_tabs', [{ type: 'pin', tab_id: 2, pinned: true }]);
+  assert.equal((await h.commit(plan)).data.status, 'applied');
+  const restore = await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id } });
+  assert.equal(restore.success, true, restore.error);
+  // Revoked between the approval and the first step.
+  h.granted.delete('tabs');
+  assert.equal((await h.commit(restore)).success, false);
+  assert.equal(h.steps(restore.data.id).length, 0);
+  h.granted.add('tabs');
+  // There is no single attempt to spend: a recorded state stays available for as long as it
+  // is in the journal.
+  const retry = await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id } });
+  assert.equal(retry.success, true, retry.error);
+  assert.equal((await h.commit(retry)).data.status, 'applied');
+  assert.equal(h.state.tabs.find(t => t.id === 2).pinned, false);
+});
 test('Cancelled previews remain cancelled across a backend restart', async () => {
   const h = harness(); await h.grant(['tabs.close']);
   const plan = await h.prepare('browser_close_tabs', [{ type: 'close', tab_id: 2 }]);
   await h.call({ action: 'cancel', planId: plan.data.id }); h.reload();
   assert.equal((await h.commit(plan)).success, false); assert.equal(h.state.mutations, 0);
 });
-test('Bookmark change pagination is independent of batch pagination', async () => {
-  const h = harness(); await h.grant(['bookmarks.delete']);
-  const plan = await h.prepare('browser_delete_bookmarks', [{ type: 'delete', id: '2' }]); await h.commit(plan);
-  const first = await h.call({ action: 'read', tool: 'browser_query_changes', params: { batch_id: plan.data.id, step_index: '0', limit: '1' } });
-  const second = await h.call({ action: 'read', tool: 'browser_query_changes', params: { batch_id: plan.data.id, step_index: '0', limit: '1', offset: '1' } });
-  assert.equal(second.data.items.length, 1); assert.notEqual(first.data.items[0].changes.items[0].id, second.data.items[0].changes.items[0].id);
-});
-test('An undo that changes no group membership never needs group write access', async () => {
-  const h = harness(); await h.grant(['tabs.arrange']);
-  const plan = await h.prepare('browser_arrange_tabs', [{ type: 'pin', tab_id: 2, pinned: true }]); await h.commit(plan);
-  const undo = await h.call({ action: 'prepare', tool: 'browser_undo_changes', params: { batch_id: plan.data.id } });
-  assert.equal(undo.success, true, undo.error); assert.equal((await h.commit(undo)).data.status, 'applied');
-});
-test('Group creation and ungrouping can be undone as approved layout changes', async () => {
-  const h = harness(); await h.grant(['tabGroups.write']);
-  const plan = await h.prepare('browser_manage_tab_groups', [{ type: 'create', tab_ids: [2, 3], title: 'Research', color: 'blue' }]);
+test('The journal list pages independently of the steps it can expand', async () => {
+  const h = harness(); await h.grant(['bookmarks.arrange']);
+  const plan = await h.prepare('browser_arrange_bookmarks', [
+    { type: 'update', id: '3', title: 'One' }, { type: 'update', id: '2', title: 'Two' },
+  ]);
   assert.equal((await h.commit(plan)).data.status, 'applied');
-  const undo = await h.call({ action: 'prepare', tool: 'browser_undo_changes', params: { batch_id: plan.data.id } });
-  assert.equal(undo.success, true, undo.error); const result = await h.commit(undo);
-  assert.equal(result.data.status, 'applied', JSON.stringify(result)); assert.equal(h.state.groups.length, 0);
+  const list = await h.call({ action: 'read', tool: 'browser_query_changes', params: { limit: '1' } });
+  // Steps arrive only when one batch was asked for: the list is a dozen lines of text and
+  // must not pay for anything larger.
+  assert.equal(list.data.items.length, 1);
+  assert.equal(list.data.items[0].steps, undefined);
+  const one = await h.call({ action: 'read', tool: 'browser_query_changes', params: { batch_id: plan.data.id } });
+  assert.deepEqual(one.data.items[0].steps.map(s => s.step_index), [0, 1]);
+  assert.deepEqual(one.data.items[0].steps.map(s => s.status), ['applied', 'applied']);
 });
-test('An undo attempt that never began leaves the batch undoable', async () => {
-  const h = harness(); await h.grant(['tabs.arrange']);
-  const plan = await h.prepare('browser_arrange_tabs', [{ type: 'pin', tab_id: 2, pinned: true }]);
-  assert.equal((await h.commit(plan)).data.status, 'applied');
-  const undo = await h.call({ action: 'prepare', tool: 'browser_undo_changes', params: { batch_id: plan.data.id } });
-  assert.equal(undo.success, true, undo.error);
-  // Revoked in the gap between the commit preflight and step one — after the undo claim
-  // is written, before anything is restored.
-  h.onQueries(1, () => h.granted.delete('tabs'));
-  assert.equal((await h.commit(undo)).data.status, 'failed');
-  assert.equal(h.steps(undo.data.id).length, 0);
-  assert.equal(h.row(plan.data.id).undone_by, null);
-  h.granted.add('tabs');
-  const retry = await h.call({ action: 'prepare', tool: 'browser_undo_changes', params: { batch_id: plan.data.id } });
-  assert.equal(retry.success, true, retry.error);
-  assert.equal((await h.commit(retry)).data.status, 'applied');
-});
-test('An undo that touched the browser is not offered a second attempt', async () => {
-  const h = harness(); await h.grant(['tabs.arrange']);
-  const plan = await h.prepare('browser_arrange_tabs', [{ type: 'pin', tab_id: 2, pinned: true }, { type: 'move', tab_id: 3, index: 0 }]);
-  assert.equal((await h.commit(plan)).data.status, 'applied');
-  const undo = await h.call({ action: 'prepare', tool: 'browser_undo_changes', params: { batch_id: plan.data.id } });
-  // Preflight, then step one's before and after: revoked going into step two, which has
-  // already moved tab 3 back.
-  h.onQueries(3, () => h.granted.delete('tabs'));
-  const result = await h.commit(undo);
-  assert.equal(result.data.completed, 1);
-  assert.ok(h.steps(undo.data.id).length > 0);
-  assert.equal(h.row(plan.data.id).undone_by, undo.data.id);
-  assert.equal((await h.call({ action: 'prepare', tool: 'browser_undo_changes', params: { batch_id: plan.data.id } })).success, false);
-});
-test('Retention drops expired previews and orphaned steps, but never a batch an undo needs', async () => {
+test('Retention drops expired previews and orphaned steps', async () => {
   const h = harness(); await h.grant(['tabs.arrange']);
   const applied = await h.prepare('browser_arrange_tabs', [{ type: 'pin', tab_id: 2, pinned: true }]);
   assert.equal((await h.commit(applied)).data.status, 'applied');
-  const undo = await h.call({ action: 'prepare', tool: 'browser_undo_changes', params: { batch_id: applied.data.id } });
   const abandoned = await h.prepare('browser_arrange_tabs', [{ type: 'pin', tab_id: 3, pinned: true }]);
   // A preview nobody approved is dead weight once it can no longer be committed; the plan
   // expiry and the retention cut use the same number, so this is exactly the window.
   h.setAge(abandoned.data.id, Date.now() - 700_000);
-  h.setAge(undo.data.id, Date.now() - 700_000);
-  h.setAge(applied.data.id, 0);
   h.reload(); await h.call({ action: 'read', tool: 'browser_query_changes', params: {} });
   assert.equal(h.row(abandoned.data.id), undefined);
-  // Kept despite being the oldest row in the table: the undo still points at it, and
-  // losing it turns a refusal the user can act on into "original batch is missing".
   assert.ok(h.row(applied.data.id));
   assert.ok(h.steps(applied.data.id).length > 0);
   assert.equal(h.orphanSteps(), 0);

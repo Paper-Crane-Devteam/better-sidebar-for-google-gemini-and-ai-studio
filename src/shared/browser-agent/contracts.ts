@@ -38,7 +38,16 @@ export const READ_TOOLS = ['browser_list_tabs', 'browser_list_tab_groups', 'brow
  * The tool name is also the most visible thing in the prompt — harder for a model to
  * skim past than a `"type":"close"` buried in JSON.
  */
-export const WRITE_TOOLS = ['browser_arrange_tabs', 'browser_close_tabs', 'browser_manage_tab_groups', 'browser_arrange_bookmarks', 'browser_delete_bookmarks', 'browser_undo_changes'] as const;
+export const WRITE_TOOLS = ['browser_arrange_tabs', 'browser_close_tabs', 'browser_manage_tab_groups', 'browser_arrange_bookmarks', 'browser_delete_bookmarks', 'browser_restore_state'] as const;
+/** The tool that puts a recorded state back. Never stored as a batch's own `tool`. */
+export const RESTORE_TOOL = 'browser_restore_state';
+/**
+ * Which of a batch's two snapshots to restore: the state it started from, or the one it
+ * produced. Both are offered, because the second is what someone wants after they have
+ * undone a batch by hand and changed their mind.
+ */
+export const RESTORE_SIDES = ['before', 'after'] as const;
+export type RestoreSide = typeof RESTORE_SIDES[number];
 export const BROWSER_TOOLS = [...READ_TOOLS, ...WRITE_TOOLS];
 export const isBrowserTool = (name: string) => (BROWSER_TOOLS as readonly string[]).includes(name);
 export const isBrowserWrite = (name: string) => (WRITE_TOOLS as readonly string[]).includes(name);
@@ -61,10 +70,10 @@ export function permissionsFor(caps: readonly Capability[]): ('tabs' | 'tabGroup
  *
  * The list above stays at eight because the *tool layer* needs that granularity: a tier
  * comes from a capability, and permission injection is one capability per tool. What the
- * user is asked is a different question, and eight checkboxes answered it badly — three of
- * them only granted *reading*, and read access is not a feature anyone turns on by itself.
- * Nothing can be organized or deleted without first being read either, so the read
- * capabilities are not a choice at all; they are `dependencies()` of the two that are.
+ * user is asked is a different question, and only two of the eight are a real choice —
+ * read access is not a feature anyone turns on by itself, and nothing can be organized or
+ * deleted without first being read, so the read capabilities are `dependencies()` of the
+ * two that are.
  *
  * What is left is the only distinction worth a switch: rearranging things, versus throwing
  * them away.
@@ -86,10 +95,9 @@ export const capabilitiesForGroups = (groups: readonly CapabilityGroup[]): Capab
  * Which switches a stored capability list reads as.
  *
  * All-or-nothing on purpose: a switch counts as on only when every capability it grants is
- * present. A list written by the build that offered read access on its own therefore reads
- * as *off*, which is the honest answer — two switches cannot describe it — and the page
- * narrows the stored list to match instead of drawing a switch that lies about what the
- * agent may do.
+ * present. A stored list holding only some of them reads as *off*, which is the honest
+ * answer — two switches cannot describe it — and the page narrows the stored list to match
+ * rather than drawing a switch that lies about what the agent may do.
  */
 export const groupsOf = (caps: readonly Capability[]): CapabilityGroup[] =>
   CAPABILITY_GROUP_IDS.filter(g => capabilitiesForGroups([g]).every(c => caps.includes(c)));
@@ -101,7 +109,7 @@ const BOOKMARK_WRITE_TOOLS: readonly string[] = ['browser_arrange_bookmarks', 'b
  * session understands) or on bookmarks (which survive a restart).
  *
  * Same question `snapshot()` answers by choosing what to capture, asked from the tool
- * name alone so the history list can decide whether a batch is still undoable without
+ * name alone so the history list can decide whether a batch is still restorable without
  * loading its snapshot.
  */
 export const isTabTool = (tool: string) => !BOOKMARK_WRITE_TOOLS.includes(tool);
@@ -118,10 +126,10 @@ export function toolCapability(name: string): Capability | undefined {
 /**
  * A tool's tier.
  *
- * `browser_undo_changes` has none of its own: undoing a move is a move, but undoing a
- * creation is a deletion — and the folders it would delete may have things in them by
- * now. So the backend decides that one per plan, from what the original batch created,
- * and this answers `low` only as the floor for a tool with no capability.
+ * `RESTORE_TOOL` is `low` unconditionally, and that is a property of what restoring does:
+ * it puts recorded objects back and never removes one, so there is nothing it can destroy.
+ * A batch stored for a restore carries an `arrange` tool name, so the capability check and
+ * the tier both come out of the same place every other batch gets them from.
  */
 export function tierOf(tool: string): Tier {
   const cap = toolCapability(tool);
@@ -212,25 +220,42 @@ export interface Snapshot { tabs?: TabState[]; groups?: GroupState[]; bookmarks?
 export interface TabState { id: number; windowId: number; index: number; url: string; title: string; pinned: boolean; active: boolean; groupId: number }
 export interface GroupState { id: number; windowId: number; title: string; color: string; collapsed: boolean }
 export interface BookmarkState { id: string; parentId?: string; index?: number; title: string; url?: string; unmodifiable?: string }
-export interface Step { operation: Operation; before: Snapshot; after?: Snapshot; status: 'applying' | 'applied' | 'unknown'; changes?: EntityChange[] }
-export interface EntityChange { kind: string; id: string; before?: unknown; after?: unknown }
-export interface Batch {
-  id: string; owner: number; epoch: string; tool: string; operations: Operation[]; before: Snapshot;
-  createdAt: number; status: 'prepared' | 'applying' | 'applied' | 'failed' | 'unknown' | 'undone';
-  steps: Step[]; error?: string; undoOf?: string; undoneBy?: string;
-}
 /**
- * A batch as the history list needs it: everything except the snapshots.
+ * One operation's verdict.
  *
- * The list used to be built by loading every batch in full and reading four fields off
- * each one. With before/after states per step that is the largest read in the module,
- * performed to render a dozen lines of text.
+ * A step carries no snapshot of its own. What a batch is worth keeping for is the two
+ * states it sits between, and those are on the batch — so a step only has to answer
+ * "did this one land", which is what turns a partial batch into something a person can
+ * read.
  */
+export interface Step { operation: Operation; status: 'applying' | 'applied' | 'unknown' }
+/**
+ * One batch, and the two states it sits between.
+ *
+ * `before` and `after` are full snapshots: every non-incognito tab and group, or the
+ * whole bookmark tree. They are what the journal is for. Both are restorable, both are
+ * what the detail view draws, and `before` is also what the preview resolves ids against
+ * so the approval card can name objects instead of numbering them.
+ *
+ * `after` is absent until the batch stops. A batch interrupted mid-run therefore has one
+ * snapshot, which is the honest answer — nobody knows what state it ended in.
+ */
+export interface Batch {
+  id: string; owner: number; epoch: string; tool: string; operations: Operation[];
+  before: Snapshot; after?: Snapshot;
+  createdAt: number; status: 'prepared' | 'applying' | 'applied' | 'failed' | 'unknown';
+  steps: Step[]; error?: string;
+  /** Set when this batch restored another one's snapshot, naming which side. */
+  restoreOf?: string; restoreSide?: RestoreSide;
+}
+/** A batch as the history list needs it: metadata and counts, never a snapshot. */
 export interface BatchSummary {
   id: string; epoch: string; tool: string; status: Batch['status']; createdAt: number;
-  error?: string; undoOf?: string; undoneBy?: string;
+  error?: string; restoreOf?: string; restoreSide?: RestoreSide;
   /** Operations planned, steps recorded, and of those the ones that definitely applied. */
   planned: number; steps: number; applied: number;
+  /** Whether an `after` snapshot was recorded, and so whether that side can be restored. */
+  hasAfter: boolean;
   touchesTabs: boolean;
 }
 /**
@@ -238,12 +263,11 @@ export interface BatchSummary {
  *
  * ⚠️ **No field here is an id, and none may become one.** Chrome's tab, window, group and
  * bookmark ids are how the engine keeps an approval bound to the objects it was granted
- * for; they describe nothing. The card used to print them raw — `#66 · was at 7 · was in
- * 1` — which asked the user to authorise a change to an object named by three numbers they
- * had never seen and could not look up. Every field below is instead something they can
- * see for themselves: a folder has a name, a window has an ordinal, a position counts
- * from 1. The resolution happens in the background, against `Batch.before`, which holds
- * the whole bookmark tree and every non-incognito tab — so it is exact, not a guess.
+ * for; they describe nothing, and a user asked to authorise a change to `#66` has been
+ * shown a number they cannot look up. Every field below is something they can see for
+ * themselves: a folder has a name, a window has an ordinal, a position counts from 1. The
+ * resolution happens in the background against `Batch.before`, which holds the whole
+ * bookmark tree and every non-incognito tab — so it is exact, not a guess.
  */
 export interface Placement {
   /** 1-based ordinal among the windows in the snapshot. Omitted when there is only one. */
@@ -260,8 +284,6 @@ export interface Placement {
   url?: string;
 }
 export interface PreviewTarget extends Placement { title: string }
-/** One object an undo would put back: where it is now, and where it would end up. */
-export interface PreviewChange { title: string; from?: Placement; to?: Placement }
 export interface PreviewItem {
   /** Operation type — `close`, `move`, `create`, … Translated by the card. */
   type: string;
@@ -273,23 +295,81 @@ export interface PreviewItem {
   targets: PreviewTarget[];
   /** How many objects the operation touches. `targets` itself is capped at 100. */
   targetCount: number;
-  undo?: boolean;
-  changes?: PreviewChange[];
+}
+
+/**
+ * A recorded state, shaped the way the browser shows it: windows containing groups
+ * containing tabs, or folders containing bookmarks.
+ *
+ * A tree rather than a list of changed fields, because that is the question a person
+ * actually has — "what did my browser look like" — and it is the one shape that can be
+ * checked at a glance against the browser sitting next to it. It also removes the last
+ * reason to mention an id: a container is a node the user can see, not a number that
+ * would have to stand in for one.
+ *
+ * Built in the background from a whole `Snapshot`, so every parent is present. The
+ * component renders it and composes no facts of its own.
+ */
+export type TreeNodeKind = 'window' | 'pinned' | 'group' | 'folder' | 'tab' | 'bookmark';
+/** What a restore would do to one node. Absent when the tree is being shown, not applied. */
+export type TreeEffect = 'keep' | 'restore' | 'reopen' | 'create';
+export interface TreeNode {
+  /** Render key. Derived from ids, never displayed. */
+  key: string;
+  kind: TreeNodeKind;
+  /** The object's own name. Absent for a window; empty for a group with no name. */
+  title?: string;
+  url?: string;
+  /** Windows only: 1-based ordinal, omitted when this is the window the sidebar is in. */
+  window?: number;
+  hostWindow?: boolean;
+  /** Groups only, as Chrome's colour name. */
+  color?: string;
+  effect?: TreeEffect;
+  children?: TreeNode[];
 }
 /**
- * A batch as the approval UI shows it: the real objects each operation would touch.
+ * What restoring a snapshot would come to, in objects.
  *
- * ⚠️ `undo` and `tier` rather than a `warning` sentence. The closing warning used to be
- * composed in the service worker and shipped as literal text, which put two paragraphs of
- * user-facing prose in the one context that has no locale. The preview only has to say
- * *which* warning applies; the wording belongs with every other string the user reads.
+ * `extra` is the one that has to be shown: it counts what exists now and is *not* in the
+ * snapshot, and restoring leaves every one of it alone. That is the whole difference
+ * between this and making the browser equal to the tree on screen, and a user who is not
+ * told the number will read the tree as a promise that it is the latter.
  */
-export interface PlanPreview { id: string; count: number; items: PreviewItem[]; undo: boolean; tier: Tier }
+export interface RestoreEffects { restore: number; reopen: number; create: number; keep: number; extra: number }
+
+/** A batch as the approval UI shows it: the real objects each operation would touch. */
+export interface OperationsPlan {
+  id: string; kind: 'operations'; tier: Tier; count: number; items: PreviewItem[];
+  /**
+   * Objects of the same kind that no operation in this batch names.
+   *
+   * The *scope* of the batch, and it has to be shown. "32 of your 84 tabs are not being
+   * touched" and "52 tabs are being touched" are not the same information: only the first
+   * tells the user whether the agent understood how much of their browser is in play.
+   */
+  untouched: number;
+}
+/**
+ * A restore as the approval UI shows it: the state being restored, and what it costs.
+ *
+ * No operation list, because a restore is one decision — the tree *is* the thing being
+ * approved. `tier` is fixed rather than derived: restoring only puts objects back.
+ */
+export interface RestorePlan {
+  id: string; kind: 'restore'; tier: 'low'; side: RestoreSide;
+  tree: TreeNode[]; effects: RestoreEffects;
+}
+export type PlanPreview = OperationsPlan | RestorePlan;
 export type BrowserRequest =
   | { action: 'open-settings' }
   | { action: 'settings' }
   | { action: 'configure'; settings: BrowserSettings }
   | { action: 'read'; tool: string; params: Record<string, string> }
+  /** Both of a batch's recorded states, as trees, for the journal's detail view. */
+  | { action: 'trees'; batchId: string }
   | { action: 'prepare'; tool: string; params: Record<string, string> }
   | { action: 'commit'; planId: string }
   | { action: 'cancel'; planId: string };
+/** The reply to `trees`. `after` is absent for a batch that never finished. */
+export interface BatchTrees { before: TreeNode[]; after?: TreeNode[] }

@@ -2,7 +2,7 @@ import React from 'react';
 import { useAppStore } from '@/shared/lib/store';
 import { Button } from '@/shared/components/ui/button';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
-import { FolderPlus, ListCollapse, ArrowDownAZ, Clock, ListChecks, Plus } from 'lucide-react';
+import { FolderPlus, CopyMinus, ArrowDownAZ, Clock, ListChecks, Plus } from 'lucide-react';
 import { PromptsFilterActions } from './PromptsFilterActions';
 import type { FilterState, PromptsTypeFilter } from '../../../types/filter';
 import { useI18n } from '@/shared/hooks/useI18n';
@@ -57,7 +57,7 @@ export const PromptsHeader = ({
                   className="h-7 w-7"
                   onClick={onCollapseAll}
                 >
-                  <ListCollapse className="h-4 w-4" />
+                  <CopyMinus className="h-4 w-4" />
                 </Button>
               </SimpleTooltip>
 

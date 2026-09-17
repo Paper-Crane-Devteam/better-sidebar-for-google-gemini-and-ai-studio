@@ -9,19 +9,16 @@
  * It shares its fetch-and-store step with the idle backfill scheduler
  * (`shared/lib/backfill/sync.ts`); the difference is only in the pacing and in who
  * asked.
+ *
+ * The table and its pager are `PagedTable` — this dialog is where that shape was worked
+ * out, and the Browser agent's record list needs the same one.
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  AlertTriangle,
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  Loader2,
-  X,
-} from 'lucide-react';
+import { AlertTriangle, Check, Loader2, X } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { OverflowTooltip } from '@/shared/components/ui/overflow-tooltip';
+import { PagedTable, type PagedTableColumn } from '@/shared/components/ui/paged-table';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { modal, useModalStore } from '@/shared/lib/modal';
 import { toast } from '@/shared/lib/toast';
@@ -41,16 +38,6 @@ interface StatusRow {
 }
 
 type RowState = 'idle' | 'syncing' | 'synced' | 'empty' | 'failed';
-
-/**
- * Rows per page.
- *
- * Paged rather than a growing "show more" list, because the list is as long as the
- * user's history: a few thousand chats would put a few thousand rows in the DOM and
- * make the dialog scroll badly, and a "show more" button gets there just as surely,
- * only slower. A page is a fixed ceiling.
- */
-const PAGE_SIZE = 10;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -72,7 +59,6 @@ const MessageSyncModalContent = () => {
 
   const [rows, setRows] = useState<StatusRow[] | null>(null);
   const [rowStates, setRowStates] = useState<Record<string, RowState>>({});
-  const [page, setPage] = useState(0);
   const [batch, setBatch] = useState<{ done: number; total: number; failed: number } | null>(
     null,
   );
@@ -194,12 +180,44 @@ const MessageSyncModalContent = () => {
   const missing = rows.filter((r) => r.message_count === 0).length;
   const batching = batch !== null;
 
-  // Clamped rather than trusted: the batch re-read can shorten the list under a page
-  // number that was valid a moment ago.
-  const pageCount = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
-  const current = Math.min(page, pageCount - 1);
-  const from = current * PAGE_SIZE;
-  const shown = rows.slice(from, from + PAGE_SIZE);
+  const columns: PagedTableColumn<StatusRow>[] = [
+    {
+      key: 'chat',
+      header: t('backfillStatus.colChat'),
+      cell: (row) => (
+        <OverflowTooltip className="block truncate text-foreground">
+          {row.title || t('common.untitled')}
+        </OverflowTooltip>
+      ),
+    },
+    {
+      key: 'messages',
+      header: t('backfillStatus.colMessages'),
+      className: 'w-24 text-right',
+      cell: (row) => (
+        <span
+          className={cn(
+            'tabular-nums',
+            row.message_count > 0 ? 'text-foreground' : 'text-muted-foreground',
+          )}
+        >
+          {row.message_count > 0 ? row.message_count : t('backfillStatus.none')}
+        </span>
+      ),
+    },
+    {
+      key: 'action',
+      className: 'w-24 text-right',
+      cell: (row) => (
+        <MessageSyncAction
+          row={row}
+          state={rowStates[row.id] ?? 'idle'}
+          disabled={batching}
+          onSync={() => void syncOne(row.id)}
+        />
+      ),
+    },
+  ];
 
   return (
     <div className="space-y-3">
@@ -244,71 +262,13 @@ const MessageSyncModalContent = () => {
         </div>
       </div>
 
-      <div className="rounded-md border border-border/60 overflow-hidden">
-        <table className="w-full text-xs table-fixed">
-          <thead>
-            <tr className="bg-secondary/40 text-foreground">
-              <th className="text-left font-medium px-3 py-2">
-                {t('backfillStatus.colChat')}
-              </th>
-              <th className="text-right font-medium px-3 py-2 w-24">
-                {t('backfillStatus.colMessages')}
-              </th>
-              <th className="px-3 py-2 w-24" />
-            </tr>
-          </thead>
-          <tbody>
-            {shown.map((row) => (
-              <MessageSyncRow
-                key={row.id}
-                row={row}
-                state={rowStates[row.id] ?? 'idle'}
-                disabled={batching}
-                onSync={() => void syncOne(row.id)}
-              />
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {rows.length > PAGE_SIZE && (
-        <div className="flex items-center justify-between">
-          <span className="text-[11px] text-muted-foreground tabular-nums">
-            {t('backfillStatus.pageRange', {
-              from: from + 1,
-              to: from + shown.length,
-              total: rows.length,
-            })}
-          </span>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              disabled={current === 0}
-              onClick={() => setPage(current - 1)}
-              aria-label={t('backfillStatus.prevPage')}
-            >
-              <ChevronLeft className="h-3 w-3" />
-              {t('backfillStatus.prevPage')}
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              disabled={current >= pageCount - 1}
-              onClick={() => setPage(current + 1)}
-              aria-label={t('backfillStatus.nextPage')}
-            >
-              {t('backfillStatus.nextPage')}
-              <ChevronRight className="h-3 w-3" />
-            </Button>
-          </div>
-        </div>
-      )}
+      <PagedTable rows={rows} columns={columns} rowKey={(row) => row.id} />
     </div>
   );
 };
 
-const MessageSyncRow = ({
+/** The row's one control: sync it, retry it, or say why there is nothing to do. */
+const MessageSyncAction = ({
   row,
   state,
   disabled,
@@ -322,54 +282,41 @@ const MessageSyncRow = ({
   const { t } = useI18n();
   const hasMessages = row.message_count > 0;
 
-  return (
-    <tr className="border-t border-border/40">
-      <td className="px-3 py-2 min-w-0">
-        <OverflowTooltip className="block truncate text-foreground">
-          {row.title || t('common.untitled')}
-        </OverflowTooltip>
-      </td>
-      <td
-        className={cn(
-          'px-3 py-2 text-right tabular-nums',
-          hasMessages ? 'text-foreground' : 'text-muted-foreground',
-        )}
+  if (state === 'syncing') {
+    return <Loader2 className="inline-block h-3.5 w-3.5 animate-spin text-muted-foreground" />;
+  }
+  if (state === 'empty') {
+    return (
+      <span className="text-[11px] text-muted-foreground">{t('backfillStatus.reallyEmpty')}</span>
+    );
+  }
+  if (state === 'failed') {
+    return (
+      <button
+        onClick={onSync}
+        disabled={disabled}
+        className="text-[11px] text-destructive hover:underline disabled:opacity-50"
       >
-        {hasMessages ? row.message_count : t('backfillStatus.none')}
-      </td>
-      <td className="px-3 py-2 text-right">
-        {state === 'syncing' ? (
-          <Loader2 className="h-3.5 w-3.5 animate-spin inline-block text-muted-foreground" />
-        ) : state === 'empty' ? (
-          <span className="text-[11px] text-muted-foreground">
-            {t('backfillStatus.reallyEmpty')}
-          </span>
-        ) : state === 'failed' ? (
-          <button
-            onClick={onSync}
-            disabled={disabled}
-            className="text-[11px] text-destructive hover:underline disabled:opacity-50"
-          >
-            {t('backfillStatus.retry')}
-          </button>
-        ) : hasMessages ? (
-          // A freshly synced row is the only one that earns a tick. The rest were
-          // already filled in before the dialog opened, and marking those would
-          // suggest this dialog did something it did not.
-          state === 'synced' ? (
-            <Check className="h-3.5 w-3.5 inline-block text-success" />
-          ) : null
-        ) : (
-          <button
-            onClick={onSync}
-            disabled={disabled}
-            className="text-[11px] text-primary hover:underline disabled:opacity-50"
-          >
-            {t('backfillStatus.sync')}
-          </button>
-        )}
-      </td>
-    </tr>
+        {t('backfillStatus.retry')}
+      </button>
+    );
+  }
+  if (hasMessages) {
+    // A freshly synced row is the only one that earns a tick. The rest were already
+    // filled in before the dialog opened, and marking those would suggest this dialog
+    // did something it did not.
+    return state === 'synced' ? (
+      <Check className="inline-block h-3.5 w-3.5 text-success" />
+    ) : null;
+  }
+  return (
+    <button
+      onClick={onSync}
+      disabled={disabled}
+      className="text-[11px] text-primary hover:underline disabled:opacity-50"
+    >
+      {t('backfillStatus.sync')}
+    </button>
   );
 };
 

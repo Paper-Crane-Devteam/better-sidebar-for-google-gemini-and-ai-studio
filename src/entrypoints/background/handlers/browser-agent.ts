@@ -1,8 +1,10 @@
 import {
-  CAPABILITIES, READ_TOOLS, dependencies, permissionsFor, toolCapability, parseOperations,
-  publicData, isChromeBuild, isTabTool, readCapability, tierOf, type Batch, type BrowserRequest,
-  type Snapshot, type Operation, type Capability, type PlanPreview, type BookmarkState,
-  type Tier, type TabState, type GroupState, type Placement, type PreviewTarget,
+  CAPABILITIES, READ_TOOLS, RESTORE_SIDES, RESTORE_TOOL, dependencies, permissionsFor,
+  toolCapability, parseOperations, publicData, isChromeBuild, isTabTool, readCapability,
+  tierOf, type BatchTrees, type Batch, type BrowserRequest, type Snapshot, type Operation,
+  type Capability, type OperationsPlan, type RestoreEffects, type RestorePlan,
+  type RestoreSide, type BookmarkState, type TabState, type GroupState, type Placement,
+  type PreviewTarget, type TreeEffect, type TreeNode,
 } from '@/shared/browser-agent/contracts';
 import { localAudit } from '@/shared/browser-agent/local-store';
 import { ensureDbReady } from '../db';
@@ -127,99 +129,19 @@ async function snapshot(tool: string): Promise<Snapshot> {
   return { tabs, groups };
 }
 /**
- * The part of the browser one batch's approval is about.
+ * Whether the objects one operation names are still the objects it was approved for.
  *
- * The comparison below used to run over the whole browser — every non-incognito tab in
- * every window, `active` and `url` included, with only `title` excluded. That is a
- * demand that the browser hold still from the moment the preview is drawn until the last
- * step lands, and browsers do not hold still. The false conflicts were routine:
+ * Run against a fresh snapshot before every step, and it is the **only** thing standing
+ * between an approval and the browser. There is deliberately no check that the browser as
+ * a whole held still: someone organizing eighty tabs is using their browser while it
+ * happens, so opening a tab, switching windows or letting a page finish loading has to be
+ * free. Those cannot make any operation here land on the wrong object — an object is named
+ * by id, and this function is what confirms the id still means what it did.
  *
- * - The preview says "close tab #7". You click over to #7 to see what it is, come back,
- *   approve — and `active` has changed. Looking at what you are about to approve is the
- *   single most likely thing to happen in that gap.
- * - You open a tab anywhere while the batch runs, and every index after it shifts.
- * - A background tab finishes a redirect.
- *
- * So the comparison is scoped to what the operations can actually be affected by:
- *
- * | | compared | why |
- * |---|---|---|
- * | windows the batch touches | every tab, in full | index-based moves depend on the whole order of their window |
- * | other windows | nothing | no operation here can be affected by them |
- * | `active` | never | focus is not a layout fact, and no operation's correctness rests on it |
- * | `url` of a targeted tab | yes | closing or moving *this* tab means the page that was in it |
- * | `url` of a context tab | no | it is only there to establish an ordering |
- *
- * ⚠️ This is not the guard that keeps an approval bound to real objects — `validateTargets`
- * re-checks every target against a fresh snapshot on each step, protected host tab and
- * private windows included. This one answers the narrower "did the world move under the
- * preview", and it is the one that has to be scoped or it fires on everything.
+ * The exception is `url`, checked for a close in `precondition` below: closing a tab means
+ * closing the page that was in it, and that is the one operation where being off by a
+ * navigation destroys something.
  */
-interface Scope {
-  /** Windows whose layout the batch depends on. */
-  windows: Set<number>;
-  /** Tabs the batch names, or whose group it names — the ones whose identity matters. */
-  targeted: Set<number>;
-  /**
-   * Tabs a restoration re-created. Their address is explicitly best-effort: we hand the
-   * URL back to Chrome and it decides where that lands, so a redirect is a normal
-   * outcome, not evidence that someone else touched the browser.
-   */
-  reopened?: Set<number>;
-}
-
-/**
- * `everyTab` widens `targeted` to the whole scoped windows, for restorations.
- *
- * `restoreTabs` does not work from the operation list — it walks the recorded snapshot and
- * moves anything whose position differs, which can be any tab in those windows. So for an
- * undo, "targeted" is all of them.
- */
-function scopeOf(operations: Operation[], before: Snapshot, owner: number, everyTab: boolean): Scope {
-  const windows = new Set<number>();
-  const targeted = new Set<number>();
-  // Always in scope: `create` without a `window_id` lands in the host tab's window.
-  const hostWindow = before.tabs?.find(t => t.id === owner)?.windowId;
-  if (hostWindow !== undefined) windows.add(hostWindow);
-  for (const op of operations) {
-    for (const id of (op.tab_ids as number[] | undefined) ?? (op.tab_id !== undefined ? [Number(op.tab_id)] : [])) targeted.add(id);
-    if (op.group_id !== undefined) for (const t of before.tabs ?? []) if (t.groupId === op.group_id) targeted.add(t.id);
-    if (op.window_id !== undefined) windows.add(Number(op.window_id));
-  }
-  for (const t of before.tabs ?? []) if (targeted.has(t.id)) windows.add(t.windowId);
-  if (everyTab) for (const t of before.tabs ?? []) if (windows.has(t.windowId)) targeted.add(t.id);
-  return { windows, targeted };
-}
-
-/**
- * A snapshot reduced to the fields and objects the scope says matter.
- *
- * Bookmarks are compared whole and unscoped. They have no equivalent of a tab quietly
- * finishing a navigation — a bookmark tree only changes when someone changes it — so the
- * strict comparison costs nothing there, and scoping it would mean reasoning about which
- * folders a move's index depends on for no gain.
- */
-function comparable(s: Snapshot, scope: Scope) {
-  if (!s.tabs) return s;
-  return {
-    ...s,
-    tabs: s.tabs
-      .filter(t => scope.windows.has(t.windowId))
-      .map(({ title: _title, active: _active, ...t }) =>
-        scope.targeted.has(t.id) && !scope.reopened?.has(t.id) ? t : { ...t, url: '' }),
-    groups: s.groups?.filter(g => scope.windows.has(g.windowId)),
-  };
-}
-function matches(a: Snapshot, b: Snapshot, scope: Scope) {
-  return stable(comparable(a, scope)) === stable(comparable(b, scope));
-}
-function diff(before: Snapshot, after: Snapshot) {
-  return (['tabs', 'groups', 'bookmarks'] as const).flatMap(kind => {
-    const a = new Map((before[kind] ?? []).map(n => [String(n.id), n] as const));
-    const b = new Map((after[kind] ?? []).map(n => [String(n.id), n] as const));
-    return [...new Set([...a.keys(), ...b.keys()])].filter(id => stable(a.get(id)) !== stable(b.get(id))).map(id => ({ kind, id, before: a.get(id), after: b.get(id) }));
-  });
-}
 function validateTargets(tool: string, op: Operation, s: Snapshot, owner: number) {
   if (!isTabTool(tool)) {
     const rows = s.bookmarks!;
@@ -250,6 +172,22 @@ function validateTargets(tool: string, op: Operation, s: Snapshot, owner: number
   }
   if (op.window_id !== undefined && !s.tabs!.some(t => t.windowId === op.window_id)) throw new Error('Destination window is missing or private.');
   if (ids.length > 1 && new Set(s.tabs!.filter(t => ids.includes(t.id)).map(t => t.windowId)).size > 1) throw new Error('Group members must belong to the same window.');
+}
+/**
+ * The one field whose *value* an approval is bound to.
+ *
+ * A tab is approved for closing by what was in it, not by its id. Ids get reused within a
+ * session and a tab can navigate on its own between the preview and the click, and either
+ * way what the user agreed to lose is the page they were shown. Nothing else is compared:
+ * a moved or pinned tab is still that tab whatever it has loaded since.
+ */
+function checkCloseTarget(op: Operation, before: Snapshot, live: Snapshot) {
+  const id = Number(op.tab_id);
+  const approved = before.tabs?.find(t => t.id === id);
+  const now = live.tabs?.find(t => t.id === id);
+  if (!approved || !now || approved.url !== now.url) {
+    throw new Error('This tab now holds a different page. Prepare and approve a new plan.');
+  }
 }
 async function apply(tool: string, op: Operation, owner: number) {
   const tabId = Number(op.tab_id);
@@ -285,68 +223,173 @@ async function apply(tool: string, op: Operation, owner: number) {
   }
 }
 
-/** Restore only changed bookmarks. Parents are recreated before children and IDs are remapped. */
-async function restoreBookmarks(before: BookmarkState[], after: BookmarkState[], remap: Map<string, string>) {
+/**
+ * Restoring is **additive**, and that is the whole contract.
+ *
+ * A recorded state is put back — objects that went missing are re-created, objects that
+ * moved go back to where they were, names and colours are set again — and **nothing is
+ * ever removed**. Whatever exists now and is not in the snapshot survives, keeping its
+ * contents, and ends up ordered after the restored objects.
+ *
+ * That makes the direction safe in a way the alternative is not. Making the browser *equal*
+ * to a snapshot means closing the tabs someone opened since, and "put my tabs back the way
+ * they were" is not a request to throw away the last ten minutes of browsing. It also means
+ * restoring never deletes and so is never destructive, which is why it needs no tier of its
+ * own and can be repeated as often as the user likes with the same result.
+ *
+ * The cost, stated in the approval card and nowhere hidden: the result is the snapshot
+ * *plus* whatever is new, so the tree on screen is what gets restored rather than
+ * everything that will be there afterwards.
+ */
+
+/**
+ * Which object standing in the browser right now *is* each recorded one.
+ *
+ * Ids answer this whenever they still exist. When they do not — a tab was closed, a bookmark
+ * was deleted — an object that looks the same is treated as the same, matched once each so
+ * two recorded tabs of one URL still need two tabs.
+ *
+ * ⚠️ Without this, restoring is not repeatable. Re-creating an object gives it a new id, so
+ * a second restore of the same state would find the recorded id missing again and make
+ * another copy — and the user's own reopening of a tab would be duplicated too. Adopting the
+ * lookalike makes running a restore twice land where running it once does.
+ */
+function pairTabs(want: TabState[], live: chrome.tabs.Tab[]): Map<number, number> {
+  const pairs = new Map<number, number>();
+  const claimed = new Set<number>();
+  for (const t of want) {
+    if (!live.some(x => x.id === t.id)) continue;
+    pairs.set(t.id, t.id);
+    claimed.add(t.id);
+  }
+  for (const t of want) {
+    if (pairs.has(t.id)) continue;
+    const adopted = live.find(x => !claimed.has(x.id!) && tabUrl(x) === t.url);
+    if (!adopted) continue;
+    pairs.set(t.id, adopted.id!);
+    claimed.add(adopted.id!);
+  }
+  return pairs;
+}
+/** The same question for bookmarks, where a lookalike is a matching title and address. */
+function pairBookmarks(want: BookmarkState[], live: BookmarkState[]): Map<string, string> {
+  const pairs = new Map<string, string>();
+  const claimed = new Set<string>();
+  for (const n of want) {
+    if (n.parentId === undefined || !live.some(x => x.id === n.id)) continue;
+    pairs.set(n.id, n.id);
+    claimed.add(n.id);
+  }
+  for (const n of want) {
+    if (n.parentId === undefined || pairs.has(n.id)) continue;
+    const adopted = live.find(x => !claimed.has(x.id) && x.title === n.title && x.url === n.url && x.parentId !== undefined);
+    if (!adopted) continue;
+    pairs.set(n.id, adopted.id);
+    claimed.add(adopted.id);
+  }
+  return pairs;
+}
+
+/** Restore bookmarks additively. Parents are created before children and new ids remapped. */
+async function restoreBookmarks(target: BookmarkState[], remap: Map<string, string>) {
   const id = (value: string) => remap.get(value) ?? value;
-  const original = new Set(before.map(n => n.id));
-  const added = after.filter(n => !original.has(n.id));
-  for (const n of [...added].reverse()) {
-    if (n.url !== undefined) await chrome.bookmarks.remove(id(n.id));
-    else await chrome.bookmarks.removeTree(id(n.id));
+  const live = await bookmarkSnapshot();
+  const pairs = pairBookmarks(target, live);
+  for (const [recorded, actual] of pairs) if (recorded !== actual) remap.set(recorded, actual);
+  const byId = new Map(live.map(n => [n.id, n]));
+  /*
+    Re-create what is gone. `target` is a pre-order walk of the tree, so a parent is always
+    reached before its children and `remap` already holds its new id by the time a child
+    needs it.
+  */
+  for (const n of target) {
+    if (n.parentId === undefined || pairs.has(n.id)) continue;
+    if (!pairs.has(n.parentId) && !byId.has(n.parentId)) throw new Error('The folder these bookmarks were in no longer exists.');
+    const created = await chrome.bookmarks.create({ parentId: id(n.parentId), title: n.title, url: n.url });
+    remap.set(n.id, created.id);
+    // A folder just created is the destination for the children still to come.
+    pairs.set(n.id, created.id);
   }
-  const existing = new Set(after.map(n => n.id));
-  for (const n of before) {
-    if (!existing.has(n.id)) {
-      const created = await chrome.bookmarks.create({ parentId: n.parentId ? id(n.parentId) : undefined, title: n.title, url: n.url, index: n.index });
-      remap.set(n.id, created.id);
-    }
+  for (const n of target) {
+    if (n.parentId === undefined || n.unmodifiable) continue;
+    const current = byId.get(id(n.id));
+    if (current && current.title !== n.title) await chrome.bookmarks.update(id(n.id), { title: n.title });
   }
-  for (const n of before) {
-    const current = after.find(x => x.id === n.id);
-    if (!current || n.parentId === undefined || n.parentId === '0') continue;
-    if (n.title !== current.title) await chrome.bookmarks.update(id(n.id), { title: n.title });
-    if (n.parentId !== current.parentId || n.index !== current.index) await chrome.bookmarks.move(id(n.id), { parentId: id(n.parentId), index: n.index });
+  /*
+    Order per folder, by rewriting only the folders that are actually out of order.
+    Positions are assigned from a running slot rather than the recorded index, so bookmarks
+    added since are pushed to the end of the folder instead of displacing the restored ones.
+  */
+  const byParent = new Map<string, BookmarkState[]>();
+  for (const n of target) {
+    if (n.parentId === undefined || n.parentId === '0' || n.unmodifiable) continue;
+    const siblings = byParent.get(n.parentId) ?? [];
+    siblings.push(n);
+    byParent.set(n.parentId, siblings);
+  }
+  for (const [parent, siblings] of byParent) {
+    siblings.sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
+    const wanted = siblings.map(n => id(n.id));
+    const present = (await chrome.bookmarks.getChildren(id(parent))).slice(0, wanted.length).map(n => n.id);
+    if (stable(present) === stable(wanted)) continue;
+    for (const [slot, node] of wanted.entries()) await chrome.bookmarks.move(node, { parentId: id(parent), index: slot });
   }
 }
 
-/** Layout restoration does not claim to restore the runtime state of a closed web page. */
-async function restoreTabs(before: Snapshot, after: Snapshot, remap: Map<string, string>) {
+/**
+ * Restore tabs additively. Reopening a page does not restore what was running inside it.
+ *
+ * ⚠️ Positions come from a **running slot per window**, not the recorded index. Tabs opened
+ * since the snapshot have to end up somewhere, and the only answer that keeps the restored
+ * tabs in their recorded order is "after them". Using the recorded index instead would
+ * interleave the two sets and put nothing where it was.
+ *
+ * The slot starts past any pinned tab that is not in the snapshot: Chrome keeps pinned tabs
+ * at the front of a window, so a new pinned tab owns position 0 whatever we ask for.
+ */
+async function restoreTabs(target: Snapshot, remap: Map<string, string>) {
   const id = (n: number) => Number(remap.get(`tab:${n}`) ?? n);
   const gid = (n: number) => Number(remap.get(`group:${n}`) ?? n);
-  const old = before.tabs!, now = after.tabs!;
-  for (const t of now.filter(t => !old.some(o => o.id === t.id))) await chrome.tabs.remove(id(t.id));
-  for (const t of old.filter(t => !now.some(o => o.id === t.id))) {
+  const want = target.tabs!;
+  const live = (await chrome.tabs.query({})).filter(t => !t.incognito);
+  const windows = new Set(live.map(t => t.windowId));
+  const pairs = pairTabs(want, live);
+  for (const [recorded, actual] of pairs) if (recorded !== actual) remap.set(`tab:${recorded}`, String(actual));
+  for (const t of want) {
+    if (!windows.has(t.windowId)) throw new Error('A window this state used no longer exists.');
+  }
+  for (const t of want) {
+    if (pairs.has(t.id)) continue;
     if (!/^https?:\/\//i.test(t.url)) throw new Error('This closed page cannot be reopened by the extension.');
-    const created = await chrome.tabs.create({ url: t.url, windowId: t.windowId, index: t.index, pinned: t.pinned, active: false });
+    const created = await chrome.tabs.create({ url: t.url, windowId: t.windowId, pinned: t.pinned, active: false });
     remap.set(`tab:${t.id}`, String(created.id));
+    pairs.set(t.id, created.id!);
   }
-  // Unpin/ungroup changed members before moving; untouched tabs stay in their groups.
-  for (const t of old) {
-    const previous = now.find(n => n.id === t.id);
+  // Pinned state first, and leave a group whose membership is about to change: a tab
+  // cannot be moved out of a group it is still in.
+  for (const t of want) {
     const current = await chrome.tabs.get(id(t.id));
-    if (current.groupId !== -1 && (current.groupId !== gid(t.groupId) || current.windowId !== t.windowId)) await chrome.tabs.ungroup(id(t.id));
-    if (!previous || previous.pinned !== t.pinned) await chrome.tabs.update(id(t.id), { pinned: t.pinned });
+    if (current.pinned !== t.pinned) await chrome.tabs.update(id(t.id), { pinned: t.pinned });
+    const wanted = t.groupId === -1 ? -1 : gid(t.groupId);
+    if (current.groupId !== -1 && (current.groupId !== wanted || current.windowId !== t.windowId)) {
+      await chrome.tabs.ungroup(id(t.id));
+    }
   }
-  /**
-   * The host tab is reordered here too — it is the one place where that is allowed.
-   *
-   * Forward operations can never move it (`validateTargets`), but they move it *anyway*:
-   * shifting any other tab past it changes its index. Leaving it pinned in place made
-   * restoration unable to converge on the recorded layout — the tab it refused to move
-   * was the one blocking every other tab from reaching its old position — and the run
-   * then failed its own verification with "restoration did not fully match", after
-   * having spent the batch's single undo attempt.
-   *
-   * The position is the only thing being restored, and only to one the browser was
-   * already in: `prepare` rejects any batch where the host's window or group differs
-   * between before and after, so this cannot move it out of its window or into a group.
-   */
-  for (const t of [...old].sort((a, b) => a.windowId - b.windowId || a.index - b.index)) {
+  const kept = new Set(pairs.values());
+  const slots = new Map<number, number>();
+  for (const windowId of windows) {
+    slots.set(windowId, live.filter(t => t.windowId === windowId && t.pinned && !kept.has(t.id!)).length);
+  }
+  for (const t of [...want].sort((a, b) => a.windowId - b.windowId || a.index - b.index)) {
+    const slot = slots.get(t.windowId)!;
+    slots.set(t.windowId, slot + 1);
     const current = await chrome.tabs.get(id(t.id));
-    if (current.windowId !== t.windowId || current.index !== t.index) await chrome.tabs.move(id(t.id), { windowId: t.windowId, index: t.index });
+    if (current.windowId !== t.windowId || current.index !== slot) {
+      await chrome.tabs.move(id(t.id), { windowId: t.windowId, index: slot });
+    }
   }
-  for (const g of before.groups ?? []) {
-    const members = old.filter(t => t.groupId === g.id).map(t => id(t.id));
+  for (const g of target.groups ?? []) {
+    const members = want.filter(t => t.groupId === g.id).map(t => id(t.id));
     if (!members.length) continue;
     const exists = (await chrome.tabGroups.query({})).some(x => x.id === gid(g.id));
     if (!exists) {
@@ -362,41 +405,166 @@ async function restoreTabs(before: Snapshot, after: Snapshot, remap: Map<string,
       await chrome.tabGroups.update(gid(g.id), { title: g.title, color: g.color as chrome.tabGroups.Color, collapsed: g.collapsed });
     }
   }
-  for (const t of old) {
+  for (const t of want) {
     if (t.active && !(await chrome.tabs.get(id(t.id))).active) await chrome.tabs.update(id(t.id), { active: true });
   }
 }
-function remapped(s: Snapshot, map: Map<string, string>): Snapshot {
-  const tab = (n: number) => Number(map.get(`tab:${n}`) ?? n);
-  const group = (n: number) => Number(map.get(`group:${n}`) ?? n);
-  return {
-    ...(s.tabs ? { tabs: s.tabs.map(t => ({ ...t, id: tab(t.id), groupId: group(t.groupId) })).sort((a, b) => a.id - b.id) } : {}),
-    ...(s.groups ? { groups: s.groups.map(g => ({ ...g, id: group(g.id) })).sort((a, b) => a.id - b.id) } : {}),
-    ...(s.bookmarks ? { bookmarks: s.bookmarks.map(n => ({ ...n, id: map.get(n.id) ?? n.id, parentId: n.parentId ? map.get(n.parentId) ?? n.parentId : undefined })) } : {}),
-  };
-}
-function undoNeedsGroups(batch: Batch) {
-  return batch.steps.some(s => stable(s.before.groups) !== stable(s.after?.groups)
-    || s.before.tabs?.some(t => (s.after?.tabs?.find(a => a.id === t.id)?.groupId ?? -1) !== t.groupId));
+/**
+ * What restoring this state would come to, counted against the browser as it is now.
+ *
+ * The same walk the tree builder uses, so a count and the node it belongs to can never
+ * disagree. `extra` is what makes the additive contract visible: objects that exist now,
+ * are absent from the snapshot, and will be left exactly where they are.
+ */
+async function restoreEffects(target: Snapshot): Promise<RestoreEffects> {
+  const { effects, extra } = await inspectRestore(target);
+  const counts: RestoreEffects = { restore: 0, reopen: 0, create: 0, keep: 0, extra };
+  for (const [key, effect] of effects) {
+    if (key.startsWith('group:')) continue; // A container is not an object the user counts.
+    counts[effect]++;
+  }
+  return counts;
 }
 /**
- * The tier of undoing a batch, which is not the tier of the batch.
+ * Per-object verdicts for a restore, plus how much the browser holds that the state does not.
  *
- * Undo is usually the safer direction, but not always: undoing "created three bookmark
- * folders" deletes those three folders, and the user may have put things in them since.
- * So the question is what the *undo* has to do — and re-creating something is the only
- * forward operation whose inverse destroys anything.
+ * One walk feeding both the tree and the counts beside it, so a badge and a number can never
+ * disagree. It reproduces what `restoreTabs` and `restoreBookmarks` will do, including the
+ * running slot and the lookalike pairing — a preview that models the restore differently
+ * from the restore is a preview that lies.
  *
- * Groups do not count. Removing a group the batch created leaves its tabs alone; the
- * group is a container, and losing it costs a name and a colour.
+ * `restore` covers anything whose place, name, colour or pinned state differs: one word
+ * rather than four, because the card answers "will this change" and the tree already shows
+ * what it will change to.
  */
-function undoTier(batch: Batch): Tier {
-  const removesObjects = batch.steps.some(step => (['tabs', 'bookmarks'] as const).some(kind => {
-    const before = new Set((step.before[kind] ?? []).map(o => String(o.id)));
-    return (step.after?.[kind] ?? []).some(o => !before.has(String(o.id)));
-  }));
-  return removesObjects ? 'lossy' : 'low';
+async function inspectRestore(target: Snapshot): Promise<{ effects: Map<string, TreeEffect>; extra: number }> {
+  const effects = new Map<string, TreeEffect>();
+  if (target.tabs) {
+    const live = (await chrome.tabs.query({})).filter(t => !t.incognito);
+    const pairs = pairTabs(target.tabs, live);
+    const byId = new Map(live.map(t => [t.id!, t]));
+    const liveGroups = new Map((await chrome.tabGroups.query({})).map(g => [g.id, g]));
+    const kept = new Set(pairs.values());
+    const windows = new Set(live.map(t => t.windowId));
+    const slots = new Map<number, number>();
+    for (const windowId of windows) {
+      slots.set(windowId, live.filter(t => t.windowId === windowId && t.pinned && !kept.has(t.id!)).length);
+    }
+    for (const t of [...target.tabs].sort((a, b) => a.windowId - b.windowId || a.index - b.index)) {
+      const actual = pairs.get(t.id);
+      if (actual === undefined) { effects.set(`tab:${t.id}`, 'reopen'); continue; }
+      const current = byId.get(actual)!;
+      const slot = slots.get(t.windowId) ?? 0;
+      slots.set(t.windowId, slot + 1);
+      // An adopted tab is a different tab wearing the same address, so it is never "already
+      // in place" — its group and position are whatever they happen to be.
+      const settled = actual === t.id && current.windowId === t.windowId && current.pinned === t.pinned
+        && current.groupId === t.groupId && current.index === slot;
+      effects.set(`tab:${t.id}`, settled ? 'keep' : 'restore');
+    }
+    for (const g of target.groups ?? []) {
+      const current = liveGroups.get(g.id);
+      const settled = !!current && current.title === g.title && current.color === g.color && current.collapsed === g.collapsed;
+      effects.set(`group:${g.id}`, settled ? 'keep' : 'restore');
+    }
+    return { effects, extra: live.filter(t => !kept.has(t.id!)).length };
+  }
+  const live = await bookmarkSnapshot();
+  const recorded = target.bookmarks ?? [];
+  const pairs = pairBookmarks(recorded, live);
+  const byId = new Map(live.map(n => [n.id, n]));
+  for (const n of recorded) {
+    if (n.parentId === undefined) continue;
+    const actual = pairs.get(n.id);
+    if (actual === undefined) { effects.set(`mark:${n.id}`, 'create'); continue; }
+    const current = byId.get(actual)!;
+    const settled = actual === n.id && current.parentId === n.parentId && current.index === n.index && current.title === n.title;
+    effects.set(`mark:${n.id}`, settled ? 'keep' : 'restore');
+  }
+  const kept = new Set(pairs.values());
+  return { effects, extra: live.filter(n => n.parentId !== undefined && !kept.has(n.id)).length };
 }
+/**
+ * A snapshot as the browser shows it: windows holding groups holding tabs, folders holding
+ * bookmarks.
+ *
+ * The one view that answers "what did my browser look like" without naming a single id, and
+ * the one that can be held up against the real browser and compared by eye. `effects`, when
+ * given, marks what a restore would do to each node — the counts beside the tree come from
+ * the same map, so the two cannot disagree.
+ */
+function treeOf(snapshot: Snapshot, hostWindow: number | undefined, effects?: Map<string, TreeEffect>): TreeNode[] {
+  const effect = (key: string) => effects && { effect: effects.get(key) ?? 'keep' };
+  if (snapshot.bookmarks) {
+    const children = new Map<string, BookmarkState[]>();
+    for (const n of snapshot.bookmarks) {
+      if (n.parentId === undefined) continue;
+      const siblings = children.get(n.parentId) ?? [];
+      siblings.push(n);
+      children.set(n.parentId, siblings);
+    }
+    const build = (node: BookmarkState): TreeNode => ({
+      key: `mark:${node.id}`,
+      kind: node.url === undefined ? 'folder' : 'bookmark',
+      title: node.title,
+      ...(node.url ? { url: node.url } : {}),
+      ...effect(`mark:${node.id}`),
+      ...(node.url === undefined
+        ? { children: (children.get(node.id) ?? []).sort((a, b) => (a.index ?? 0) - (b.index ?? 0)).map(build) }
+        : {}),
+    });
+    // The roots ("Bookmarks bar" and friends) are the children of "0"; "0" itself has no
+    // name and nothing to say.
+    return (children.get('0') ?? []).sort((a, b) => (a.index ?? 0) - (b.index ?? 0)).map(build);
+  }
+  const tabs = snapshot.tabs ?? [];
+  const groups = new Map((snapshot.groups ?? []).map(g => [g.id, g]));
+  /*
+    Windows are numbered by id, which is allocation order — close enough to the order they
+    were opened that an ordinal stays put across a whole card, which is the property that
+    matters. The host's window says so instead, and a lone window gets no ordinal at all.
+  */
+  const order = [...new Set(tabs.map(t => t.windowId))].sort((a, b) => a - b);
+  const tab = (t: TabState): TreeNode => ({
+    key: `tab:${t.id}`, kind: 'tab', title: t.title, ...(t.url ? { url: t.url } : {}), ...effect(`tab:${t.id}`),
+  });
+  return order.map(windowId => {
+    const members = tabs.filter(t => t.windowId === windowId).sort((a, b) => a.index - b.index);
+    const children: TreeNode[] = [];
+    const pinned = members.filter(t => t.pinned);
+    if (pinned.length) children.push({ key: `pinned:${windowId}`, kind: 'pinned', children: pinned.map(tab) });
+    // A group is placed where its first member sits, so the tree reads in the same order
+    // as the tab strip.
+    const seen = new Set<number>();
+    for (const t of members) {
+      if (t.pinned) continue;
+      if (t.groupId === -1) { children.push(tab(t)); continue; }
+      if (seen.has(t.groupId)) continue;
+      seen.add(t.groupId);
+      const group = groups.get(t.groupId);
+      children.push({
+        key: `group:${t.groupId}`, kind: 'group', title: group?.title ?? '',
+        ...(group?.color ? { color: group.color } : {}),
+        ...effect(`group:${t.groupId}`),
+        children: members.filter(m => !m.pinned && m.groupId === t.groupId).map(tab),
+      });
+    }
+    return {
+      key: `window:${windowId}`, kind: 'window' as const,
+      ...(windowId === hostWindow ? { hostWindow: true } : {}),
+      ...(order.length > 1 ? { window: order.indexOf(windowId) + 1 } : {}),
+      children,
+    };
+  });
+}
+/**
+ * Whether putting this state back needs group write access.
+ *
+ * Asked of the target state rather than of what changed: restoring a state that has tabs in
+ * groups means grouping tabs, whatever the batch that recorded it happened to do.
+ */
+const restoreNeedsGroups = (target: Snapshot) =>
+  !!target.groups?.length || !!target.tabs?.some(t => t.groupId !== -1);
 /**
  * Operation params that are an id and nothing else.
  *
@@ -484,189 +652,236 @@ function describer(batch: Batch) {
     },
     target: (kind: 'tabs' | 'bookmarks', row: TabState | BookmarkState): PreviewTarget =>
       ({ title: row.title, ...place(kind, row) }),
-    place,
   };
 }
 
-function preview(batch: Batch, undo?: Batch): PlanPreview {
+function preview(batch: Batch): OperationsPlan {
   const describe = describer(batch);
-  return {
-    id: batch.id, count: batch.operations.length,
-    tier: undo ? undoTier(undo) : tierOf(batch.tool),
-    items: batch.operations.map((op, index) => {
+  /** Every object any operation names, so the ones nobody names can be counted. */
+  const named = new Set<string>();
+  const items = batch.operations.map(op => {
       const subtree = new Set<string>();
       if (op.type === 'delete' && typeof op.id === 'string') {
         subtree.add(op.id);
         for (const b of batch.before.bookmarks ?? []) if (b.parentId && subtree.has(b.parentId)) subtree.add(b.id);
       }
       /*
-        ⚠️ A move's destination folder is deliberately *not* a target. It used to be matched
-        in here alongside the bookmark being moved, which put the folder the user is moving
-        something *into* on the same list as the things being moved — indistinguishable, and
-        for a `create` it was the only entry, so the card claimed one object would be
-        affected and then named the wrong one. The destination is a detail now (`folder`).
+        ⚠️ A move's destination folder is deliberately *not* a target. Listing it beside the
+        bookmarks being moved makes the two indistinguishable, and for a `create` it would
+        be the only entry — a card claiming one object is affected and then naming the wrong
+        one. The destination is a detail (`folder`).
       */
       const kind = batch.before.tabs ? 'tabs' : 'bookmarks';
       const targets: Array<TabState | BookmarkState> = batch.before.tabs?.filter(t => t.id === op.tab_id || (op.tab_ids as number[] | undefined)?.includes(t.id) || (op.group_id !== undefined && t.groupId === op.group_id))
         ?? batch.before.bookmarks?.filter(b => subtree.has(b.id) || b.id === op.id) ?? [];
-      const changes = undo?.steps[undo.steps.length - index - 1].changes;
+      for (const row of targets) named.add(String(row.id));
       return {
         type: op.type, details: describe.details(op),
         targetCount: targets.length,
         targets: targets.slice(0, 100).map(row => describe.target(kind, row)),
-        ...(undo ? {
-          undo: true,
-          changes: changes?.slice(0, 100).map(c => ({
-            // Named by what it is. The row carries the title on whichever side exists —
-            // a tab being reopened has no current state, and a created one no prior state.
-            title: ((c.after ?? c.before) as { title?: string } | undefined)?.title ?? '',
-            from: describe.place(c.kind, c.after),
-            to: describe.place(c.kind, c.before),
-          })),
-        } : {}),
       };
-    }),
-    undo: !!batch.undoOf,
+    });
+  /*
+    Bookmarks count only real nodes: the tree's roots ("0" and the bars under it) are not
+    things a user thinks of as bookmarks, so including them would inflate the one number on
+    the card that is supposed to describe the size of their collection.
+  */
+  const all = batch.before.tabs ?? (batch.before.bookmarks ?? []).filter(n => n.parentId !== undefined && n.parentId !== '0');
+  return {
+    id: batch.id, kind: 'operations', count: batch.operations.length,
+    tier: tierOf(batch.tool),
+    items,
+    untouched: all.filter(row => !named.has(String(row.id))).length,
   };
 }
 async function prepare(tool: string, params: Record<string, string>, owner: number) {
-  let undo: Batch | undefined;
-  if (tool === 'browser_undo_changes') {
-    undo = await localAudit.get(params.batch_id);
-    if (!undo || undo.undoOf || undo.undoneBy || !['applied', 'failed'].includes(undo.status) || !undo.steps.length || undo.steps.some(s => s.status !== 'applied')) throw new Error('This batch cannot be undone automatically.');
-    if (undo.before.tabs && undo.epoch !== await epoch()) throw new Error('Tab undo is unavailable after a browser restart.');
-    tool = undo.tool;
-  }
+  if (tool === RESTORE_TOOL) return prepareRestore(params, owner);
   await requireTool(tool);
   const before = await snapshot(tool);
-  const operations = undo ? [...undo.steps].reverse().map(s => s.operation) : parseOperations(tool, params.operations);
-  if (undo) {
-    if (before.tabs && undoNeedsGroups(undo)) await requireCaps(['tabGroups.write']);
-    // Scoped by the original batch: those are the windows the restoration will work in.
-    if (!matches(before, undo.steps.at(-1)!.after!, scopeOf(undo.operations, undo.before, owner, true))) throw new Error('The browser has changed since this batch. Undo would overwrite newer changes.');
-    // Recreated/reordered host tabs are never allowed, including an old batch from another host.
-    if (before.tabs && undo.steps.some(s => {
-      const a = s.before.tabs?.find(t => t.id === owner), b = s.after?.tabs?.find(t => t.id === owner);
-      return !!a !== !!b || (a && b && (a.windowId !== b.windowId || a.groupId !== b.groupId));
-    })) throw new Error('Undo would remove or regroup the Agent host tab.');
-  } else for (const op of operations) validateTargets(tool, op, before, owner);
-  const batch: Batch = { id: crypto.randomUUID(), owner, epoch: await epoch(), tool, operations, before, createdAt: Date.now(), status: 'prepared', steps: [], ...(undo ? { undoOf: undo.id } : {}) };
+  const operations = parseOperations(tool, params.operations);
+  for (const op of operations) validateTargets(tool, op, before, owner);
+  const batch: Batch = { id: crypto.randomUUID(), owner, epoch: await epoch(), tool, operations, before, createdAt: Date.now(), status: 'prepared', steps: [] };
   // Awaited before the preview is shown: a plan the journal never accepted must not be
   // approvable, because approval is what makes it executable.
   await localAudit.insert(batch);
-  return preview(batch, undo);
+  return preview(batch);
+}
+/**
+ * A plan to put one recorded state back.
+ *
+ * Stored as a batch like any other, with one pseudo-operation so the commit loop, the step
+ * row and the audit trail need no special case. Its `tool` is the *arrange* tool for the
+ * kind of state involved, not the tool of the batch it came from: restoring a batch of
+ * closes reopens and positions tabs, so `tabs.arrange` is the capability that describes it,
+ * and asking for `tabs.close` to undo a close would be asking for the wrong thing.
+ */
+async function prepareRestore(params: Record<string, string>, owner: number): Promise<RestorePlan> {
+  const side = (params.side || 'before') as RestoreSide;
+  if (!(RESTORE_SIDES as readonly string[]).includes(side)) throw new Error('Restore side must be "before" or "after".');
+  const source = await localAudit.get(params.batch_id);
+  if (!source) throw new Error('That batch is not in the journal.');
+  const target = side === 'before' ? source.before : source.after;
+  if (!target) throw new Error('This batch never finished, so it has no end state to restore.');
+  const onTabs = !!target.tabs;
+  if (onTabs && source.epoch !== await epoch()) throw new Error('Tab states cannot be restored after a browser restart, because tab ids do not survive one.');
+  const tool = onTabs ? 'browser_arrange_tabs' : 'browser_arrange_bookmarks';
+  await requireTool(tool);
+  if (onTabs && restoreNeedsGroups(target)) await requireCaps(['tabGroups.write']);
+  const before = await snapshot(tool);
+  /*
+    The host tab may be reordered within its window — every other tab reaching its recorded
+    position depends on it, and refusing would leave the restore unable to converge. Moving
+    it to another window or into a group is refused, per §13.
+  */
+  const host = before.tabs?.find(t => t.id === owner);
+  const recordedHost = target.tabs?.find(t => t.id === owner);
+  if (host && recordedHost && (host.windowId !== recordedHost.windowId || host.groupId !== recordedHost.groupId)) {
+    throw new Error('Restoring this state would move the Agent host tab to another window or group.');
+  }
+  const batch: Batch = {
+    id: crypto.randomUUID(), owner, epoch: await epoch(), tool,
+    operations: [{ type: 'restore', batch_id: source.id, side }],
+    before, createdAt: Date.now(), status: 'prepared', steps: [],
+    restoreOf: source.id, restoreSide: side,
+  };
+  await localAudit.insert(batch);
+  const { effects } = await inspectRestore(target);
+  return {
+    id: batch.id, kind: 'restore', tier: 'low', side,
+    tree: treeOf(target, host?.windowId, effects),
+    effects: await restoreEffects(target),
+  };
 }
 async function commit(planId: string, owner: number) {
   const batch = await localAudit.get(planId);
   if (!batch || batch.owner !== owner) throw new Error('Unknown plan or wrong host.');
   if (batch.status !== 'prepared') throw new Error('This plan has already been attempted. Read its audit record; do not retry it.');
   if (batch.epoch !== await epoch() || Date.now() - batch.createdAt > 600000) throw new Error('Plan expired. Prepare and approve a new plan.');
-  await requireTool(batch.tool);
-  const scope = scopeOf(batch.operations, batch.before, owner, !!batch.undoOf);
-  if (!matches(batch.before, await snapshot(batch.tool), scope)) throw new Error('The browser changed after preview. Prepare and approve a new plan.');
-  const undo = batch.undoOf ? await localAudit.get(batch.undoOf) : undefined;
-  if (batch.undoOf && !undo) throw new Error('Original batch is missing.');
-  if (undo && batch.before.tabs && undoNeedsGroups(undo)) await requireCaps(['tabGroups.write']);
-  if (undo?.undoneBy) throw new Error('This batch already has an undo attempt.');
+  /**
+   * Everything that can refuse the batch, before anything is attempted.
+   *
+   * ⚠️ Preconditions belong out here rather than in the run, so a plan that cannot proceed is
+   * *refused* instead of journalled as a half-attempt. Past this point the batch has a
+   * verdict to explain; "the tab you approved closing now holds a different page" is not
+   * something to explain in a record, it is something to say to the caller.
+   *
+   * A refusal is still written down. The user approved this, so "it did not happen, and why"
+   * belongs in the journal beside the batches that did — with no end state, which is what
+   * marks it as never having run.
+   */
+  let target: Snapshot | undefined;
+  try {
+    await requireTool(batch.tool);
+    const restoring = batch.restoreOf ? await localAudit.get(batch.restoreOf) : undefined;
+    if (batch.restoreOf && !restoring) throw new Error('The batch this would restore is no longer in the journal.');
+    target = restoring && (batch.restoreSide === 'after' ? restoring.after : restoring.before);
+    if (restoring && !target) throw new Error('The recorded state is missing.');
+    if (target?.tabs && restoreNeedsGroups(target)) await requireCaps(['tabGroups.write']);
+    if (!target) {
+      const live = await snapshot(batch.tool);
+      for (const op of batch.operations) {
+        validateTargets(batch.tool, op, live, owner);
+        if (batch.tool === 'browser_close_tabs') checkCloseTarget(op, batch.before, live);
+      }
+    }
+  } catch (error) {
+    batch.error = error instanceof Error ? error.message : 'This plan can no longer be applied.';
+    await localAudit.patch(batch.id, { status: 'failed', error: batch.error }).catch(() => { /* Already failing. */ });
+    throw error;
+  }
   batch.status = 'applying';
   await localAudit.patch(batch.id, { status: batch.status });
-  if (undo) { undo.undoneBy = batch.id; await localAudit.patch(undo.id, { undoneBy: batch.id }); }
   active.add(planId);
   owners.set(planId, owner);
   const map = new Map<string, string>();
-  /**
-   * The scope, plus whatever this run has re-created so far.
-   *
-   * Re-created tabs join `targeted` as well as `reopened`: they are the objects the
-   * restoration is about, and a tab that did not exist when the scope was computed cannot
-   * have been named by it.
-   */
-  const scoped = (): Scope => {
-    const reopened = new Set([...map].filter(([key]) => key.startsWith('tab:')).map(([, id]) => Number(id)));
-    return { ...scope, targeted: new Set([...scope.targeted, ...reopened]), reopened };
-  };
-  let expected = batch.before;
   try {
     for (const [index, op] of batch.operations.entries()) {
       if (cancelled.has(planId)) throw new Error('Stopped. Completed steps were retained.');
       await requireTool(batch.tool);
-      if (undo && batch.before.tabs && undoNeedsGroups(undo)) await requireCaps(['tabGroups.write']);
-      const before = await snapshot(batch.tool);
-      if (!matches(expected, before, scoped())) throw new Error('External changes detected. Remaining steps were stopped.');
-      if (!undo) validateTargets(batch.tool, op, before, owner);
-      const step: Batch['steps'][number] = { operation: op, before, status: 'applying' };
+      if (target?.tabs && restoreNeedsGroups(target)) await requireCaps(['tabGroups.write']);
+      /*
+        Re-checked per step as well, because a step earlier in this batch moves the browser
+        and the operations after it were approved against what the preview showed.
+      */
+      if (!target) {
+        const live = await snapshot(batch.tool);
+        validateTargets(batch.tool, op, live, owner);
+        if (batch.tool === 'browser_close_tabs') checkCloseTarget(op, batch.before, live);
+      }
+      const step: Batch['steps'][number] = { operation: op, status: 'applying' };
       batch.steps.push(step);
       // Its own row, written before the Chrome call. A reload in the middle of a write is
       // the one situation nothing else can reconstruct, and this row is the only evidence.
       await localAudit.insertStep(batch.id, index, step);
-      if (undo) {
-        const original = undo.steps[undo.steps.length - index - 1];
-        if (original.before.bookmarks) await restoreBookmarks(original.before.bookmarks, original.after!.bookmarks!, map);
-        else {
-          // Restoration can change membership, even for a batch that only arranged tabs.
-          await restoreTabs(original.before, original.after!, map);
-        }
-      } else await apply(batch.tool, op, owner);
-      step.after = await snapshot(batch.tool);
-      step.changes = diff(step.before, step.after);
-      step.status = 'applied';
-      if (undo) {
-        const target = remapped(undo.steps[undo.steps.length - index - 1].before, map);
-        if (!matches(target, step.after, scoped())) throw new Error('Restoration did not fully match the saved state. Inspect the result before continuing.');
+      if (target) {
+        if (target.bookmarks) await restoreBookmarks(target.bookmarks, map);
+        else await restoreTabs(target, map);
+      } else {
+        await apply(batch.tool, op, owner);
       }
-      expected = step.after;
+      step.status = 'applied';
       // The outcome of a step that already happened. Failing to record it is exactly the
       // `unknown` case: the browser moved and we cannot prove where it landed.
-      try { await localAudit.updateStep(batch.id, index, step); }
+      try { await localAudit.setStepStatus(batch.id, index, 'applied'); }
       catch (error) {
         step.status = 'unknown';
-        await localAudit.updateStep(batch.id, index, step).catch(() => { /* Already failing. */ });
+        await localAudit.setStepStatus(batch.id, index, 'unknown').catch(() => { /* Already failing. */ });
         throw error;
       }
     }
     batch.status = 'applied';
-    if (undo) { undo.status = 'undone'; await localAudit.patch(undo.id, { status: undo.status }); }
   } catch (error) {
     const pending = batch.steps.at(-1);
     if (pending?.status === 'applying') {
       pending.status = 'unknown';
-      await localAudit.updateStep(batch.id, batch.steps.length - 1, pending).catch(() => { /* Best effort. */ });
+      await localAudit.setStepStatus(batch.id, batch.steps.length - 1, 'unknown').catch(() => { /* Best effort. */ });
     }
     batch.status = pending?.status === 'unknown' ? 'unknown' : 'failed';
     batch.error = error instanceof Error ? error.message : 'Browser operation failed.';
   } finally { active.delete(planId); owners.delete(planId); cancelled.delete(planId); }
-  await localAudit.patch(batch.id, { status: batch.status, error: batch.error ?? null });
   /**
-   * `undoneBy` is a claim, not a verdict — so release it when the attempt never began.
+   * The state the batch ended in, recorded once, whatever the verdict.
    *
-   * It is written before the first step so that two undo attempts cannot race, and it
-   * used to stay written whatever happened next. A conflict or a revoked permission at
-   * step one therefore spent the batch's single undo without restoring anything, and the
-   * batch was marked un-undoable for good: `prepare` answered "this batch cannot be
-   * undone automatically" forever, for a reason that had already gone away.
-   *
-   * Released only when **no step row was ever created**. Past that the browser has been
-   * touched — a step at `applied` changed something, and one at `unknown` might have —
-   * and a second attempt would be working from a state neither we nor the user can
-   * describe. Zero steps is the only case where nothing happened.
+   * ⚠️ Written for a failure too, and that is the point: a batch that stopped halfway left
+   * the browser in a state nobody planned, and this is the snapshot that makes it
+   * restorable and readable. It is skipped only when the run never reached a step, where
+   * `before` already describes the browser.
    */
-  if (undo && !batch.steps.length && batch.status !== 'applied') {
-    await localAudit.patch(undo.id, { undoneBy: null });
-  }
+  const after = batch.steps.length ? await snapshot(batch.tool).catch(() => undefined) : undefined;
+  if (after) batch.after = after;
+  await localAudit.patch(batch.id, { status: batch.status, error: batch.error ?? null, ...(after ? { after } : {}) });
   /**
    * What the AI is told: the verdict per step, and where to look for the rest.
    *
-   * It used to carry up to ten full before/after objects per step. Thirty steps of that is
-   * tens of kilobytes of JSON going into a composer with a 31,998-character ceiling — so
-   * the payload got truncated, and what the model actually read was a result cut off
-   * mid-object. None of it was needed: `browser_query_changes` pages the same records on
-   * demand, which is what it exists for.
+   * No object payload. A composer has a 31,998-character ceiling, and thirty steps of
+   * before/after objects overruns it — leaving the model reading a result truncated
+   * mid-object. `browser_query_changes` pages the same records on demand.
    */
   return {
     batch_id: batch.id, status: batch.status, error: batch.error,
     completed: batch.steps.filter(s => s.status === 'applied').length, planned: batch.operations.length,
-    steps: batch.steps.map(s => ({ operation: s.operation, status: s.status, change_count: s.changes?.length ?? 0 })),
-    ...(batch.status === 'applied' ? {} : { detail: `Use browser_query_changes with batch_id "${batch.id}" to read what changed, step by step. Do not retry this batch.` }),
+    steps: batch.steps.map(s => ({ operation: s.operation, status: s.status })),
+    ...(batch.status === 'applied' ? {} : { detail: `Use browser_query_changes with batch_id "${batch.id}" to read what happened, step by step. Do not retry this batch.` }),
+  };
+}
+/**
+ * Both recorded states of one batch, as trees, for the journal's detail view.
+ *
+ * Not routed through `browser_query_changes`: the AI needs ids to act on and a tree
+ * deliberately has none. It answers to the same read capability the tool would, and its
+ * output goes through the same redaction, so what the panel may see still matches what the
+ * agent may see.
+ */
+async function trees(batchId: string, owner: number): Promise<BatchTrees> {
+  const batch = await localAudit.get(batchId);
+  if (!batch) throw new Error('That batch is not in the journal.');
+  await requireCaps([readCapability(toolCapability(batch.tool) ?? 'tabs.read')]);
+  const states = await localAudit.snapshots(batchId);
+  if (!states) throw new Error('That batch is not in the journal.');
+  const hostWindow = (await chrome.tabs.get(owner).catch(() => undefined))?.windowId;
+  return {
+    before: treeOf(states.before, hostWindow),
+    ...(states.after ? { after: treeOf(states.after, hostWindow) } : {}),
   };
 }
 
@@ -695,20 +910,23 @@ async function read(tool: string, params: Record<string, string>, owner: number)
   for (const cap of ['tabs.read', 'tabGroups.read', 'bookmarks.read'] as const) {
     try { await requireCaps([cap]); readable.add(cap); } catch { /* Revoked capabilities also hide historical data. */ }
   }
-  const readableKinds = new Set(([['tabs', 'tabs.read'], ['groups', 'tabGroups.read'], ['bookmarks', 'bookmarks.read']] as const)
-    .filter(([, cap]) => readable.has(cap)).map(([kind]) => kind));
   const session = await epoch();
   const visible = [];
   for (const b of await localAudit.list(params.batch_id || undefined)) {
     const cap = toolCapability(b.tool);
     if (cap && !readable.has(readCapability(cap))) continue;
-    visible.push({ batch_id: b.id, created_at: b.createdAt, tool: b.tool, status: b.status, error: b.error, undo_of: b.undoOf, undone_by: b.undoneBy,
-      can_undo: !b.undoOf && !b.undoneBy && ['applied', 'failed'].includes(b.status) && b.steps > 0 && b.applied === b.steps && (!b.touchesTabs || b.epoch === session),
+    /*
+      Restorable, per side. Both are offered as soon as the state exists and its ids still
+      mean something — there is no "already restored" to rule one out, because putting a
+      recorded state back adds objects and removes none, so doing it twice lands in the
+      same place as doing it once.
+    */
+    const usable = !b.touchesTabs || b.epoch === session;
+    visible.push({ batch_id: b.id, created_at: b.createdAt, tool: b.tool, status: b.status, error: b.error,
+      restore_of: b.restoreOf, restore_side: b.restoreSide,
+      can_restore_before: usable, can_restore_after: usable && b.hasAfter,
       completed: b.applied, planned: b.planned,
-      // Steps and object-level changes are only loaded when the caller asked for one
-      // batch: they are the two columns that carry snapshots.
-      ...(params.batch_id ? { steps: (await localAudit.listSteps(b.id)).map(s => ({ step_index: s.index, operation: s.operation, status: s.status, change_count: s.changeCount })),
-        ...(params.step_index !== undefined ? { changes: page((await localAudit.stepChanges(b.id, numberParam(params.step_index, 0))).filter(c => readableKinds.has(c.kind as 'tabs' | 'groups' | 'bookmarks')), params) } : {}) } : {}),
+      ...(params.batch_id ? { steps: (await localAudit.listSteps(b.id)).map(s => ({ step_index: s.index, operation: s.operation, status: s.status })) } : {}),
     });
   }
   return page(visible, params.batch_id ? { limit: '1' } : params);
@@ -761,6 +979,7 @@ export async function handleBrowserAgent(request: BrowserRequest, sender: Messag
     await journalReady(owner);
     const work = async () => {
       const result = request.action === 'read' ? await read(request.tool, request.params, owner!)
+        : request.action === 'trees' ? await trees(request.batchId, owner!)
         : request.action === 'prepare' ? await prepare(request.tool, request.params, owner!)
         : request.action === 'commit' ? await commit(request.planId, owner!)
         : (() => { throw new Error('Unknown browser request.'); })();

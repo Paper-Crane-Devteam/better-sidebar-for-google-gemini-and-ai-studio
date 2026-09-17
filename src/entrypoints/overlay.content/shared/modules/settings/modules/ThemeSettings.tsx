@@ -67,9 +67,9 @@ const themePreviewColors: Record<
     secondary: '#ff9500',
   },
   'retro-terminal': {
-    bg: '#0a0a0a',
-    fg: '#00ff41',
-    accent: '#00ff41',
+    bg: '#0b0f0d',
+    fg: '#5cc981',
+    accent: '#2ce87f',
     secondary: '#ffb000',
   },
   'nord-aurora': {

@@ -64,7 +64,7 @@ export function getToolLabel(toolName: string, t: Translate, query?: string): st
     case 'browser_query_changes':
       return t('agent.tool.queryChanges', { defaultValue: 'Checking what it changed' });
     case 'browser_arrange_tabs':
-      return t('agent.tool.arrangeTabs', { defaultValue: 'Rearranging tabs' });
+      return t('agent.tool.arrangeTabs', { defaultValue: 'Opening and arranging tabs' });
     // ⚠️ The two destructive ones are named for what they destroy, not "changing tabs".
     // Their whole point is being distinguishable at a glance from the tidying tools.
     case 'browser_close_tabs':
@@ -75,8 +75,8 @@ export function getToolLabel(toolName: string, t: Translate, query?: string): st
       return t('agent.tool.arrangeBookmarks', { defaultValue: 'Reorganizing bookmarks' });
     case 'browser_delete_bookmarks':
       return t('agent.tool.deleteBookmarks', { defaultValue: 'Deleting bookmarks' });
-    case 'browser_undo_changes':
-      return t('agent.tool.undoChanges', { defaultValue: 'Undoing an earlier change' });
+    case 'browser_restore_state':
+      return t('agent.tool.restoreState', { defaultValue: 'Restoring an earlier state' });
     default:
       return t('agent.tool.generic', { defaultValue: 'Running a step' });
   }

@@ -59,7 +59,7 @@ export const REQUIRED_PARAMS: Record<string, string[]> = {
   browser_manage_tab_groups: ['operations'],
   browser_arrange_bookmarks: ['operations'],
   browser_delete_bookmarks: ['operations'],
-  browser_undo_changes: ['batch_id'],
+  browser_restore_state: ['batch_id', 'side'],
   execute_sql: ['query'],
   sync_conversation_messages: ['conversation_ids'],
   // `format` is deliberately absent: omitting it is how the model says "the user

@@ -3,7 +3,7 @@ import { Icon as IconifyIcon } from '@iconify/react';
 import { cn } from '@/shared/lib/utils/utils';
 
 export interface UnifiedIconProps {
-  /** Iconify icon name, e.g. "tabler:diamond", "codicon:collapse-all" */
+  /** Iconify icon name, e.g. "tabler:diamond", "tabler:notebook" */
   icon: string;
   /** Additional CSS classes (size, color, etc.) */
   className?: string;
@@ -24,7 +24,7 @@ export interface UnifiedIconProps {
  *
  * Usage:
  *   <UIcon icon="tabler:diamond" className="h-4 w-4" />
- *   <UIcon icon="codicon:collapse-all" className="h-3.5 w-3.5" />
+ *   <UIcon icon="tabler:notebook" className="h-3.5 w-3.5" />
  *   <UIcon icon="fluent-color:premium-24" width={24} height={24} />
  *
  * NOTE: do not set `color: 'currentColor'` inline here. Iconify already emits

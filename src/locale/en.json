@@ -16,7 +16,10 @@
     "settings": "Settings",
     "preferences": "Preferences",
     "untitled": "Untitled",
-    "view": "View"
+    "view": "View",
+    "pageRange": "{{from}} - {{to}} of {{total}}",
+    "prevPage": "Previous",
+    "nextPage": "Next"
   },
   "tabs": {
     "files": "Files",
@@ -648,9 +651,6 @@
     "stop": "Stop",
     "progress": "Syncing: {{done}} / {{total}}",
     "progressFailed": "{{count}} failed",
-    "pageRange": "{{from}} - {{to}} of {{total}}",
-    "prevPage": "Previous",
-    "nextPage": "Next",
     "nothingToSync": "All chats are already synced.",
     "loadFailed": "Failed to load chat list.",
     "batchDone": "Successfully synced {{count}} chats.",
@@ -1032,7 +1032,7 @@
     "grimoireName": "The Grimoire",
     "grimoireDescription": "Ancient parchment aesthetic with warm tones and serif typography",
     "retroTerminalName": "Retro Terminal",
-    "retroTerminalDescription": "CRT terminal aesthetic with neon green text and monospace typography",
+    "retroTerminalDescription": "CRT terminal aesthetic with easy-on-the-eyes phosphor green and monospace typography",
     "nordAuroraName": "Nord Aurora",
     "nordAuroraDescription": "Arctic-inspired dark theme with cool blues and frost green accents",
     "cyberpunkNeonName": "Cyberpunk Neon",
@@ -1411,12 +1411,12 @@
       "listTabGroups": "Looking at your tab groups",
       "listBookmarks": "Looking through your bookmarks",
       "queryChanges": "Checking what it changed",
-      "arrangeTabs": "Rearranging tabs",
+      "arrangeTabs": "Opening and arranging tabs",
       "closeTabs": "Closing tabs",
       "manageTabGroups": "Reorganizing tab groups",
       "arrangeBookmarks": "Reorganizing bookmarks",
       "deleteBookmarks": "Deleting bookmarks",
-      "undoChanges": "Undoing an earlier change"
+      "restoreState": "Restoring an earlier state"
     },
     "sync": {
       "progress": "Fetching conversation content — {{current}}/{{total}}",
@@ -1625,35 +1625,32 @@
     "browser": {
       "needsPermission": "🔒 Not authorized yet · click to open permissions",
       "panel": {
-        "approvalNote": "Every change is approved, sorting included.",
-        "permissions": "Allowed: {{list}}",
-        "noPermissions": "Permissions: none granted yet",
-        "urlsShared": "Full URLs: readable by the AI.",
-        "urlsRedacted": "Full URLs: redacted.",
-        "auditNote": "The audit record stays on this machine.",
         "openSettings": "Permissions and privacy",
         "viewHistory": "Local records",
         "noHistory": "No records to show. Reading history needs the matching permission too.",
-        "detail": "Detail",
-        "previewUndo": "Preview undo",
-        "changeDetail": "Changed objects",
-        "truncated": "Each step shows its first 100 changes. The full record stays on this machine and the agent can page through it.",
-        "approveUndo": "Approve and undo",
+        "detail": "Before and after",
         "cancel": "Cancel",
         "before": "Before",
         "after": "After",
-        "outcome": "{{status}}: {{completed}}/{{planned}}. {{error}}"
+        "outcome": "{{status}}: {{completed}}/{{planned}}. {{error}}",
+        "revertToThis": "Revert to this",
+        "approveRestore": "Approve and restore",
+        "noEndState": "This batch did not finish, so no end state was recorded.",
+        "recordsTitle": "Local records",
+        "recordsIntro": "Every batch the agent applied, kept on this machine. Open one to see the browser before and after it, and to put either back.",
+        "colWhen": "When",
+        "colOutcome": "Outcome",
+        "reload": "Reload",
+        "busySession": "A task is running. Restoring would change the browser it is working on, so it waits until the task ends."
       },
       "status": {
         "applied": "Done",
         "failed": "Stopped",
         "applying": "Running",
-        "unknown": "Outcome uncertain — check the browser",
-        "undone": "Undone"
+        "unknown": "Outcome uncertain — check the browser"
       },
       "preview": {
         "scope": "{{count}} operations · this approval covers only the batch below",
-        "undoPrefix": "Undo: ",
         "objects": "{{count}} objects affected",
         "firstHundred": " (first 100 shown)",
         "untitled": "Untitled",
@@ -1663,19 +1660,10 @@
         "inUnnamedGroup": "in an unnamed group",
         "unnamed": "unnamed",
         "inFolder": "in {{name}}",
-        "atPosition": "position {{n}}",
         "pinned": "pinned",
-        "collapsed": "collapsed",
-        "otherWindow": "in another window",
-        "otherFolder": "in another folder",
-        "otherGroup": "in another group",
-        "unchangedPlace": "no details to show",
-        "current": "Now",
-        "restoreTo": "Restore to",
-        "absent": "does not exist",
         "lossy": "This batch removes things. Closing a tab can only be undone by reopening its address — forms, scroll position and page state are not guaranteed. Deleting a folder deletes everything in it, and a restored bookmark is a new copy rather than the original. Approved on its own, every time; no setting can run it unattended.",
         "warning": "This approval covers only the operations above. Nothing here is closed or deleted — those are separate tools with their own permission.",
-        "undoWarning": "Undo needs approval too, and stops as soon as it finds an external change. Closing a tab can only be undone by reopening its address — forms, scroll position and page state are not guaranteed. A restored bookmark is a new copy rather than the original."
+        "untouched": "{{count}} other objects are not touched"
       },
       "op": {
         "create": "Create",
@@ -1693,7 +1681,6 @@
         "title": "Title",
         "url": "Address",
         "color": "Color",
-        "position": "Position",
         "folder": "Destination folder",
         "group": "Group",
         "window": "Destination window"
@@ -1721,6 +1708,61 @@
         "urlToggle": "Let the AI read full URLs",
         "urlHelp": "On: the full link is sent to the current AI conversation. Off: only the scheme and host — path, query and fragment stay hidden. Addresses already sent cannot be recalled.",
         "done": "Done"
+      },
+      "tree": {
+        "thisWindow": "This window",
+        "window": "Window",
+        "windowN": "Window {{n}}",
+        "pinned": "Pinned",
+        "unnamedGroup": "Unnamed group",
+        "willReopen": "reopen",
+        "willCreate": "add back",
+        "willRestore": "move back",
+        "empty": "Nothing was recorded here.",
+        "childCount": "({{count}})"
+      },
+      "restore": {
+        "headingBefore": "Restore the state before this batch",
+        "headingAfter": "Restore the state after this batch",
+        "counts": "{{restore}} to move back · {{reopen}} to reopen · {{create}} to add back · {{keep}} already in place",
+        "extra": "{{count}} things opened or added since are kept as they are. Nothing is closed or deleted.",
+        "additive": "Nothing is closed or deleted. Anything newer is kept.",
+        "note": "A reopened page comes back at its address only — form input, scroll position and page state are not restored. A re-added bookmark is a new copy."
+      },
+      "examples": {
+        "group": {
+          "label": "Group tabs by topic",
+          "text": "Look at the tabs in this window and group them by what they are about. Name each group for the topic and give it a colour, leave the pinned ones alone, and show me the plan before you move anything. Do not close anything."
+        },
+        "duplicates": {
+          "label": "Find duplicates",
+          "text": "Find the tabs I have open more than once. Treat two addresses as the same page only if the query and fragment match too. List them grouped by page, oldest first, and tell me how many I would get back — do not close them yet."
+        },
+        "stash": {
+          "label": "Park tabs as bookmarks",
+          "text": "I want this window down to the handful I am actually working in. Bookmark everything else into a new folder named for today, keep the pinned tabs and anything from my company domain open, then show me the list before you close a single tab."
+        },
+        "bookmarks": {
+          "label": "Sort the bookmarks",
+          "text": "Go through my bookmarks bar. Group the loose ones into folders by topic and move them in, rename the ones whose title is still the page title into something I would recognise, and tell me which ones look like duplicates instead of deleting them."
+        },
+        "open": {
+          "label": "Set up a workspace",
+          "text": "Open the tabs I need for a review session: our repo, the issue tracker and the design doc. Put them in one group called Review, pin the repo, and leave everything I already have open where it is."
+        },
+        "prune": {
+          "label": "Clear out the dead ends",
+          "text": "Show me the bookmarks that look stale — untitled ones, search result pages, anything saved twice. List them with the folder each one is in, and let me pick which to delete rather than deciding for me."
+        }
+      },
+      "phrasesTitle": "Or just ask",
+      "phrases": {
+        "listTabs": "What have I got open in this window?",
+        "groupThis": "Group these tabs by topic",
+        "findDupes": "Find my duplicate tabs",
+        "bookmarkAll": "Bookmark this window into a new folder",
+        "sortBar": "Tidy up my bookmarks bar",
+        "pinFew": "Pin the tabs I keep switching back to"
       }
     },
     "workspaceIntro": {

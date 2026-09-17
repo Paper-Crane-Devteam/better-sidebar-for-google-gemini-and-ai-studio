@@ -39,21 +39,15 @@
  * reads as "new section" rather than as air between a heading and what it introduces.
  */
 
-import React, { useState } from 'react';
-import { Bot, ChevronRight, Lock, SlidersHorizontal } from 'lucide-react';
-import { Button } from '@/shared/components/ui/button';
-import { UIcon } from '@/shared/components/ui/icon';
-import { SimpleTooltip } from '@/shared/components/ui/tooltip';
+import React from 'react';
+import { ChevronRight, Lock, SlidersHorizontal } from 'lucide-react';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useAppStore } from '@/shared/lib/store';
 import { useLicenseStore } from '@/shared/lib/license-store';
-import { navigateToNewChat } from '@/shared/lib/navigation';
-import { getAgentEntryById } from '../../agent-loop/agent-entry';
-import { agentEventBus } from '../../agent-loop/event-bus';
-import { useAgentLoopStore } from '../../agent-loop/agent-loop-store';
-import { getActiveEngine } from '../../agent-loop/engine/engine-registry';
 import { LauncherCta } from './LauncherCta';
 import { LauncherExamples } from './LauncherExamples';
+import { StageProblemNotice } from './StageProblemNotice';
+import { useStageExample } from './useStageExample';
 
 /** A full-width destination row: icon, label, one line of explanation. */
 const DestinationRow: React.FC<{
@@ -85,83 +79,18 @@ export const AgentLauncher: React.FC = () => {
   const tier = useLicenseStore((s) => s.tier);
   const canWrite = tier === 'power_pack' || tier === 'pro' || tier === 'support_pack';
 
-  /** null = fine; otherwise why the last attempt didn't reach the chat input */
-  const [unavailable, setUnavailable] = useState<
-    'no-editor' | 'composer-busy' | 'session-busy' | null
-  >(null);
-
-  /**
-   * Staging a second task while one is live would replace what the running task has
-   * queued in the composer, so the examples go inert rather than looking clickable.
-   */
-  const status = useAgentLoopStore((s) => s.status);
-  const busy = status !== 'idle';
-
-  const stopRunning = () => {
-    const engine = getActiveEngine();
-    if (engine) engine.stop();
-    else useAgentLoopStore.getState().stop();
-    setUnavailable(null);
-  };
-
   /**
    * This panel belongs to the Better Sidebar agent specifically.
    *
-   * Not "whichever agent is selected": the Workspace agent has its own panel, so the only
-   * agent that reaches this code is this one. Naming it explicitly is what makes the
-   * examples and the `>` label below correct — they have to quote the marker the user will
-   * actually type.
+   * Not "whichever agent is selected": the Workspace and Browser agents have their own
+   * panels, so the only agent that reaches this code is this one. Naming it explicitly is
+   * what makes the examples and the `>` label below correct — they have to quote the marker
+   * the user will actually type.
    */
-  const entry = getAgentEntryById('bettersidebar');
-  const entryTitle =
-    entry?.title ?? t('agent.agents.bettersidebar.name', { defaultValue: 'Better Sidebar' });
-
-  /**
-   * Put an example in the chat input, unsent.
-   *
-   * Ask the platform feature to stage it; if nothing acknowledges within a moment the
-   * chat input isn't reachable (no chat open, or the feature is off) — say so instead of
-   * appearing to do nothing.
-   */
-  const stage = (text: string) => {
-    setUnavailable(null);
-    if (busy || !entry) {
-      setUnavailable('session-busy');
-      return;
-    }
-
-    let settled = false;
-    const offStaged = agentEventBus.once('launcher:staged', () => {
-      settled = true;
-    });
-    const offFailed = agentEventBus.once('launcher:failed', ({ reason }) => {
-      settled = true;
-      setUnavailable(
-        reason === 'composer-busy' || reason === 'session-busy' ? reason : 'no-editor',
-      );
-    });
-
-    agentEventBus.emit('launcher:run-entry', {
-      entryId: entry.id,
-      userInput: text,
-      autoSend: false,
-    });
-
-    setTimeout(() => {
-      offStaged();
-      offFailed();
-      if (!settled) setUnavailable('no-editor');
-    }, 1200);
-  };
-
-  /**
-   * The agent runs through the page's chat input, so there has to be a chat open.
-   * Offer that as a one-click action rather than only telling the user about it.
-   */
-  const handleNewChat = () => {
-    setUnavailable(null);
-    navigateToNewChat();
-  };
+  const { entryTitle, stage, problem, clearProblem, busy, stopRunning } = useStageExample(
+    'bettersidebar',
+    t('agent.agents.bettersidebar.name', { defaultValue: 'Better Sidebar' }),
+  );
 
   return (
     <div className="flex h-full flex-col gap-6 overflow-y-auto px-3 py-3">
@@ -180,46 +109,7 @@ export const AgentLauncher: React.FC = () => {
 
       <LauncherCta entryTitle={entryTitle} />
 
-      {unavailable && (
-        <div className="-mx-2 space-y-2 rounded-lg bg-orange-500/10 px-2 py-2">
-          <p className="text-xs text-muted-foreground">
-            {unavailable === 'composer-busy'
-              ? t('agent.launcher.composerBusy', {
-                  defaultValue:
-                    'The running task has results waiting in the chat input. Send those first, then try again.',
-                })
-              : unavailable === 'session-busy'
-                ? t('agent.launcher.sessionBusy', {
-                    defaultValue:
-                      'A task is already running. Finish it, or stop it, before starting another.',
-                  })
-                : t('agent.launcher.noEditor', {
-                    defaultValue: 'Open a chat first — the agent runs through the chat input.',
-                  })}
-          </p>
-          {unavailable === 'session-busy' && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-6 bg-background/60 px-2 text-xs hover:bg-background"
-              onClick={stopRunning}
-            >
-              {t('agent.launcher.stopRunning', { defaultValue: 'Stop the running task' })}
-            </Button>
-          )}
-          {unavailable === 'no-editor' && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-6 gap-1 bg-background/60 px-2 text-xs hover:bg-background"
-              onClick={handleNewChat}
-            >
-              <UIcon icon="tabler:message-plus" className="h-3 w-3" />
-              {t('explorerHeader.newChat')}
-            </Button>
-          )}
-        </div>
-      )}
+      <StageProblemNotice problem={problem} onStopRunning={stopRunning} onDismiss={clearProblem} />
 
       <LauncherExamples capsuleLabel={entryTitle} onPick={stage} disabled={busy} />
 

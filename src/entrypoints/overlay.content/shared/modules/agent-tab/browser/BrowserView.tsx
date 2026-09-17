@@ -1,306 +1,90 @@
 /**
  * BrowserView — the Browser agent's panel in the Agent tab.
  *
- * What the Workspace agent's file tree is to that agent, this is to this one: **the thing it
- * operates on, made visible.** Not a launcher. The way to start a task is `>` in the chat
- * input, the same as every other agent — this panel exists to answer the two questions the
- * composer cannot:
+ * ## What it used to be, and why that was wrong
  *
- * | Question | Answer here |
- * |---|---|
- * | What is it allowed to touch? | the permission summary, and the way to change it |
- * | What has it already done to my browser? | the local journal, with undo |
+ * It opened on a paragraph of the agent's own terms and conditions — every change is approved,
+ * here are the capability groups you granted, here is whether URLs are redacted, the audit
+ * record stays local — and under that, a record list that unfolded into two snapshot trees in
+ * place.
  *
- * ⚠️ **The journal is the reason this panel is not optional.** Tabs and bookmarks are not
- * versioned and not diffable: once a batch lands, the only record that it happened — and the
- * only route back — is the snapshot the extension kept. Undo has to be reachable without a
- * running session, because the session that made the change is usually long over by the time
- * the user notices they want it back.
+ * Every sentence of that was true and none of it was what the user had come for. Someone who
+ * has just switched to this agent has one question, "what do I type", and the panel answered
+ * a different one: "what are the terms". The permission state is a thing you check once, when
+ * you are about to change it, and there is a window for exactly that — so it lives behind the
+ * button that opens it. The records are the same: a thing you go looking for, not a thing you
+ * read on arrival, and they need more width than a sidebar has (see `BrowserRecordsModal`).
  *
- * It used to also hold a textarea and four "Organize tabs / groups / bookmarks" buttons that
- * filled the composer. Those are gone: they were a second, worse composer next to the real
- * one, and the four buttons were the same agent aimed four ways — a sentence the user can
- * simply type.
+ * So the panel is now shaped like the Better Sidebar agent's, because they have the same job:
+ * how to start, a carousel of worked examples, the short requests, and then the two places you
+ * go that are not a task. The two agents differing in shape was never a decision, only the
+ * order they were built in.
+ *
+ * ⚠️ **The journal is still the reason this panel is not optional.** Tabs and bookmarks are
+ * not versioned and not diffable: once a batch lands, the state the extension kept is the only
+ * record it happened and the only route back. Moving it into a dialog changed where it is
+ * reached from, not how important it is — hence a real button rather than a text link.
  */
 
-import React, { useState } from 'react';
-import { groupsOf, type EntityChange, type PlanPreview } from '@/shared/browser-agent/contracts';
-import {
-  browserRequest,
-  cancelBrowserPlan,
-  commitBrowserPlan,
-  openBrowserAgentSettings,
-  useBrowserAgent,
-} from '../../agent-loop/browser/browser-store';
-import {
-  BrowserPlanPreview,
-  BrowserState,
-} from '../../agent-loop/browser/BrowserPlanPreview';
-import { useAgentLoopStore } from '../../agent-loop/agent-loop-store';
+import React from 'react';
+import { History, ShieldCheck } from 'lucide-react';
+import { Button } from '@/shared/components/ui/button';
 import { useI18n } from '@/shared/hooks/useI18n';
-
-interface JournalEntry {
-  batch_id: string;
-  tool: string;
-  status: string;
-  completed: number;
-  planned: number;
-  created_at: number;
-  can_undo: boolean;
-  error?: string;
-}
-
-/** The journal is read through the agent's own tool, so it obeys the same read permissions. */
-const readJournal = (params: Record<string, string>) =>
-  browserRequest<{ items: JournalEntry[] }>({
-    action: 'read',
-    tool: 'browser_query_changes',
-    params,
-  });
+import { toast } from '@/shared/lib/toast';
+import { openBrowserAgentSettings } from '../../agent-loop/browser/browser-store';
+import { LauncherCta } from '../components/LauncherCta';
+import { LauncherExamples } from '../components/LauncherExamples';
+import { StageProblemNotice } from '../components/StageProblemNotice';
+import { useStageExample } from '../components/useStageExample';
+import { BROWSER_EXAMPLES } from './browser-examples';
+import { BrowserPhrases } from './BrowserPhrases';
+import { openBrowserRecordsModal } from './BrowserRecordsModal';
 
 export const BrowserView: React.FC = () => {
   const { t } = useI18n();
-  const settings = useBrowserAgent((s) => s.settings);
-  const groups = groupsOf(settings.capabilities);
-  /**
-   * A live session blocks undo, not the whole panel.
-   *
-   * Undoing while the agent is mid-task would have it planning against a browser that changed
-   * under it — and the snapshot it reasoned from is exactly what undo is rewinding.
-   */
-  const running = useAgentLoopStore((s) => s.status !== 'idle');
-
-  const [journal, setJournal] = useState<JournalEntry[] | null>(null);
-  const [plan, setPlan] = useState<PlanPreview | null>(null);
-  const [detail, setDetail] = useState<EntityChange[] | null>(null);
-  const [notice, setNotice] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-
-  const statusLabel = (status: string) =>
-    t(`agent.browser.status.${status}`, { defaultValue: status });
-
-  const load = async () => setJournal((await readJournal({ limit: '50' })).items);
-
-  /** Every action here talks to the background, so every action can fail out loud. */
-  const work = (fn: () => Promise<void>) => {
-    void (async () => {
-      setBusy(true);
-      setError('');
-      try {
-        await fn();
-      } catch (e) {
-        setError((e as Error).message);
-      } finally {
-        setBusy(false);
-      }
-    })();
-  };
-
-  const showDetail = (batchId: string) =>
-    work(async () => {
-      const batch = await readJournal({ batch_id: batchId });
-      const steps = (batch.items[0] as unknown as { steps?: Array<{ step_index: number }> })
-        ?.steps ?? [];
-      // Per step, because change rows are the one thing the journal pages: a batch of 30
-      // moves can carry hundreds of them and they each hold a before/after snapshot.
-      const pages = await Promise.all(
-        steps.map((step) =>
-          browserRequest<{ items: Array<{ changes?: { items: EntityChange[] } }> }>({
-            action: 'read',
-            tool: 'browser_query_changes',
-            params: { batch_id: batchId, step_index: String(step.step_index), limit: '100' },
-          }),
-        ),
-      );
-      setDetail(pages.flatMap((page) => page.items[0]?.changes?.items ?? []));
-      setNotice(
-        t('agent.browser.panel.truncated', {
-          defaultValue: 'Each step shows its first 100 changes.',
-        }),
-      );
-    });
+  const { entryTitle, stage, problem, clearProblem, busy, stopRunning } = useStageExample(
+    'browser',
+    t('agent.agents.browser.name', { defaultValue: 'Browser Agent' }),
+  );
 
   return (
-    <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-3 pb-3 text-xs">
-      <div className="space-y-2 rounded-md border border-border/50 p-3">
-        <p>
-          {t('agent.browser.panel.approvalNote', {
-            defaultValue: 'Every change is approved, sorting included.',
-          })}{' '}
-          {/* Named, not counted. The settings window offers two switches over eight
-              capabilities, so "6 enabled" would be a number the user has never seen. */}
-          {groups.length
-            ? t('agent.browser.panel.permissions', {
-                list: groups
-                  .map((g) => t(`agent.browser.settings.group.${g}`, { defaultValue: g }))
-                  .join(' · '),
-                defaultValue: 'Allowed: {{list}}',
-              })
-            : t('agent.browser.panel.noPermissions', {
-                defaultValue: 'Permissions: none granted yet',
-              })}
-        </p>
-        <p className="text-muted-foreground">
-          {settings.shareFullUrls
-            ? t('agent.browser.panel.urlsShared', { defaultValue: 'Full URLs: readable by the AI.' })
-            : t('agent.browser.panel.urlsRedacted', { defaultValue: 'Full URLs: redacted.' })}{' '}
-          {t('agent.browser.panel.auditNote', {
-            defaultValue: 'The audit record stays on this machine.',
-          })}
-        </p>
-        <div className="flex gap-3">
-          <button
-            type="button"
-            className="underline"
-            onClick={() => work(async () => void (await openBrowserAgentSettings()))}
-          >
-            {t('agent.browser.panel.openSettings', { defaultValue: 'Permissions and privacy' })}
-          </button>
-          <button type="button" disabled={busy} className="underline" onClick={() => work(load)}>
-            {t('agent.browser.panel.viewHistory', { defaultValue: 'Local records' })}
-          </button>
-        </div>
+    <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-3 py-3">
+      <LauncherCta entryTitle={entryTitle} />
+
+      <StageProblemNotice problem={problem} onStopRunning={stopRunning} onDismiss={clearProblem} />
+
+      <LauncherExamples
+        capsuleLabel={entryTitle}
+        onPick={stage}
+        disabled={busy}
+        examples={BROWSER_EXAMPLES}
+        i18nPrefix="agent.browser.examples"
+      />
+
+      <BrowserPhrases onPick={stage} disabled={busy} />
+
+      {/*
+        Buttons, not the underlined links these were. Both open a window, which is what a
+        button means here and what a link in a paragraph did not — the records link in
+        particular used to load a list *into this panel*, so it looked like a disclosure
+        triangle and behaved like one.
+      */}
+      <div className="flex flex-wrap gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() =>
+            void openBrowserAgentSettings().catch((e: Error) => toast.error(e.message))
+          }
+        >
+          <ShieldCheck className="h-3.5 w-3.5" />
+          {t('agent.browser.panel.openSettings', { defaultValue: 'Permissions and privacy' })}
+        </Button>
+        <Button variant="outline" size="sm" onClick={openBrowserRecordsModal}>
+          <History className="h-3.5 w-3.5" />
+          {t('agent.browser.panel.viewHistory', { defaultValue: 'Local records' })}
+        </Button>
       </div>
-
-      {journal && (
-        <div className="space-y-2">
-          {journal.length === 0 ? (
-            <p>
-              {t('agent.browser.panel.noHistory', {
-                defaultValue:
-                  'No records to show. Reading history needs the matching permission too.',
-              })}
-            </p>
-          ) : (
-            journal.map((batch) => (
-              <div key={batch.batch_id} className="rounded bg-muted/40 p-2">
-                <div>
-                  {new Date(batch.created_at).toLocaleString()} · {statusLabel(batch.status)} ·{' '}
-                  {batch.completed}/{batch.planned}
-                </div>
-                {batch.error && <p className="text-destructive">{batch.error}</p>}
-                <button
-                  type="button"
-                  className="mr-3 underline"
-                  disabled={busy}
-                  onClick={() => showDetail(batch.batch_id)}
-                >
-                  {t('agent.browser.panel.detail', { defaultValue: 'Detail' })}
-                </button>
-                <button
-                  type="button"
-                  className="underline disabled:opacity-40"
-                  disabled={busy || running || !batch.can_undo}
-                  onClick={() =>
-                    work(async () =>
-                      setPlan(
-                        await browserRequest<PlanPreview>({
-                          action: 'prepare',
-                          tool: 'browser_undo_changes',
-                          params: { batch_id: batch.batch_id },
-                        }),
-                      ),
-                    )
-                  }
-                >
-                  {t('agent.browser.panel.previewUndo', { defaultValue: 'Preview undo' })}
-                </button>
-              </div>
-            ))
-          )}
-        </div>
-      )}
-
-      {notice && <p className="text-muted-foreground">{notice}</p>}
-
-      {detail && (
-        <details open>
-          <summary>
-            {t('agent.browser.panel.changeDetail', { defaultValue: 'Changed objects' })}
-          </summary>
-          <div className="max-h-48 space-y-2 overflow-auto">
-            {detail.map((change, i) => (
-              <div key={i} className="break-all rounded bg-muted/30 p-2">
-                {/* Named by its title, not its id. A change row carries the title on
-                    whichever side exists — a closed tab has no "after", a created one no
-                    "before" — so the two are tried in turn. */}
-                <strong>
-                  {((change.after ?? change.before) as { title?: string } | undefined)?.title ||
-                    t('agent.browser.preview.untitled', { defaultValue: 'Untitled' })}
-                </strong>
-                <p>
-                  {t('agent.browser.panel.before', { defaultValue: 'Before' })}:{' '}
-                  <BrowserState value={change.before} />
-                </p>
-                <p>
-                  {/* Only the "after" side compares: "in another window" is a statement
-                      about where it ended up, and saying it twice reads as two moves. */}
-                  {t('agent.browser.panel.after', { defaultValue: 'After' })}:{' '}
-                  <BrowserState value={change.after} other={change.before} />
-                </p>
-              </div>
-            ))}
-          </div>
-        </details>
-      )}
-
-      {plan && (
-        <>
-          <BrowserPlanPreview plan={plan} />
-          {/*
-            ⚠️ Undo is approved here, the same as any other write. The plan the background
-            prepared is armed until one of these two buttons disposes of it, so neither branch
-            may simply drop `plan` from state.
-          */}
-          <div className="flex gap-3">
-            <button
-              type="button"
-              disabled={busy || running}
-              className="rounded bg-primary px-3 py-1 text-primary-foreground"
-              onClick={() =>
-                work(async () => {
-                  const result = (await commitBrowserPlan(plan.id)) as {
-                    status: string;
-                    completed: number;
-                    planned: number;
-                    error?: string;
-                  };
-                  setNotice(
-                    t('agent.browser.panel.outcome', {
-                      status: statusLabel(result.status),
-                      completed: result.completed,
-                      planned: result.planned,
-                      error: result.error ?? '',
-                      defaultValue: '{{status}}: {{completed}}/{{planned}}. {{error}}',
-                    }),
-                  );
-                  setPlan(null);
-                  await load();
-                })
-              }
-            >
-              {t('agent.browser.panel.approveUndo', { defaultValue: 'Approve and undo' })}
-            </button>
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => {
-                cancelBrowserPlan(plan.id);
-                setPlan(null);
-              }}
-            >
-              {t('agent.browser.panel.cancel', { defaultValue: 'Cancel' })}
-            </button>
-          </div>
-        </>
-      )}
-
-      {error && (
-        <p role="alert" className="text-destructive">
-          {error}
-        </p>
-      )}
     </div>
   );
 };

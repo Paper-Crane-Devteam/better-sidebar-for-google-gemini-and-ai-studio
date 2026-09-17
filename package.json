@@ -14,6 +14,7 @@
     "zip:firefox": "wxt zip -b firefox",
     "compile": "tsc --noEmit",
     "devtap": "node scripts/devtap.mjs",
+    "i18n": "node scripts/i18n.mjs",
     "postinstall": "patch-package && wxt prepare",
     "release": "bash scripts/release.sh",
     "publishGumroad": "gumroad products page publish eklogd ./landing.html --json --no-input --non-interactive"

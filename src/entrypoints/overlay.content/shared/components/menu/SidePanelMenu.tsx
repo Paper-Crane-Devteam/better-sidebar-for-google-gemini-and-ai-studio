@@ -11,7 +11,7 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { useAppStore } from '@/shared/lib/store';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { navigate } from '@/shared/lib/navigation';
-import { MoreVertical, Settings, Database, History, Layout, RefreshCw, FolderPlus, ListCollapse, ArrowDownAZ, Clock, Calendar, Folder, Upload, Eye, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { MoreVertical, Settings, Database, History, Layout, RefreshCw, FolderPlus, CopyMinus, ArrowDownAZ, Clock, Calendar, Folder, Upload, Eye, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { BadgeLabel, FeatureBadge } from '@/shared/components/ui/badge-dot';
 import { toggleCompactMode } from '@/shared/lib/compact-mode';
 
@@ -127,7 +127,7 @@ export const SidePanelMenu = ({
         )}
         {onCollapseAll && (
             <DropdownMenuItem onClick={onCollapseAll}>
-                <ListCollapse className="mr-2 h-4 w-4" />
+                <CopyMinus className="mr-2 h-4 w-4" />
                 <span>{t('menu.collapseAll')}</span>
             </DropdownMenuItem>
         )}

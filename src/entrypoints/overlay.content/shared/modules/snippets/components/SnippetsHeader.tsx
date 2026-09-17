@@ -2,7 +2,7 @@ import { Button } from '@/shared/components/ui/button';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
 import {
   FolderPlus,
-  ListCollapse,
+  CopyMinus,
   ListChecks,
   Plus,
   ArrowDownAZ,
@@ -206,7 +206,7 @@ export const SnippetsHeader = ({
               className="h-7 w-7"
               onClick={onCollapseAll}
             >
-              <ListCollapse className="h-4 w-4" />
+              <CopyMinus className="h-4 w-4" />
             </Button>
           </SimpleTooltip>
 

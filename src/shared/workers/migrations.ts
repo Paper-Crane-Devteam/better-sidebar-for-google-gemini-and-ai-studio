@@ -578,24 +578,29 @@ export const runMigrations = async (db: any) => {
     });
 
     /**
-     * Browser Agent's audit journal — what it changed in Chrome, and how to put it back.
+     * Browser Agent's audit journal — the states it moved the browser between.
      *
-     * Lives here rather than in a database of its own. The first version opened a
-     * separate IndexedDB to keep the journal out of reach of `execute_sql`, which was
-     * not worth what it cost: a second storage engine with no migration mechanism, no
-     * retention story, and records shaped as whole-batch blobs that had to be rewritten
-     * on every step. The threat it defended against is not one we have — the agent has
-     * no reason to erase its own audit trail, and nothing else about the extension is
-     * built on the assumption that it might.
+     * Two snapshots per batch and nothing per step. `before_state` and `after_state` are
+     * whole states (every non-incognito tab and group, or the entire bookmark tree), and
+     * they are what both features of the journal are built on: the detail view draws them
+     * as trees, and restoring means putting one of them back. A step row only records
+     * whether that operation landed, which is what makes a half-finished batch legible.
      *
      * ⚠️ Neither table is in `SYNC_TABLES`, so nothing here leaves the machine through
      * Drive. A full local database export *does* include them; see `prune`.
-     *
-     * The steps are their own rows on purpose. As nested JSON, recording step N meant
-     * serialising steps 1..N-1 again — a 30-step batch over a few hundred tabs rewrote
-     * megabytes per step, and every one of those snapshots was already written.
      */
     await step('create browser agent audit tables', async () => {
+      await ensureMigrationsTable();
+      /*
+        The journal is disposable, so its schema is replaced rather than migrated. What it
+        holds is the route back from changes made in the last few days; a profile carrying
+        an older shape of it loses that, and gains a table the code can actually read.
+      */
+      if (!(await hasMigrationRun('browser_agent_journal_snapshots'))) {
+        await db.run('DROP TABLE IF EXISTS browser_agent_batches');
+        await db.run('DROP TABLE IF EXISTS browser_agent_steps');
+        await markMigrationDone('browser_agent_journal_snapshots');
+      }
       await db.run(`
         CREATE TABLE IF NOT EXISTS browser_agent_batches (
           id TEXT PRIMARY KEY,
@@ -604,10 +609,11 @@ export const runMigrations = async (db: any) => {
           tool TEXT NOT NULL,
           operations TEXT NOT NULL,
           before_state TEXT NOT NULL,
+          after_state TEXT,
           status TEXT NOT NULL,
           error TEXT,
-          undo_of TEXT,
-          undone_by TEXT,
+          restore_of TEXT,
+          restore_side TEXT,
           created_at INTEGER NOT NULL
         )
       `);
@@ -620,10 +626,6 @@ export const runMigrations = async (db: any) => {
           batch_id TEXT NOT NULL,
           step_index INTEGER NOT NULL,
           operation TEXT NOT NULL,
-          before_state TEXT NOT NULL,
-          after_state TEXT,
-          changes TEXT,
-          change_count INTEGER NOT NULL DEFAULT 0,
           status TEXT NOT NULL,
           PRIMARY KEY (batch_id, step_index)
         )

@@ -32,6 +32,13 @@
  *
  * ⚠️ Nothing at rest says there are eight. There was an `n/8` counter, removed to keep the
  * header on one line; the rotation is what reveals the rest now.
+ *
+ * ## Shared by every agent's panel
+ *
+ * The example set and the i18n namespace are props, so the Browser agent's panel rotates its
+ * own examples through the same box. Nothing about the rotation, the fixed height or the
+ * capsule is agent-specific, and the alternative — a second copy for the second agent — is
+ * where the two would start drifting.
  */
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -44,14 +51,18 @@ import {
   FileText,
   FolderTree,
   HelpCircle,
+  Layers,
+  ListTree,
+  Pin,
   Search,
+  Trash2,
   Wand2,
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils/utils';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
 import { useI18n } from '@/shared/hooks/useI18n';
-import { AGENT_EXAMPLES } from './agent-examples';
+import { AGENT_EXAMPLES, type AgentExample } from './agent-examples';
 
 /** How long each example holds before the next one comes up. */
 const ROTATE_MS = 7000;
@@ -64,24 +75,34 @@ const ICONS: Record<string, LucideIcon> = {
   Bookmark,
   FileText,
   BarChart3,
+  Layers,
+  ListTree,
+  Pin,
+  Trash2,
 };
 
 interface LauncherExamplesProps {
-  /** Label shown on the capsule, i.e. the auto entry's title. */
+  /** Label shown on the capsule, i.e. the agent entry's title. */
   capsuleLabel: string;
   /** Stage this text in the chat input, behind the capsule, without sending. */
   onPick: (text: string) => void;
   disabled?: boolean;
+  /** The set to rotate through. Defaults to the Better Sidebar agent's. */
+  examples?: AgentExample[];
+  /** i18n namespace holding `<key>.label` and `<key>.text` for each example. */
+  i18nPrefix?: string;
 }
 
 export const LauncherExamples: React.FC<LauncherExamplesProps> = ({
   capsuleLabel,
   onPick,
   disabled,
+  examples = AGENT_EXAMPLES,
+  i18nPrefix = 'agent.launcher.examples',
 }) => {
   const { t } = useI18n();
 
-  const total = AGENT_EXAMPLES.length;
+  const total = examples.length;
   const [index, setIndex] = useState(0);
   /** Pointer over the carousel, or focus inside it — either means someone is reading. */
   const [held, setHeld] = useState(false);
@@ -157,12 +178,12 @@ export const LauncherExamples: React.FC<LauncherExamplesProps> = ({
         onFocus={() => setHeld(true)}
         onBlur={() => setHeld(false)}
       >
-        {AGENT_EXAMPLES.map((example, i) => {
+        {examples.map((example, i) => {
           const Icon = ICONS[example.icon] ?? FileText;
-          const label = t(`agent.launcher.examples.${example.key}.label`, {
+          const label = t(`${i18nPrefix}.${example.key}.label`, {
             defaultValue: example.label,
           });
-          const text = t(`agent.launcher.examples.${example.key}.text`, {
+          const text = t(`${i18nPrefix}.${example.key}.text`, {
             defaultValue: example.text,
           });
           const active = i === index;

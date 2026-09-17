@@ -16,7 +16,6 @@ const path = require('path');
 
 const sources = {
   'fluent-color': require('../node_modules/@iconify-json/fluent-color/icons.json'),
-  'codicon': require('../node_modules/@iconify-json/codicon/icons.json'),
   'tabler': require('../node_modules/@iconify-json/tabler/icons.json'),
 };
 
@@ -27,7 +26,6 @@ const needed = {
     'laptop-24', 'database-24', 'history-24', 'share-android-24',
     'document-add-24',
   ],
-  'codicon': ['collapse-all'],
   'tabler': [
     'diamond', 'notebook', 'blockquote', 'message-plus',
     'layout-sidebar-left-expand',

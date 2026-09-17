@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { SearchInput } from './components/SearchInput';
 import { SearchResults, SearchResultItem } from './components/SearchResults';
 import { SidePanelMenu } from '../../components/menu/SidePanelMenu';
-import { ListCollapse } from 'lucide-react';
+import { CopyMinus } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
 import { useI18n } from '@/shared/hooks/useI18n';
@@ -84,7 +84,7 @@ export const SearchTab = ({
               className="h-7 w-7"
               onClick={handleCollapseAll}
             >
-              <ListCollapse className="h-4 w-4" />
+              <CopyMinus className="h-4 w-4" />
             </Button>
           </SimpleTooltip>
           {extraHeaderButtons &&

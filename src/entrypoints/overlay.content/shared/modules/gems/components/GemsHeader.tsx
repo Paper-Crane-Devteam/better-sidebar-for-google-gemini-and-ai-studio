@@ -2,7 +2,7 @@ import { useAppStore } from '@/shared/lib/store';
 import { Button } from '@/shared/components/ui/button';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
 import {
-  ListCollapse,
+  CopyMinus,
   ArrowDownAZ,
   Clock,
   Eye,
@@ -58,7 +58,7 @@ export const GemsHeader = ({
         <div className="flex items-center gap-0.5">
           <SimpleTooltip content={t('menu.collapseAll')}>
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onCollapseAll}>
-              <ListCollapse className="h-4 w-4" />
+              <CopyMinus className="h-4 w-4" />
             </Button>
           </SimpleTooltip>
 

@@ -31,7 +31,7 @@ import {
   FilePlus,
   FolderPlus,
   FolderUp,
-  ListCollapse,
+  CopyMinus,
   Loader2,
   Plus,
   Search,
@@ -116,7 +116,7 @@ export const WorkspaceToolbar: React.FC<WorkspaceToolbarProps> = ({
             className="h-7 w-7 shrink-0"
             onClick={onCollapseAll}
           >
-            <ListCollapse className="h-4 w-4" />
+            <CopyMinus className="h-4 w-4" />
           </Button>
         </SimpleTooltip>
 

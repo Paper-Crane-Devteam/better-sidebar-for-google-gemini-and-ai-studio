@@ -4,8 +4,7 @@ import { OutlineContent, OutlineContentHandle } from './outline/OutlineContent';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { Button } from '@/shared/components/ui/button';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
-import { Crosshair } from 'lucide-react';
-import { UIcon } from '@/shared/components/ui/icon';
+import { CopyMinus, Crosshair } from 'lucide-react';
 import { CollapsibleSection } from '../../../components/CollapsibleSection';
 
 interface OutlineSectionProps {
@@ -60,7 +59,7 @@ export const OutlineSection: React.FC<OutlineSectionProps> = ({ fillAvailable = 
               className="h-5 w-5 text-muted-foreground hover:text-foreground"
               onClick={handleCollapseAll}
             >
-              <UIcon icon="codicon:collapse-all" className="h-3.5 w-3.5" />
+              <CopyMinus className="h-3.5 w-3.5" />
             </Button>
           </SimpleTooltip>
         </>

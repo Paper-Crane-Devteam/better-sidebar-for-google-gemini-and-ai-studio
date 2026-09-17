@@ -109,16 +109,15 @@ const SCHEMAS: Record<string, ToolDefinition['schema']> = {
   browser_query_changes: {
     name: 'browser_query_changes',
     description:
-      'Read the local audit journal — every batch this extension applied, what it did and ' +
-      'whether it can still be undone. Call it with no batch_id for the list, with a ' +
-      'batch_id for that batch\'s steps, and add step_index for the objects one step ' +
-      'changed. This is how you find out what happened after a result came back "unknown": ' +
-      'inspect it, never blindly retry. Only batches you have read permission for appear.',
+      'Read the local audit journal — every batch this extension applied, what it did, and ' +
+      'which of its two recorded states can still be put back. Call it with no batch_id for ' +
+      'the list, with a batch_id to expand one batch into its steps. This is how you find ' +
+      'out what happened after a result came back "unknown": inspect it, never blindly ' +
+      'retry. Only batches you have read permission for appear.',
     parameters: {
       type: 'object',
       properties: {
         batch_id: { type: 'string', description: 'Optional batch to expand into its steps.' },
-        step_index: { type: 'string', description: 'Optional 0-based step whose changed objects to page through. Needs batch_id.' },
         ...PAGING,
       },
       required: [],
@@ -127,14 +126,16 @@ const SCHEMAS: Record<string, ToolDefinition['schema']> = {
   browser_arrange_tabs: {
     name: 'browser_arrange_tabs',
     description:
-      'Rearrange tabs: open, focus, move and pin. Cannot close anything — that is ' +
-      'browser_close_tabs, and it needs its own permission. Reversible, but still needs ' +
-      'the user to approve this exact batch.',
+      'Open new tabs, and focus, move and pin existing ones. `create` opens a tab at any ' +
+      'HTTP(S) URL, so this is the tool for "open these links" as well as for tidying — up ' +
+      'to 30 in one batch. Cannot close anything — that is browser_close_tabs, and it needs ' +
+      'its own permission. Reversible, but still needs the user to approve this exact batch.',
     parameters: {
       type: 'object',
       properties: {
         operations: OPERATIONS(
-          'Types: create {url, window_id?, index?}; activate {tab_id}; ' +
+          'Types: create {url, window_id?, index?} — url must be http(s) and carry no ' +
+            'credentials; activate {tab_id}; ' +
             'move {tab_id, window_id?, index}; pin {tab_id, pinned}.',
         ),
         change_summary: CHANGE_SUMMARY,
@@ -213,17 +214,20 @@ const SCHEMAS: Record<string, ToolDefinition['schema']> = {
       required: ['operations'],
     },
   },
-  browser_undo_changes: {
-    name: 'browser_undo_changes',
+  browser_restore_state: {
+    name: 'browser_restore_state',
     description:
-      'Reverse a batch this extension applied, found through browser_query_changes. Needs ' +
-      'fresh approval like any other write, and stops as soon as it finds that something ' +
-      'changed outside the extension since. Tab batches cannot be undone after a browser ' +
-      'restart, because tab ids do not survive one.',
+      'Put back one of the two states a journalled batch recorded — the state before it ran, ' +
+      'or the state it produced. Find batches through browser_query_changes. Restoring is ' +
+      'additive: recorded objects are re-created and moved back, and anything the user has ' +
+      'opened or added since is left untouched, so it never removes anything and can be run ' +
+      'again with the same result. Needs fresh approval like any other write. Tab states ' +
+      'cannot be restored after a browser restart, because tab ids do not survive one.',
     parameters: {
       type: 'object',
       properties: {
-        batch_id: { type: 'string', description: 'The batch to reverse, from browser_query_changes.' },
+        batch_id: { type: 'string', description: 'The batch whose state to put back, from browser_query_changes.' },
+        side: { type: 'string', description: '"before" (the state the batch started from, the usual choice) or "after" (the state it produced). Defaults to "before".' },
         change_summary: CHANGE_SUMMARY,
       },
       required: ['batch_id'],
@@ -248,9 +252,10 @@ export const ALL_BROWSER_TOOLS: ToolDefinition[] = BROWSER_TOOLS.map((name) => (
  * The tools the user has actually permitted.
  *
  * A tool needs every capability its own implies — moving a tab reads group membership too,
- * or the change could not be described afterwards, let alone undone (`dependencies`).
- * `browser_undo_changes` has no capability of its own: it is offered as soon as anything at
- * all may be written, because until then there is nothing that could need undoing.
+ * or the change could not be described afterwards, let alone put back (`dependencies`).
+ * `browser_restore_state` has no capability of its own: it is offered as soon as anything at
+ * all may be written, because until then there is nothing that could need restoring. The
+ * capability it actually spends is decided per plan, from the state being restored.
  */
 export function availableBrowserTools(): ToolDefinition[] {
   const { capabilities } = useBrowserAgent.getState().settings;
