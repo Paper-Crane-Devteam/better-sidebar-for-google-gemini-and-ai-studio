@@ -5,20 +5,27 @@ BETTER SIDEBAR FOR GEMINI & AI STUDIO — l'accélérateur ultime pour les déve
 
 Nous transformons l'interface par défaut en une base de connaissances puissante et organisée. Arrêtez de faire défiler sans fin l'historique et commencez à travailler efficacement.
 
-🔥 NOUVEAUTÉS (v2.10.0)
+🔥 NOUVEAUTÉS (v2.11.0)
 
-💼 Workspace Agent (Laissez l'IA éditer des fichiers pour vous) :
-• La révolution est là ! Tapez « > » pour invoquer le Workspace Agent, glissez-déposez vos fichiers (Word, Excel, PDF, sous-titres, Markdown, code), et laissez l'IA les analyser et les éditer.
-• Le meilleur ? Il préserve strictement votre mise en forme. En utilisant le suivi des modifications et des remplacements précis plutôt que des écrasements brutaux, vos formules Excel, styles Word et horodatages de sous-titres restent intacts.
-• Actuellement en Bêta. Le Powerpack débloque une capacité illimitée.
+⌨️ Palette de commandes Cmd+K (Style Raycast) :
+• Appuyez sur Cmd+K (Mac) ou Ctrl+K (Windows) pour ouvrir un volet central d'actions rapides. Recherchez titres, contenu des messages et outils de l'extension avec un flux 100% clavier.
 
-✨ Améliorations de l'expérience :
-• Mode Compact : Masquez complètement la barre d'icônes latérale pour une interface ultra-épurée sans distraction.
-• Chats temporaires pour AI Studio : Une expérience simulée de chat temporaire qui ne laisse aucune trace. Correction du bug où les chats temporaires Gemini créaient des entrées fantômes.
-• Actions plus rapides : Clic du milieu sur le bouton « New Chat » pour l'ouvrir dans un nouvel onglet. Ajout de raccourcis clavier : F2 pour renommer, Suppr pour supprimer.
-• Recherche de dossiers : Barre de recherche ajoutée à la popup de sélection de dossiers.
-• Améliorations de l'UI : Correction de l'ordre de la smart scrollbar, correction du fond de la barre pour le thème AI Studio, et ajout de l'avatar du compte pour changer facilement de profil.
-• Nouveaux thèmes : 6 superbes nouveaux thèmes (dans le Supportpack) et sélection de couleurs personnalisées plus pratique depuis le menu déroulant.
+🔄 Synchronisation silencieuse en arrière-plan (Recherche globale inter-appareils) :
+• Ne manquez plus jamais un résultat de recherche ! Les messages sont désormais indexés discrètement en arrière-plan sans avoir à ouvrir manuellement chaque conversation. Comprend une vue d'ensemble du statut et une synchronisation manuelle par conversation (optionnel avec régulation sécurisée).
+
+🤖 Browser Agent (Votre intendant de navigateur, Expérimental) :
+• L'IA au service de la propreté de votre navigateur : déduplication intelligente des onglets, regroupement sémantique et nettoyage en profondeur de vos dossiers de favoris. Sauvegarde automatique par instantané et retour en arrière en un clic.
+
+🎨 Atelier de thèmes en direct avec BetterSidebar Agent :
+• Plus besoin de copier-coller des prompts et des fichiers JSON. Décrivez l'ambiance souhaitée à l'agent : il génère et applique le thème instantanément, avec ajustements conversationnels.
+
+🧩 Barre d'icônes latérale personnalisable et réorganisable :
+• Masquez les outils que vous n'utilisez pas au quotidien et réorganisez les icônes par glisser-déposer.
+
+🛠️ Corrections et finitions :
+• Déploiement AI Studio : Correction du repli de la barre latérale suite aux récentes modifications de Google.
+• Routage des dossiers : Correction du bug où les nouvelles conversations se retrouvaient toujours dans « Inbox » malgré la sélection d'un autre dossier.
+• Contraste du thème Retro : Réduction de la saturation excessive du thème Retro Terminal pour un meilleur confort visuel.
 
 ---
 
@@ -26,15 +33,23 @@ Nous transformons l'interface par défaut en une base de connaissances puissante
 
 🤖 AI AGENT & WORKSPACE
 
-Tapez « > » pour invoquer l'Agent. Décrivez vos tâches et il vous aidera à les exécuter. Avec le nouveau Workspace Agent, vous pouvez glisser-déposer des documents (Word, Excel, PDF, code, etc.) et laisser l'IA les analyser ou les éditer tout en préservant strictement votre mise en forme originale. Supporte aussi l'organisation auto des chats, les requêtes de données, les Skills personnalisés et le contexte multi-tours. Fonctionne même sidebar fermée via l'Agent Dock.
+Tapez « > » pour invoquer l'Agent. Décrivez vos tâches et il vous aidera à les exécuter.
+• Workspace Agent : Glissez-déposez des documents (Word, Excel, PDF, code, etc.) et laissez l'IA les analyser ou les éditer en préservant votre mise en forme.
+• Browser Agent (Nouveau) : Éliminez le bazar d'onglets (déduplication et regroupement) et nettoyez vos favoris avec instantanés automatiques et restauration en un clic.
+• BetterSidebar Agent : Créez et appliquez des thèmes sur mesure à la volée, organisez les conversations et interrogez vos données. Fonctionne même barre fermée via l'Agent Dock.
 
 📂 SIDEBAR & ORGANISATION
 
 📂 Dossiers & Couleurs
 Glissez-déposez dans des dossiers imbriqués. Couleurs personnalisées pour dossiers et tags.
 
+🧩 Barre d'icônes personnalisable
+Affichez ou masquez les outils sur la barre gauche et organisez-les par glisser-déposer pour un espace de travail épuré.
+
 🔍 Recherche & Filtres
-Recherche plein texte sur tout l'historique. Filtres combinés : titre, tag, type. Recherche dans le chat actif.
+
+⌨️ Palette de commandes Cmd+K & Synchronisation silencieuse
+Appuyez sur Cmd+K / Ctrl+K pour une recherche unifiée : titres, descriptions, outils et texte intégral des messages. Propulsée par la synchronisation silencieuse pour une recherche complète sur tous vos appareils. Filtres combinés et recherche dans la conversation active.
 
 🏷️ Tags Intelligents
 Tags personnalisés visibles dans l'en-tête. Filtrage instantané.

@@ -17,16 +17,14 @@ export default defineConfig({
       '128': 'icons/icon128.png',
     },
     permissions: [
-      // 'sidePanel',
       'unlimitedStorage',
       'storage',
       'alarms',
-      // 'tabs', // Removed to speed up review, we have host permissions
       'scripting',
       'offscreen',
       'identity',
     ],
-    optional_permissions: targetBrowser === 'chrome' ? ['tabs', 'tabGroups', 'bookmarks'] : [],
+    optional_permissions: ['tabs', 'tabGroups', 'bookmarks'],
     host_permissions: [
       'https://aistudio.google.com/*',
       'https://gemini.google.com/*',

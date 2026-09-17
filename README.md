@@ -9,158 +9,142 @@
 [![Discord](https://img.shields.io/badge/Discord-Join_Us-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/FRzesxaGAx)
 [![License](https://img.shields.io/badge/License-Open_Source-orange?style=for-the-badge)](./LICENSE)
 
-Hi there! Welcome to the home of **Better Sidebar for Gemini & AI Studio**.
+The all-in-one productivity sidebar, prompt manager, and AI agent toolkit for **Google Gemini** and **Google AI Studio**.
 
-If you use **Gemini** or **Google AI Studio** heavily, you know the struggle: your chat list gets messy, old prompts get lost, and finding that _one_ specific conversation from last week is a nightmare.
-
-We built this extension to fix that. It gives you a clean, organized sidebar with folders, tags, and a powerful search engine that actually works across **both platforms**—all while keeping your data 100% local and private.
-
-## 🤖 What's New in v2.9.x — The Agent Has Landed
-
-### 🚀 AI Agent
-
-Type `>` in the input box, describe what you want in plain English, and the AI actually goes and does it — reading your data, making decisions, executing multi-step work, and reporting back. It runs **inside your browser using your own Gemini session**: no API keys, no extra tokens, no data leaving your machine.
-
-The Agent has genuine query access to your local database (conversations, messages, folders, tags, prompts, snippets). It writes its own queries, looks at the results, and decides the next step — so it's a real multi-turn conversation, not a menu of canned actions.
-
-**Skills that ship in the box:**
-- **🗂️ Auto-Organize** — "Sort my last 200 chats into folders and tag them." It reads the titles, builds the taxonomy, creates folders, moves everything.
-- **🔄 Backfill Search Index** — messages are only recorded while a chat is open, so anything from before you installed the extension has no content. This syncs the real messages in, so full-text search and export finally see everything.
-- **📊 Query Your Own Data** — "Which folder has the most chats from last month?" Ask your history like a database, because it is one.
-- **📝 Manage Prompts & Snippets** — rewrite, reorganize, and deduplicate in bulk.
-- **🛠️ Custom Skills** — define your own in **Settings → Agent**; each becomes a permanent one-click card.
-
-**Safety rails:** every write asks for approval first (reads run free), **Speed Mode** turns off the prompts when you trust it (with undo), the **Agent Dock** above your input box shows status / stop / approvals even when the sidebar is closed, and circuit breakers kill runs that loop or stall and tell you why.
-
-### ✨ Also New
-
-- **⚡ Gemini Spark Integration** — appears as a native sidebar tab if Google has rolled it out to your account
-- **💾 Automatic Local Backups** — scheduled snapshots plus manual ones, with rollback
-- **📜 Expandable Smart Scrollbar** — click to expand into a full message list for long conversations
-- **🖍️ Text Selection Toolbar** — select text in a chat to explain, summarize, save as snippet, or copy
-- **📁 Default Folder for Gems & Notebooks** — new chats land in the assigned folder automatically, and folder settings let you bind/unbind from either side
-- **⌨️ Slash Commands in AI Studio** — the `/` Prompt Library shortcut is no longer Gemini-only
-- **🎛️ Toolbar Icon Control Panel** — toggle platforms and features without digging through menus
-- **🎨 Calmer UI** — tighter spacing rhythm, better contrast, refined themes, animated theme switching
-- **📂 New Folder from the Move dialog** — no more dead-end when the folder doesn't exist yet
-
-### 🐛 Notable Fixes
-
-- **☁️ Google Drive sync no longer overwrites local data.** The old auto-merge logic is gone. Uploads still run automatically if sync is on, but restoring is now a deliberate, manual download. Your local data is the source of truth.
-- **⚪ Grey dots cleanup** — the Smart Scrollbar's expanded panel has an eraser button that clears this conversation's saved messages and reloads, so they are captured again from the chat
-- **📝 Snippets keep their Markdown** — headings, lists, and code blocks survive the save
-- **😴 Zombie sidebar** after leaving a tab open for hours — it reconnects properly now
-- **🕒 Accurate timestamps**, **💎 Gems & Notebooks detected on creation**, **📐 no more Gemini page shifting**, **⌨️ spaces no longer cancel renames**
+If you use AI heavily for work or research, your chat history quickly turns into a messy, endless list. **Better Sidebar** transforms that flat list into a powerful, structured knowledge base with nested folders, full-text search, keyboard-first command palettes, custom themes, and autonomous AI agents—all running **100% locally in your browser**.
 
 ---
 
-## ✨ Features
+## 🌟 Core Highlights
 
-Here is what Better Sidebar can do for you:
+### 🤖 1. Autonomous AI Agent Ecosystem (Local & Private)
+Type `>` in the input box to summon our multi-agent toolkit. The agents execute multi-step workflows directly in your browser using your active session—**no API keys required, zero extra token fees, and zero data leaving your machine**:
+- **💼 Workspace Agent (File & Code Editor)**: Drag and drop local documents—Word (`.docx`), Excel (`.xlsx`), PDF, subtitles (`.srt`, `.vtt`), Markdown, and code. The agent analyzes and edits them while **strictly preserving formatting** (using Word Tracked Changes & comments, genuine Excel formulas, and millisecond-accurate subtitle timestamps). It can also scaffold complete frontend and backend projects from scratch without uploading prior files.
+- **🌐 Browser Agent (Browser Caretaker)**: Intelligent tab deduplication and semantic clustering to cure tab overload, plus deep cleanup of sprawling bookmarks. Includes **automatic pre-run state snapshots** for instant one-click rollback if you aren't satisfied.
+- **🪄 BetterSidebar Agent**: Organize your chat tree, tag conversations, query your local database, and design custom themes on the fly.
+- **🎨 Live Prompt-to-Theme**: Tell the agent what aesthetic you want in plain words (e.g. *"Create a cyberpunk dark slate theme with neon green accents"*), and it generates and applies the theme live, with iterative conversational tweaking.
+
+### ⌨️ 2. Cmd+K Command Palette (Raycast Style)
+Designed for power users who love a keyboard-first flow:
+- Press **`Cmd + K`** (Mac) or **`Ctrl + K`** (Windows) anywhere to summon the central spotlight overlay.
+- Search conversation titles, descriptions, tools, navigation shortcuts, and full message transcripts in milliseconds.
+- Arrow keys to navigate, Enter to jump—navigate your entire AI history without ever lifting your hands from the keyboard.
+
+### 🔍 3. True Full-Text Search & Silent Background Sync
+- **Silent Background Message Sync**: Conversations are quietly indexed in the background without needing you to open chats first, eliminating missing search hits across different computers and browsers.
+- **Rate-Limited & Safe**: Controlled, throttled background sync keeps your Google account completely safe from rate limits.
+- **Sync Status Overview**: View synced vs. unsynced conversations at a glance, with single-click manual sync for immediate indexing.
+- **Chained Precision Filters**: Combine conditions by title, tag, date range, or message type, with dedicated "Search within active chat" support.
+
+### 📂 4. Sidebar Organization & Deep Customization
+- **Nested Folders & Custom Colors**: Create multi-level folder trees with drag-and-drop hierarchy and custom color accents.
+- **🧩 Customizable Icon Bar**: Toggle visibility of individual tool icons on the far-left dock and drag-and-drop to reorder them for an uncluttered workspace.
+- **🗂️ Compact Mode**: Hide the icon bar entirely for an ultra-clean, distraction-free environment.
+- **🏷️ Smart Tags & Remarks**: Color-coded tags visible directly in chat headers, plus customizable descriptions with rich hover tooltips.
+- **💬 Temporary Chats**: Native simulated temp chat support in AI Studio—experiment freely without cluttering your file tree.
+- **💎 Gem & Notebook Integration**: Manage and set default landing folders for Google Gems and Notebooks so new conversations auto-sort themselves.
+
+### 📝 5. Prompt Library, Snippets & Slash Commands
+- **Reusable Prompt Library**: Store frequently used prompts with variable placeholders and system instructions.
+- **⚡ Magic Slash Commands**: Type `/` in Gemini or AI Studio to immediately pop open and inject prompts from your library.
+- **✂️ Snippets Repository**: Highlight and extract key AI responses into a dedicated, folder-organized snippet collection.
+- **🖍️ Text Selection Toolbar**: Select any text in a chat to explain, summarize, copy, or save as a snippet.
+
+### 📤 6. Multi-Format Export & Personal Cloud Backup
+- **Export Formats**: Export individual chats as Markdown, Plain Text, or JSON.
+- **🔗 Powerpack — Notion & Obsidian**: Seamlessly export chats and snippets directly into Notion and Obsidian with complete formatting preserved.
+- **☁️ Google Drive Backup**: Securely sync your settings, tags, and prompt library to your personal Google Drive. Restores are always manual and deliberate—your local data is always the single source of truth.
+- **💾 Automatic Local Backups**: Built-in SQLite snapshots with instant rollback prevent accidental data loss.
+
+---
+
+## ✨ Features at a Glance
 
 | Feature | Description |
 | :--- | :--- |
-| 🤖 **AI Agent** | Type `>` and describe a task in plain English. The Agent queries your local data, plans, and executes multi-step work — using your own Gemini session, no API key needed. |
-| 🛠️ **Custom Agent Skills** | Define your own repeatable workflows in Settings → Agent. Each becomes a one-click card. |
-| 🛑 **Agent Approvals & Dock** | Writes require approval, reads run free. The Agent Dock sits above your input with status, stop, and approvals. |
-| ⚡ **Gemini Spark** | Native sidebar tab for Spark if it's enabled on your account. |
-| 💾 **Automatic Local Backups** | Scheduled and manual snapshots of your extension data, with rollback. |
-| 🖍️ **Text Selection Toolbar** | Select text in a chat to explain, summarize, save as a snippet, or copy. Fully configurable. |
-| 🌟 **Multi-Platform Support** | Manage conversations across both Gemini and Google AI Studio seamlessly in one unified sidebar. |
-| 👥 **Multi-Account Profiles** | Create separate profiles for work or personal use. Each maintains its own independent database. |
-| 🔍 **Chained Search** | Filter conversations by combining multiple conditions — title, tag, and type — for laser-precise results. |
-| 💎 **Gem Management** | Full Gem integration — browse, filter, create, and start conversations with your Gems right from the sidebar. |
-| 📜 **Smart Scrollbar** | A visual scrollbar for Gemini conversations. Jump directly to any message, or click to expand it into a full message list. |
-| 🤖 **Default Model** | Set a default model for Gemini and every new conversation will automatically use it. |
-| ✏️ **True Rename** | Rename conversations directly — changes are synced to Google's servers in real time. |
-| 🗑️ **True Delete & Batch Delete** | Delete or batch-delete conversations with real server-side removal. No more ghost chats. |
-| 🔐 **Persistent Login** | Stay logged in across sessions with smart merge for synced data. |
-| 📂 **Folders & Colors** | Drag and drop your chats into nested folders. Assign custom colors to folders and tags. |
-| 📝 **Prompt Library** | Build your personal library of reusable prompts. Supports option variables, prompt composition, and system prompt imports. |
-| 🔍 **Precision Search** | Full-text search across every message in your history. Limit search to the active chat for immediate context. |
-| 📓 **Notebook Integration** | Full notebook support for Gemini — browse, organize, and manage your notebooks right from the sidebar. |
-| ☁️ **Google Drive Backup** | Automatically upload your settings, prompts, and config data to your own Google Drive. Restoring is always a deliberate manual download — nothing overwrites your local data behind your back. |
-| 🎨 **UI Customization** | Advanced layout controls for Gemini, including width adjustments and Focus Mode. |
-| ⚙️ **Platform Manager** | Use the extension popup to quickly jump between platforms or enable/disable them on the fly. |
-| 🏷️ **Smart Tagging** | Assign custom tags to your conversations, now visible directly in the chat header. |
-| ⭐ **Favorites & Pinning** | Keep your most frequently used chats or specific prompts at the top for quick access. |
-| 🔄 **Automatic Sync** | Your latest conversations are automatically synced behind the scenes when you visit the page. |
-| 📊 **Timeline View** | Visualize your workflow with a "Today", "Yesterday", and "Last Week" timeline. |
-| 🖼️ **Watermark-Free Downloads** | Automatically remove watermarks when downloading generated images in Gemini, including Pro HD images. |
-| 📥 **Conversation Export** | Export your conversations as Markdown, Plain Text, or JSON for documentation or backup. |
-| ✂️ **Snippets** | Extract highlights from any AI reply into a dedicated Snippet library with folder management. |
-| 🔗 **Powerpack — Notion & Obsidian Export** | Seamlessly export conversations and snippets to Notion and Obsidian with full formatting preserved. Batch export supported. |
-| 👀 **Conversation Outline** | See the structure of long conversations at a glance with the new Outline view. |
-| 📝 **Chat Remarks & Rich Tooltips** | Add descriptions to chats; hover for creation date, tags, and notes. |
-| 📌 **Folder Pinning** | Pin favorite folders to the top and drag-to-reorder for effortless organization. |
-| 🎯 **Locate Active Chat** | One click to auto-expand and snap to your current active conversation in the tree. |
-| ⚡ **Magic Slash Commands** | Type `/` in Gemini or AI Studio's input to instantly summon your Prompt Library. |
-| 🏠 **Default Homes** | Assign default folders to Gems & Notebooks — new chats auto-sort themselves. Manageable from either the Gem/Notebook or the folder side. |
-| 🌗 **Theme Sync** | Automatically matches the platform's light/dark mode. |
-| 🔒 **Privacy First** | Everything is stored locally in your browser (SQLite). We don't see your data, ever. |
-| 💾 **Data Control** | Export your data (SQL dump) anytime. You own your data. |
+| ⌨️ **Cmd+K Command Palette** | Raycast-style spotlight bar (`Cmd+K` / `Ctrl+K`) for rapid navigation, search, and action execution. |
+| 🔄 **Silent Background Sync** | Automatic background indexing of message history for comprehensive cross-device search. |
+| 🤖 **AI Agent Ecosystem** | Type `>` to summon BetterSidebar Agent, Workspace Agent, or Browser Agent. Multi-turn autonomous execution. |
+| 💼 **Workspace Document Editing** | Edit Word (.docx), Excel (.xlsx), subtitles, and code while strictly preserving existing formatting. |
+| 🌐 **Browser Agent** | Clean up tab overload (deduplication & smart grouping) and organize messy bookmarks with 1-click rollback. |
+| 🎨 **Live Prompt-to-Theme** | Generate and apply custom themes on the fly by chatting directly with the BetterSidebar Agent. |
+| 🧩 **Customizable Icon Bar** | Toggle visibility of functional dock icons and drag-and-drop to reorder them for a minimal layout. |
+| 📂 **Folders & Custom Colors** | Organize chats in nested multi-level folders. Assign custom colors to folders and tags. |
+| 🔍 **Full-Text Search & Filters** | Instant search across all chat titles and message bodies. Multi-condition filtering by tag, type, and date. |
+| 🌟 **Multi-Platform Support** | Seamlessly manage conversations across both Google Gemini and Google AI Studio in one sidebar. |
+| 👥 **Multi-Account Profiles** | Create independent profiles for work, personal, or research use, each with an isolated database. |
+| 💎 **Gem & Notebook Integration** | Browse, organize, filter, and set default landing folders for your Gems and Notebooks. |
+| 📜 **Smart Scrollbar** | Visual message index on long conversations with quick jump and message list inspection. |
+| ✏️ **True Server-Side Rename & Delete**| Renames and batch-deletions sync directly with Google servers—no phantom/ghost chats. |
+| 📝 **Prompt Library & Slash Commands** | Build reusable prompt templates with option variables; trigger instantly with `/` in input boxes. |
+| ✂️ **Snippets Library** | Extract gems from AI responses into a dedicated Snippets repository with folder organization. |
+| 📤 **Multi-Format Chat Export** | Export chats as Markdown, Plain Text, or JSON. Powerpack adds Notion and Obsidian export. |
+| ☁️ **Google Drive Backup** | Securely upload your settings and prompt library to your own Google Drive. Restore is always deliberate and local-first. |
+| 💾 **Automatic Local Backups** | Built-in SQLite snapshots with instant rollback so you never lose your organization structure. |
+| ⚡ **Gemini Spark Tab** | Native sidebar integration for Spark whenever available on your Google account. |
+| 🖍️ **Text Selection Toolbar** | Highlight chat text to explain, summarize, copy, or save as a snippet. |
+| 🔒 **100% Privacy-First** | Everything runs locally in browser storage (SQLite). No tracking, no data harvesting, no model training. |
+
+---
 
 ## 🔒 Privacy & Security
 
-We take this seriously.
+We take your privacy seriously:
 
-- **100% Local:** We use an embedded SQLite database running entirely within your browser.
-- **No Cloud Sync to Our Servers:** Your folders, tags, and notes are NOT sent to our servers. Google Drive sync is between you and your own Google account.
-- **No Training:** We do not read your conversations to train any AI models.
+- **100% Local Storage:** We use an embedded SQLite database running entirely within your browser.
+- **No Cloud Sync to Our Servers:** Your conversations, folder trees, tags, and notes are NEVER uploaded to any servers operated by us.
+- **Optional Google Drive Sync:** Drive backup connects strictly between your browser and your own Google account.
+- **No Model Training:** We never access or use your prompts or conversations for AI model training.
+- **Safe Agent Sandboxing:** Agents run in your browser using your active session. Write actions require confirmation or speed-mode undo buffers.
 
-When you install, your browser will request permission to "Read and change data on aistudio.google.com and gemini.google.com". This is solely to inject the enhanced sidebar interface and read chat titles for organization. We do not access your other browsing history.
+When you install, the browser requests permission for `aistudio.google.com` and `gemini.google.com`. This is strictly to inject the sidebar interface and sync chat metadata.
+
+---
 
 ## 📥 Installation
 
 **[Get it from the Chrome Web Store](https://chromewebstore.google.com/detail/better-sidebar-for-google/cjeoaidogoaekodkbhijgljhenknkenj)**
 
 Also available on:
-
 - [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/better-sidebar-for-ai-studio)
-- **Microsoft Edge**: Not yet supported (coming soon).
-
-## 🤝 Contributing
-
-This project is now open source! If you're a developer and want to help make it better, feel free to open an issue or submit a PR.
-
-## 🆘 Support & Troubleshooting
-
-### Common Issues (FAQ)
-
-<details>
-<summary><strong>1. The extension overlay isn't appearing.</strong></summary>
-
-- **Refresh the page:** Sometimes the extension needs a page reload to inject properly, especially right after installation.
-- **Check permissions:** Ensure the extension has permission to run on `aistudio.google.com` and `gemini.google.com`.
-- **Conflict:** Disable other Gemini or AI Studio extensions temporarily to check for conflicts.
-</details>
-
-<details>
-<summary><strong>2. My chats aren't showing up or I can't find specific messages.</strong></summary>
-
-- **New chats missing?** The extension automatically syncs when you visit the page. If conversations are still missing, go to `Settings` -> `Data & Storage` and click **"Scan Library"** to force a manual sync.
-- **Missing message content?** If search can't find text from older chats, you might need to import them. Go to the **Search** tab and click **"Import History"**. You can upload a Google Takeout zip to fully index your past conversations.
-</details>
-
-<details>
-<summary><strong>3. I lost my folder structure!</strong></summary>
-
-- **Don't Panic:** Your data is stored locally.
-- **Check Database:** In the `Settings`, try exporting your data to see if it's still there.
-- **Restore:** If you have a previous backup (DB file), use the Import function to restore your state.
-</details>
-
-### Community
-
-Join our [Discord server](https://discord.gg/FRzesxaGAx) to chat with other users, get help, or share feedback.
-
-### Reporting Bugs
-
-Found a bug? Have a cool idea?
-
-- Check the [Issues](../../issues) tab to see if it's already reported.
-- If not, feel free to open a new issue!
+- **Microsoft Edge**: Coming soon.
 
 ---
 
-_Note: This is an independent project and is not affiliated with, endorsed by, or sponsored by Google._
+## 🤝 Contributing & Community
+
+Better Sidebar is open source! If you're a developer and want to help make it better:
+- Feel free to open an issue or submit a Pull Request.
+- Read our [CONTRIBUTING.md](./CONTRIBUTING.md) for local development setup.
+
+Join our community on [Discord](https://discord.gg/FRzesxaGAx) to chat with fellow users, suggest features, or get help.
+
+---
+
+## 🆘 Troubleshooting & FAQ
+
+<details>
+<summary><strong>1. The extension overlay isn't appearing on Gemini or AI Studio.</strong></summary>
+
+- **Refresh the page:** The extension might need a page reload to inject after installation or an update.
+- **Check permissions:** Ensure the extension has permission to run on `aistudio.google.com` and `gemini.google.com`.
+- **Extension conflicts:** Temporarily disable other third-party extensions on the page to verify compatibility.
+</details>
+
+<details>
+<summary><strong>2. Search isn't finding messages from older conversations.</strong></summary>
+
+- **Turn on Silent Background Sync:** In `Settings` -> `Data & Storage`, enable **Silent Background Message Sync**. Better Sidebar will quietly fetch past message transcripts into your local full-text search index.
+- **Manual Sync:** Open the sync management modal in Settings to see which conversations are pending, and click to trigger an immediate sync.
+</details>
+
+<details>
+<summary><strong>3. How do I restore my folders if I switch computers?</strong></summary>
+
+- Use **Google Drive Backup** in `Settings` to keep your folders and prompts backed up to your personal Drive.
+- Alternatively, export a local database backup (`.sqlite` / JSON export) and import it on your new computer.
+</details>
+
+---
+
+_Disclaimer: This is an independent open-source project and is not affiliated with, endorsed by, or sponsored by Google._

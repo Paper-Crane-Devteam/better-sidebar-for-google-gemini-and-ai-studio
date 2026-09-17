@@ -3,20 +3,27 @@ Organize conversations into folders, search across all messages, export chats, s
 
 Meet BETTER SIDEBAR FOR GEMINI & AI STUDIO — designed to help developers, prompt engineers, and AI power users streamline their daily workflows. We aim to transform the default interface into a more organized knowledge base, helping you find what you need without endless scrolling.
 
-🔥 WHAT'S NEW (v2.10.0)
+🔥 WHAT'S NEW (v2.11.0)
 
-💼 Workspace Agent (Let AI edit files for you):
-• The game-changer is here! Type ">" to summon the Workspace Agent, drag and drop your files (supports Word, Excel, PDF, subtitles, Markdown, and code), and let the Agent analyze and edit them.
-• The best part? It strictly preserves your formatting. Using tracked changes and precise replacements rather than brutal overwrites, your Excel formulas, Word styles, and subtitle timestamps remain perfectly intact.
-• Currently in Beta. Powerpack unlocks unlimited workspaces and files.
+⌨️ Cmd+K Command Palette (Raycast Style):
+• Hit Cmd+K (Mac) or Ctrl+K (Windows) to instantly summon a centered quick-action panel. Search conversation titles, message transcripts, and trigger extension tools with a pure keyboard workflow.
 
-✨ Quality of Life Improvements:
-• Compact Mode: Hide the sidebar icon bar completely for an ultra-clean, distraction-free interface.
-• Temporary Chats for AI Studio: A simulated temp chat experience that leaves no trace in your file tree. Also fixed a bug where Gemini temp chats created phantom folder entries.
-• Quicker Actions: Middle-click the "New Chat" button to open it in a new tab. We've also added keyboard shortcuts: F2 to rename and Delete to trash files.
-• Folder Search: Added a search bar to the folder selection popup so you can locate folders instantly.
-• UI Polish: Fixed smart scrollbar ordering during branch chats, corrected the AI Studio theme sidebar background, and added an account avatar display for easier multi-account switching.
-• New Themes: Added 6 gorgeous new themes (in Supportpack) and a more convenient custom color picker right in the folder dropdown menu.
+🔄 Silent Background Message Sync (Full-Text Search Across Devices):
+• Never miss a search result again! History messages now sync quietly in the background without needing you to open chats first. Includes a sync status overview modal and manual single-chat sync triggers (opt-in with safe throttling).
+
+🤖 Browser Agent (Your Personal Browser Caretaker, Experimental):
+• AI extends into browser hygiene: automatically deduplicate tabs, group related tabs semantically, and deep-clean chaotic bookmark folders. Automatic pre-run state snapshots with instant one-click rollback.
+
+🎨 BetterSidebar Agent Live Theme Workshop:
+• Stop copying and pasting prompts and JSON files. Tell BetterSidebar Agent what vibe you want, and it builds and applies the theme instantly, ready for conversational fine-tuning.
+
+🧩 Customizable & Reorderable Icon Bar:
+• Toggle visibility for unused functional tabs on the far-left dock and drag-and-drop to reorder them to your liking.
+
+🛠️ Polish & Bug Fixes:
+• AI Studio UI Fix: Fully restored sidebar expand/collapse following recent Google AI Studio DOM layout changes.
+• Folder Routing Fix: Fixed an issue where new chats stubbornly fell into "Inbox" even when a target folder was selected.
+• Retro Theme Contrast: Tuned down excessive saturation in the Retro Terminal theme for a more eye-friendly experience.
 
 ---
 
@@ -24,15 +31,23 @@ Meet BETTER SIDEBAR FOR GEMINI & AI STUDIO — designed to help developers, prom
 
 🤖 AI AGENT & WORKSPACE
 
-Type ">" to summon the Agent. Describe your tasks in everyday language, and it will help you execute them. With the new Workspace Agent, you can drag and drop documents (Word, Excel, PDF, code files, etc.) and let AI analyze or edit them while strictly preserving your original formatting and layouts. Also supports auto-organizing chats, querying data, custom Skills, and multi-turn context. Works even with the sidebar closed via the Agent Dock.
+Type ">" to summon the Agent. Describe your tasks in everyday language, and it will help you execute them.
+• Workspace Agent: Drag and drop documents (Word, Excel, PDF, code files, etc.) and let AI analyze or edit them while strictly preserving your original formatting.
+• Browser Agent (New): Clean up tab clutter with smart deduplication/grouping and organize messy bookmarks with automatic snapshots and one-click rollback.
+• BetterSidebar Agent: Create and apply custom themes on the fly, organize conversations, and query data. Works even with the sidebar closed via the Agent Dock.
 
 📂 SIDEBAR & ORGANIZATION
 
 📂 Folders & Colors
 Drag and drop your chats into nested folders. Assign custom colors to folders and tags for visual clarity.
 
+🧩 Customizable Icon Bar
+Show or hide individual tool icons on the far-left dock and drag-and-drop to reorder them for an uncluttered workspace.
+
 🔍 Search & Filter
-Full-text search across every message in your history. Combine multiple conditions — title, tag, type — for laser-precise results. Search within the active chat for immediate context.
+
+⌨️ Cmd+K Command Palette & Background Sync
+Hit Cmd+K / Ctrl+K to summon a unified spotlight search covering chat titles, descriptions, tools, and full message transcripts. Powered by silent background message sync for truly complete cross-device search. Combine multiple filter conditions or search directly within the active conversation.
 
 🏷️ Smart Tagging
 Assign custom tags to conversations, visible directly in the chat header. Filter instantly by tag.
