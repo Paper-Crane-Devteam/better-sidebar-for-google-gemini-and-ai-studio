@@ -12,6 +12,7 @@
 
 import i18n from '@/locale/i18n';
 import { BUILTIN_MCP_ID } from '../mcp/builtin-mcp';
+import { THEME_MCP_ID } from '../mcp/theme-mcp';
 import { WORKSPACE_MCP_ID } from '../mcp/workspace-mcp';
 import { DOCUMENT_MCP_ID } from '../mcp/document-mcp';
 import { BROWSER_MCP_ID } from '../mcp/browser-mcp';
@@ -62,9 +63,11 @@ export const AGENTS: AgentDefinition[] = [
     id: 'bettersidebar',
     name: 'Better Sidebar',
     shortName: 'Sidebar',
-    description: 'Organize conversations, folders, tags, prompts and snippets',
+    description: 'Organize conversations, folders, tags, prompts, snippets and themes',
     icon: 'Bot',
-    mcpServerIds: [BUILTIN_MCP_ID],
+    // The theme server is second because it is the smaller subject: the prompt should read
+    // as "your data, and also how it looks", not the other way round.
+    mcpServerIds: [BUILTIN_MCP_ID, THEME_MCP_ID],
     tabContent: 'launcher',
     buildSoul: buildBetterSidebarSoul,
   },

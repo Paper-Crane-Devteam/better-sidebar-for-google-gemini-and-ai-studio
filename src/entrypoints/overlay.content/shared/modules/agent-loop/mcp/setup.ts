@@ -11,6 +11,7 @@ import { mcpRegistry } from './registry';
 import type { MCPServer } from './types';
 import { CORE_MCP } from './core-mcp';
 import { BUILTIN_MCP } from './builtin-mcp';
+import { THEME_MCP } from './theme-mcp';
 import { WORKSPACE_MCP, WORKSPACE_MCP_ID } from './workspace-mcp';
 import { DOCUMENT_MCP, DOCUMENT_MCP_ID } from './document-mcp';
 import { BROWSER_MCP } from './browser-mcp';
@@ -28,6 +29,7 @@ import { isChromeBuild } from '@/shared/browser-agent/contracts';
  */
 const OWNED_SERVERS: MCPServer[] = [
   BUILTIN_MCP,
+  THEME_MCP,
   WORKSPACE_MCP,
   DOCUMENT_MCP,
   ...(isChromeBuild() ? [BROWSER_MCP] : []),

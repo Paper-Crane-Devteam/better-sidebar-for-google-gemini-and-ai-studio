@@ -88,6 +88,15 @@ export const AGENT_EXAMPLES: AgentExample[] = [
       'under today\'s date instead of overwriting it.',
   },
   {
+    icon: 'Palette',
+    key: 'theme',
+    label: 'Design a theme',
+    text:
+      'Make me a warm dusk theme — deep indigo background, muted amber accent, easy on the eyes ' +
+      'at night. Keep the text contrast high enough to read for hours. Save it as a custom theme ' +
+      'and tell me what you picked before you switch anything on.',
+  },
+  {
     icon: 'BarChart3',
     key: 'stats',
     label: 'Look at the numbers',

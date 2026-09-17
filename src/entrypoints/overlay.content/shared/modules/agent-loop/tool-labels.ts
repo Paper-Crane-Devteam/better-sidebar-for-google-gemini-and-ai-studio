@@ -55,6 +55,14 @@ export function getToolLabel(toolName: string, t: Translate, query?: string): st
       // still has to accept, and a card that says "Editing your document" overstates what
       // is about to happen to the file.
       return t('agent.tool.docEdit', { defaultValue: 'Marking up a document' });
+    case 'list_themes':
+      return t('agent.tool.listThemes', { defaultValue: 'Looking at your themes' });
+    case 'create_theme':
+      return t('agent.tool.createTheme', { defaultValue: 'Saving a theme' });
+    case 'apply_theme':
+      // "Switching the look" rather than "Applying a theme": the card is read while the
+      // page is already changing colour around it, so it should name what just happened.
+      return t('agent.tool.applyTheme', { defaultValue: 'Switching the look' });
     case 'browser_list_tabs':
       return t('agent.tool.listTabs', { defaultValue: 'Looking at your tabs' });
     case 'browser_list_tab_groups':

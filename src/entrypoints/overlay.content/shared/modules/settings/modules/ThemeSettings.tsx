@@ -22,30 +22,11 @@ import {
   type BuiltinThemePresetId,
 } from '@/themes';
 import { AI_THEME_PROMPT_TITLE, AI_THEME_PROMPT_CONTENT } from '@/themes/ai-theme-prompt';
+import { selectTheme } from '@/themes/theme-actions';
 import { ImportThemeModalContentStateful, handleImportTheme } from '../components/ImportThemeModal';
-
-/** Preview duration: 5 minutes */
-const PREVIEW_DURATION_MS = 5 * 60 * 1000;
 
 /** Number of theme cards per page */
 const THEMES_PER_PAGE = 4;
-
-/**
- * Module-level preview timer — survives component unmount/remount.
- */
-let modulePreviewTimer: ReturnType<typeof setTimeout> | null = null;
-
-function startModulePreviewTimer(onExpire: () => void) {
-  clearModulePreviewTimer();
-  modulePreviewTimer = setTimeout(onExpire, PREVIEW_DURATION_MS);
-}
-
-function clearModulePreviewTimer() {
-  if (modulePreviewTimer) {
-    clearTimeout(modulePreviewTimer);
-    modulePreviewTimer = null;
-  }
-}
 
 /**
  * Theme card preview colors for each preset
@@ -260,41 +241,16 @@ export const ThemeSettings = () => {
 
   const isDefaultTheme = customTheme === null;
 
-  // Preview timer — resets to default after expiry for unlicensed premium themes
-  const { isPreviewActive, previewThemeId, startPreview, endPreview } = licenseState;
-
-  const handlePreviewExpired = useCallback(() => {
-    clearModulePreviewTimer();
-    endPreview();
-    setCustomTheme(null);
-  }, [endPreview, setCustomTheme]);
+  // Premium themes without a licence run as a timed preview — see `themes/theme-actions`,
+  // which owns that rule so the agent's apply_theme tool cannot diverge from it.
+  const { isPreviewActive, previewThemeId } = licenseState;
 
   const handleThemeClick = (themeId: ThemePresetId, event: React.MouseEvent) => {
-    const preset = themeRegistry[themeId];
-
-    startViewTransition(event, () => {
-      if (preset.isPremium && !hasLicense) {
-        setCustomTheme(themeId);
-        startPreview(themeId);
-        startModulePreviewTimer(handlePreviewExpired);
-      } else {
-        if (isPreviewActive) {
-          clearModulePreviewTimer();
-          endPreview();
-        }
-        setCustomTheme(themeId);
-      }
-    }, themeId, theme);
+    startViewTransition(event, () => selectTheme(themeId), themeId, theme);
   };
 
   const handleDefaultClick = (event: React.MouseEvent) => {
-    startViewTransition(event, () => {
-      if (isPreviewActive) {
-        clearModulePreviewTimer();
-        endPreview();
-      }
-      setCustomTheme(null);
-    }, null, theme);
+    startViewTransition(event, () => selectTheme(null), null, theme);
   };
 
   /** Create the AI theme generator prompt in Prompt Manager */

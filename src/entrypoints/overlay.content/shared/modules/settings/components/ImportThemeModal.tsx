@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { AlertCircle, CheckCircle2, Sparkles, ShoppingCart } from 'lucide-react';
 import { validateUserTheme } from '@/themes/user-themes';
 import { useUserThemeStore, refreshThemeRegistry } from '@/themes';
-import { usePegasusStore } from '@/shared/lib/pegasus-store';
+import { selectTheme } from '@/themes/theme-actions';
 import { useLicenseStore, isLicenseValid } from '@/shared/lib/license-store';
 import { openPurchasePage } from '@/shared/lib/license-links';
 import { toast } from '@/shared/lib/toast';
@@ -48,9 +48,15 @@ export function handleImportTheme(t: (key: string) => string): boolean {
     useUserThemeStore.getState().addTheme(validation.theme!);
   }
 
-  // Refresh registry and apply
+  /*
+   * Refresh the registry, then go through `selectTheme` rather than writing `customTheme`
+   * directly. The licence was checked just above, so this always takes the plain "applied"
+   * path — what it adds is ending a preview that happened to be running, which the direct
+   * store write left behind as a stale banner and a timer still counting down on a theme
+   * the user had already replaced.
+   */
   refreshThemeRegistry();
-  usePegasusStore.getState().setCustomTheme(validation.theme!.id);
+  selectTheme(validation.theme!.id);
 
   toast.success(t('themeSettings.importSuccess'));
   return true;

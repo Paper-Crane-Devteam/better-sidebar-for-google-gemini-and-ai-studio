@@ -50,6 +50,10 @@ export const SUPPORTED_TOOLS = [
   // run.
   'doc_read',
   'doc_edit',
+  // Theme tools (see mcp/theme-mcp.ts).
+  'list_themes',
+  'create_theme',
+  'apply_theme',
 ] as const;
 
 /** Params that must be present and non-empty, per tool */
@@ -82,6 +86,10 @@ export const REQUIRED_PARAMS: Record<string, string[]> = {
   // the correct first call on any document.
   doc_read: ['path'],
   doc_edit: ['path', 'ops'],
+  // `list_themes` takes nothing at all.
+  list_themes: [],
+  create_theme: ['theme'],
+  apply_theme: ['theme_id'],
 };
 
 /**

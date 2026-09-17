@@ -1070,6 +1070,7 @@
     "importAndApply": "Import & Apply",
     "importRequiresLicense": "Importing custom themes requires a Support Pack.",
     "importSuccess": "Theme imported and applied successfully!",
+    "themeSaved": "Custom theme saved — you can switch to it in Themes.",
     "promptAlreadyExists": "AI theme prompt already exists — switching to Prompts tab.",
     "promptCreated": "Prompt created! Switching to Prompts tab.",
     "themeDeleted": "Custom theme removed."
@@ -1256,6 +1257,10 @@
           "label": "Clean up snippets",
           "text": "My snippet inbox is a mess. Group them into folders by topic, and shorten titles that are still my original question into a brief summary. If the same content is saved twice, keep only the oldest one. Show me the list before deleting anything."
         },
+        "theme": {
+          "label": "Design a theme",
+          "text": "Design a warm dusk theme for me: deep indigo background with muted amber accents, comfortable for late-night reading. Keep text contrast high enough to read for hours. Save it as a custom theme, and tell me what you chose before switching anything on."
+        },
         "workspace": {
           "label": "Record decisions",
           "text": "Summarize our conclusions from this chat as a bulleted list and save it to notes/decisions.md in the workspace. Append any unresolved questions at the end. If the file already exists, append the content at the end with today's date instead of overwriting."
@@ -1397,6 +1402,9 @@
       "manageFiles": "Reorganizing files",
       "docRead": "Reading a document",
       "docEdit": "Marking up a document",
+      "listThemes": "Looking at your themes",
+      "createTheme": "Saving a theme",
+      "applyTheme": "Switching the look",
       "listTabs": "Looking at your tabs",
       "listTabGroups": "Looking at your tab groups",
       "listBookmarks": "Looking through your bookmarks",
@@ -1518,6 +1526,10 @@
         "title": "Manage Snippets",
         "description": "Organize, dedupe and search saved snippets — including their full text"
       },
+      "designTheme": {
+        "title": "Design a Theme",
+        "description": "Design a custom colour theme with the user, save it, and switch to it if they want it"
+      },
       "workspace": {
         "title": "Workspace Agent",
         "description": "Read, write, edit, and search files in your private workspace"
@@ -1549,7 +1561,14 @@
         "list_files": "List what is in a folder",
         "glob_files": "Find files by name pattern",
         "grep_files": "Search file contents by regex",
-        "manage_files": "Delete, move or create folders"
+        "manage_files": "Delete, move or create folders",
+        "list_themes": "List available themes and the active one",
+        "create_theme": "Save a designed theme as a custom theme",
+        "apply_theme": "Switch the page and sidebar to a theme"
+      },
+      "theme": {
+        "name": "Themes",
+        "description": "Design, save and switch the appearance of the page and sidebar"
       },
       "workspace": {
         "name": "Files",

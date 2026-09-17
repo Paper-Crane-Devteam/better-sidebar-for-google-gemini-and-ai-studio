@@ -9,6 +9,7 @@
  * by `skill-registry.ts` so consumers see localized strings.
  */
 
+import { THEME_JSON_SPEC } from '@/themes/ai-theme-prompt';
 import type { Skill } from './types';
 
 export const BUILTIN_SKILLS: Skill[] = [
@@ -356,6 +357,99 @@ machine-made titles, and nobody ever tidies it. Sorting and searching it is the 
   snippets per conversation, or a whole folder condensed into one overview.
 
 Say what changed, per row or per group, then call \`complete_task\`.
+`,
+    enabled: true,
+    createdAt: 0,
+    updatedAt: 0,
+  },
+  {
+    id: 'builtin-design-theme',
+    type: 'builtin',
+    agentId: 'bettersidebar',
+    title: 'Design a Theme',
+    description:
+      'Design a custom colour theme with the user, save it, and switch to it if they want it',
+    titleKey: 'agent.skills.designTheme.title',
+    descriptionKey: 'agent.skills.designTheme.description',
+    icon: 'Palette',
+    promptContent: `## Task: Design a Theme
+
+A theme re-colours the whole page and the sidebar with it: Gemini's own CSS variables, the
+Material component tokens, the code-block syntax colours, and the sidebar's separate token
+set. \`create_theme\` saves one, \`apply_theme\` switches to it, \`list_themes\` shows what
+already exists.
+
+### The order of work
+
+1. **\`list_themes\` first.** It tells you what is already saved, and — the part you cannot
+   guess — which theme is active right now. "Make it a bit warmer than this" is a request to
+   start from the current theme, and without that call you do not know what "this" is.
+2. **Design, and say what you decided.** A palette is not a private step: name the base
+   surface, the text colour, the accent and the highlight in one short paragraph before the
+   tool call, so the user can object before anything is stored. Two or three sentences, not a
+   table of eighty hex values.
+3. **\`create_theme\`.** It validates and reports back. Read the result — a rejection lists
+   exactly what is missing.
+4. **Then stop and ask.** Saving is invisible; applying re-colours their screen mid-sentence.
+   So do not apply a theme the user did not ask you to apply. Finish the task with the offer
+   in it: "Saved as Warm Sunset. Want me to switch to it?" They can answer in the next
+   message, and applying it then is a one-call task.
+5. **\`apply_theme\`** when they say yes — or immediately, without step 4, when the request
+   was already "make me a X theme and put it on".
+
+### Talking about themes without building one
+
+Plenty of these requests are not "build me a theme": which built-in comes closest to what
+they described, why a theme looks washed out on their monitor, what to change about one they
+already have. \`list_themes\` plus a straight answer is the whole task then. Do not manufacture
+a theme nobody asked for.
+
+To revise a saved theme, call \`create_theme\` again with the **same id** — that replaces it.
+Say that you are replacing it rather than creating something new.
+
+### The design part, which is the part that goes wrong
+
+- **Contrast is not negotiable.** Body text against its surface needs about 4.5:1. A theme
+  that reads beautifully as a palette and illegibly as a page is a failed theme.
+- **Fill in the whole family, not just \`--gem-sys-color--surface\`.** The container variables
+  (\`-container\`, \`-container-low\`, \`-container-high\`, \`-container-highest\`) are what separate
+  a card from the page behind it. Leave them at one value and the layout goes flat.
+- **The sidebar has its own tokens, in a different format** — \`"R G B"\` triplets, not hex.
+  Mixing the formats is the single most common way a theme half-applies.
+- **\`--highlight\` is not the primary colour.** It marks favourites and badges, and it exists
+  to be distinguishable from the accent — amber against a blue primary, coral against teal.
+- **Typography is optional and separate.** No webfont? Omit \`fontCss\`, \`fontVariables\` and
+  \`fonts\` entirely. If you do set a font, the rules below say why it is kept out of
+  \`extraCss\`.
+- **\`id\` is kebab-case and permanent-ish**, and it must not be a built-in theme's id — that
+  is refused, because a user theme with the same id hides the original.
+
+### Writing the tool call
+
+The theme goes in as a **real JSON object** inside \`params\`, not as a quoted string:
+
+\`\`\`
+<bs_agent_tool>
+{"name": "create_theme", "description": "保存「暖阳落日」主题", "params": {"theme": {"id": "warm-sunset", "name": "Warm Sunset", "description": "...", "preferredMode": "light", "variables": [{"property": "--gem-sys-color--surface", "value": "#fff8f0"}]}}}
+</bs_agent_tool>
+\`\`\`
+
+Writing it as \`"theme": "{...}"\` means escaping every inner quote, and one missed escape
+throws the entire call away — a few hundred lines of design work lost to a quoting slip.
+
+It is a long call. Send it on its own, with nothing after it in the same response.
+
+### What the licence changes
+
+Saving a custom theme needs the Support Pack. Without it \`create_theme\` reports a paywall
+and stores nothing — the theme is not lost from the conversation, but it is not saved either.
+\`apply_theme\` still works in that case, as a five-minute preview that reverts by itself and
+on reload; the result string says which of the two happened, so report that rather than
+assuming it stuck.
+
+### The theme format
+
+${THEME_JSON_SPEC}
 `,
     enabled: true,
     createdAt: 0,

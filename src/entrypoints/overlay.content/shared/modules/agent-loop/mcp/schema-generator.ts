@@ -32,10 +32,15 @@ export function generateToolSchemaPrompt(agentId: AgentId): string {
     for (const tool of tools) {
       const { schema } = tool;
       output += `### ${schema.name}\n`;
-      output += `${schema.description}\n`;
-      output += `Parameters:\n`;
+      const properties = Object.entries(schema.parameters.properties);
 
-      for (const [key, val] of Object.entries(schema.parameters.properties)) {
+      output += `${schema.description}\n`;
+      // "none" spelled out rather than a bare "Parameters:" with nothing under it. A tool
+      // that genuinely takes nothing (`list_themes`) otherwise reads as a truncated schema,
+      // which is an invitation to invent a parameter.
+      output += properties.length === 0 ? 'Parameters: none\n' : 'Parameters:\n';
+
+      for (const [key, val] of properties) {
         const isRequired = schema.parameters.required.includes(key);
         output += `  - ${key}: ${val.type}${isRequired ? ' (required)' : ''} — ${val.description}\n`;
       }

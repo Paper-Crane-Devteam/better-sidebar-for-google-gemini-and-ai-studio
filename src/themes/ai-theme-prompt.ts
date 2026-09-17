@@ -1,22 +1,22 @@
 /**
- * AI Theme Generator prompt template.
+ * The theme JSON contract, and the two things that ask for it.
  *
- * This prompt is injected into the user's Prompt Manager when they click
- * "Create AI Theme Prompt" in the Theme Settings panel.
- * It uses the {{theme_description}} variable for user input.
+ * `THEME_JSON_SPEC` is the structure plus the design rules — every variable the engine
+ * reads, in the format it reads it in. Two callers need it and they must not drift:
+ *
+ * - the prompt the Theme Settings panel writes into the user's prompt library, for the
+ *   manual route (generate JSON in the chat, copy it, paste it into Import Theme)
+ * - the agent's theme skill (`agent-loop/skills/builtin-skills.ts`), where the same JSON
+ *   goes straight into `create_theme` and no copying happens at all
+ *
+ * They differ only in what surrounds the spec: the prompt asks for raw JSON as the reply,
+ * the skill asks for it as a tool-call parameter.
  */
 
 export const AI_THEME_PROMPT_TITLE = '🎨 AI Theme Generator';
 
-export const AI_THEME_PROMPT_CONTENT = `You are a theme designer for a browser extension that customizes Google Gemini / AI Studio's appearance. Generate a complete theme JSON based on the user's requirements.
-
-## User Requirements
-{{theme_description}}
-
-## Output Format
-Output ONLY a valid JSON object (no markdown code fences, no explanation) with this exact structure:
-
-{
+/** Structure + rules. Wrapped by whoever is asking; see the file header. */
+export const THEME_JSON_SPEC = `{
   "id": "kebab-case-id",
   "name": "Display Name",
   "description": "Brief description of the theme aesthetic",
@@ -176,3 +176,20 @@ Output ONLY a valid JSON object (no markdown code fences, no explanation) with t
 - Design a cohesive color palette — all colors should work harmoniously together
 - "--highlight" is a distinctive accent color used for favorites indicators, turn badges, and decorative touches. It should be a vibrant, recognizable color that complements the primary color but is visually distinct from it (e.g. amber for a blue-primary theme, coral for a teal-primary theme)
 - For dark themes: use dark surfaces with light text; for light themes: use light surfaces with dark text`;
+
+/**
+ * The manual route: a prompt the user runs in the chat, then copies the reply out of.
+ *
+ * Created in the prompt library by "Create AI Theme Prompt" in Theme Settings. Kept as it
+ * was — the agent's route is additive, and this one works on any platform, in any chat,
+ * with no session and no tools.
+ */
+export const AI_THEME_PROMPT_CONTENT = `You are a theme designer for a browser extension that customizes Google Gemini / AI Studio's appearance. Generate a complete theme JSON based on the user's requirements.
+
+## User Requirements
+{{theme_description}}
+
+## Output Format
+Output ONLY a valid JSON object (no markdown code fences, no explanation) with this exact structure:
+
+${THEME_JSON_SPEC}`;

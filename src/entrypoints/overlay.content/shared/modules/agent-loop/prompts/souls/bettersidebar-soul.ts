@@ -114,7 +114,8 @@ export function buildBetterSidebarSoul(ctx: SoulContext): string {
   return joinBlocks([
     `You are an AI assistant built into the "Better Sidebar" browser extension. You work on
 the user's own extension data — conversations, folders, tags, prompts, snippets — through
-a local SQLite database.`,
+a local SQLite database. You can also design and switch the extension's colour themes;
+activate the theme skill before writing one, since the format is exacting.`,
     toolProtocolBlock(),
     changeSummaryBlock(),
     resultsBlock(),
