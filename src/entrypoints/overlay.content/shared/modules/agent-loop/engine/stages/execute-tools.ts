@@ -26,7 +26,11 @@ import { deliversResultToAI, isHandoffTool } from '../parser/tool-schema';
 import { formatSectionHeading } from './handoff/formatter';
 import { AUTO_APPROVED, requestApproval } from './approval-gate';
 import { toolCallRecorder } from '../../records';
-import { isBrowserWrite, type PlanPreview } from '@/shared/browser-agent/contracts';
+import i18n from '@/locale/i18n';
+import { isBrowserWrite, RESTORE_TOOL, type PlanPreview } from '@/shared/browser-agent/contracts';
+import { isPowerPackUser } from '@/shared/lib/license-store';
+import { showPowerPackPaywall } from '@/shared/lib/powerpack-paywall';
+import { paywallResult } from '../../tools/paywall-signal';
 import {
   cancelBrowserPlan,
   commitBrowserPlan,
@@ -127,6 +131,9 @@ export async function executeTools(
       // Ownership first. Because this path skips `runToolCall`, the check that stops one
       // agent reaching for another's tools has to be made here explicitly — otherwise a
       // Better Sidebar session emitting `browser_close_tabs` would get an approval card.
+      //
+      // ⚠️ No licence check here. The plan is built and shown to a free user on purpose —
+      // see the approval branch below for why.
       let failure = toolRefusal(toolCall.name);
 
       if (!failure) {
@@ -158,6 +165,74 @@ export async function executeTools(
           remaining: toolCalls.length - index - 1,
         })
       : AUTO_APPROVED;
+
+    /**
+     * ── The Browser agent's licence, charged on the approval and nowhere else ──
+     *
+     * ⚠️ **This is the only browser paywall in the codebase, and its position is the point.**
+     * Nothing earlier mentions Power Pack: the `>` row offers the agent plainly, the session
+     * starts, the tools read tabs and bookmarks for free, and `prepare` resolves the batch into
+     * the real objects it would touch and shows them. All of that is deliberate. The user gets
+     * the *specific* thing they would be buying — this many tabs into these groups — in front
+     * of them, and the licence is only mentioned once they have said yes to it.
+     *
+     * A gate any earlier is a worse trade for both sides. Refusing at pick time gives a free
+     * user an agent they have never seen work and a price for a promise; refusing at the read
+     * makes the agent look broken. Here, the answer to "what do I get" is on screen.
+     *
+     * Three details that are not incidental:
+     *
+     * - **Only when approved.** A rejected batch needs no sales pitch — they already said no,
+     *   and a paywall on top of that reads as a penalty for declining.
+     * - **`RESTORE_TOOL` is exempt.** Putting a state back is how a user gets out of something
+     *   the agent did while the licence was valid, and it never removes anything. Charging for
+     *   the way out would be indefensible — same reasoning as `undo/db-channel.ts`.
+     * - **The plan is cancelled.** It holds a snapshot in the background, and an abandoned one
+     *   is a batch the user agreed to sitting armed.
+     */
+    if (
+      browserPlan &&
+      decision.approved &&
+      toolCall.name !== RESTORE_TOOL &&
+      !isPowerPackUser()
+    ) {
+      cancelBrowserPlan(browserPlan.id);
+      showPowerPackPaywall(i18n.t('agent.agents.browser.name', { defaultValue: 'Browser Agent' }));
+
+      const blocked = paywallResult(
+        'The user approved this batch, but applying changes to tabs, tab groups and bookmarks ' +
+          'requires Power Pack, so nothing was applied. The upgrade prompt is on their screen. ' +
+          'Do not retry and do not try a different browser write — they are all covered by the ' +
+          'same licence. Say the plan is ready and will run once they upgrade, and stop.',
+      );
+
+      console.log('[AgentLoop] Browser write approved but not licensed, stopping');
+      ctx.store.addResult({
+        toolName: toolCall.name,
+        description: toolCall.description,
+        success: false,
+        result: blocked,
+        timestamp: Date.now(),
+      });
+      // `record`, not `settle`: nothing ran, so this call never went through `begin`. It
+      // still needs a row, or the card reads "not run" with no explanation after a reload.
+      void toolCallRecorder.record(
+        {
+          key,
+          round: ctx.round,
+          orderIndex: index,
+          toolName: toolCall.name,
+          description: toolCall.description,
+          params: toolCall.params,
+          isWrite: true,
+        },
+        { status: 'rejected', resultBody: blocked },
+      );
+      results.push(section(toolCall, key, blocked));
+      ctx.store.setCurrentTool(null);
+      ctx.finish('paywall');
+      return { kind: 'ended' };
+    }
 
     if (!decision.approved) {
       if (browserPlan) cancelBrowserPlan(browserPlan.id);

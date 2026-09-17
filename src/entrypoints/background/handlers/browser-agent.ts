@@ -243,24 +243,53 @@ async function apply(tool: string, op: Operation, owner: number) {
  */
 
 /**
+ * What a tab restore has to know about the browser it is being put back into.
+ *
+ * ⚠️ `sameSession` decides how much of the recorded state still *names* anything. Tab,
+ * window and group ids are handed out per browser run and start over at the next one, so
+ * across a restart a recorded id is not merely missing — it may well name a different
+ * object now. Every id match below is gated on it, and the address- and
+ * membership-based fallbacks beside them are what carry a restore across a restart.
+ */
+interface RestoreContext {
+  /** The tab the sidebar is in now. */
+  owner: number;
+  /** The tab it was in when the state was recorded. Its window anchors the mapping. */
+  recordedOwner: number;
+  sameSession: boolean;
+}
+/** The host tab, then and now, when the recorded state still contains it. */
+interface HostPair { recorded: number; live: number; recordedWindow: number; liveWindow: number }
+/**
  * Which object standing in the browser right now *is* each recorded one.
  *
- * Ids answer this whenever they still exist. When they do not — a tab was closed, a bookmark
- * was deleted — an object that looks the same is treated as the same, matched once each so
- * two recorded tabs of one URL still need two tabs.
+ * Ids answer this within one browser session, whenever they still exist. When they do not —
+ * a tab was closed, a bookmark was deleted, the browser was restarted — an object that
+ * looks the same is treated as the same, matched once each so two recorded tabs of one URL
+ * still need two tabs.
  *
  * ⚠️ Without this, restoring is not repeatable. Re-creating an object gives it a new id, so
  * a second restore of the same state would find the recorded id missing again and make
  * another copy — and the user's own reopening of a tab would be duplicated too. Adopting the
  * lookalike makes running a restore twice land where running it once does.
  */
-function pairTabs(want: TabState[], live: chrome.tabs.Tab[]): Map<number, number> {
+function pairTabs(want: TabState[], live: chrome.tabs.Tab[], sameSession: boolean, host?: HostPair): Map<number, number> {
   const pairs = new Map<number, number>();
   const claimed = new Set<number>();
-  for (const t of want) {
-    if (!live.some(x => x.id === t.id)) continue;
-    pairs.set(t.id, t.id);
-    claimed.add(t.id);
+  /*
+    The host tab is paired first and by role rather than by id or address: it is the one
+    object whose identity is known independently of the ids, and its window is what anchors
+    every other window across a restart. Left to the address pass it could be claimed by
+    some *other* recorded tab of the same address, and then the restore would move the
+    sidebar — the one thing §13 does not allow.
+  */
+  if (host) { pairs.set(host.recorded, host.live); claimed.add(host.live); }
+  if (sameSession) {
+    for (const t of want) {
+      if (pairs.has(t.id) || claimed.has(t.id) || !live.some(x => x.id === t.id)) continue;
+      pairs.set(t.id, t.id);
+      claimed.add(t.id);
+    }
   }
   for (const t of want) {
     if (pairs.has(t.id)) continue;
@@ -270,6 +299,126 @@ function pairTabs(want: TabState[], live: chrome.tabs.Tab[]): Map<number, number
     claimed.add(adopted.id!);
   }
   return pairs;
+}
+/**
+ * Which live window each recorded one is. Absent means "build it again".
+ *
+ * ⚠️ A window is the one thing in a recorded state with **nothing to recognise it by** —
+ * no address, no title, no members that are certainly still its own. So there are exactly
+ * two answers: the id, inside the session that issued it, and the host tab's window, which
+ * stands in for the window the host was recorded in because the host is not allowed to move
+ * out of it anyway. Everything else is built from scratch.
+ *
+ * The identity pass runs first, so the anchor can only fill a window that pass left empty —
+ * which after a restart is all of them. Where the two would disagree, `resolveRestore`
+ * refuses rather than picking one: the sidebar has moved since the recording, and dragging
+ * a whole window's tabs after it is not what "put this back" means.
+ */
+function pairWindows(want: TabState[], live: chrome.tabs.Tab[], sameSession: boolean, host?: HostPair): Map<number, number> {
+  const map = new Map<number, number>();
+  if (sameSession) {
+    const alive = new Set(live.map(t => t.windowId));
+    for (const t of want) if (alive.has(t.windowId)) map.set(t.windowId, t.windowId);
+  }
+  if (host && !map.has(host.recordedWindow)) map.set(host.recordedWindow, host.liveWindow);
+  return map;
+}
+/**
+ * Which live group each recorded one is.
+ *
+ * A group is recognised by the tabs in it once its id stops meaning anything. That is what
+ * keeps a cross-session restore repeatable: re-creating a group gives it a new id, so
+ * without this a second restore would build another group beside the first and pull the
+ * members over into it.
+ *
+ * Unanimity is required — every mapped member that is grouped has to be in the *same* live
+ * group — because anything less is a guess, and the fallback (a new group) is both correct
+ * and visible in the preview.
+ */
+function pairGroups(target: Snapshot, pairs: Map<number, number>, live: chrome.tabs.Tab[], liveGroups: chrome.tabGroups.TabGroup[], sameSession: boolean): Map<number, number> {
+  const map = new Map<number, number>();
+  const byId = new Map(live.map(t => [t.id!, t]));
+  for (const g of target.groups ?? []) {
+    if (sameSession && liveGroups.some(x => x.id === g.id)) { map.set(g.id, g.id); continue; }
+    const holders = new Set((target.tabs ?? [])
+      .filter(t => t.groupId === g.id)
+      .map(t => byId.get(pairs.get(t.id) ?? -1)?.groupId)
+      .filter((id): id is number => id !== undefined && id !== -1));
+    if (holders.size === 1) map.set(g.id, [...holders][0]);
+  }
+  return map;
+}
+/**
+ * Everything a tab restore decides before it moves anything.
+ *
+ * ⚠️ One resolution, two callers: `inspectRestore` previews from it and `restoreTabs`
+ * executes from it. That is the only way a badge on a row and what actually happens to that
+ * row can be guaranteed to agree — a preview computed by a second model of the restore is a
+ * preview that lies.
+ *
+ * The host guard lives here for the same reason. It is a precondition of the whole restore,
+ * and running it from both callers means the preview can refuse before the user approves
+ * *and* the commit re-checks against a browser that may have moved since.
+ */
+async function resolveRestore(target: Snapshot, ctx: RestoreContext) {
+  const live = (await chrome.tabs.query({})).filter(t => !t.incognito);
+  const liveGroups = await chrome.tabGroups.query({});
+  const want = target.tabs ?? [];
+  const liveHost = live.find(t => t.id === ctx.owner);
+  const recordedHost = want.find(t => t.id === ctx.recordedOwner);
+  /*
+    ⚠️ An anchor is only wanted when the recorded host id does not already name a live tab —
+    after a restart, or when the sidebar has been reopened in a new tab since. While that id
+    still names something, declaring some *other* live tab to be the recorded host would
+    reorder the wrong sidebar and leave the real one counted as a newcomer.
+  */
+  const host: HostPair | undefined = liveHost && recordedHost
+    && (!ctx.sameSession || !live.some(t => t.id === ctx.recordedOwner))
+    ? { recorded: recordedHost.id, live: liveHost.id!, recordedWindow: recordedHost.windowId, liveWindow: liveHost.windowId }
+    : undefined;
+  const pairs = pairTabs(want, live, ctx.sameSession, host);
+  const windows = pairWindows(want, live, ctx.sameSession, host);
+  const groups = pairGroups(target, pairs, live, liveGroups, ctx.sameSession);
+  /*
+    §13, checked against what the mapping actually resolved to rather than against raw ids.
+    The host tab may be reordered inside its window — every other tab reaching its recorded
+    position depends on it — but never moved to another window. A mismatch here means the
+    user has moved the sidebar since the recording, and dragging it home is not something
+    "put this state back" is allowed to do; nor is there a way to leave it out, since every
+    other tab of that window is going somewhere the host is not.
+  */
+  const guarded = host ? recordedHost : ctx.sameSession ? want.find(t => t.id === ctx.owner) : undefined;
+  if (liveHost && guarded && windows.get(guarded.windowId) !== liveHost.windowId) {
+    throw new Error('Restoring this state would move the Agent host tab to another window.');
+  }
+  /**
+   * Whether the host tab's group is being left as it is because the snapshot disagrees.
+   *
+   * ⚠️ Skipped, not refused. §13 says the host is **not in the organizing scope at all**, so
+   * "the snapshot wants it in a group it is not in" is a requirement that does not apply to
+   * it rather than a conflict to stop over — and refusing made a whole batch unrestorable
+   * for a reason that had nothing to do with the tabs the user wanted back. The common way
+   * in is mundane: the host sat in a group, the browser restarted without reopening that
+   * group, and putting the state back would now mean creating one and moving the sidebar in.
+   *
+   * Both directions, since both are the same forbidden move: into a group it is not in, and
+   * out of one it is in.
+   */
+  const hostGroupKept = !!liveHost && !!guarded
+    && (guarded.groupId === -1 ? -1 : groups.get(guarded.groupId)) !== liveHost.groupId;
+  const kept = new Set(pairs.values());
+  /**
+   * Where the first restored tab of a window goes.
+   *
+   * Past any pinned tab that is not in the snapshot: Chrome keeps pinned tabs at the front
+   * of a window, so a newcomer that is pinned owns position 0 whatever we ask for. A window
+   * that does not exist yet has none of them, hence zero.
+   */
+  const slotStart = (recordedWindow: number) => {
+    const actual = windows.get(recordedWindow);
+    return actual === undefined ? 0 : live.filter(t => t.windowId === actual && t.pinned && !kept.has(t.id!)).length;
+  };
+  return { live, liveGroups, pairs, windows, groups, kept, slotStart, hostGroupKept };
 }
 /** The same question for bookmarks, where a lookalike is a matching title and address. */
 function pairBookmarks(want: BookmarkState[], live: BookmarkState[]): Map<string, string> {
@@ -344,24 +493,47 @@ async function restoreBookmarks(target: BookmarkState[], remap: Map<string, stri
  * tabs in their recorded order is "after them". Using the recorded index instead would
  * interleave the two sets and put nothing where it was.
  *
- * The slot starts past any pinned tab that is not in the snapshot: Chrome keeps pinned tabs
- * at the front of a window, so a new pinned tab owns position 0 whatever we ask for.
+ * ⚠️ A window that is gone is **built again**, which is what lets a tab state be restored
+ * after a browser restart at all. It used to stop instead — and the reason was never that
+ * the pages could not be found, since they are matched by address, but that a recorded tab
+ * says which window it belongs to with a raw window id and every window id changes at a
+ * restart. So the ids get mapped (`pairWindows`) and the unmapped ones get a window of
+ * their own.
  */
-async function restoreTabs(target: Snapshot, remap: Map<string, string>) {
+async function restoreTabs(target: Snapshot, remap: Map<string, string>, ctx: RestoreContext) {
   const id = (n: number) => Number(remap.get(`tab:${n}`) ?? n);
   const gid = (n: number) => Number(remap.get(`group:${n}`) ?? n);
   const want = target.tabs!;
-  const live = (await chrome.tabs.query({})).filter(t => !t.incognito);
-  const windows = new Set(live.map(t => t.windowId));
-  const pairs = pairTabs(want, live);
+  const { pairs, windows, groups, slotStart } = await resolveRestore(target, ctx);
   for (const [recorded, actual] of pairs) if (recorded !== actual) remap.set(`tab:${recorded}`, String(actual));
-  for (const t of want) {
-    if (!windows.has(t.windowId)) throw new Error('A window this state used no longer exists.');
+  for (const [recorded, actual] of groups) remap.set(`group:${recorded}`, String(actual));
+  /*
+    A missing window is built by its own first tab, because `windows.create` needs either a
+    tab to move in or an address to open and both of those are that tab. Creating an empty
+    window instead would leave a New Tab page in it that the restore would have to close —
+    and a restore never closes anything.
+  */
+  for (const recorded of [...new Set(want.map(t => t.windowId))].sort((a, b) => a - b)) {
+    if (windows.has(recorded)) continue;
+    const [anchor] = want.filter(t => t.windowId === recorded).sort((a, b) => a.index - b.index);
+    const standing = pairs.get(anchor.id);
+    if (standing === undefined && !/^https?:\/\//i.test(anchor.url)) throw new Error('This closed page cannot be reopened by the extension.');
+    const created = await chrome.windows.create(standing === undefined
+      ? { url: anchor.url, focused: false }
+      : { tabId: standing, focused: false });
+    const opened = standing ?? created?.tabs?.[0]?.id;
+    if (created === undefined || created.id === undefined || opened === undefined) {
+      throw new Error('A window this state used could not be opened again.');
+    }
+    remap.set(`tab:${anchor.id}`, String(opened));
+    pairs.set(anchor.id, opened);
+    windows.set(recorded, created.id);
   }
+  const wid = (n: number) => windows.get(n)!;
   for (const t of want) {
     if (pairs.has(t.id)) continue;
     if (!/^https?:\/\//i.test(t.url)) throw new Error('This closed page cannot be reopened by the extension.');
-    const created = await chrome.tabs.create({ url: t.url, windowId: t.windowId, pinned: t.pinned, active: false });
+    const created = await chrome.tabs.create({ url: t.url, windowId: wid(t.windowId), pinned: t.pinned, active: false });
     remap.set(`tab:${t.id}`, String(created.id));
     pairs.set(t.id, created.id!);
   }
@@ -370,29 +542,33 @@ async function restoreTabs(target: Snapshot, remap: Map<string, string>) {
   for (const t of want) {
     const current = await chrome.tabs.get(id(t.id));
     if (current.pinned !== t.pinned) await chrome.tabs.update(id(t.id), { pinned: t.pinned });
+    // §13: the host tab is never moved out of its group. Pinning it is fine — that is a
+    // property of the tab, not of where it sits — which is why the line above runs for it.
+    if (id(t.id) === ctx.owner) continue;
     const wanted = t.groupId === -1 ? -1 : gid(t.groupId);
-    if (current.groupId !== -1 && (current.groupId !== wanted || current.windowId !== t.windowId)) {
+    if (current.groupId !== -1 && (current.groupId !== wanted || current.windowId !== wid(t.windowId))) {
       await chrome.tabs.ungroup(id(t.id));
     }
   }
-  const kept = new Set(pairs.values());
   const slots = new Map<number, number>();
-  for (const windowId of windows) {
-    slots.set(windowId, live.filter(t => t.windowId === windowId && t.pinned && !kept.has(t.id!)).length);
-  }
   for (const t of [...want].sort((a, b) => a.windowId - b.windowId || a.index - b.index)) {
-    const slot = slots.get(t.windowId)!;
+    const slot = slots.get(t.windowId) ?? slotStart(t.windowId);
     slots.set(t.windowId, slot + 1);
     const current = await chrome.tabs.get(id(t.id));
-    if (current.windowId !== t.windowId || current.index !== slot) {
-      await chrome.tabs.move(id(t.id), { windowId: t.windowId, index: slot });
+    if (current.windowId !== wid(t.windowId) || current.index !== slot) {
+      await chrome.tabs.move(id(t.id), { windowId: wid(t.windowId), index: slot });
     }
   }
   for (const g of target.groups ?? []) {
-    const members = want.filter(t => t.groupId === g.id).map(t => id(t.id));
+    // The host tab is not a member this restore may place (§13). It drops out whether or not
+    // it is already in the resolved group — where it is, excluding it changes nothing.
+    const members = want.filter(t => t.groupId === g.id).map(t => id(t.id)).filter(tab => tab !== ctx.owner);
+    // A group whose only recorded member was the host has nothing left to build.
     if (!members.length) continue;
-    const exists = (await chrome.tabGroups.query({})).some(x => x.id === gid(g.id));
-    if (!exists) {
+    // Recognised or not, decided once by `pairGroups` — never by asking whether the
+    // recorded id happens to match a live one, which across a restart it may do by
+    // coincidence and for an unrelated group.
+    if (!remap.has(`group:${g.id}`)) {
       const newId = await chrome.tabs.group({ tabIds: members as [number, ...number[]] });
       remap.set(`group:${g.id}`, String(newId));
     } else {
@@ -410,14 +586,13 @@ async function restoreTabs(target: Snapshot, remap: Map<string, string>) {
   }
 }
 /**
- * What restoring this state would come to, counted against the browser as it is now.
+ * What restoring this state would come to, counted in objects.
  *
- * The same walk the tree builder uses, so a count and the node it belongs to can never
- * disagree. `extra` is what makes the additive contract visible: objects that exist now,
- * are absent from the snapshot, and will be left exactly where they are.
+ * Pure, and fed the same walk the tree is annotated from, so a count and the node it belongs
+ * to can never disagree. `extra` is what makes the additive contract visible: objects that
+ * exist now, are absent from the snapshot, and will be left exactly where they are.
  */
-async function restoreEffects(target: Snapshot): Promise<RestoreEffects> {
-  const { effects, extra } = await inspectRestore(target);
+function restoreEffects({ effects, extra }: { effects: Map<string, TreeEffect>; extra: number }): RestoreEffects {
   const counts: RestoreEffects = { restore: 0, reopen: 0, create: 0, keep: 0, extra };
   for (const [key, effect] of effects) {
     if (key.startsWith('group:')) continue; // A container is not an object the user counts.
@@ -437,37 +612,37 @@ async function restoreEffects(target: Snapshot): Promise<RestoreEffects> {
  * rather than four, because the card answers "will this change" and the tree already shows
  * what it will change to.
  */
-async function inspectRestore(target: Snapshot): Promise<{ effects: Map<string, TreeEffect>; extra: number }> {
+async function inspectRestore(target: Snapshot, ctx: RestoreContext): Promise<{ effects: Map<string, TreeEffect>; extra: number; hostGroupKept?: boolean }> {
   const effects = new Map<string, TreeEffect>();
   if (target.tabs) {
-    const live = (await chrome.tabs.query({})).filter(t => !t.incognito);
-    const pairs = pairTabs(target.tabs, live);
+    const { live, liveGroups, pairs, windows, groups, kept, slotStart, hostGroupKept } = await resolveRestore(target, ctx);
     const byId = new Map(live.map(t => [t.id!, t]));
-    const liveGroups = new Map((await chrome.tabGroups.query({})).map(g => [g.id, g]));
-    const kept = new Set(pairs.values());
-    const windows = new Set(live.map(t => t.windowId));
     const slots = new Map<number, number>();
-    for (const windowId of windows) {
-      slots.set(windowId, live.filter(t => t.windowId === windowId && t.pinned && !kept.has(t.id!)).length);
-    }
     for (const t of [...target.tabs].sort((a, b) => a.windowId - b.windowId || a.index - b.index)) {
       const actual = pairs.get(t.id);
       if (actual === undefined) { effects.set(`tab:${t.id}`, 'reopen'); continue; }
       const current = byId.get(actual)!;
-      const slot = slots.get(t.windowId) ?? 0;
+      const slot = slots.get(t.windowId) ?? slotStart(t.windowId);
       slots.set(t.windowId, slot + 1);
       // An adopted tab is a different tab wearing the same address, so it is never "already
-      // in place" — its group and position are whatever they happen to be.
-      const settled = actual === t.id && current.windowId === t.windowId && current.pinned === t.pinned
-        && current.groupId === t.groupId && current.index === slot;
+      // in place" — its group and position are whatever they happen to be. Neither is a tab
+      // whose window has to be built again: it is about to be moved into the new one. The
+      // host's group is not compared at all, because the restore will not change it (§13).
+      const settled = actual === t.id && current.windowId === windows.get(t.windowId)
+        && current.pinned === t.pinned && current.index === slot
+        && (actual === ctx.owner || current.groupId === (t.groupId === -1 ? -1 : groups.get(t.groupId)));
       effects.set(`tab:${t.id}`, settled ? 'keep' : 'restore');
     }
     for (const g of target.groups ?? []) {
-      const current = liveGroups.get(g.id);
-      const settled = !!current && current.title === g.title && current.color === g.color && current.collapsed === g.collapsed;
+      // Same membership the executor will place, host excluded — a group it was the only
+      // recorded member of is not going to be built, so nothing about it changes.
+      const members = target.tabs.filter(t => t.groupId === g.id).filter(t => pairs.get(t.id) !== ctx.owner);
+      const current = liveGroups.find(x => x.id === groups.get(g.id));
+      const settled = !members.length
+        || (!!current && current.title === g.title && current.color === g.color && current.collapsed === g.collapsed);
       effects.set(`group:${g.id}`, settled ? 'keep' : 'restore');
     }
-    return { effects, extra: live.filter(t => !kept.has(t.id!)).length };
+    return { effects, extra: live.filter(t => !kept.has(t.id!)).length, hostGroupKept };
   }
   const live = await bookmarkSnapshot();
   const recorded = target.bookmarks ?? [];
@@ -723,21 +898,18 @@ async function prepareRestore(params: Record<string, string>, owner: number): Pr
   const target = side === 'before' ? source.before : source.after;
   if (!target) throw new Error('This batch never finished, so it has no end state to restore.');
   const onTabs = !!target.tabs;
-  if (onTabs && source.epoch !== await epoch()) throw new Error('Tab states cannot be restored after a browser restart, because tab ids do not survive one.');
   const tool = onTabs ? 'browser_arrange_tabs' : 'browser_arrange_bookmarks';
   await requireTool(tool);
   if (onTabs && restoreNeedsGroups(target)) await requireCaps(['tabGroups.write']);
   const before = await snapshot(tool);
+  const ctx: RestoreContext = { owner, recordedOwner: source.owner, sameSession: source.epoch === await epoch() };
   /*
-    The host tab may be reordered within its window — every other tab reaching its recorded
-    position depends on it, and refusing would leave the restore unable to converge. Moving
-    it to another window or into a group is refused, per §13.
+    ⚠️ Resolved before the batch is written, not after. `resolveRestore` holds the host
+    guard (§13), and a prepare that is refused has to leave nothing behind — a stored plan
+    is a plan someone could approve.
   */
+  const inspected = await inspectRestore(target, ctx);
   const host = before.tabs?.find(t => t.id === owner);
-  const recordedHost = target.tabs?.find(t => t.id === owner);
-  if (host && recordedHost && (host.windowId !== recordedHost.windowId || host.groupId !== recordedHost.groupId)) {
-    throw new Error('Restoring this state would move the Agent host tab to another window or group.');
-  }
   const batch: Batch = {
     id: crypto.randomUUID(), owner, epoch: await epoch(), tool,
     operations: [{ type: 'restore', batch_id: source.id, side }],
@@ -745,11 +917,11 @@ async function prepareRestore(params: Record<string, string>, owner: number): Pr
     restoreOf: source.id, restoreSide: side,
   };
   await localAudit.insert(batch);
-  const { effects } = await inspectRestore(target);
   return {
     id: batch.id, kind: 'restore', tier: 'low', side,
-    tree: treeOf(target, host?.windowId, effects),
-    effects: await restoreEffects(target),
+    tree: treeOf(target, host?.windowId, inspected.effects),
+    effects: restoreEffects(inspected),
+    ...(inspected.hostGroupKept ? { hostGroupKept: true } : {}),
   };
 }
 async function commit(planId: string, owner: number) {
@@ -770,12 +942,16 @@ async function commit(planId: string, owner: number) {
    * marks it as never having run.
    */
   let target: Snapshot | undefined;
+  let restoreCtx: RestoreContext | undefined;
   try {
     await requireTool(batch.tool);
     const restoring = batch.restoreOf ? await localAudit.get(batch.restoreOf) : undefined;
     if (batch.restoreOf && !restoring) throw new Error('The batch this would restore is no longer in the journal.');
     target = restoring && (batch.restoreSide === 'after' ? restoring.after : restoring.before);
     if (restoring && !target) throw new Error('The recorded state is missing.');
+    // The session that issued the recorded ids, which is what decides whether any of them
+    // still name the object they named. Taken from the batch being restored, not this one.
+    if (restoring) restoreCtx = { owner, recordedOwner: restoring.owner, sameSession: restoring.epoch === await epoch() };
     if (target?.tabs && restoreNeedsGroups(target)) await requireCaps(['tabGroups.write']);
     if (!target) {
       const live = await snapshot(batch.tool);
@@ -815,7 +991,7 @@ async function commit(planId: string, owner: number) {
       await localAudit.insertStep(batch.id, index, step);
       if (target) {
         if (target.bookmarks) await restoreBookmarks(target.bookmarks, map);
-        else await restoreTabs(target, map);
+        else await restoreTabs(target, map, restoreCtx!);
       } else {
         await apply(batch.tool, op, owner);
       }
@@ -850,6 +1026,22 @@ async function commit(planId: string, owner: number) {
   const after = batch.steps.length ? await snapshot(batch.tool).catch(() => undefined) : undefined;
   if (after) batch.after = after;
   await localAudit.patch(batch.id, { status: batch.status, error: batch.error ?? null, ...(after ? { after } : {}) });
+  /**
+   * A restore that landed leaves no record of its own.
+   *
+   * The journal answers "what did the extension change about my browser". Putting a
+   * recorded state back is the answer to that question, not another instance of it — and a
+   * row per undo doubles the list with entries that are the inverse of the one above them,
+   * each carrying two more full snapshots against a 200-batch ceiling. Changing your mind
+   * again is still one click: both sides of the batch it came from are still there, so it
+   * is restoring the other side rather than restoring the restore.
+   *
+   * ⚠️ Only when it landed cleanly. A restore that failed or ended `unknown` left the
+   * browser somewhere nobody planned, and this row is the only evidence of that.
+   */
+  if (batch.restoreOf && batch.status === 'applied') {
+    await localAudit.discard(batch.id).catch(() => { /* Upkeep. `prune` will get it. */ });
+  }
   /**
    * What the AI is told: the verdict per step, and where to look for the rest.
    *
@@ -910,21 +1102,20 @@ async function read(tool: string, params: Record<string, string>, owner: number)
   for (const cap of ['tabs.read', 'tabGroups.read', 'bookmarks.read'] as const) {
     try { await requireCaps([cap]); readable.add(cap); } catch { /* Revoked capabilities also hide historical data. */ }
   }
-  const session = await epoch();
   const visible = [];
   for (const b of await localAudit.list(params.batch_id || undefined)) {
     const cap = toolCapability(b.tool);
     if (cap && !readable.has(readCapability(cap))) continue;
     /*
-      Restorable, per side. Both are offered as soon as the state exists and its ids still
-      mean something — there is no "already restored" to rule one out, because putting a
-      recorded state back adds objects and removes none, so doing it twice lands in the
-      same place as doing it once.
+      Restorable, per side, and the only question is whether the state was recorded. There
+      is no "already restored" to rule one out — putting a recorded state back adds objects
+      and removes none, so doing it twice lands where doing it once does — and no browser
+      session to be inside of either: windows are built again and objects are recognised by
+      address or membership when their ids stop meaning anything (see `resolveRestore`).
     */
-    const usable = !b.touchesTabs || b.epoch === session;
     visible.push({ batch_id: b.id, created_at: b.createdAt, tool: b.tool, status: b.status, error: b.error,
       restore_of: b.restoreOf, restore_side: b.restoreSide,
-      can_restore_before: usable, can_restore_after: usable && b.hasAfter,
+      can_restore_before: true, can_restore_after: b.hasAfter,
       completed: b.applied, planned: b.planned,
       ...(params.batch_id ? { steps: (await localAudit.listSteps(b.id)).map(s => ({ step_index: s.index, operation: s.operation, status: s.status })) } : {}),
     });

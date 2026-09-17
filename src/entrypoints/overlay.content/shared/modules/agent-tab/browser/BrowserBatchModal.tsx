@@ -14,6 +14,14 @@
  * work: the list stays mounted underneath, keeps its page, and reloads when this one closes
  * having changed something.
  *
+ * ## Side by side, not stacked
+ *
+ * The two states are columns. They were rows, which reintroduced the exact fault that moving
+ * out of the sidebar was meant to fix: comparing two trees means reading one line against the
+ * line opposite it, and stacked blocks put "after" a scroll below "before" so only one is ever
+ * on screen. Columns cost width, hence the wider dialog — the trees are indented paths, which
+ * wrap badly but truncate acceptably, so width spent here buys more than it costs.
+ *
  * ## Two stages, same window
  *
  * Picking a side prepares a restore and replaces the pair with that plan — so the tree being
@@ -28,7 +36,7 @@
  */
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Undo2 } from 'lucide-react';
 import {
   RESTORE_TOOL,
   type BatchTrees,
@@ -168,18 +176,22 @@ const BrowserBatchContent: React.FC<{ entry: JournalEntry; onChanged: () => void
         </>
       ) : (
         <>
-          <StateBlock
-            heading={t('agent.browser.panel.before', { defaultValue: 'Before' })}
-            nodes={trees?.before}
-            onRestore={entry.can_restore_before ? () => askRestore('before') : undefined}
-            busy={busy || running}
-          />
-          <StateBlock
-            heading={t('agent.browser.panel.after', { defaultValue: 'After' })}
-            nodes={trees?.after}
-            onRestore={entry.can_restore_after ? () => askRestore('after') : undefined}
-            busy={busy || running}
-          />
+          {/* `items-stretch` so both columns get the same height and the two restore
+              buttons line up, whichever tree happens to be shorter. */}
+          <div className="grid items-stretch gap-3 md:grid-cols-2">
+            <StateBlock
+              heading={t('agent.browser.panel.before', { defaultValue: 'Before' })}
+              nodes={trees?.before}
+              onRestore={() => askRestore('before')}
+              busy={busy || running}
+            />
+            <StateBlock
+              heading={t('agent.browser.panel.after', { defaultValue: 'After' })}
+              nodes={trees?.after}
+              onRestore={() => askRestore('after')}
+              busy={busy || running}
+            />
+          </div>
           {running && (
             <p className="text-muted-foreground">
               {t('agent.browser.panel.busySession', {
@@ -206,6 +218,17 @@ const BrowserBatchContent: React.FC<{ entry: JournalEntry; onChanged: () => void
  * ⚠️ Absent nodes and an empty tree are different answers, and the missing one is always
  * the `after` of a batch that never finished. Saying so is the point: nobody knows what
  * state that batch ended in, so there is nothing to draw and nothing to restore.
+ *
+ * That is now the *only* reason a side has no way back. A tab state used to become
+ * view-only at the next browser restart, and the button carried an explanation for it;
+ * restores build missing windows again and recognise objects by address, so a state that
+ * was recorded can be put back whenever. Anything that can still refuse — the host tab
+ * would have to change window or group (§13), a recorded page cannot be reopened by an
+ * extension — is a property of this browser right now, not of the record, so it is a
+ * failure the preview reports rather than a button drawn dead.
+ *
+ * Below the tree and full width, rather than a small button beside the heading. It is the
+ * action, and beside a heading at this size it read as decoration on the label.
  */
 function StateBlock({
   heading,
@@ -215,30 +238,33 @@ function StateBlock({
 }: {
   heading: string;
   nodes?: TreeNode[];
-  onRestore?: () => void;
+  onRestore: () => void;
   busy: boolean;
 }) {
   const { t } = useI18n();
   return (
-    <div className="space-y-1.5 rounded-md border border-border/50 p-2">
-      <div className="flex items-center justify-between gap-2">
-        <strong className="text-foreground">{heading}</strong>
-        {nodes && onRestore && (
-          <Button variant="outline" size="sm" disabled={busy} onClick={onRestore}>
-            {t('agent.browser.panel.revertToThis', { defaultValue: 'Revert to this' })}
-          </Button>
-        )}
-      </div>
+    <div className="flex min-w-0 flex-col gap-1.5 rounded-md border border-border/50 p-2">
+      <strong className="text-foreground">{heading}</strong>
+
       {nodes ? (
-        <div className="max-h-72 overflow-auto">
+        // `flex-1` so the shorter of the two columns still pushes its button to the bottom
+        // and the pair stays aligned.
+        <div className="max-h-80 min-h-0 flex-1 overflow-auto">
           <BrowserTree nodes={nodes} />
         </div>
       ) : (
-        <p className="text-muted-foreground">
+        <p className="flex-1 text-muted-foreground">
           {t('agent.browser.panel.noEndState', {
             defaultValue: 'This batch did not finish, so no end state was recorded.',
           })}
         </p>
+      )}
+
+      {nodes && (
+        <Button variant="outline" size="sm" className="w-full" disabled={busy} onClick={onRestore}>
+          <Undo2 className="h-3.5 w-3.5" />
+          {t('agent.browser.panel.revertToThis', { defaultValue: 'Revert to this' })}
+        </Button>
       )}
     </div>
   );
@@ -255,9 +281,11 @@ export function openBrowserBatchModal(entry: JournalEntry, onChanged: () => void
   useModalStore.getState().open({
     id: `browser-agent-batch-${entry.batch_id}`,
     type: 'info',
-    title: `${i18n.t('agent.browser.panel.detail', { defaultValue: 'Before and after' })} · ${new Date(entry.created_at).toLocaleString()}`,
+    // The full timestamp lives here, since the list's `When` column only carries a short one.
+    title: `${i18n.t('agent.browser.panel.detail', { defaultValue: 'Detail' })} · ${new Date(entry.created_at).toLocaleString()}`,
     content: <BrowserBatchContent entry={entry} onChanged={onChanged} />,
-    confirmText: i18n.t('common.close'),
-    modalClassName: 'max-w-2xl',
+    // Wider than the record list behind it: two trees side by side is the whole point of
+    // this dialog, and at `max-w-2xl` each column got about thirty characters.
+    modalClassName: 'max-w-4xl',
   });
 }

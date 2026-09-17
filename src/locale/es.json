@@ -1233,7 +1233,6 @@
       "examplesHintLabel": "Cómo usar estos ejemplos",
       "examplePick": "Insertar en el chat",
       "workspaceHint": "Espacio de trabajo del Agente para leer y guardar archivos",
-      "manageHint": "Configurar los permisos y confirmaciones del Agente",
       "examplePrev": "Anterior",
       "exampleNext": "Siguiente",
       "examples": {
@@ -1440,6 +1439,7 @@
       "ended": "Sesión finalizada",
       "paywallDesc": "El plan gratuito permite al agente leer tus datos, pero no modificarlos. Mejora tu plan para permitir escrituras.",
       "paywallWorkspaceDesc": "El plan gratuito incluye 1 espacio de trabajo con hasta {{max}} archivos. Mejora tu plan para acceso ilimitado.",
+      "paywallBrowserDesc": "Leer tus pestañas y marcadores es gratis. Aplicar cambios requiere Power Pack: mejora tu plan, vuelve a pedirlo y aprueba el mismo lote.",
       "paywallFeature": "Escrituras del agente en la base de datos",
       "steps_one": "{{count}} paso ejecutado",
       "steps_other": "{{count}} pasos ejecutados",
@@ -1663,8 +1663,11 @@
         "recordsTitle": "Registros locales",
         "recordsIntro": "Cada lote aplicado por el agente se conserva en este equipo. Abre uno para ver el navegador antes y después, y para restaurar cualquiera de los dos estados.",
         "colWhen": "Cuándo",
+        "colKind": "Tipo",
+        "kindTabs": "Pestañas",
+        "kindBookmarks": "Marcadores",
         "colOutcome": "Resultado",
-        "reload": "Recargar",
+        "colActions": "Acciones",
         "busySession": "Hay una tarea en ejecución. Restaurar cambiaría el navegador en el que está trabajando, por lo que esperará hasta que la tarea finalice."
       },
       "status": {
@@ -1751,6 +1754,7 @@
         "counts": "{{restore}} para volver a mover · {{reopen}} para reabrir · {{create}} para volver a añadir · {{keep}} ya en su lugar",
         "extra": "{{count}} elementos abiertos o añadidos desde entonces se conservan como están. No se cierra ni elimina nada.",
         "additive": "No se cierra ni se elimina nada. Todo lo más reciente se conserva.",
+        "hostGroup": "Esta pestaña es la que ejecuta el agente, así que nunca se mueve dentro ni fuera de un grupo de pestañas. Su grupo se mantiene tal cual; el resto del estado se restaura a su alrededor.",
         "note": "Una página reabierta vuelve solo a su dirección: las entradas de formularios, la posición de desplazamiento y el estado de la página no se restauran. Un marcador vuelto a añadir es una copia nueva."
       },
       "examples": {
@@ -1777,6 +1781,14 @@
         "prune": {
           "label": "Limpiar marcadores obsoletos",
           "text": "Muéstrame los marcadores que parezcan obsoletos: sin título, páginas de resultados de búsqueda o guardados dos veces. Lístalos con la carpeta en la que está cada uno y permíteme elegir cuáles eliminar en lugar de decidir por mí."
+        },
+        "dedupe": {
+          "label": "Cerrar las duplicadas",
+          "text": "Tengo las mismas páginas abiertas varias veces. Cierra las duplicadas y quédate con una de cada una: la copia fijada o agrupada si existe, y si no, la más antigua. Dos direcciones solo cuentan como la misma página si también coinciden la consulta y el fragmento. Muéstrame exactamente qué pestaña conservas y cuáles se van antes de cerrar nada, y haz lo mismo con mis marcadores si el mismo enlace está guardado en más de una carpeta."
+        },
+        "deadLinks": {
+          "label": "Buscar marcadores rotos",
+          "text": "Revisa los marcadores de mi carpeta Leer más tarde y decide cuáles vale la pena conservar. Abre tú mismo los enlaces cuando el título no diga lo suficiente y señala los que ya no existen: error 404, dominio aparcado o redirección a una página de inicio. Cuéntame lo que encontraste en cada caso con una línea de explicación y elimina solo los que yo confirme."
         }
       },
       "phrasesTitle": "O simplemente pide",

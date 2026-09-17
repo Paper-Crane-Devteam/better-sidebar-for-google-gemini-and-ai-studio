@@ -18,9 +18,10 @@
  */
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { Loader2, RefreshCw } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { PagedTable, type PagedTableColumn } from '@/shared/components/ui/paged-table';
+import { isTabTool } from '@/shared/browser-agent/contracts';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useModalStore } from '@/shared/lib/modal';
 import i18n from '@/locale/i18n';
@@ -31,18 +32,23 @@ const BrowserRecordsContent: React.FC = () => {
   const { t } = useI18n();
   const [rows, setRows] = useState<JournalEntry[] | null>(null);
   const [error, setError] = useState('');
-  const [busy, setBusy] = useState(false);
 
+  /**
+   * Loaded on mount, and again after a restore lands — never on demand.
+   *
+   * There was a Reload button here, and nothing could arrive for it to find: the journal
+   * only grows when a batch is applied, applying a batch needs a running session, and a
+   * running session is exactly when this dialog is not the thing being looked at. The one
+   * case where the list genuinely goes stale is a restore made from the detail dialog, and
+   * that reloads through `onChanged` without being asked.
+   */
   const load = useCallback(async () => {
-    setBusy(true);
     setError('');
     try {
       setRows(await readJournal());
     } catch (e) {
       setRows([]);
       setError((e as Error).message);
-    } finally {
-      setBusy(false);
     }
   }, []);
 
@@ -63,14 +69,52 @@ const BrowserRecordsContent: React.FC = () => {
     {
       key: 'when',
       header: t('agent.browser.panel.colWhen', { defaultValue: 'When' }),
+      /*
+        Fixed and narrow, with a short date.
+
+        The table is `table-fixed`, so an unsized column absorbs whatever the sized ones
+        leave — this one was that column, and a full `toLocaleString()` in it took a third
+        of the dialog to say a thing nobody reads to the second. Short date plus short time
+        is enough to tell two records apart, which is all this column is for; the exact
+        timestamp is still spelled out in the detail dialog's title.
+      */
+      className: 'w-36',
       cell: (row) => (
-        <span className="text-foreground">{new Date(row.created_at).toLocaleString()}</span>
+        <span className="block truncate tabular-nums text-foreground">
+          {new Date(row.created_at).toLocaleString(undefined, {
+            dateStyle: 'short',
+            timeStyle: 'short',
+          })}
+        </span>
       ),
     },
     {
+      /*
+        Which half of the browser a batch touched — tabs and groups, or bookmarks.
+
+        Derived from the tool name through `isTabTool`, the same call that decides what a
+        snapshot captures, rather than a field added to the journal: the answer is already
+        implied by the record and a second source for it could disagree with the first.
+        Worth a column because "Done 6/6" says nothing about *what* moved, and the two
+        kinds are restored independently — someone hunting for the batch that scattered
+        their bookmarks should not have to open six tab batches to rule them out.
+      */
+      key: 'kind',
+      header: t('agent.browser.panel.colKind', { defaultValue: 'Kind' }),
+      className: 'w-24',
+      cell: (row) => (
+        <span className="block truncate text-muted-foreground">
+          {isTabTool(row.tool)
+            ? t('agent.browser.panel.kindTabs', { defaultValue: 'Tabs' })
+            : t('agent.browser.panel.kindBookmarks', { defaultValue: 'Bookmarks' })}
+        </span>
+      ),
+    },
+    {
+      // Unsized on purpose: the error line is the one cell here that can be any length, so
+      // it gets the width the other three do not need.
       key: 'status',
       header: t('agent.browser.panel.colOutcome', { defaultValue: 'Outcome' }),
-      className: 'w-36',
       cell: (row) => (
         <div className="min-w-0">
           <span className="block truncate">
@@ -86,14 +130,21 @@ const BrowserRecordsContent: React.FC = () => {
     },
     {
       key: 'detail',
-      className: 'w-32 text-right',
+      // Headed, unlike most action columns. Every other column here is labelled, and the
+      // one blank heading read as a label that had gone missing rather than one not needed.
+      header: t('agent.browser.panel.colActions', { defaultValue: 'Actions' }),
+      className: 'w-24 text-right',
       cell: (row) => (
+        // A text button, not the outlined one it was: it opens a dialog about the row it
+        // sits in, which is the same "go and look" the rest of this table implies, and a
+        // framed button per row read as ten competing calls to action.
         <Button
-          variant="outline"
+          variant="link"
           size="sm"
+          className="h-auto p-0"
           onClick={() => openBrowserBatchModal(row, () => void load())}
         >
-          {t('agent.browser.panel.detail', { defaultValue: 'Before and after' })}
+          {t('agent.browser.panel.detail', { defaultValue: 'Detail' })}
         </Button>
       ),
     },
@@ -101,26 +152,14 @@ const BrowserRecordsContent: React.FC = () => {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between gap-3">
-        {/* The one sentence this dialog keeps: it is the answer to "why is this list empty",
-            and an empty list is the most common thing to arrive at. */}
-        <p className="min-w-0 text-xs leading-relaxed">
-          {t('agent.browser.panel.recordsIntro', {
-            defaultValue:
-              'Every batch the agent applied, kept on this machine. Open one to see the browser before and after it, and to put either back.',
-          })}
-        </p>
-        <Button
-          variant="ghost"
-          size="sm"
-          disabled={busy}
-          onClick={() => void load()}
-          aria-label={t('agent.browser.panel.reload', { defaultValue: 'Reload' })}
-        >
-          <RefreshCw className={busy ? 'h-3 w-3 animate-spin' : 'h-3 w-3'} />
-          {t('agent.browser.panel.reload', { defaultValue: 'Reload' })}
-        </Button>
-      </div>
+      {/* The one sentence this dialog keeps: it is the answer to "why is this list empty",
+          and an empty list is the most common thing to arrive at. */}
+      <p className="text-xs leading-relaxed">
+        {t('agent.browser.panel.recordsIntro', {
+          defaultValue:
+            'Every batch the agent applied, kept on this machine. Open one to see the browser before and after it, and to put either back.',
+        })}
+      </p>
 
       <PagedTable
         rows={rows}

@@ -12,7 +12,7 @@
  * every write here touches one row.
  */
 import { runQuery, runCommand } from '../index';
-import { isTabTool, type Batch, type BatchSummary, type Operation, type RestoreSide, type Snapshot, type Step } from '@/shared/browser-agent/contracts';
+import type { Batch, BatchSummary, Operation, RestoreSide, Snapshot, Step } from '@/shared/browser-agent/contracts';
 
 /**
  * How many batches survive.
@@ -115,6 +115,19 @@ export const browserAuditRepo = {
     );
   },
 
+  /**
+   * Drop a batch and its steps.
+   *
+   * One caller: a restore that landed. The journal is a record of what the extension
+   * changed about the browser, and putting a recorded state back is the answer to that
+   * question rather than another instance of it — see the note in `commit`. Steps first,
+   * so a failure between the two leaves rows the batch sweep can still find by id.
+   */
+  discard: async (id: string): Promise<void> => {
+    await runCommand('DELETE FROM browser_agent_steps WHERE batch_id = ?', [id]);
+    await runCommand('DELETE FROM browser_agent_batches WHERE id = ?', [id]);
+  },
+
   insertStep: async (batchId: string, index: number, step: Step): Promise<void> => {
     await runCommand(
       `INSERT OR REPLACE INTO browser_agent_steps (batch_id, step_index, operation, status)
@@ -147,13 +160,7 @@ export const browserAuditRepo = {
     );
   },
 
-  /**
-   * The history list: metadata and counts, never a snapshot.
-   *
-   * `isTabTool` answers "did this batch touch tabs" from the tool name, which is how
-   * `snapshot()` decides what to capture in the first place — so the caller's
-   * browser-session check does not have to load a state to find out.
-   */
+  /** The history list: metadata and counts, never a snapshot. */
   list: async (batchId?: string): Promise<BatchSummary[]> => {
     const rows = await runQuery(
       `SELECT b.id, b.session_epoch, b.tool, b.operations, b.status, b.error,
@@ -173,7 +180,7 @@ export const browserAuditRepo = {
       restoreOf: row.restore_of ?? undefined, restoreSide: row.restore_side ?? undefined,
       createdAt: row.created_at, planned: load<Operation[]>(row.operations, []).length,
       steps: row.step_count, applied: row.applied_count,
-      hasAfter: !!row.has_after, touchesTabs: isTabTool(row.tool),
+      hasAfter: !!row.has_after,
     }));
   },
 

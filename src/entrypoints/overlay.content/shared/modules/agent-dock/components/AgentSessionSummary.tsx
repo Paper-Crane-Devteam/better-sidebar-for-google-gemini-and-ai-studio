@@ -13,6 +13,7 @@ import { Button } from '@/shared/components/ui/button';
 import { cn } from '@/shared/lib/utils/utils';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { usePaywallStore } from '@/shared/lib/powerpack-paywall';
+import { isBrowserTool } from '@/shared/browser-agent/contracts';
 import { FREE_MAX_FILES } from '@/shared/workspace/limits';
 import { PAYWALL_SIGNAL } from '../../agent-loop/tools/paywall-signal';
 import { useAgentLoopStore } from '../../agent-loop/agent-loop-store';
@@ -79,13 +80,21 @@ export const AgentSessionSummary: React.FC = () => {
    * It matters because the copy used to name the database unconditionally. Once the
    * workspace had a free-tier cap of its own, a run blocked on the sixth file explained
    * itself as a restriction on changing your data — for an operation that touches none.
+   *
+   * The Browser agent is a third answer, and the one where the wording carries the most
+   * weight: it is the only paywall the user meets *after* approving a specific batch, so
+   * the card has to say the plan was fine and only the applying was withheld. "Reads are
+   * free, writes are not" is technically true of it and still the wrong sentence — it
+   * sounds like a refusal rather than a plan waiting to run.
    */
-  const isWorkspacePaywall =
-    isPaywall &&
-    [...history]
-      .reverse()
-      .flatMap((h) => [...h.results].reverse())
-      .find((r) => r.result?.startsWith(PAYWALL_SIGNAL))?.toolName === 'write_file';
+  const paywalledTool = isPaywall
+    ? [...history]
+        .reverse()
+        .flatMap((h) => [...h.results].reverse())
+        .find((r) => r.result?.startsWith(PAYWALL_SIGNAL))?.toolName
+    : undefined;
+  const isWorkspacePaywall = paywalledTool === 'write_file';
+  const isBrowserPaywall = !!paywalledTool && isBrowserTool(paywalledTool);
 
   const finalNote =
     endReason === 'infeasible'
@@ -165,15 +174,20 @@ export const AgentSessionSummary: React.FC = () => {
 
       {isPaywall ? (
         <p className="text-xs leading-relaxed text-muted-foreground">
-          {isWorkspacePaywall
-            ? t('agent.summary.paywallWorkspaceDesc', {
-                defaultValue: `The free plan keeps one workspace with up to ${FREE_MAX_FILES} files. Upgrade for as many as you need.`,
-                max: FREE_MAX_FILES,
-              })
-            : t('agent.summary.paywallDesc', {
+          {isBrowserPaywall
+            ? t('agent.summary.paywallBrowserDesc', {
                 defaultValue:
-                  'The free plan lets the agent read your data but not change it. Upgrade to allow writes.',
-              })}
+                  'Reading your tabs and bookmarks is free. Applying changes needs Power Pack — upgrade, then ask again and approve the same batch.',
+              })
+            : isWorkspacePaywall
+              ? t('agent.summary.paywallWorkspaceDesc', {
+                  defaultValue: `The free plan keeps one workspace with up to ${FREE_MAX_FILES} files. Upgrade for as many as you need.`,
+                  max: FREE_MAX_FILES,
+                })
+              : t('agent.summary.paywallDesc', {
+                  defaultValue:
+                    'The free plan lets the agent read your data but not change it. Upgrade to allow writes.',
+                })}
         </p>
       ) : (
         <p className="text-xs text-muted-foreground">
@@ -203,14 +217,16 @@ export const AgentSessionSummary: React.FC = () => {
             className="h-7 text-xs"
             onClick={() =>
               showPaywall(
-                isWorkspacePaywall
-                  ? t('agent.workspace.paywallFiles', {
-                      defaultValue: `More than ${FREE_MAX_FILES} files in a workspace`,
-                      max: FREE_MAX_FILES,
-                    })
-                  : t('agent.summary.paywallFeature', {
-                      defaultValue: 'Agent database writes',
-                    }),
+                isBrowserPaywall
+                  ? t('agent.agents.browser.name', { defaultValue: 'Browser Agent' })
+                  : isWorkspacePaywall
+                    ? t('agent.workspace.paywallFiles', {
+                        defaultValue: `More than ${FREE_MAX_FILES} files in a workspace`,
+                        max: FREE_MAX_FILES,
+                      })
+                    : t('agent.summary.paywallFeature', {
+                        defaultValue: 'Agent database writes',
+                      }),
               )
             }
           >

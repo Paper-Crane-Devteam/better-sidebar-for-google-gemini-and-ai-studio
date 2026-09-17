@@ -1233,7 +1233,6 @@
       "examplesHintLabel": "Como usar os exemplos",
       "examplePick": "Inserir no chat",
       "workspaceHint": "Área de trabalho do Agente para leitura e gravação de arquivos",
-      "manageHint": "Configurar permissões e confirmações do Agente",
       "examplePrev": "Anterior",
       "exampleNext": "Próximo",
       "examples": {
@@ -1440,6 +1439,7 @@
       "ended": "Sessão encerrada",
       "paywallDesc": "O plano gratuito permite que o agente leia seus dados, mas não os altere. Faça upgrade para permitir escritas.",
       "paywallWorkspaceDesc": "O plano gratuito inclui 1 espaço de trabalho com até {{max}} arquivos. Faça upgrade para acesso ilimitado.",
+      "paywallBrowserDesc": "Ler suas abas e favoritos é gratuito. Aplicar mudanças requer o Power Pack: faça upgrade, peça de novo e aprove o mesmo lote.",
       "paywallFeature": "Escrita no banco de dados do agente",
       "steps_one": "{{count}} etapa executada",
       "steps_other": "{{count}} etapas executadas",
@@ -1652,7 +1652,7 @@
         "openSettings": "Permissões e privacidade",
         "viewHistory": "Registros locais",
         "noHistory": "Nenhum registro para mostrar. Ler o histórico também exige a permissão correspondente.",
-        "detail": "Detalhe",
+        "detail": "Detalhes",
         "cancel": "Cancelar",
         "before": "Antes",
         "after": "Depois",
@@ -1663,8 +1663,11 @@
         "recordsTitle": "Registros locais",
         "recordsIntro": "Cada lote aplicado pelo agente é mantido nesta máquina. Abra um para ver o navegador antes e depois, e restaurar qualquer um dos estados.",
         "colWhen": "Quando",
+        "colKind": "Tipo",
+        "kindTabs": "Abas",
+        "kindBookmarks": "Favoritos",
         "colOutcome": "Resultado",
-        "reload": "Recarregar",
+        "colActions": "Ações",
         "busySession": "Uma tarefa está em execução. Restaurar alteraria o navegador no qual ela está trabalhando, portanto aguardará até que a tarefa termine."
       },
       "status": {
@@ -1751,6 +1754,7 @@
         "counts": "{{restore}} para mover de volta · {{reopen}} para reabrir · {{create}} para adicionar de volta · {{keep}} já no lugar",
         "extra": "{{count}} itens abertos ou adicionados desde então são mantidos como estão. Nada é fechado ou excluído.",
         "additive": "Nada é fechado ou excluído. Qualquer item mais recente é mantido.",
+        "hostGroup": "Esta aba é a que executa o agente, portanto ela nunca é movida para dentro ou para fora de um grupo de abas. O grupo dela permanece exatamente como está; o restante do estado é restaurado ao redor dela.",
         "note": "Uma página reaberta volta apenas no seu endereço: entradas de formulários, posição de rolagem e estado da página não são restaurados. Um favorito adicionado de volta é uma nova cópia."
       },
       "examples": {
@@ -1777,6 +1781,14 @@
         "prune": {
           "label": "Limpar favoritos obsoletos",
           "text": "Mostre os favoritos que parecem obsoletos: sem título, páginas de resultados de busca ou salvos em duplicidade. Liste-os com a pasta em que estão e deixe-me escolher quais excluir em vez de decidir por mim."
+        },
+        "dedupe": {
+          "label": "Fechar as duplicadas",
+          "text": "Tenho as mesmas páginas abertas várias vezes. Feche as duplicadas e mantenha uma de cada — a cópia fixada ou agrupada, se houver; caso contrário, a mais antiga. Dois endereços só contam como a mesma página se a query e o fragmento também coincidirem. Mostre exatamente qual aba você vai manter e quais serão fechadas antes de fechar qualquer coisa, e faça o mesmo com meus favoritos se o mesmo link estiver salvo em mais de uma pasta."
+        },
+        "deadLinks": {
+          "label": "Verificar favoritos quebrados",
+          "text": "Revise os favoritos da minha pasta Ler Depois e avalie quais vale a pena manter. Abra os links você mesmo quando o título não disser o suficiente e aponte os que já não existem: erro 404, domínio estacionado, redirecionamento para a página inicial. Relate o que encontrou em cada caso com uma linha de justificativa e exclua apenas os que eu confirmar."
         }
       },
       "phrasesTitle": "Ou simplesmente peça",

@@ -52,7 +52,14 @@ export function browserWriteUnavailable(name: string): string {
   );
 }
 
-/** Bind a tool name to its executor. Reads run; writes explain themselves. */
+/**
+ * Bind a tool name to its executor. Reads run; writes explain themselves.
+ *
+ * ⚠️ No licence check on this path. Reading tabs, groups, bookmarks and the journal is free on
+ * every plan — the Browser agent is paid at the point a change is applied, not at the point it
+ * looks (`engine/stages/execute-tools.ts`). A read that refused would make the agent useless
+ * to a free user before they had seen it do anything.
+ */
 export function browserExecutor(name: string): (params: Record<string, string>) => Promise<string> {
   return isBrowserWrite(name)
     ? async () => browserWriteUnavailable(name)

@@ -105,12 +105,11 @@ export const groupsOf = (caps: readonly Capability[]): CapabilityGroup[] =>
 export const readCapability = (cap: Capability) => `${cap.split('.')[0]}.read` as Capability;
 const BOOKMARK_WRITE_TOOLS: readonly string[] = ['browser_arrange_bookmarks', 'browser_delete_bookmarks'];
 /**
- * Whether a batch of this tool works on tabs (and therefore on ids only this browser
- * session understands) or on bookmarks (which survive a restart).
+ * Whether a batch of this tool works on tabs and groups or on bookmarks.
  *
- * Same question `snapshot()` answers by choosing what to capture, asked from the tool
- * name alone so the history list can decide whether a batch is still restorable without
- * loading its snapshot.
+ * The same question `snapshot()` answers by choosing what to capture, asked from the tool
+ * name alone — which is also what decides whether a snapshot's ids are the per-session
+ * kind, and so how a restore has to recognise its objects (see `resolveRestore`).
  */
 export const isTabTool = (tool: string) => !BOOKMARK_WRITE_TOOLS.includes(tool);
 
@@ -256,7 +255,6 @@ export interface BatchSummary {
   planned: number; steps: number; applied: number;
   /** Whether an `after` snapshot was recorded, and so whether that side can be restored. */
   hasAfter: boolean;
-  touchesTabs: boolean;
 }
 /**
  * Where an object sits, said without a single id.
@@ -359,6 +357,15 @@ export interface OperationsPlan {
 export interface RestorePlan {
   id: string; kind: 'restore'; tier: 'low'; side: RestoreSide;
   tree: TreeNode[]; effects: RestoreEffects;
+  /**
+   * Set when the recorded state puts the host tab in a group it is not in — or takes it out
+   * of one it is in — and the restore is therefore leaving its group alone (§13).
+   *
+   * ⚠️ Has to be said on the card. The tree draws the host inside the group the snapshot
+   * recorded, so without this line the user approves a picture that is accurate about
+   * everything except the one tab they are looking at the panel from.
+   */
+  hostGroupKept?: boolean;
 }
 export type PlanPreview = OperationsPlan | RestorePlan;
 export type BrowserRequest =

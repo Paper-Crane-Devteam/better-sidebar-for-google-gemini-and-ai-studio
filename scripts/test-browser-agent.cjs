@@ -115,7 +115,27 @@ function harness() {
     },
     windows: {
       get: async id => { if (!state.tabs.some(t => t.windowId === id)) throw new Error('No window'); return { incognito: false }; },
-      getAll: async () => [], create: async () => {}, update: async () => {},
+      getAll: async () => [], update: async () => {},
+      // Modelled rather than stubbed, because restoring a state recorded before a browser
+      // restart *builds* the windows it named — every window id changed, so there is
+      // nothing left to move the tabs into. Both shapes the backend uses are here: an
+      // existing tab moved into a window of its own, and an address opened in one.
+      // Window ids come out of the same counter as tab and group ids so that a test can
+      // never pass by two id spaces coincidentally agreeing.
+      create: async (p = {}) => {
+        const id = nextId++;
+        if (p.type === 'popup') return { id, incognito: false, tabs: [] };
+        if (p.tabId !== undefined) {
+          const tab = getTab(p.tabId);
+          tab.windowId = id; tab.index = 0; reindexTabs(); mutation();
+          return { id, incognito: false, tabs: [clone(tab)] };
+        }
+        if (p.url === undefined) return { id, incognito: false, tabs: [] };
+        const tab = { id: nextId++, title: '', windowId: id, index: 0, active: true, pinned: false, groupId: -1, incognito: false,
+          ...(instant ? { url: redirects.get(p.url) ?? p.url } : { url: '', pendingUrl: p.url, settleAt: queries + 1 }) };
+        state.tabs.push(tab); mutation();
+        return { id, incognito: false, tabs: [clone(tab)] };
+      },
     },
     tabs: {
       onRemoved: { addListener() {} }, onUpdated: { addListener() {} }, get: async id => clone(getTab(id)),
@@ -474,25 +494,48 @@ test('Restoring leaves everything newer alone, and says how much that is', async
   const order = h.state.tabs.slice().sort((a, b) => a.index - b.index).map(t => t.id);
   assert.deepEqual(order.slice(0, 4), [7, 1, 2, 3]);
 });
-test('A restore is journalled as its own batch, and is itself restorable', async () => {
+test('A restore that lands leaves no record of its own; changing your mind is the other side', async () => {
   const h = harness(); await h.grant(['tabs.arrange']);
   const plan = await h.prepare('browser_arrange_tabs', [{ type: 'pin', tab_id: 2, pinned: true }]);
   assert.equal((await h.commit(plan)).data.status, 'applied');
   const restore = await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id } });
   assert.equal((await h.commit(restore)).data.status, 'applied');
   assert.equal(h.state.tabs.find(t => t.id === 2).pinned, false);
+  /*
+    The journal answers "what did the extension change about my browser". Putting a recorded
+    state back is the answer to that, not another instance of it — a row per undo doubles the
+    list with the inverse of the entry above it, two more full snapshots each.
+  */
+  assert.equal(h.row(restore.data.id), undefined);
+  assert.equal(h.steps(restore.data.id).length, 0);
+  assert.equal(h.orphanSteps(), 0);
+  const list = (await h.call({ action: 'read', tool: 'browser_query_changes', params: {} })).data.items;
+  assert.deepEqual(list.map(i => i.batch_id), [plan.data.id]);
+  // Changing your mind again costs one click all the same: both sides of the original batch
+  // are still recorded, so it is restoring the other one.
+  const back = await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id, side: 'after' } });
+  assert.equal(back.success, true, back.error);
+  assert.equal((await h.commit(back)).data.status, 'applied');
+  assert.equal(h.state.tabs.find(t => t.id === 2).pinned, true);
+});
+test('A restore that did not land keeps its record, because nothing else knows what happened', async () => {
+  const h = harness(); await h.grant(['tabs.arrange']);
+  h.state.tabs.push({ id: 9, windowId: 10, index: 3, title: 'Settings', url: 'chrome://settings', active: false, pinned: false, groupId: -1, incognito: false });
+  const plan = await h.prepare('browser_arrange_tabs', [{ type: 'pin', tab_id: 2, pinned: true }]);
+  assert.equal((await h.commit(plan)).data.status, 'applied');
+  const restore = await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id } });
+  // Between the approval and the click, the user closes a tab whose address an extension is
+  // not allowed to open. The restore gets partway and then cannot finish.
+  h.state.tabs = h.state.tabs.filter(t => t.id !== 9);
+  const result = await h.commit(restore);
+  assert.equal(result.data.status, 'unknown');
   const row = h.row(restore.data.id);
+  assert.ok(row, 'a restore left half-done is the only record of where the browser ended up');
   assert.equal(row.restore_of, plan.data.id);
   assert.equal(row.restore_side, 'before');
   // The tool recorded is the one whose permission the restore actually spent, not the one
   // of the batch it came from.
   assert.equal(row.tool, 'browser_arrange_tabs');
-  // And because it recorded both of its own states, changing your mind again is the same
-  // operation over again rather than a special case.
-  const back = await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: restore.data.id, side: 'before' } });
-  assert.equal(back.success, true, back.error);
-  assert.equal((await h.commit(back)).data.status, 'applied');
-  assert.equal(h.state.tabs.find(t => t.id === 2).pinned, true);
 });
 test('Undoing a close needs organizing, not closing', async () => {
   // The capability a restore spends is the one it uses: reopening and positioning tabs is
@@ -518,19 +561,27 @@ test('A tab committing its navigation is not mistaken for a different page', asy
   const trees = await h.call({ action: 'trees', batchId: plan.data.id });
   assert.match(JSON.stringify(trees.data.after), /new\.test\/page/);
 });
-test('Restoring a state that no longer fits the browser stops instead of improvising', async () => {
+test('A window the recorded state used is built again rather than its tabs going elsewhere', async () => {
   const h = harness(); await h.grant(['tabs.arrange']);
   h.state.tabs.push({ id: 8, windowId: 11, index: 0, title: 'Elsewhere', url: 'https://elsewhere.test/', active: true, pinned: false, groupId: -1, incognito: false });
   const plan = await h.prepare('browser_arrange_tabs', [{ type: 'move', tab_id: 8, window_id: 11, index: 0 }]);
   assert.equal((await h.commit(plan)).data.status, 'applied');
-  // The window the recorded state used is gone. Putting its tabs somewhere else would be
-  // inventing a layout the browser was never in.
+  // The user closes that whole window. Its tab is gone with it, so the restore has to
+  // reopen the page *and* have somewhere to put it — piling it into the host's window
+  // would be inventing a layout the browser was never in.
   h.state.tabs = h.state.tabs.filter(t => t.windowId !== 11);
-  const restore = await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id } });
+  const restore = await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id, side: 'after' } });
   assert.equal(restore.success, true, restore.error);
+  assert.equal(restore.data.effects.reopen, 1);
   const result = await h.commit(restore);
-  assert.equal(result.data.status, 'unknown');
-  assert.match(result.data.error, /window/i);
+  assert.equal(result.data.status, 'applied', JSON.stringify(result));
+  const reopened = h.state.tabs.find(t => h.address(t) === 'https://elsewhere.test/');
+  assert.ok(reopened);
+  // A window of its own, and not one of the two that were already there.
+  assert.equal(h.state.tabs.filter(t => t.windowId === reopened.windowId).length, 1);
+  assert.ok(![10, 11].includes(reopened.windowId));
+  // And the host tab stayed exactly where it was.
+  assert.equal(h.state.tabs.find(t => t.id === 1).windowId, 10);
 });
 test('Restoring a deleted bookmark subtree rebuilds it, parents first', async () => {
   const h = harness(); await h.grant(['bookmarks.delete', 'bookmarks.arrange']);
@@ -551,33 +602,103 @@ test('Restoring a deleted bookmark subtree rebuilds it, parents first', async ()
   assert.equal((await h.commit(again)).data.status, 'applied');
   assert.equal(h.state.bookmarks.filter(n => n.title === 'Folder').length, 1);
 });
-test('Tab states cannot be restored across a browser restart; bookmark states can', async () => {
+test('A tab state survives a browser restart: new ids, same pages, same layout', async () => {
   const tabs = harness(); await tabs.grant(['tabs.arrange']);
   const moved = await tabs.prepare('browser_arrange_tabs', [{ type: 'pin', tab_id: 2, pinned: true }]);
   await tabs.commit(moved);
-  delete tabs.session['browser-agent-epoch']; tabs.reload();
-  // Tab ids are per-session, so the recorded ids no longer name anything.
-  assert.equal((await tabs.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: moved.data.id } })).success, false);
+  /*
+    The browser restarts: the epoch is gone and every tab and window comes back under a
+    different id. Nothing in the record names anything any more — which is exactly the case
+    this used to refuse, on the grounds that a recorded tab says which window it is in with
+    a raw window id.
+  */
+  delete tabs.session['browser-agent-epoch'];
+  tabs.state.tabs = tabs.state.tabs.map((t, i) => ({ ...t, id: 200 + i, windowId: 42, pinned: false }));
+  tabs.sender.tab.id = 200;
+  tabs.reload();
   const [entry] = (await tabs.call({ action: 'read', tool: 'browser_query_changes', params: { batch_id: moved.data.id } })).data.items;
-  assert.equal(entry.can_restore_before, false);
+  assert.equal(entry.can_restore_before, true);
+  const restore = await tabs.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: moved.data.id, side: 'after' } });
+  assert.equal(restore.success, true, restore.error);
+  // Every page is standing, just under another id, so they are adopted rather than reopened.
+  assert.equal(restore.data.effects.reopen, 0);
+  assert.equal((await tabs.commit(restore)).data.status, 'applied');
+  // The recorded state had tab 2 pinned. Its page is now tab 201, and that is what got pinned.
+  assert.equal(tabs.state.tabs.find(t => t.id === 201).pinned, true);
+  // The host tab did not move: no new window, and the sidebar is still in the one it was in.
+  assert.deepEqual([...new Set(tabs.state.tabs.map(t => t.windowId))], [42]);
 
   const marks = harness(); await marks.grant(['bookmarks.arrange']);
   const renamed = await marks.prepare('browser_arrange_bookmarks', [{ type: 'update', id: '3', title: 'Renamed' }]);
   await marks.commit(renamed);
   delete marks.session['browser-agent-epoch']; marks.reload();
-  const restore = await marks.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: renamed.data.id } });
-  assert.equal(restore.success, true, restore.error);
-  assert.equal((await marks.commit(restore)).data.status, 'applied');
+  const rename = await marks.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: renamed.data.id } });
+  assert.equal(rename.success, true, rename.error);
+  assert.equal((await marks.commit(rename)).data.status, 'applied');
   assert.equal(marks.state.bookmarks.find(n => n.id === '3').title, 'Bookmark');
 });
-test('Restoring never moves the host tab to another window or group', async () => {
+test('Across a restart the second window is rebuilt, and the sidebar stays in the one it is in', async () => {
+  const h = harness(); await h.grant(['tabs.arrange']);
+  h.state.tabs.push({ id: 8, windowId: 11, index: 0, title: 'Elsewhere', url: 'https://elsewhere.test/', active: true, pinned: false, groupId: -1, incognito: false });
+  const plan = await h.prepare('browser_arrange_tabs', [{ type: 'pin', tab_id: 2, pinned: true }]);
+  assert.equal((await h.commit(plan)).data.status, 'applied');
+  /*
+    The restart, as the user meets it: a fresh epoch, every id different, and only one of the
+    two windows reopened. The recorded state names four tabs across two windows and not one
+    of those numbers means anything now.
+  */
+  delete h.session['browser-agent-epoch'];
+  h.state.tabs = [
+    { id: 300, windowId: 42, index: 0, title: 'Agent', url: 'https://gemini.google.com/app', active: true, pinned: false, groupId: -1, incognito: false },
+    { id: 301, windowId: 42, index: 1, title: 'Vague title', url: 'https://example.com/private?token=secret#fragment', active: false, pinned: false, groupId: -1, incognito: false },
+  ];
+  h.sender.tab.id = 300;
+  h.reload();
+  const restore = await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id, side: 'after' } });
+  assert.equal(restore.success, true, restore.error);
+  // Two pages are standing and get adopted by address; the other two are reopened.
+  assert.equal(restore.data.effects.reopen, 2);
+  assert.equal((await h.commit(restore)).data.status, 'applied');
+  assert.equal(h.state.tabs.find(t => t.id === 300).windowId, 42, 'the sidebar never moved');
+  // The tab that belonged to the host's window came back into it; the one that belonged to
+  // the window that is gone got a window of its own rather than being piled in beside it.
+  assert.equal(h.state.tabs.find(t => h.address(t) === 'https://other.test/path').windowId, 42);
+  assert.notEqual(h.state.tabs.find(t => h.address(t) === 'https://elsewhere.test/').windowId, 42);
+});
+test('The host tab keeps its group instead of the whole restore being refused', async () => {
   const h = harness(); await h.grant(['tabGroups.write']);
   const plan = await h.prepare('browser_manage_tab_groups', [{ type: 'create', tab_ids: [2, 3], title: 'Research', color: 'blue' }]);
   assert.equal((await h.commit(plan)).data.status, 'applied');
-  // The user groups the host tab afterwards. Restoring the earlier state would pull it out
-  // of that group, which is the one thing no batch may do to it.
-  h.state.tabs[0].groupId = h.state.groups[0].id;
-  assert.equal((await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id } })).success, false);
+  /*
+    The user groups the host tab afterwards. The recorded state has it ungrouped, and pulling
+    it out is the one thing no batch may do to it — but the host is not in the organizing
+    scope at all (§13), so that part of the snapshot does not apply to it rather than
+    invalidating everything else the user wanted back.
+  */
+  const group = h.state.groups[0].id;
+  h.state.tabs[0].groupId = group;
+  const restore = await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id } });
+  assert.equal(restore.success, true, restore.error);
+  // Said on the card: the tree draws the host outside the group, and that row is the one
+  // thing the tree is about to be wrong about.
+  assert.equal(restore.data.hostGroupKept, true);
+  assert.equal((await h.commit(restore)).data.status, 'applied');
+  assert.equal(h.state.tabs.find(t => t.id === 1).groupId, group, 'the host stayed in its group');
+  // Everything else did go back: the two tabs the batch grouped are ungrouped again.
+  assert.equal(h.state.tabs.find(t => t.id === 2).groupId, -1);
+  assert.equal(h.state.tabs.find(t => t.id === 3).groupId, -1);
+});
+test('Restoring still refuses to move the host tab to another window', async () => {
+  const h = harness(); await h.grant(['tabs.arrange']);
+  h.state.tabs.push({ id: 8, windowId: 11, index: 0, title: 'Elsewhere', url: 'https://elsewhere.test/', active: false, pinned: false, groupId: -1, incognito: false });
+  const plan = await h.prepare('browser_arrange_tabs', [{ type: 'pin', tab_id: 2, pinned: true }]);
+  assert.equal((await h.commit(plan)).data.status, 'applied');
+  // The user drags the sidebar's tab into the other window. Unlike a group, this cannot be
+  // skipped: every other tab of the recorded window is going somewhere the host is not.
+  h.state.tabs.find(t => t.id === 1).windowId = 11;
+  const restore = await h.call({ action: 'prepare', tool: 'browser_restore_state', params: { batch_id: plan.data.id } });
+  assert.equal(restore.success, false);
+  assert.match(restore.error, /window/i);
 });
 test('Restoring group membership needs group organizing; restoring a plain layout does not', async () => {
   const grouped = harness(); await grouped.grant(['tabGroups.write']);

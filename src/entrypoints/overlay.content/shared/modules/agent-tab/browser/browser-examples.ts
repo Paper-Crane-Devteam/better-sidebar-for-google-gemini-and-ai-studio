@@ -81,6 +81,27 @@ export const BROWSER_EXAMPLES: AgentExample[] = [
       'saved twice. List them with the folder each one is in, and let me pick which to delete ' +
       'rather than deciding for me.',
   },
+  {
+    icon: 'Copy',
+    key: 'dedupe',
+    label: 'Close the duplicates',
+    text:
+      'I have the same pages open several times over. Close the duplicates and keep one of each ' +
+      '— the pinned or grouped copy if there is one, otherwise the oldest. Two addresses only ' +
+      'count as the same page if the query and fragment match as well. Show me exactly which ' +
+      'tab you are keeping and which ones go before you close anything, and do the same for my ' +
+      'bookmarks if the same link is saved in more than one folder.',
+  },
+  {
+    icon: 'Unlink',
+    key: 'deadLinks',
+    label: 'Check for broken bookmarks',
+    text:
+      'Go through the bookmarks in my Read Later folder and work out which ones are worth ' +
+      'keeping. Open the links yourself where the title does not tell you enough, and flag the ' +
+      'ones that are gone — 404, domain parked, redirected to a homepage. Report what you found ' +
+      'for each with a one-line reason, then delete only the ones I confirm.',
+  },
 ];
 
 /** A short request, and the i18n key holding it. Staged into the composer as-is. */

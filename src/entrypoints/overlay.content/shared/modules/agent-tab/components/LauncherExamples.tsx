@@ -47,6 +47,7 @@ import {
   Bookmark,
   ChevronLeft,
   ChevronRight,
+  Copy,
   Download,
   FileText,
   FolderTree,
@@ -56,6 +57,7 @@ import {
   Pin,
   Search,
   Trash2,
+  Unlink,
   Wand2,
   type LucideIcon,
 } from 'lucide-react';
@@ -79,6 +81,8 @@ const ICONS: Record<string, LucideIcon> = {
   ListTree,
   Pin,
   Trash2,
+  Copy,
+  Unlink,
 };
 
 interface LauncherExamplesProps {

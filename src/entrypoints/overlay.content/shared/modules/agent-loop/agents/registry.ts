@@ -87,6 +87,16 @@ export const AGENTS: AgentDefinition[] = [
           mcpServerIds: [BROWSER_MCP_ID],
           tabContent: 'browser' as const,
           buildSoul: buildBrowserSoul,
+          /**
+           * Permission, and only permission.
+           *
+           * ⚠️ Deliberately **not** a licence check, even though applying a change needs Power
+           * Pack. Reading tabs and bookmarks is free and stays free, so a free plan has a
+           * whole agent it can genuinely use — and the licence is charged at the one moment it
+           * can be explained without a sales pitch: the user has the actual batch of changes
+           * in front of them and presses Approve. See the approval branch in
+           * `engine/stages/execute-tools.ts`.
+           */
           unavailable: () =>
             browserAgentNeedsPermission()
               ? {

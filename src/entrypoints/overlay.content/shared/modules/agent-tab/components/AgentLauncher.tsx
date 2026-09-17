@@ -40,38 +40,15 @@
  */
 
 import React from 'react';
-import { ChevronRight, Lock, SlidersHorizontal } from 'lucide-react';
+import { Lock, SlidersHorizontal } from 'lucide-react';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useAppStore } from '@/shared/lib/store';
 import { useLicenseStore } from '@/shared/lib/license-store';
+import { DestinationRow } from './DestinationRow';
 import { LauncherCta } from './LauncherCta';
 import { LauncherExamples } from './LauncherExamples';
 import { StageProblemNotice } from './StageProblemNotice';
 import { useStageExample } from './useStageExample';
-
-/** A full-width destination row: icon, label, one line of explanation. */
-const DestinationRow: React.FC<{
-  icon: React.ReactNode;
-  label: string;
-  hint: string;
-  onClick: () => void;
-}> = ({ icon, label, hint, onClick }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    // Same `-mx-2 px-2` band as everything else tinted here: the surface bleeds outward
-    // rather than indenting its contents inside the tab's own padding.
-    className="-mx-2 flex w-[calc(100%+1rem)] items-center gap-2.5 rounded-lg bg-muted/40 px-2 py-2
-               text-left transition-colors hover:bg-accent/40"
-  >
-    <span className="shrink-0 text-primary">{icon}</span>
-    <span className="min-w-0 flex-1">
-      <span className="block truncate text-[13px] font-medium text-foreground">{label}</span>
-      <span className="block truncate text-xs text-muted-foreground">{hint}</span>
-    </span>
-    <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" />
-  </button>
-);
 
 export const AgentLauncher: React.FC = () => {
   const { t } = useI18n();
@@ -123,7 +100,6 @@ export const AgentLauncher: React.FC = () => {
         <DestinationRow
           icon={<SlidersHorizontal className="h-4 w-4" />}
           label={t('agent.launcher.manage', { defaultValue: 'Skills & tools' })}
-          hint={t('agent.launcher.manageHint', { defaultValue: 'What it may do, and when to ask' })}
           onClick={() => setSettingsOpen(true, 'agent')}
         />
       </div>

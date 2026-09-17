@@ -165,6 +165,19 @@ function RestoreCard({ plan }: { plan: RestorePlan }) {
             defaultValue: 'Nothing is closed or deleted. Anything newer is kept.',
           })}
     </p>
+    {/* ⚠️ The tree draws this tab inside the group the snapshot recorded it in, and that is
+        the one row it is about to be wrong about. The agent never moves its own tab in or
+        out of a group (§13), so the snapshot's answer for it is skipped rather than
+        applied — and someone approving a picture of their browser has to be told which part
+        of the picture is not a promise. */}
+    {plan.hostGroupKept && (
+      <p>
+        {t('agent.browser.restore.hostGroup', {
+          defaultValue:
+            'This tab is the one running the agent, so it is never moved in or out of a tab group. Its group stays exactly as it is; the rest of the state is put back around it.',
+        })}
+      </p>
+    )}
     <p className="text-muted-foreground">
       {t('agent.browser.restore.note', {
         defaultValue: 'A reopened page comes back at its address only — form input, scroll position and page state are not restored. A re-added bookmark is a new copy.',

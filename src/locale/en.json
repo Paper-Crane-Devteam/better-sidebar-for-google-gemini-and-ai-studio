@@ -1233,7 +1233,6 @@
       "examplesHintLabel": "How to use examples",
       "examplePick": "Insert into chat",
       "workspaceHint": "Agent's workspace for reading and saving files",
-      "manageHint": "Configure Agent permissions and confirmations",
       "examplePrev": "Previous",
       "exampleNext": "Next",
       "examples": {
@@ -1440,6 +1439,7 @@
       "ended": "Session ended",
       "paywallDesc": "The free plan lets the agent read your data but not change it. Upgrade to allow writes.",
       "paywallWorkspaceDesc": "The free plan includes 1 workspace with up to {{max}} files. Upgrade for unlimited access.",
+      "paywallBrowserDesc": "Reading your tabs and bookmarks is free. Applying changes needs Power Pack — upgrade, then ask again and approve the same batch.",
       "paywallFeature": "Agent database writes",
       "steps_one": "{{count}} step run",
       "steps_other": "{{count}} steps run",
@@ -1647,12 +1647,12 @@
       "howToUseContent": "Browser Agent works on your Chrome windows: open tabs, tab groups and bookmarks. It sees titles and addresses, not page contents.\n\nHow to use:\nType >Browser Agent in the chat input, then describe what you want tidied — for example \"group these tabs by topic and collapse the ones I'm not using\" or \"file the loose bookmarks into folders\".\n\nWhat it can do:\n- Tabs: open, focus, reorder, move between windows, pin.\n- Tab groups: create, rename, recolor, collapse, dissolve.\n- Bookmarks: create folders, rename, and move things between them.\n- Closing tabs and deleting bookmarks are separate permissions, off unless you turn them on.\n\nHow approval works:\nReading needs no confirmation. Every change is shown to you first as the actual tabs or bookmarks it would touch, and applied only after you approve that specific batch. There is no setting that skips this. Anything it does is recorded on this machine, and most of it can be undone from this panel.\n\n💡 Tip: \"Organize my tabs\" never means closing them. If you want things gone, say so — otherwise it will gather them into a group or a folder and leave the decision to you."
     },
     "browser": {
-      "needsPermission": "🔒 Not authorized yet · click to open permissions",
+      "needsPermission": "Not authorized yet · click to open permissions",
       "panel": {
         "openSettings": "Permissions and privacy",
         "viewHistory": "Local records",
         "noHistory": "No records to show. Reading history needs the matching permission too.",
-        "detail": "Before and after",
+        "detail": "Detail",
         "cancel": "Cancel",
         "before": "Before",
         "after": "After",
@@ -1663,8 +1663,11 @@
         "recordsTitle": "Local records",
         "recordsIntro": "Every batch the agent applied, kept on this machine. Open one to see the browser before and after it, and to put either back.",
         "colWhen": "When",
+        "colKind": "Kind",
+        "kindTabs": "Tabs",
+        "kindBookmarks": "Bookmarks",
         "colOutcome": "Outcome",
-        "reload": "Reload",
+        "colActions": "Actions",
         "busySession": "A task is running. Restoring would change the browser it is working on, so it waits until the task ends."
       },
       "status": {
@@ -1751,6 +1754,7 @@
         "counts": "{{restore}} to move back · {{reopen}} to reopen · {{create}} to add back · {{keep}} already in place",
         "extra": "{{count}} things opened or added since are kept as they are. Nothing is closed or deleted.",
         "additive": "Nothing is closed or deleted. Anything newer is kept.",
+        "hostGroup": "This tab is the one running the agent, so it is never moved in or out of a tab group. Its group stays exactly as it is; the rest of the state is put back around it.",
         "note": "A reopened page comes back at its address only — form input, scroll position and page state are not restored. A re-added bookmark is a new copy."
       },
       "examples": {
@@ -1777,6 +1781,14 @@
         "prune": {
           "label": "Clear out the dead ends",
           "text": "Show me the bookmarks that look stale — untitled ones, search result pages, anything saved twice. List them with the folder each one is in, and let me pick which to delete rather than deciding for me."
+        },
+        "dedupe": {
+          "label": "Close the duplicates",
+          "text": "I have the same pages open several times over. Close the duplicates and keep one of each — the pinned or grouped copy if there is one, otherwise the oldest. Two addresses only count as the same page if the query and fragment match as well. Show me exactly which tab you are keeping and which ones go before you close anything, and do the same for my bookmarks if the same link is saved in more than one folder."
+        },
+        "deadLinks": {
+          "label": "Check for broken bookmarks",
+          "text": "Go through the bookmarks in my Read Later folder and work out which ones are worth keeping. Open the links yourself where the title does not tell you enough, and flag the ones that are gone — 404, domain parked, redirected to a homepage. Report what you found for each with a one-line reason, then delete only the ones I confirm."
         }
       },
       "phrasesTitle": "Or just ask",

@@ -33,6 +33,27 @@ type Translate = ReturnType<typeof useI18n>['t'];
 const isContainer = (node: TreeNode) =>
   node.kind === 'window' || node.kind === 'pinned' || node.kind === 'group' || node.kind === 'folder';
 
+/**
+ * Chrome's nine group colours, as something to write with.
+ *
+ * The colour used to be a word beside the name — `Research grey` — which read as part of
+ * the title and cost a line's worth of width on every group row to say something the user
+ * can see at a glance in their own tab strip. Writing the name *in* the colour says the
+ * same thing in no space at all, and matches how the group actually looks.
+ *
+ * ⚠️ Fixed hex, not theme tokens. These are the browser's colours, not the panel's, and a
+ * group the user set to red has to read as red under every theme this extension ships.
+ * They are mid-tones for that reason: each one has to hold contrast on a light background
+ * and a dark one.
+ *
+ * ⚠️ Colour is never the only carrier. The name stays as text, and the colour's name goes
+ * out to assistive technology below, so nothing here depends on being able to see it.
+ */
+const GROUP_COLORS: Record<string, string> = {
+  grey: '#8a9199', blue: '#3b82c4', red: '#d1544a', yellow: '#b98900',
+  green: '#2f9e56', pink: '#d1568f', purple: '#9161cc', cyan: '#2f95ad', orange: '#d1762f',
+};
+
 /** Windows and the pinned strip have no name of their own, so their label is their role. */
 function label(node: TreeNode, t: Translate): string {
   if (node.kind === 'window') {
@@ -93,16 +114,21 @@ function Row({ node, depth }: { node: TreeNode; depth: number }) {
         ) : (
           <span className="w-3 shrink-0" aria-hidden />
         )}
-        <span className={container ? 'font-medium text-foreground' : 'text-muted-foreground'}>
+        <span
+          className={container ? 'font-medium text-foreground' : 'text-muted-foreground'}
+          style={node.color ? { color: GROUP_COLORS[node.color] } : undefined}
+        >
           {label(node, t)}
+          {/* Chrome names its group colours in English; a translated name keeps the row in
+              one language. Spoken, not shown: on screen the colour *is* the name's colour,
+              and a reader that cannot see it still needs to be told which group this is. */}
+          {node.color && (
+            <span className="sr-only">
+              {' '}
+              {t(`agent.browser.color.${node.color}`, { defaultValue: node.color })}
+            </span>
+          )}
         </span>
-        {/* Chrome names its group colours in English; a translated name keeps the row in
-            one language. */}
-        {node.color && (
-          <span className="shrink-0 text-[10px] text-muted-foreground">
-            {t(`agent.browser.color.${node.color}`, { defaultValue: node.color })}
-          </span>
-        )}
         <Effect effect={node.effect} />
         {/* The child count, so a folded container still says how much it is hiding. */}
         {foldable && !open && (
@@ -114,8 +140,16 @@ function Row({ node, depth }: { node: TreeNode; depth: number }) {
           </span>
         )}
       </div>
+      {/* One line, clipped. An address wrapped over three lines makes a tree of eighty tabs
+          unreadable and pushes the rows that matter off screen — and the address is here to
+          tell two same-titled pages apart, which the front of it already does. The whole
+          thing is in `title` for anyone who needs the rest. */}
       {node.url && (
-        <div className="break-all text-[10px] text-muted-foreground/70" style={{ paddingLeft: `${depth * 12 + 20}px` }}>
+        <div
+          title={node.url}
+          className="truncate text-[10px] text-muted-foreground/70"
+          style={{ paddingLeft: `${depth * 12 + 20}px` }}
+        >
           {node.url}
         </div>
       )}

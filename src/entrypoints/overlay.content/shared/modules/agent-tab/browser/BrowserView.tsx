@@ -28,10 +28,10 @@
 
 import React from 'react';
 import { History, ShieldCheck } from 'lucide-react';
-import { Button } from '@/shared/components/ui/button';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { toast } from '@/shared/lib/toast';
 import { openBrowserAgentSettings } from '../../agent-loop/browser/browser-store';
+import { DestinationRow } from '../components/DestinationRow';
 import { LauncherCta } from '../components/LauncherCta';
 import { LauncherExamples } from '../components/LauncherExamples';
 import { StageProblemNotice } from '../components/StageProblemNotice';
@@ -64,26 +64,26 @@ export const BrowserView: React.FC = () => {
       <BrowserPhrases onPick={stage} disabled={busy} />
 
       {/*
-        Buttons, not the underlined links these were. Both open a window, which is what a
-        button means here and what a link in a paragraph did not — the records link in
-        particular used to load a list *into this panel*, so it looked like a disclosure
-        triangle and behaved like one.
+        Destination rows, not the outline buttons these were, and the same `DestinationRow`
+        the Better Sidebar panel ends on. Both open a window — a place you go, not a control
+        acting on this panel — and the two panels drawing the same idea differently was only
+        ever the order they were built in. (They were underlined links before that, and the
+        records one loaded a list *into this panel*, so it looked like a disclosure triangle
+        and behaved like one.)
       */}
-      <div className="flex flex-wrap gap-2">
-        <Button
-          variant="outline"
-          size="sm"
+      <div className="space-y-1.5">
+        <DestinationRow
+          icon={<ShieldCheck className="h-4 w-4" />}
+          label={t('agent.browser.panel.openSettings', { defaultValue: 'Permissions and privacy' })}
           onClick={() =>
             void openBrowserAgentSettings().catch((e: Error) => toast.error(e.message))
           }
-        >
-          <ShieldCheck className="h-3.5 w-3.5" />
-          {t('agent.browser.panel.openSettings', { defaultValue: 'Permissions and privacy' })}
-        </Button>
-        <Button variant="outline" size="sm" onClick={openBrowserRecordsModal}>
-          <History className="h-3.5 w-3.5" />
-          {t('agent.browser.panel.viewHistory', { defaultValue: 'Local records' })}
-        </Button>
+        />
+        <DestinationRow
+          icon={<History className="h-4 w-4" />}
+          label={t('agent.browser.panel.viewHistory', { defaultValue: 'Local records' })}
+          onClick={openBrowserRecordsModal}
+        />
       </div>
     </div>
   );

@@ -12,7 +12,14 @@
 
 import { browserRequest } from '../../agent-loop/browser/browser-store';
 
-/** One batch, exactly as `browser_query_changes` reports it. */
+/**
+ * One batch, as this panel reads it out of `browser_query_changes`.
+ *
+ * ⚠️ Not every field the tool reports. `can_restore_before` / `can_restore_after` are
+ * deliberately absent: both now answer only "was this state recorded", which the detail
+ * view already knows from whether it was handed a tree. They were once a gate on the
+ * restore button, and a field kept here is an invitation to gate on it again.
+ */
 export interface JournalEntry {
   batch_id: string;
   tool: string;
@@ -20,8 +27,6 @@ export interface JournalEntry {
   completed: number;
   planned: number;
   created_at: number;
-  can_restore_before: boolean;
-  can_restore_after: boolean;
   error?: string;
 }
 
