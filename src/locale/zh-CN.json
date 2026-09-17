@@ -12,11 +12,19 @@
     "copy": "复制",
     "close": "关闭",
     "loading": "加载中...",
+    "move": "移动",
     "settings": "设置",
     "preferences": "偏好设置",
     "untitled": "未命名",
-    "move": "移动",
-    "view": "查看"
+    "view": "查看",
+    "pageRange": "第 {{from}} - {{to}} 条，共 {{total}} 条",
+    "prevPage": "上一页",
+    "nextPage": "下一页",
+    "copied": "已复制",
+    "download": "下载",
+    "back": "返回",
+    "clear": "清空",
+    "rename": "重命名"
   },
   "tabs": {
     "files": "文件",
@@ -31,6 +39,12 @@
     "snippets": "片段",
     "spark": "Spark",
     "agent": "Agent"
+  },
+  "spark": {
+    "tasks": "任务",
+    "schedules": "定时任务",
+    "skills": "技能",
+    "apps": "已连接应用"
   },
   "sidebar": {
     "newConversation": "新建对话",
@@ -312,8 +326,8 @@
     "codex": "Codex",
     "myStuff": "我的内容",
     "gems": "Gems",
-    "originalUI": "切换到原始侧边栏",
     "notebooks": "笔记本",
+    "originalUI": "切换到原始侧边栏",
     "openCommandPalette": "打开命令面板"
   },
   "iconBar": {
@@ -385,25 +399,6 @@
     "chats": "对话",
     "moreFilters": "更多筛选"
   },
-  "outline": {
-    "title": "大纲",
-    "placeholder": "打开对话以查看大纲",
-    "search": "搜索大纲",
-    "searchPlaceholder": "全文搜索...",
-    "filterAll": "全部",
-    "filterHeadings": "标题",
-    "filterCode": "代码",
-    "noConversation": "未打开对话",
-    "noConversationHint": "打开一个对话以查看大纲",
-    "empty": "暂无大纲内容",
-    "noResults": "无匹配项",
-    "copy": "复制",
-    "copyQuery": "复制问题",
-    "copyResponse": "复制回复",
-    "expandAll": "展开全部",
-    "collapseAll": "折叠全部",
-    "navigate": "跳转到消息"
-  },
   "node": {
     "newFolder": "创建子文件夹",
     "newFolderName": "新建文件夹",
@@ -460,20 +455,6 @@
     "defaultTargetMoved": "「{{name}}」已从「{{from}}」移到这里",
     "defaultTargetRemoved": "「{{name}}」不再默认保存到此文件夹",
     "defaultTargetFailed": "更新默认文件夹失败"
-  },
-  "folderColor": {
-    "indigo": "靛蓝",
-    "violet": "紫罗兰",
-    "pink": "粉红",
-    "red": "红色",
-    "orange": "橙色",
-    "yellow": "黄色",
-    "green": "绿色",
-    "teal": "青色",
-    "cyan": "蓝绿",
-    "blue": "蓝色",
-    "lavender": "薰衣草",
-    "rose": "玫瑰"
   },
   "presetColor": {
     "indigo": "靛蓝",
@@ -661,9 +642,6 @@
     "stop": "停止",
     "progress": "正在同步：{{done}} / {{total}}",
     "progressFailed": "{{count}} 个失败",
-    "pageRange": "第 {{from}} - {{to}} 个，共 {{total}} 个",
-    "prevPage": "上一页",
-    "nextPage": "下一页",
     "nothingToSync": "所有聊天已全部同步。",
     "loadFailed": "读取对话列表失败。",
     "batchDone": "成功同步了 {{count}} 个聊天。",
@@ -1007,6 +985,25 @@
     "eraseNoConversation": "当前还没有加载对话",
     "eraseFailed": "清空已保存的消息失败"
   },
+  "outline": {
+    "title": "大纲",
+    "placeholder": "打开对话以查看大纲",
+    "search": "搜索大纲",
+    "searchPlaceholder": "全文搜索...",
+    "filterAll": "全部",
+    "filterHeadings": "标题",
+    "filterCode": "代码",
+    "noConversation": "未打开对话",
+    "noConversationHint": "打开一个对话以查看大纲",
+    "empty": "暂无大纲内容",
+    "noResults": "无匹配项",
+    "copy": "复制",
+    "copyQuery": "复制问题",
+    "copyResponse": "复制回复",
+    "expandAll": "展开全部",
+    "collapseAll": "折叠全部",
+    "navigate": "跳转到消息"
+  },
   "firstInstall": {
     "title": "是否导入对话列表？",
     "description": "插件默认只会录入最近的对话。",
@@ -1297,9 +1294,11 @@
       "paused": "已暂停",
       "error": "出错"
     },
-    "header": {
-      "step": "第 {{count}} 步",
-      "speedHint": "本次任务剩下的步骤都不会再问你"
+    "dock": {
+      "speedOff": "本次任务自动批准所有操作 — 点击停止",
+      "settings": "可以做什么",
+      "collapse": "收起",
+      "expand": "展开"
     },
     "actions": {
       "stop": "停止",
@@ -1314,6 +1313,17 @@
     "interrupt": {
       "errorTitle": "出了点问题",
       "pausedTitle": "循环已暂停"
+    },
+    "checkIn": {
+      "title_one": "已自动执行 {{count}} 步",
+      "title_other": "已自动执行 {{count}} 步",
+      "title": "已自动执行 {{count}} 步",
+      "desc": "没出问题——只是先停一下，让你看看它已经做了什么，再决定是否继续。",
+      "failedNote_one": "过程中有 {{count}} 步失败了，可以在下面看看。",
+      "failedNote_other": "过程中有 {{count}} 步失败了，可以在下面看看。",
+      "failedNote": "过程中有 {{count}} 步失败了，可以在下面看看。",
+      "continue": "继续",
+      "stop": "就此停止"
     },
     "owed": {
       "title_one": "有 {{count}} 条结果没送到 AI",
@@ -1335,7 +1345,6 @@
       "autoContinue": "自己往下走",
       "autoContinueHint": "关掉后，每一步都要你按回车",
       "sendHint": "你确认过的步骤仍会等你按回车；只有不用确认的步骤才会自动发送。",
-      "taskApproved": "本次任务已全部放行 — 点击可停止",
       "browserFixed": "读你的标签页和书签不需要批准。改动一定要，而且一批一批地问 —— 这条关不掉。"
     },
     "approve": {
@@ -1398,7 +1407,7 @@
       "manageTabGroups": "整理标签组",
       "arrangeBookmarks": "整理书签",
       "deleteBookmarks": "删除书签",
-      "undoChanges": "撤销之前的改动"
+      "restoreState": "正在恢复先前的状态"
     },
     "sync": {
       "progress": "正在获取对话内容 — {{current}}/{{total}}",
@@ -1408,12 +1417,14 @@
       "donePartial": "已同步 {{count}} 个对话，{{incomplete}} 个未完成",
       "remaining": "还有 {{count}} 个对话没有消息 — 再运行一次同步继续获取"
     },
+    "overlay": {
+      "emptyTitle": "智能体视图",
+      "emptyHint": "在下方输入，或选择一个智能体提示词开始",
+      "scrollToBottom": "回到底部"
+    },
     "instruction": {
       "placeholder": "给 AI 补充说明…",
       "sent": "已发送"
-    },
-    "history": {
-      "title": "步骤"
     },
     "summary": {
       "done": "任务完成",
@@ -1437,19 +1448,8 @@
       "noSteps": "没有执行任何工具。",
       "upgrade": "查看方案",
       "dismiss": "关闭",
-      "clear": "清除",
-      "keepChanges": "保留更改"
-    },
-    "checkIn": {
-      "title_one": "已自动执行 {{count}} 步",
-      "title_other": "已自动执行 {{count}} 步",
-      "title": "已自动执行 {{count}} 步",
-      "desc": "没出问题——只是先停一下，让你看看它已经做了什么，再决定是否继续。",
-      "failedNote_one": "过程中有 {{count}} 步失败了，可以在下面看看。",
-      "failedNote_other": "过程中有 {{count}} 步失败了，可以在下面看看。",
-      "failedNote": "过程中有 {{count}} 步失败了，可以在下面看看。",
-      "continue": "继续",
-      "stop": "就此停止"
+      "keepChanges": "保留更改",
+      "clear": "清除"
     },
     "undo": {
       "action": "撤销更改",
@@ -1460,25 +1460,20 @@
       "done_one": "已回退 {{count}} 条记录",
       "done_other": "已回退 {{count}} 条记录",
       "done": "已回退 {{count}} 条记录",
-      "failed": "撤销失败：{{message}}",
-      "unavailable": "这些更改无法自动撤销。原因：{{reason}}",
       "aiUnaware": "AI 不知道这个操作 — 继续对话前请告知它。",
       "reverted": "更改已撤销",
       "toastPrompt": "智能体修改了你的数据。",
-      "expired": "没有可撤销的内容 — 新任务已开始，或更改已被保留。"
-    },
-    "dock": {
-      "speedOff": "本次任务自动批准所有操作 — 点击停止",
-      "settings": "可以做什么",
-      "collapse": "收起",
-      "expand": "展开"
-    },
-    "overlay": {
-      "emptyTitle": "智能体视图",
-      "emptyHint": "在下方输入，或选择一个智能体提示词开始",
-      "scrollToBottom": "回到底部"
+      "expired": "没有可撤销的内容 — 新任务已开始，或更改已被保留。",
+      "failed": "撤销失败：{{message}}",
+      "unavailable": "这些更改无法自动撤销。原因：{{reason}}"
     },
     "settings": {
+      "skillsTitle": "技能",
+      "skillsDescription": "技能为智能体定义了专门的提示词指令。内置技能不可删除。",
+      "maxSkills": "已达到 20 个自定义技能的上限。",
+      "mcpTitle": "MCP 服务器",
+      "mcpDescription": "MCP 服务器为智能体提供工具。",
+      "mcpToolCount": "{{count}} 个工具",
       "newSkill": "新建技能",
       "editSkill": "编辑技能",
       "skillTitle": "标题",
@@ -1496,12 +1491,6 @@
       "deleteSkillTitle": "删除技能",
       "deleteSkillContent": "「{{title}}」将被永久删除，此操作不可撤销。",
       "alwaysOn": "始终启用",
-      "skillsTitle": "技能",
-      "skillsDescription": "技能为智能体定义了专门的提示词指令。内置技能不可删除。",
-      "maxSkills": "已达到 20 个自定义技能的上限。",
-      "mcpTitle": "MCP 服务器",
-      "mcpDescription": "MCP 服务器为智能体提供工具。",
-      "mcpToolCount": "{{count}} 个工具",
       "agentsTitle": "Agent",
       "agentsDesc": "每个 Agent 处理的东西不同，工具也各自独立。在输入框打 > 就能启动。",
       "noTools": "没有可选工具。",
@@ -1562,13 +1551,13 @@
         "grep_files": "用正则搜索文件内容",
         "manage_files": "删除、移动或新建文件夹"
       },
-      "documents": {
-        "name": "文档",
-        "description": "按大纲和章节读取 Word 文档"
-      },
       "workspace": {
         "name": "文件",
         "description": "读写、编辑和搜索文本文件"
+      },
+      "documents": {
+        "name": "文档",
+        "description": "按大纲和章节读取 Word 文档"
       },
       "core": {
         "name": "核心",
@@ -1599,7 +1588,40 @@
       "paywallFiles": "工作区文件数超过 {{max}} 个",
       "paywallFilesSkipped": "已忽略 {{files}} 个文件 —— 免费版工作区最多支持 {{max}} 个文件",
       "clearWarning": "删除\"{name}\"中的所有 {fileCount} 个文件？此操作无法撤销。",
-      "deleteWarning": "删除工作区\"{name}\"及其中 {fileCount} 个文件？已使用此工作区的对话将无法再读写文件。此操作无法撤销。"
+      "deleteWarning": "删除工作区\"{name}\"及其中 {fileCount} 个文件？已使用此工作区的对话将无法再读写文件。此操作无法撤销。",
+      "documentNoPreview": "此处暂不支持直接预览 Office 文档，但 AI 助手可以读取该文件 —— 您可以让它总结文件内容、查看特定章节或分析表格。",
+      "binaryNoPreview": "这是二进制文件。它已按原样存储，但无法作为文本展示，AI 助手也无法读取其内容。",
+      "largeNoPreview": "此文件过大，直接预览可能导致侧边栏卡顿。建议下载查看，或直接向 AI 助手提问 —— 它可以分片读取文件。",
+      "nameNoSlash": "名称不能包含 \"/\"。",
+      "confirmDeleteOne": "确认删除 \"{{name}}\"？若为文件夹，其内部内容也将一并删除。此操作无法撤销。",
+      "confirmDeleteMany": "确认删除选中的 {{count}} 项？文件夹内部的内容将一并删除。此操作无法撤销。",
+      "deleteFailed": "未能删除 {{total}} 项中的 {{count}} 项。",
+      "moreActions": "更多操作",
+      "exportAll": "导出为 ZIP",
+      "searchPlaceholder": "搜索文件",
+      "add": "添加",
+      "newFile": "新建文件",
+      "newFolder": "新建文件夹",
+      "importFiles": "导入文件…",
+      "importFolder": "导入文件夹…",
+      "noMatches": "没有与搜索匹配的文件。",
+      "dropHint": "拖放文件或文件夹即可添加到此工作区",
+      "binaryHint": "二进制文件。已存储并可下载，但 AI 助手无法读取。",
+      "open": "打开",
+      "copyContent": "复制内容",
+      "importHere": "在此导入文件…",
+      "downloadZip": "下载为 ZIP",
+      "uploadedCount": "已添加 {{count}} 个文件",
+      "renamedCount": "为避免覆盖，已重命名 {{count}} 个文件",
+      "binaryCount": "{{count}} 个二进制文件（已存储，但 AI 助手无法读取）",
+      "failedCount": "{{count}} 个失败",
+      "uploading": "正在上传 {{done}}/{{total}}…",
+      "dropEmpty": "拖放的内容中没有可上传的文件。",
+      "zipping": "正在打包压缩…",
+      "zippingProgress": "正在打包压缩 {{done}}/{{total}}…",
+      "zipEmpty": "没有可导出的内容。",
+      "zipPartial": "已导出 {{count}} 个文件；其中 {{failed}} 个无法读取。",
+      "zipDone": "已导出 {{count}} 个文件。"
     },
     "agents": {
       "bettersidebar": {
@@ -1615,6 +1637,9 @@
         "description": "整理 Chrome 标签页、标签组与收藏夹"
       }
     },
+    "switcher": {
+      "label": "选择 Agent"
+    },
     "browserIntro": {
       "title": "让 AI 帮你收拾标签页和书签",
       "about": "关于浏览器助手",
@@ -1624,48 +1649,45 @@
     "browser": {
       "needsPermission": "🔒 尚未授权 · 点击打开权限设置",
       "panel": {
-        "approvalNote": "所有改动都需批准，包括排序。",
-        "permissions": "已允许：{{list}}",
-        "noPermissions": "权限：尚未授权",
-        "urlsShared": "完整 URL：允许 AI 读取。",
-        "urlsRedacted": "完整 URL：已脱敏。",
-        "auditNote": "审计记录仅留本机。",
         "openSettings": "权限与隐私设置",
         "viewHistory": "查看本机记录",
         "noHistory": "暂无可查看的记录；历史读取也需要对应权限。",
         "detail": "明细",
-        "previewUndo": "预览撤销",
-        "changeDetail": "变更明细",
-        "truncated": "每步最多展示前 100 个变更；完整记录保存在本机，可由 Agent 分页查询。",
-        "approveUndo": "批准并撤销",
         "cancel": "取消",
         "before": "之前",
         "after": "之后",
-        "outcome": "{{status}}：{{completed}}/{{planned}}。{{error}}"
+        "outcome": "{{status}}：{{completed}}/{{planned}}。{{error}}",
+        "revertToThis": "恢复到此状态",
+        "approveRestore": "批准并恢复",
+        "noEndState": "该批次未完成，因此未记录最终状态。",
+        "recordsTitle": "本地操作记录",
+        "recordsIntro": "AI 助手应用过的所有批次记录均保存在本机。打开某条记录可查看执行前后的浏览器状态，并可随时还原。",
+        "colWhen": "时间",
+        "colOutcome": "结果",
+        "reload": "重新加载",
+        "busySession": "任务正在运行中。此时还原会影响当前操作的浏览器，请等待任务结束。"
       },
       "status": {
         "applied": "已完成",
         "failed": "已停止",
         "applying": "执行中",
-        "unknown": "结果不确定，请检查浏览器",
-        "undone": "已撤销"
+        "unknown": "结果不确定，请检查浏览器"
       },
       "preview": {
         "scope": "{{count}} 项操作 · 批准仅适用于下面这一批",
-        "undoPrefix": "撤销：",
         "objects": "涉及 {{count}} 个对象",
         "firstHundred": "（前 100 个如下）",
         "untitled": "无标题",
-        "window": "当前窗口 {{id}}",
-        "position": "原位置 {{index}}",
-        "folder": "原目录 {{id}}",
-        "object": "对象 #{{id}}",
-        "current": "当前",
-        "restoreTo": "恢复为",
-        "absent": "不存在",
+        "inThisWindow": "在此窗口中",
+        "inWindow": "在窗口 {{n}} 中",
+        "inGroup": "在分组 {{name}} 中",
+        "inUnnamedGroup": "在未命名分组中",
+        "unnamed": "未命名",
+        "inFolder": "在 {{name}} 中",
+        "pinned": "已固定",
         "lossy": "这一批会删除东西。关闭的标签页只能靠重新打开链接来恢复，表单内容、滚动位置和页面状态都无法保证。删除文件夹会连里面的内容一起删掉，恢复收藏夹会生成新的 ID。这类操作每次都要单独批准，任何设置都不能让它自动执行。",
         "warning": "这次批准只覆盖上面这些操作。这里不会关闭或删除任何东西——那是另外的工具，需要单独授权。",
-        "undoWarning": "撤销也需要批准；发现外部变化就停止。关闭标签只尽力重新打开 URL，不能保证恢复表单、滚动位置或页面运行状态。恢复收藏夹会生成新 ID。"
+        "untouched": "另有 {{count}} 个项目未被改动"
       },
       "op": {
         "create": "创建",
@@ -1678,22 +1700,25 @@
         "ungroup": "取消分组"
       },
       "field": {
-        "tab_id": "标签",
-        "tab_ids": "标签",
-        "group_id": "组",
-        "window_id": "目标窗口",
-        "index": "位置（从 0 开始）",
         "pinned": "固定",
         "collapsed": "折叠",
         "title": "标题",
-        "id": "对象",
-        "parent_id": "目标目录",
         "url": "地址",
         "color": "颜色",
-        "windowId": "窗口",
-        "groupId": "组",
-        "parentId": "目录",
-        "active": "激活"
+        "folder": "目标文件夹",
+        "group": "分组",
+        "window": "目标窗口"
+      },
+      "color": {
+        "grey": "灰色",
+        "blue": "蓝色",
+        "red": "红色",
+        "yellow": "黄色",
+        "green": "绿色",
+        "pink": "粉色",
+        "purple": "紫色",
+        "cyan": "青色",
+        "orange": "橙色"
       },
       "settings": {
         "title": "Browser Agent",
@@ -1707,10 +1732,62 @@
         "urlToggle": "允许 AI 读取完整 URL",
         "urlHelp": "开启：完整链接会发送到当前 AI 对话。关闭：只提供协议和域名，隐藏路径、参数与片段。已经发送的地址无法收回。",
         "done": "完成"
+      },
+      "tree": {
+        "thisWindow": "当前窗口",
+        "window": "窗口",
+        "windowN": "窗口 {{n}}",
+        "pinned": "固定标签",
+        "unnamedGroup": "未命名分组",
+        "willReopen": "重新打开",
+        "willCreate": "补回",
+        "willRestore": "移回",
+        "empty": "此处未记录到任何内容。",
+        "childCount": "({{count}})"
+      },
+      "restore": {
+        "headingBefore": "恢复到执行此批次前的状态",
+        "headingAfter": "恢复到执行此批次后的状态",
+        "counts": "移回 {{restore}} 项 · 重新打开 {{reopen}} 项 · 补回 {{create}} 项 · {{keep}} 项保留在原处",
+        "extra": "此后打开或新增的 {{count}} 个项目将保留原状，不会关闭或删除任何内容。",
+        "additive": "不会关闭或删除任何内容，所有更新的内容都会保留。",
+        "note": "重新打开的页面仅恢复其 URL 地址 —— 表单输入、滚动位置和页面状态不会被恢复。补回的书签为新建副本。"
+      },
+      "examples": {
+        "group": {
+          "label": "按主题为标签分组",
+          "text": "查看此窗口中的所有标签页并按主题分组。为每个分组命名并设置颜色，不要改动已固定的标签页；在移动任何内容之前先向我展示计划，不要关闭任何标签页。"
+        },
+        "duplicates": {
+          "label": "查找重复标签",
+          "text": "找出我打开了多次的标签页。仅当查询参数和哈希完全相同时才视为同一页面。按页面分组列出，最早打开的排在前面，并告诉我能腾出多少标签页 —— 先不要关闭它们。"
+        },
+        "stash": {
+          "label": "将标签存为书签",
+          "text": "我希望当前窗口只留下正在处理的几个标签页。将其余所有标签存入以今天日期命名的文件夹中，保留已固定的标签和公司域名的标签；在关闭任何标签页之前，先向我展示列表。"
+        },
+        "bookmarks": {
+          "label": "整理书签栏",
+          "text": "帮我检查书签栏。将分散的书签按主题归类到文件夹中，将仍然使用原始网页标题的书签重命名为更易辨认的名称；指出可能重复的书签，不要直接删除。"
+        },
+        "open": {
+          "label": "搭建工作环境",
+          "text": "打开我进行代码审查所需的标签页：我们的仓库、Issue 追踪器和设计文档。将它们归入名为 Review 的分组中，固定仓库标签，其他已打开的内容保持不变。"
+        },
+        "prune": {
+          "label": "清理无效书签",
+          "text": "找出看起来过时的书签 —— 无标题的、搜索结果页面、重复保存的内容。列出它们及所在文件夹，让我来选择删除哪些，不要替我做决定。"
+        }
+      },
+      "phrasesTitle": "或者直接吩咐",
+      "phrases": {
+        "listTabs": "这个窗口里都打开了些什么？",
+        "groupThis": "把这些标签页按主题分组",
+        "findDupes": "帮我找出重复打开的标签页",
+        "bookmarkAll": "把当前窗口的所有标签存入新文件夹",
+        "sortBar": "整理一下我的书签栏",
+        "pinFew": "固定我频繁切换的那几个标签"
       }
-    },
-    "switcher": {
-      "label": "选择 Agent"
     },
     "workspaceIntro": {
       "title": "与 AI 一起处理您的工作区文档",
@@ -1752,11 +1829,5 @@
     "reasonPreSync": "同步前",
     "reasonPreMergeDelete": "批量删除前",
     "reasonPreRestore": "还原前"
-  },
-  "spark": {
-    "tasks": "任务",
-    "schedules": "定时任务",
-    "skills": "技能",
-    "apps": "已连接应用"
   }
 }

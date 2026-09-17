@@ -12,11 +12,19 @@
     "copy": "Copiar",
     "close": "Cerrar",
     "loading": "Cargando...",
+    "move": "Mover",
     "settings": "Configuración",
     "preferences": "Preferencias",
     "untitled": "Sin título",
-    "move": "Mover",
-    "view": "Ver"
+    "view": "Ver",
+    "pageRange": "{{from}} - {{to}} de {{total}}",
+    "prevPage": "Anterior",
+    "nextPage": "Siguiente",
+    "copied": "Copiado",
+    "download": "Descargar",
+    "back": "Atrás",
+    "clear": "Limpiar",
+    "rename": "Renombrar"
   },
   "tabs": {
     "files": "Archivos",
@@ -31,6 +39,12 @@
     "snippets": "Fragmentos",
     "spark": "Spark",
     "agent": "Agent"
+  },
+  "spark": {
+    "tasks": "Tareas",
+    "schedules": "Programaciones",
+    "skills": "Habilidades",
+    "apps": "Apps conectadas"
   },
   "sidebar": {
     "newConversation": "Nueva Conversación",
@@ -120,7 +134,7 @@
     "scanStarted": "Escaneo de biblioteca iniciado en pestaña en segundo plano",
     "scanStartFailed": "Error al iniciar el escaneo",
     "interfaceUpdated": "La interfaz de Google AI Studio se ha actualizado. Por favor, actualiza la extensión o espera una corrección.",
-    "copiedToClipboard": "Copied to clipboard",
+    "copiedToClipboard": "Copiado al portapapeles",
     "noContentToExport": "No se encontró contenido. Abra la conversación en {{platform}} para que la extensión pueda registrarla e intente de nuevo.",
     "importAiStudioSystemSuccess": "Importadas {{count}} instrucción(es) de sistema desde AI Studio",
     "importAiStudioSystemNoData": "No se encontraron instrucciones de sistema de AI Studio en esta página",
@@ -385,25 +399,6 @@
     "chats": "Chats",
     "moreFilters": "Más filtros"
   },
-  "outline": {
-    "title": "Esquema",
-    "placeholder": "Abre una conversación para ver su esquema",
-    "search": "Buscar esquema",
-    "searchPlaceholder": "Búsqueda de texto completo...",
-    "filterAll": "Todo",
-    "filterHeadings": "Encabezados",
-    "filterCode": "Código",
-    "noConversation": "Sin conversación abierta",
-    "noConversationHint": "Abre una conversación para ver su esquema",
-    "empty": "Sin contenido de esquema",
-    "noResults": "Sin coincidencias",
-    "copy": "Copiar",
-    "copyQuery": "Copiar pregunta",
-    "copyResponse": "Copiar respuesta",
-    "expandAll": "Expandir todo",
-    "collapseAll": "Contraer todo",
-    "navigate": "Ir al mensaje"
-  },
   "node": {
     "newFolder": "Crear Subcarpeta",
     "newFolderName": "Nueva Carpeta",
@@ -460,20 +455,6 @@
     "defaultTargetMoved": "\"{{name}}\" se movió aquí desde \"{{from}}\"",
     "defaultTargetRemoved": "\"{{name}}\" ya no usa esta carpeta por defecto",
     "defaultTargetFailed": "No se pudo actualizar la carpeta predeterminada"
-  },
-  "folderColor": {
-    "indigo": "Índigo",
-    "violet": "Violeta",
-    "pink": "Rosa",
-    "red": "Rojo",
-    "orange": "Naranja",
-    "yellow": "Amarillo",
-    "green": "Verde",
-    "teal": "Verde azulado",
-    "cyan": "Cian",
-    "blue": "Azul",
-    "lavender": "Lavanda",
-    "rose": "Rosa"
   },
   "presetColor": {
     "indigo": "Índigo",
@@ -596,7 +577,6 @@
     "platforms": "Plataformas compatibles",
     "enablePlatform": "Activar en {{platform}}"
   },
-  "options": {},
   "feedback": {
     "title": "Contáctenos",
     "description": "¿Tienes ideas, sugerencias o encontraste un error? Contáctanos por cualquiera de los canales a continuación.",
@@ -609,6 +589,10 @@
     "emailTitle": "Correo Electrónico",
     "emailButton": "Enviar Correo",
     "thankYou": "Gracias por ayudarnos a mejorar"
+  },
+  "dataManagement": {
+    "resetDatabase": "Restablecer Base de Datos",
+    "resetDatabaseConfirm": "Solo se eliminarán los datos locales. La copia de seguridad remota (si existe) no se verá afectada. Para borrar los datos remotos, usa \"Backup to Drive\" después del restablecimiento."
   },
   "search": {
     "title": "Buscar",
@@ -658,9 +642,6 @@
     "stop": "Detener",
     "progress": "Sincronizando: {{done}} / {{total}}",
     "progressFailed": "{{count}} con error",
-    "pageRange": "{{from}} - {{to}} de {{total}}",
-    "prevPage": "Anterior",
-    "nextPage": "Siguiente",
     "nothingToSync": "Todos los chats ya están sincronizados.",
     "loadFailed": "Error al cargar la lista de chats.",
     "batchDone": "Sincronizados correctamente {{count}} chats.",
@@ -700,10 +681,6 @@
     "logProcessed": "Procesado {{current}}/{{total}}...",
     "logComplete": "Importación completada: {{count}} importadas.",
     "logCriticalError": "Error crítico: {{message}}"
-  },
-  "dataManagement": {
-    "resetDatabase": "Restablecer Base de Datos",
-    "resetDatabaseConfirm": "Solo se eliminarán los datos locales. La copia de seguridad remota (si existe) no se verá afectada. Para borrar los datos remotos, usa \"Backup to Drive\" después del restablecimiento."
   },
   "rating": {
     "title": "¿Te gusta esta extensión?",
@@ -1008,6 +985,25 @@
     "eraseNoConversation": "Todavía no hay ninguna conversación cargada",
     "eraseFailed": "No se pudieron borrar los mensajes guardados"
   },
+  "outline": {
+    "title": "Esquema",
+    "placeholder": "Abre una conversación para ver su esquema",
+    "search": "Buscar esquema",
+    "searchPlaceholder": "Búsqueda de texto completo...",
+    "filterAll": "Todo",
+    "filterHeadings": "Encabezados",
+    "filterCode": "Código",
+    "noConversation": "Sin conversación abierta",
+    "noConversationHint": "Abre una conversación para ver su esquema",
+    "empty": "Sin contenido de esquema",
+    "noResults": "Sin coincidencias",
+    "copy": "Copiar",
+    "copyQuery": "Copiar pregunta",
+    "copyResponse": "Copiar respuesta",
+    "expandAll": "Expandir todo",
+    "collapseAll": "Contraer todo",
+    "navigate": "Ir al mensaje"
+  },
   "firstInstall": {
     "title": "¿Importar lista de conversaciones?",
     "description": "Por defecto, la extensión solo registra las conversaciones recientes.",
@@ -1227,6 +1223,7 @@
       "safety": "Solo se toca tu base de datos local. Los cambios se confirman antes de ejecutarse.",
       "freeTier": "El plan gratuito es de solo lectura. Mejora tu plan para que el agente pueda hacer cambios.",
       "manage": "Habilidades y herramientas",
+      "workspace": "Espacio de trabajo",
       "stepsTitle": "Cómo usarlo",
       "step1": "Abre cualquier chat.",
       "step2": "Escribe > en el cuadro de entrada y selecciona el Agente.",
@@ -1297,9 +1294,11 @@
       "paused": "En pausa",
       "error": "Error"
     },
-    "header": {
-      "step": "Paso {{count}}",
-      "speedHint": "No se te preguntará nada durante el resto de esta tarea"
+    "dock": {
+      "speedOff": "Aprobando todo para esta tarea — haz clic para detenerlo",
+      "settings": "Lo que puede hacer",
+      "collapse": "Colapsar",
+      "expand": "Expandir"
     },
     "actions": {
       "stop": "Detener",
@@ -1314,6 +1313,17 @@
     "interrupt": {
       "errorTitle": "Algo salió mal",
       "pausedTitle": "Bucle en pausa"
+    },
+    "checkIn": {
+      "title_one": "{{count}} paso realizado por su cuenta",
+      "title_other": "{{count}} pasos realizados por su cuenta",
+      "title": "{{count}} pasos realizados por su cuenta",
+      "desc": "No pasa nada: el agente solo se detuvo para que revises lo que ha hecho antes de continuar.",
+      "failedNote_one": "{{count}} paso falló por el camino. Merece un vistazo abajo.",
+      "failedNote_other": "{{count}} pasos fallaron por el camino. Merecen un vistazo abajo.",
+      "failedNote": "{{count}} pasos fallaron por el camino. Merecen un vistazo abajo.",
+      "continue": "Continuar",
+      "stop": "Parar aquí"
     },
     "owed": {
       "title_one": "{{count}} resultado no llegó a la IA",
@@ -1335,7 +1345,6 @@
       "autoContinue": "Continuar por su cuenta",
       "autoContinueHint": "Si está desactivado, tendrás que pulsar Enter en cada paso",
       "sendHint": "Un paso que apruebas sigue esperando a que pulses Enter; solo los pasos sin supervisión se envían solos.",
-      "taskApproved": "Aprobando todo en esta tarea: haz clic para detenerlo",
       "browserFixed": "Leer tus pestañas y marcadores nunca requiere aprobación. Todo cambio sí, de un lote a la vez, y eso no se puede desactivar."
     },
     "approve": {
@@ -1359,15 +1368,6 @@
       "export": "Exportando",
       "complete": "Finalizando",
       "generic": "Ejecutando un paso",
-      "readFile": "Leyendo un archivo",
-      "writeFile": "Escribiendo un archivo",
-      "editFile": "Editando un archivo",
-      "listFiles": "Explorando el espacio de trabajo",
-      "globFiles": "Buscando archivos",
-      "grepFiles": "Buscando dentro de los archivos",
-      "manageFiles": "Reorganizando archivos",
-      "docRead": "Leyendo un documento",
-      "docEdit": "Marcando cambios en un documento",
       "nameLabel": "Acción",
       "statement": "Sentencia",
       "waiting": "Esperándote",
@@ -1389,6 +1389,15 @@
       "systemPrompt": "Prompt del sistema",
       "resultsTitle": "Resultados de herramientas",
       "promptTitle": "Contenido del prompt",
+      "readFile": "Leyendo un archivo",
+      "writeFile": "Escribiendo un archivo",
+      "editFile": "Editando un archivo",
+      "listFiles": "Explorando el espacio de trabajo",
+      "globFiles": "Buscando archivos",
+      "grepFiles": "Buscando dentro de los archivos",
+      "manageFiles": "Reorganizando archivos",
+      "docRead": "Leyendo un documento",
+      "docEdit": "Marcando cambios en un documento",
       "listTabs": "Revisando tus pestañas",
       "listTabGroups": "Revisando tus grupos de pestañas",
       "listBookmarks": "Buscando en tus marcadores",
@@ -1398,7 +1407,7 @@
       "manageTabGroups": "Reorganizando grupos de pestañas",
       "arrangeBookmarks": "Reorganizando marcadores",
       "deleteBookmarks": "Eliminando marcadores",
-      "undoChanges": "Deshaciendo un cambio anterior"
+      "restoreState": "Restaurando un estado anterior"
     },
     "sync": {
       "progress": "Obteniendo el contenido de la conversación — {{current}}/{{total}}",
@@ -1408,12 +1417,14 @@
       "donePartial": "{{count}} conversación(es) sincronizada(s), {{incomplete}} incompleta(s)",
       "remaining": "{{count}} conversación(es) siguen sin mensajes: vuelve a ejecutar la sincronización para continuar"
     },
+    "overlay": {
+      "emptyTitle": "Vista del agente",
+      "emptyHint": "Escribe abajo o elige un prompt de agente para empezar",
+      "scrollToBottom": "Ir al final"
+    },
     "instruction": {
       "placeholder": "Añade una nota para la IA...",
       "sent": "Nota enviada"
-    },
-    "history": {
-      "title": "Pasos"
     },
     "summary": {
       "done": "Tarea finalizada",
@@ -1437,19 +1448,8 @@
       "noSteps": "No se ejecutó ninguna herramienta.",
       "upgrade": "Ver planes",
       "dismiss": "Descartar",
-      "clear": "Limpiar",
-      "keepChanges": "Conservar cambios"
-    },
-    "checkIn": {
-      "title_one": "{{count}} paso realizado por su cuenta",
-      "title_other": "{{count}} pasos realizados por su cuenta",
-      "title": "{{count}} pasos realizados por su cuenta",
-      "desc": "No pasa nada: el agente solo se detuvo para que revises lo que ha hecho antes de continuar.",
-      "failedNote_one": "{{count}} paso falló por el camino. Merece un vistazo abajo.",
-      "failedNote_other": "{{count}} pasos fallaron por el camino. Merecen un vistazo abajo.",
-      "failedNote": "{{count}} pasos fallaron por el camino. Merecen un vistazo abajo.",
-      "continue": "Continuar",
-      "stop": "Parar aquí"
+      "keepChanges": "Conservar cambios",
+      "clear": "Limpiar"
     },
     "undo": {
       "action": "Deshacer cambios",
@@ -1460,25 +1460,20 @@
       "done_one": "Se revirtió {{count}} fila",
       "done_other": "Se revirtieron {{count}} filas",
       "done": "Se revirtieron {{count}} filas",
-      "failed": "No se pudo deshacer: {{message}}",
-      "unavailable": "Estos cambios no se pueden deshacer automáticamente. Motivo: {{reason}}",
       "aiUnaware": "La IA no sabe de esto — díselo antes de continuar la conversación.",
       "reverted": "Cambios revertidos",
       "toastPrompt": "El agente modificó tus datos.",
-      "expired": "No queda nada que deshacer — se inició una nueva tarea o los cambios se conservaron."
-    },
-    "dock": {
-      "speedOff": "Aprobando todo para esta tarea — haz clic para detenerlo",
-      "settings": "Lo que puede hacer",
-      "collapse": "Colapsar",
-      "expand": "Expandir"
-    },
-    "overlay": {
-      "emptyTitle": "Vista del agente",
-      "emptyHint": "Escribe abajo o elige un prompt de agente para empezar",
-      "scrollToBottom": "Ir al final"
+      "expired": "No queda nada que deshacer — se inició una nueva tarea o los cambios se conservaron.",
+      "failed": "No se pudo deshacer: {{message}}",
+      "unavailable": "Estos cambios no se pueden deshacer automáticamente. Motivo: {{reason}}"
     },
     "settings": {
+      "skillsTitle": "Habilidades",
+      "skillsDescription": "Las habilidades definen instrucciones especializadas para el Agente. Las habilidades integradas no se pueden eliminar.",
+      "maxSkills": "Se alcanzó el máximo de 20 habilidades personalizadas.",
+      "mcpTitle": "Servidores MCP",
+      "mcpDescription": "Los servidores MCP proporcionan herramientas que el Agente puede usar.",
+      "mcpToolCount": "{{count}} herramientas",
       "newSkill": "Nueva habilidad",
       "editSkill": "Editar habilidad",
       "skillTitle": "Título",
@@ -1496,12 +1491,6 @@
       "deleteSkillTitle": "Eliminar habilidad",
       "deleteSkillContent": "\"{{title}}\" se eliminará permanentemente. Esto no se puede deshacer.",
       "alwaysOn": "Siempre activa",
-      "skillsTitle": "Habilidades",
-      "skillsDescription": "Las habilidades definen instrucciones especializadas para el Agente. Las habilidades integradas no se pueden eliminar.",
-      "maxSkills": "Se alcanzó el máximo de 20 habilidades personalizadas.",
-      "mcpTitle": "Servidores MCP",
-      "mcpDescription": "Los servidores MCP proporcionan herramientas que el Agente puede usar.",
-      "mcpToolCount": "{{count}} herramientas",
       "agentsTitle": "Agentes",
       "agentsDesc": "Cada agente trabaja sobre cosas distintas y tiene sus propias herramientas. Escribe > en el chat para iniciar uno.",
       "noTools": "Sin herramientas opcionales.",
@@ -1562,6 +1551,10 @@
         "grep_files": "Busca en el contenido con expresiones regulares",
         "manage_files": "Elimina, mueve o crea carpetas"
       },
+      "workspace": {
+        "name": "Archivos",
+        "description": "Lee, escribe, edita y busca archivos de texto"
+      },
       "documents": {
         "name": "Documentos",
         "description": "Lee documentos de Word por esquema y sección"
@@ -1573,10 +1566,6 @@
       "bettersidebar": {
         "name": "Datos de Better Sidebar",
         "description": "Consulta y modifica conversaciones, carpetas, etiquetas y prompts"
-      },
-      "workspace": {
-        "name": "Archivos",
-        "description": "Lee, escribe, edita y busca archivos de texto"
       }
     },
     "entry": {
@@ -1584,9 +1573,55 @@
       "autoDescription": "Describe una tarea y deja que el agente elija las herramientas adecuadas"
     },
     "workspace": {
+      "title": "Espacio de trabajo",
+      "create": "Nuevo espacio de trabajo",
+      "delete": "Eliminar este espacio de trabajo",
+      "clearAll": "Borrar todos los archivos",
+      "clearTitle": "Borrar espacio de trabajo",
+      "deleteTitle": "Eliminar espacio de trabajo",
+      "namePlaceholder": "Nombre del espacio de trabajo",
+      "empty": "Aún no hay archivos. Pídele al agente que escriba algo y aparecerá aquí.",
+      "emptyFile": "Este archivo está vacío.",
+      "lockedHint": "Esta conversación está usando \"{name}\". Inicia un nuevo chat para cambiar.",
+      "busyHint": "Hay una tarea en ejecución. Termínala o detenla antes de cambiar.",
       "paywallWorkspaces": "Múltiples espacios de trabajo",
       "paywallFiles": "Más de {{max}} archivos por espacio de trabajo",
-      "paywallFilesSkipped": "{{files}} archivo(s) omitido(s): el límite gratuito es de {{max}} por espacio de trabajo"
+      "paywallFilesSkipped": "{{files}} archivo(s) omitido(s): el límite gratuito es de {{max}} por espacio de trabajo",
+      "clearWarning": "¿Eliminar los {fileCount} archivo(s) de \"{name}\"? Esta acción no se puede deshacer.",
+      "deleteWarning": "¿Eliminar \"{name}\" y todos sus {fileCount} archivo(s)? Las conversaciones que ya usaban este espacio de trabajo no podrán leer ni escribir archivos. Esta acción no se puede deshacer.",
+      "documentNoPreview": "Los documentos de Office aún no se muestran aquí, pero el agente puede leer este: pídele que resuma el archivo, revise una sección o examine una hoja.",
+      "binaryNoPreview": "Este es un archivo binario. Se guarda exactamente como llegó, pero no se puede mostrar como texto y el agente no puede leerlo.",
+      "largeNoPreview": "Este archivo es demasiado grande para previsualizarlo sin congelar la barra lateral. Descárgalo para leerlo, o pregúntale al agente: lee archivos por fragmentos.",
+      "nameNoSlash": "El nombre no puede contener \"/\".",
+      "confirmDeleteOne": "¿Eliminar \"{{name}}\"? Si es una carpeta, se eliminará también su contenido. Esta acción no se puede deshacer.",
+      "confirmDeleteMany": "¿Eliminar {{count}} elementos? Las carpetas eliminan también su contenido. Esta acción no se puede deshacer.",
+      "deleteFailed": "No se pudieron eliminar {{count}} de los {{total}} elementos.",
+      "moreActions": "Más acciones",
+      "exportAll": "Exportar como ZIP",
+      "searchPlaceholder": "Buscar archivos",
+      "add": "Añadir",
+      "newFile": "Nuevo archivo",
+      "newFolder": "Nueva carpeta",
+      "importFiles": "Importar archivos…",
+      "importFolder": "Importar carpeta…",
+      "noMatches": "Ningún archivo coincide con esa búsqueda.",
+      "dropHint": "Arrastra y suelta archivos o carpetas para añadirlos a este espacio de trabajo",
+      "binaryHint": "Archivo binario. Guardado y descargable, pero el agente no puede leerlo.",
+      "open": "Abrir",
+      "copyContent": "Copiar contenido",
+      "importHere": "Importar archivos aquí…",
+      "downloadZip": "Descargar como ZIP",
+      "uploadedCount": "{{count}} archivo(s) añadido(s)",
+      "renamedCount": "{{count}} renombrado(s) para evitar sobrescribir",
+      "binaryCount": "{{count}} binario(s) (guardados, pero el agente no puede leerlos)",
+      "failedCount": "{{count}} fallido(s)",
+      "uploading": "Subiendo {{done}}/{{total}}…",
+      "dropEmpty": "No hay nada para subir en esa acción de soltar.",
+      "zipping": "Preparando archivo comprimido…",
+      "zippingProgress": "Preparando archivo comprimido {{done}}/{{total}}…",
+      "zipEmpty": "Nada que exportar.",
+      "zipPartial": "Se exportaron {{count}} archivo(s); {{failed}} no se pudieron leer.",
+      "zipDone": "Se exportaron {{count}} archivo(s)."
     },
     "agents": {
       "bettersidebar": {
@@ -1602,6 +1637,9 @@
         "description": "Organiza pestañas, grupos de pestañas y marcadores de Chrome"
       }
     },
+    "switcher": {
+      "label": "Elige un agente"
+    },
     "browserIntro": {
       "title": "Deja que la IA ordene tus pestañas y marcadores",
       "about": "Acerca del Browser Agent",
@@ -1611,48 +1649,45 @@
     "browser": {
       "needsPermission": "🔒 Sin autorizar · haz clic para abrir los permisos",
       "panel": {
-        "approvalNote": "Todos los cambios se aprueban, también el orden.",
-        "permissions": "Permitido: {{list}}",
-        "noPermissions": "Permisos: ninguno concedido todavía",
-        "urlsShared": "URL completas: la IA puede leerlas.",
-        "urlsRedacted": "URL completas: ocultas.",
-        "auditNote": "El registro de auditoría se queda en este equipo.",
         "openSettings": "Permisos y privacidad",
         "viewHistory": "Registros locales",
         "noHistory": "No hay registros que mostrar. Leer el historial también requiere el permiso correspondiente.",
         "detail": "Detalle",
-        "previewUndo": "Previsualizar deshacer",
-        "changeDetail": "Objetos modificados",
-        "truncated": "Cada paso muestra sus primeros 100 cambios. El registro completo se queda en este equipo y el agente puede recorrerlo por páginas.",
-        "approveUndo": "Aprobar y deshacer",
         "cancel": "Cancelar",
         "before": "Antes",
         "after": "Después",
-        "outcome": "{{status}}: {{completed}}/{{planned}}. {{error}}"
+        "outcome": "{{status}}: {{completed}}/{{planned}}. {{error}}",
+        "revertToThis": "Revertir a este",
+        "approveRestore": "Aprobar y restaurar",
+        "noEndState": "Este lote no finalizó, por lo que no se registró ningún estado final.",
+        "recordsTitle": "Registros locales",
+        "recordsIntro": "Cada lote aplicado por el agente se conserva en este equipo. Abre uno para ver el navegador antes y después, y para restaurar cualquiera de los dos estados.",
+        "colWhen": "Cuándo",
+        "colOutcome": "Resultado",
+        "reload": "Recargar",
+        "busySession": "Hay una tarea en ejecución. Restaurar cambiaría el navegador en el que está trabajando, por lo que esperará hasta que la tarea finalice."
       },
       "status": {
         "applied": "Hecho",
         "failed": "Detenido",
         "applying": "En curso",
-        "unknown": "Resultado incierto: revisa el navegador",
-        "undone": "Deshecho"
+        "unknown": "Resultado incierto: revisa el navegador"
       },
       "preview": {
         "scope": "{{count}} operaciones · esta aprobación cubre solo el lote de abajo",
-        "undoPrefix": "Deshacer: ",
         "objects": "{{count}} objetos afectados",
         "firstHundred": " (se muestran los primeros 100)",
         "untitled": "Sin título",
-        "window": "en la ventana {{id}}",
-        "position": "estaba en {{index}}",
-        "folder": "estaba en {{id}}",
-        "object": "Objeto n.º {{id}}",
-        "current": "Ahora",
-        "restoreTo": "Restaurar a",
-        "absent": "no existe",
+        "inThisWindow": "en esta ventana",
+        "inWindow": "en la ventana {{n}}",
+        "inGroup": "en el grupo {{name}}",
+        "inUnnamedGroup": "en un grupo sin nombre",
+        "unnamed": "sin nombre",
+        "inFolder": "en {{name}}",
+        "pinned": "fijada",
         "lossy": "Este lote elimina elementos. Una pestaña cerrada solo se puede recuperar volviendo a abrir su URL: los formularios, la posición de desplazamiento y el estado de la página no están garantizados. Al eliminar una carpeta se elimina todo su contenido, y al restaurar marcadores se crean IDs nuevos. Se aprueba por separado cada vez; ninguna opción permite ejecutarlo sin supervisión.",
         "warning": "Esta aprobación cubre solo las operaciones anteriores. Aquí no se cierra ni se elimina nada: para eso hay herramientas aparte con su propio permiso.",
-        "undoWarning": "Deshacer también necesita aprobación y se detiene en cuanto detecta un cambio externo. Cerrar una pestaña solo se puede deshacer volviendo a abrir su URL: los formularios, la posición de desplazamiento y el estado de la página no están garantizados. Restaurar marcadores crea IDs nuevos."
+        "untouched": "{{count}} objetos más no se modifican"
       },
       "op": {
         "create": "Crear",
@@ -1665,22 +1700,25 @@
         "ungroup": "Quitar del grupo"
       },
       "field": {
-        "tab_id": "Pestaña",
-        "tab_ids": "Pestañas",
-        "group_id": "Grupo",
-        "window_id": "Ventana de destino",
-        "index": "Posición (desde 0)",
         "pinned": "Fijada",
         "collapsed": "Contraído",
         "title": "Título",
-        "id": "Objeto",
-        "parent_id": "Carpeta de destino",
         "url": "Dirección",
         "color": "Color",
-        "windowId": "Ventana",
-        "groupId": "Grupo",
-        "parentId": "Carpeta",
-        "active": "Activa"
+        "folder": "Carpeta de destino",
+        "group": "Grupo",
+        "window": "Ventana de destino"
+      },
+      "color": {
+        "grey": "Gris",
+        "blue": "Azul",
+        "red": "Rojo",
+        "yellow": "Amarillo",
+        "green": "Verde",
+        "pink": "Rosa",
+        "purple": "Morado",
+        "cyan": "Cian",
+        "orange": "Naranja"
       },
       "settings": {
         "title": "Browser Agent",
@@ -1694,10 +1732,62 @@
         "urlToggle": "Permitir que la IA lea las URL completas",
         "urlHelp": "Activado: el enlace completo se envía a la conversación de IA actual. Desactivado: solo el esquema y el host; la ruta, los parámetros y el fragmento quedan ocultos. Las direcciones ya enviadas no se pueden retirar.",
         "done": "Listo"
+      },
+      "tree": {
+        "thisWindow": "Esta ventana",
+        "window": "Ventana",
+        "windowN": "Ventana {{n}}",
+        "pinned": "Fijadas",
+        "unnamedGroup": "Grupo sin nombre",
+        "willReopen": "reabrir",
+        "willCreate": "volver a añadir",
+        "willRestore": "volver a mover",
+        "empty": "No se registró nada aquí.",
+        "childCount": "({{count}})"
+      },
+      "restore": {
+        "headingBefore": "Restaurar el estado previo a este lote",
+        "headingAfter": "Restaurar el estado posterior a este lote",
+        "counts": "{{restore}} para volver a mover · {{reopen}} para reabrir · {{create}} para volver a añadir · {{keep}} ya en su lugar",
+        "extra": "{{count}} elementos abiertos o añadidos desde entonces se conservan como están. No se cierra ni elimina nada.",
+        "additive": "No se cierra ni se elimina nada. Todo lo más reciente se conserva.",
+        "note": "Una página reabierta vuelve solo a su dirección: las entradas de formularios, la posición de desplazamiento y el estado de la página no se restauran. Un marcador vuelto a añadir es una copia nueva."
+      },
+      "examples": {
+        "group": {
+          "label": "Agrupar pestañas por tema",
+          "text": "Observa las pestañas de esta ventana y agrúpalas según su temática. Asigna un nombre y un color a cada grupo, no toques las fijadas y muéstrame el plan antes de mover nada. No cierres ninguna pestaña."
+        },
+        "duplicates": {
+          "label": "Buscar duplicados",
+          "text": "Busca las pestañas que tengo abiertas más de una vez. Considera dos direcciones como la misma página solo si la consulta y el fragmento también coinciden. Lístalas agrupadas por página, las más antiguas primero, y dime cuántas recuperaría; no las cierres todavía."
+        },
+        "stash": {
+          "label": "Guardar pestañas en marcadores",
+          "text": "Quiero reducir esta ventana a solo aquellas en las que estoy trabajando actualmente. Guarda todo lo demás en una carpeta nueva con la fecha de hoy, mantén abiertas las fijadas y las de mi empresa, y muéstrame la lista antes de cerrar una sola pestaña."
+        },
+        "bookmarks": {
+          "label": "Organizar los marcadores",
+          "text": "Revisa mi barra de marcadores. Agrupa los sueltos en carpetas por tema y muévelos dentro, renombra aquellos cuyo título sigue siendo el de la página por algo reconocible y avísame de los que parezcan duplicados en lugar de eliminarlos."
+        },
+        "open": {
+          "label": "Configurar un espacio de trabajo",
+          "text": "Abre las pestañas que necesito para una sesión de revisión: nuestro repositorio, el gestor de incidencias y el documento de diseño. Ponlas en un grupo llamado Review, fija el repositorio y deja todo lo que ya tengo abierto tal como está."
+        },
+        "prune": {
+          "label": "Limpiar marcadores obsoletos",
+          "text": "Muéstrame los marcadores que parezcan obsoletos: sin título, páginas de resultados de búsqueda o guardados dos veces. Lístalos con la carpeta en la que está cada uno y permíteme elegir cuáles eliminar en lugar de decidir por mí."
+        }
+      },
+      "phrasesTitle": "O simplemente pide",
+      "phrases": {
+        "listTabs": "¿Qué tengo abierto en esta ventana?",
+        "groupThis": "Agrupa estas pestañas por tema",
+        "findDupes": "Encuentra mis pestañas duplicadas",
+        "bookmarkAll": "Guarda esta ventana en una nueva carpeta de marcadores",
+        "sortBar": "Organiza mi barra de marcadores",
+        "pinFew": "Fija las pestañas a las que cambio constantemente"
       }
-    },
-    "switcher": {
-      "label": "Elige un agente"
     },
     "workspaceIntro": {
       "title": "Colabora con la IA en tus documentos de Workspace",
@@ -1740,10 +1830,5 @@
     "reasonPreMergeDelete": "Antes de eliminación masiva",
     "reasonPreRestore": "Antes de restaurar"
   },
-  "spark": {
-    "tasks": "Tareas",
-    "schedules": "Programaciones",
-    "skills": "Habilidades",
-    "apps": "Apps conectadas"
-  }
+  "options": {}
 }

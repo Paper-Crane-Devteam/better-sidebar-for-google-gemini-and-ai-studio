@@ -12,11 +12,19 @@
     "copy": "コピー",
     "close": "閉じる",
     "loading": "読み込み中...",
+    "move": "動く",
     "settings": "設定",
     "preferences": "設定",
     "untitled": "無題",
-    "move": "動く",
-    "view": "表示"
+    "view": "表示",
+    "pageRange": "{{from}} - {{to}} / 全{{total}}件",
+    "prevPage": "前へ",
+    "nextPage": "次へ",
+    "copied": "コピーしました",
+    "download": "ダウンロード",
+    "back": "戻る",
+    "clear": "クリア",
+    "rename": "名前を変更"
   },
   "tabs": {
     "files": "ファイル",
@@ -31,6 +39,12 @@
     "snippets": "スニペット",
     "spark": "Spark",
     "agent": "Agent"
+  },
+  "spark": {
+    "tasks": "タスク",
+    "schedules": "スケジュール",
+    "skills": "スキル",
+    "apps": "連携アプリ"
   },
   "sidebar": {
     "newConversation": "新しい会話",
@@ -385,25 +399,6 @@
     "chats": "チャット",
     "moreFilters": "その他のフィルター"
   },
-  "outline": {
-    "title": "アウトライン",
-    "placeholder": "会話を開くとアウトラインが表示されます",
-    "search": "アウトラインを検索",
-    "searchPlaceholder": "全文検索...",
-    "filterAll": "すべて",
-    "filterHeadings": "見出し",
-    "filterCode": "コード",
-    "noConversation": "会話が開かれていません",
-    "noConversationHint": "会話を開くとアウトラインが表示されます",
-    "empty": "アウトラインの内容がありません",
-    "noResults": "一致する項目がありません",
-    "copy": "コピー",
-    "copyQuery": "質問をコピー",
-    "copyResponse": "回答をコピー",
-    "expandAll": "すべて展開",
-    "collapseAll": "すべて折りたたむ",
-    "navigate": "メッセージに移動"
-  },
   "node": {
     "newFolder": "サブフォルダを作成",
     "newFolderName": "新しいフォルダ",
@@ -460,20 +455,6 @@
     "defaultTargetMoved": "「{{name}}」を「{{from}}」からここに移動しました",
     "defaultTargetRemoved": "「{{name}}」のデフォルト保存先を解除しました",
     "defaultTargetFailed": "デフォルトフォルダーの更新に失敗しました"
-  },
-  "folderColor": {
-    "indigo": "インディゴ",
-    "violet": "バイオレット",
-    "pink": "ピンク",
-    "red": "赤",
-    "orange": "オレンジ",
-    "yellow": "黄色",
-    "green": "緑",
-    "teal": "ティール",
-    "cyan": "シアン",
-    "blue": "青",
-    "lavender": "ラベンダー",
-    "rose": "ローズ"
   },
   "presetColor": {
     "indigo": "インディゴ",
@@ -596,7 +577,6 @@
     "platforms": "対応プラットフォーム",
     "enablePlatform": "{{platform}} で有効にする"
   },
-  "options": {},
   "feedback": {
     "title": "お問い合わせ",
     "description": "ご意見、ご提案、またはバグを見つけましたか？以下のいずれかのチャンネルからご連絡ください。",
@@ -609,6 +589,10 @@
     "emailTitle": "メール",
     "emailButton": "メールを送信",
     "thankYou": "改善にご協力いただきありがとうございます"
+  },
+  "dataManagement": {
+    "resetDatabase": "データベースをリセット",
+    "resetDatabaseConfirm": "ローカルデータのみが削除されます。リモートバックアップ（ある場合）は影響を受けません。リモートデータを消去するには、リセット後に「ドライブにバックアップ」を実行してください。"
   },
   "search": {
     "title": "検索",
@@ -658,9 +642,6 @@
     "stop": "停止",
     "progress": "同期中：{{done}} / {{total}}",
     "progressFailed": "{{count}} 件失敗",
-    "pageRange": "{{from}} - {{to}} / 全{{total}}件",
-    "prevPage": "前へ",
-    "nextPage": "次へ",
     "nothingToSync": "すべてのチャットはすでに同期されています。",
     "loadFailed": "チャットリストの読み込みに失敗しました。",
     "batchDone": "{{count}}個のチャットを正常に同期しました。",
@@ -700,10 +681,6 @@
     "logProcessed": "処理済み {{current}}/{{total}}...",
     "logComplete": "インポート完了：{{count}} 件をインポートしました。",
     "logCriticalError": "重大なエラー：{{message}}"
-  },
-  "dataManagement": {
-    "resetDatabase": "データベースをリセット",
-    "resetDatabaseConfirm": "ローカルデータのみが削除されます。リモートバックアップ（ある場合）は影響を受けません。リモートデータを消去するには、リセット後に「ドライブにバックアップ」を実行してください。"
   },
   "rating": {
     "title": "この拡張機能は気に入りましたか？",
@@ -1008,6 +985,25 @@
     "eraseNoConversation": "まだ会話が読み込まれていません",
     "eraseFailed": "保存済みメッセージを消去できませんでした"
   },
+  "outline": {
+    "title": "アウトライン",
+    "placeholder": "会話を開くとアウトラインが表示されます",
+    "search": "アウトラインを検索",
+    "searchPlaceholder": "全文検索...",
+    "filterAll": "すべて",
+    "filterHeadings": "見出し",
+    "filterCode": "コード",
+    "noConversation": "会話が開かれていません",
+    "noConversationHint": "会話を開くとアウトラインが表示されます",
+    "empty": "アウトラインの内容がありません",
+    "noResults": "一致する項目がありません",
+    "copy": "コピー",
+    "copyQuery": "質問をコピー",
+    "copyResponse": "回答をコピー",
+    "expandAll": "すべて展開",
+    "collapseAll": "すべて折りたたむ",
+    "navigate": "メッセージに移動"
+  },
   "firstInstall": {
     "title": "会話リストをインポートしますか？",
     "description": "デフォルトでは、最近の会話のみが記録されます。",
@@ -1227,6 +1223,7 @@
       "safety": "操作対象はローカルデータベースのみです。変更前に必ず確認します。",
       "freeTier": "無料プランは読み取り専用です。アップグレードするとエージェントが変更できるようになります。",
       "manage": "スキルとツール",
+      "workspace": "ワークスペース",
       "stepsTitle": "使い方",
       "step1": "任意のチャット画面を開きます。",
       "step2": "入力欄に > と入力し、エージェントを選択します。",
@@ -1297,9 +1294,11 @@
       "paused": "一時停止中",
       "error": "エラー"
     },
-    "header": {
-      "step": "ステップ {{count}}",
-      "speedHint": "このタスクの残りは確認なしで進みます"
+    "dock": {
+      "speedOff": "このタスクではすべて自動承認中 — クリックで停止",
+      "settings": "できること",
+      "collapse": "折りたたむ",
+      "expand": "展開"
     },
     "actions": {
       "stop": "停止",
@@ -1314,6 +1313,17 @@
     "interrupt": {
       "errorTitle": "問題が発生しました",
       "pausedTitle": "ループを一時停止しました"
+    },
+    "checkIn": {
+      "title_one": "{{count}} 件のステップを自動で実行しました",
+      "title_other": "{{count}} 件のステップを自動で実行しました",
+      "title": "{{count}} 件のステップを自動で実行しました",
+      "desc": "問題はありません。続行する前に実行内容を確認できるよう、エージェントが一時停止しました。",
+      "failedNote_one": "途中で {{count}} 件のステップが失敗しました。下で確認してください。",
+      "failedNote_other": "途中で {{count}} 件のステップが失敗しました。下で確認してください。",
+      "failedNote": "途中で {{count}} 件のステップが失敗しました。下で確認してください。",
+      "continue": "続行",
+      "stop": "ここで停止"
     },
     "owed": {
       "title_one": "{{count}} 件の結果が AI に届いていません",
@@ -1335,7 +1345,6 @@
       "autoContinue": "自動で進める",
       "autoContinueHint": "オフの場合、各ステップごとに Enter を押す必要があります",
       "sendHint": "あなたが承認したステップは Enter を押すまで待ちます。承認が不要なステップだけ自動で送信されます。",
-      "taskApproved": "このタスクではすべて承認中 — 停止するにはクリック",
       "browserFixed": "タブやブックマークの読み取りに承認は要りません。変更はすべて、一まとまりごとに確認します。これはオフにできません。"
     },
     "approve": {
@@ -1359,15 +1368,6 @@
       "export": "エクスポートしています",
       "complete": "仕上げています",
       "generic": "ステップを実行しています",
-      "readFile": "ファイルを読んでいます",
-      "writeFile": "ファイルを書き込んでいます",
-      "editFile": "ファイルを編集しています",
-      "listFiles": "ワークスペースを確認しています",
-      "globFiles": "ファイルを探しています",
-      "grepFiles": "ファイルの中を検索しています",
-      "manageFiles": "ファイルを整理しています",
-      "docRead": "ドキュメントを読んでいます",
-      "docEdit": "ドキュメントに変更履歴を記録しています",
       "nameLabel": "操作",
       "statement": "実行文",
       "waiting": "あなたの操作を待っています",
@@ -1389,6 +1389,15 @@
       "systemPrompt": "システムプロンプト",
       "resultsTitle": "ツール結果",
       "promptTitle": "プロンプト内容",
+      "readFile": "ファイルを読んでいます",
+      "writeFile": "ファイルを書き込んでいます",
+      "editFile": "ファイルを編集しています",
+      "listFiles": "ワークスペースを確認しています",
+      "globFiles": "ファイルを探しています",
+      "grepFiles": "ファイルの中を検索しています",
+      "manageFiles": "ファイルを整理しています",
+      "docRead": "ドキュメントを読んでいます",
+      "docEdit": "ドキュメントに変更履歴を記録しています",
       "listTabs": "タブを確認しています",
       "listTabGroups": "タブグループを確認しています",
       "listBookmarks": "ブックマークを見ています",
@@ -1398,7 +1407,7 @@
       "manageTabGroups": "タブグループを整理しています",
       "arrangeBookmarks": "ブックマークを整理しています",
       "deleteBookmarks": "ブックマークを削除しています",
-      "undoChanges": "以前の変更を元に戻しています"
+      "restoreState": "以前の状態に復元中"
     },
     "sync": {
       "progress": "会話の内容を取得しています — {{current}}/{{total}}",
@@ -1408,12 +1417,14 @@
       "donePartial": "{{count}} 件の会話を同期しました（{{incomplete}} 件は未完了）",
       "remaining": "{{count}} 件の会話にまだメッセージがありません。もう一度同期を実行して続けてください"
     },
+    "overlay": {
+      "emptyTitle": "エージェントビュー",
+      "emptyHint": "下に入力するか、エージェントプロンプトを選んで開始",
+      "scrollToBottom": "一番下へ"
+    },
     "instruction": {
       "placeholder": "AI へのメモを追加…",
       "sent": "メモを送信しました"
-    },
-    "history": {
-      "title": "ステップ"
     },
     "summary": {
       "done": "タスク完了",
@@ -1437,19 +1448,8 @@
       "noSteps": "ツールは実行されませんでした。",
       "upgrade": "プランを見る",
       "dismiss": "閉じる",
-      "clear": "クリア",
-      "keepChanges": "変更を保持"
-    },
-    "checkIn": {
-      "title_one": "{{count}} 件のステップを自動で実行しました",
-      "title_other": "{{count}} 件のステップを自動で実行しました",
-      "title": "{{count}} 件のステップを自動で実行しました",
-      "desc": "問題はありません。続行する前に実行内容を確認できるよう、エージェントが一時停止しました。",
-      "failedNote_one": "途中で {{count}} 件のステップが失敗しました。下で確認してください。",
-      "failedNote_other": "途中で {{count}} 件のステップが失敗しました。下で確認してください。",
-      "failedNote": "途中で {{count}} 件のステップが失敗しました。下で確認してください。",
-      "continue": "続行",
-      "stop": "ここで停止"
+      "keepChanges": "変更を保持",
+      "clear": "クリア"
     },
     "undo": {
       "action": "変更を取り消す",
@@ -1460,25 +1460,20 @@
       "done_one": "{{count}} 件のレコードを元に戻しました",
       "done_other": "{{count}} 件のレコードを元に戻しました",
       "done": "{{count}} 件のレコードを元に戻しました",
-      "failed": "取り消しに失敗しました: {{message}}",
-      "unavailable": "これらの変更は自動では取り消せません。理由: {{reason}}",
       "aiUnaware": "AIはこの操作を知りません — 会話を続ける前に伝えてください。",
       "reverted": "変更を元に戻しました",
       "toastPrompt": "エージェントがデータを変更しました。",
-      "expired": "元に戻すものがありません — 新しいタスクが開始されたか、変更が保持されました。"
-    },
-    "dock": {
-      "speedOff": "このタスクではすべて自動承認中 — クリックで停止",
-      "settings": "できること",
-      "collapse": "折りたたむ",
-      "expand": "展開"
-    },
-    "overlay": {
-      "emptyTitle": "エージェントビュー",
-      "emptyHint": "下に入力するか、エージェントプロンプトを選んで開始",
-      "scrollToBottom": "一番下へ"
+      "expired": "元に戻すものがありません — 新しいタスクが開始されたか、変更が保持されました。",
+      "failed": "取り消しに失敗しました: {{message}}",
+      "unavailable": "これらの変更は自動では取り消せません。理由: {{reason}}"
     },
     "settings": {
+      "skillsTitle": "スキル",
+      "skillsDescription": "スキルはエージェント向けの専門的なプロンプト指示を定義します。組み込みスキルは削除できません。",
+      "maxSkills": "カスタムスキルの上限（20個）に達しました。",
+      "mcpTitle": "MCP サーバー",
+      "mcpDescription": "MCP サーバーはエージェントが使用できるツールを提供します。",
+      "mcpToolCount": "{{count}} ツール",
       "newSkill": "新規スキル",
       "editSkill": "スキルを編集",
       "skillTitle": "タイトル",
@@ -1496,12 +1491,6 @@
       "deleteSkillTitle": "スキルを削除",
       "deleteSkillContent": "「{{title}}」は完全に削除されます。この操作は元に戻せません。",
       "alwaysOn": "常にオン",
-      "skillsTitle": "スキル",
-      "skillsDescription": "スキルはエージェント向けの専門的なプロンプト指示を定義します。組み込みスキルは削除できません。",
-      "maxSkills": "カスタムスキルの上限（20個）に達しました。",
-      "mcpTitle": "MCP サーバー",
-      "mcpDescription": "MCP サーバーはエージェントが使用できるツールを提供します。",
-      "mcpToolCount": "{{count}} ツール",
       "agentsTitle": "エージェント",
       "agentsDesc": "エージェントごとに扱う対象とツールが異なります。入力欄で > と打つと起動します。",
       "noTools": "任意ツールはありません。",
@@ -1562,6 +1551,10 @@
         "grep_files": "正規表現でファイル内容を検索",
         "manage_files": "削除・移動・フォルダ作成"
       },
+      "workspace": {
+        "name": "ファイル",
+        "description": "テキストファイルの読み書き・編集・検索"
+      },
       "documents": {
         "name": "ドキュメント",
         "description": "Word 文書をアウトラインとセクション単位で読む"
@@ -1573,10 +1566,6 @@
       "bettersidebar": {
         "name": "Better Sidebar のデータ",
         "description": "会話・フォルダ・タグ・プロンプトの照会と変更"
-      },
-      "workspace": {
-        "name": "ファイル",
-        "description": "テキストファイルの読み書き・編集・検索"
       }
     },
     "entry": {
@@ -1584,9 +1573,55 @@
       "autoDescription": "タスクを説明すると、エージェントが適切なツールを選びます"
     },
     "workspace": {
+      "title": "ワークスペース",
+      "create": "新しいワークスペース",
+      "delete": "このワークスペースを削除",
+      "clearAll": "すべてのファイルをクリア",
+      "clearTitle": "ワークスペースをクリア",
+      "deleteTitle": "ワークスペースを削除",
+      "namePlaceholder": "ワークスペース名",
+      "empty": "ファイルはまだありません。エージェントに書き込みを依頼すると、ここに表示されます。",
+      "emptyFile": "ファイルは空です。",
+      "lockedHint": "この会話は「{name}」を使用しています。切り替えるには新しいチャットを開始してください。",
+      "busyHint": "タスクが実行中です。切り替える前に完了または停止してください。",
       "paywallWorkspaces": "複数のワークスペース",
       "paywallFiles": "ワークスペースあたり {{max}} 件を超えるファイル",
-      "paywallFilesSkipped": "{{files}} 件のファイルをスキップしました — 無料プランはワークスペースごとに最大 {{max}} 件です"
+      "paywallFilesSkipped": "{{files}} 件のファイルをスキップしました — 無料プランはワークスペースごとに最大 {{max}} 件です",
+      "clearWarning": "「{name}」内のすべてのファイル（{fileCount} 件）を削除しますか？この操作は元に戻せません。",
+      "deleteWarning": "「{name}」とその中のすべてのファイル（{fileCount} 件）を削除しますか？このワークスペースを使用していた会話では、ファイルの読み書きができなくなります。この操作は元に戻せません。",
+      "documentNoPreview": "Office ドキュメントのプレビューは現在サポートされていませんが、エージェントはこのファイルを読み取ることができます。要約、特定のセクションの確認、シートの分析などを依頼してください。",
+      "binaryNoPreview": "これはバイナリファイルです。そのまま保存されていますが、テキストとして表示することはできず、エージェントも読み取ることができません。",
+      "largeNoPreview": "このファイルは大きすぎるため、サイドバーのフリーズを防ぐためにプレビューできません。ダウンロードして確認するか、エージェントにお尋ねください（エージェントはファイルを分割して読み取ります）。",
+      "nameNoSlash": "名前に \"/\" を含めることはできません。",
+      "confirmDeleteOne": "「{{name}}」を削除しますか？フォルダーの場合、その中身も一緒に削除されます。この操作は元に戻せません。",
+      "confirmDeleteMany": "{{count}} 件のアイテムを削除しますか？フォルダーはその中身も一緒に削除されます。この操作は元に戻せません。",
+      "deleteFailed": "{{total}} 件中 {{count}} 件のアイテムを削除できませんでした。",
+      "moreActions": "その他の操作",
+      "exportAll": "ZIP としてエクスポート",
+      "searchPlaceholder": "ファイルを検索",
+      "add": "追加",
+      "newFile": "新規ファイル",
+      "newFolder": "新規フォルダー",
+      "importFiles": "ファイルをインポート…",
+      "importFolder": "フォルダーをインポート…",
+      "noMatches": "検索に一致するファイルはありません。",
+      "dropHint": "ファイルまたはフォルダーをドロップしてワークスペースに追加",
+      "binaryHint": "バイナリファイルです。保存されダウンロード可能ですが、エージェントは読み取れません。",
+      "open": "開く",
+      "copyContent": "内容をコピー",
+      "importHere": "ここにファイルをインポート…",
+      "downloadZip": "ZIP としてダウンロード",
+      "uploadedCount": "{{count}} 件のファイルを追加しました",
+      "renamedCount": "上書きを防ぐため {{count}} 件の名前を変更しました",
+      "binaryCount": "{{count}} 件のバイナリ（保存済みですが、エージェントは読み取れません）",
+      "failedCount": "{{count}} 件失敗",
+      "uploading": "アップロード中 {{done}}/{{total}}…",
+      "dropEmpty": "ドロップされた項目にアップロード可能なものがありません。",
+      "zipping": "アーカイブを準備中…",
+      "zippingProgress": "アーカイブを準備中 {{done}}/{{total}}…",
+      "zipEmpty": "エクスポートするものがありません。",
+      "zipPartial": "{{count}} 件のファイルをエクスポートしました（{{failed}} 件は読み取れませんでした）。",
+      "zipDone": "{{count}} 件のファイルをエクスポートしました。"
     },
     "agents": {
       "bettersidebar": {
@@ -1602,6 +1637,9 @@
         "description": "Chrome のタブ・タブグループ・ブックマークを整理する"
       }
     },
+    "switcher": {
+      "label": "エージェントを選択"
+    },
     "browserIntro": {
       "title": "タブとブックマークの整理を AI に任せる",
       "about": "Browser Agent について",
@@ -1611,48 +1649,45 @@
     "browser": {
       "needsPermission": "🔒 未許可 · クリックして権限設定を開く",
       "panel": {
-        "approvalNote": "並べ替えを含め、すべての変更に承認が必要です。",
-        "permissions": "許可済み：{{list}}",
-        "noPermissions": "権限：まだ許可されていません",
-        "urlsShared": "完全な URL：AI が読み取れます。",
-        "urlsRedacted": "完全な URL：マスクされています。",
-        "auditNote": "監査記録はこの端末にのみ保存されます。",
         "openSettings": "権限とプライバシー",
         "viewHistory": "ローカル記録",
         "noHistory": "表示できる記録がありません。履歴の閲覧にも対応する権限が必要です。",
         "detail": "詳細",
-        "previewUndo": "取り消しをプレビュー",
-        "changeDetail": "変更されたオブジェクト",
-        "truncated": "各ステップは最初の 100 件の変更のみ表示します。完全な記録はこの端末に残り、エージェントがページ単位で参照できます。",
-        "approveUndo": "承認して取り消す",
         "cancel": "キャンセル",
         "before": "変更前",
         "after": "変更後",
-        "outcome": "{{status}}：{{completed}}/{{planned}}。{{error}}"
+        "outcome": "{{status}}：{{completed}}/{{planned}}。{{error}}",
+        "revertToThis": "この状態に戻す",
+        "approveRestore": "承認して復元",
+        "noEndState": "このバッチは完了しなかったため、終了状態は記録されませんでした。",
+        "recordsTitle": "ローカル履歴",
+        "recordsIntro": "エージェントが適用したすべてのバッチ記録はローカルに保持されます。記録を開くと適用前後のブラウザ状態を確認し、元に戻すことができます。",
+        "colWhen": "日時",
+        "colOutcome": "結果",
+        "reload": "再読み込み",
+        "busySession": "タスクを実行中です。復元を行うと操作中のブラウザが変更されるため、タスク終了まで待機します。"
       },
       "status": {
         "applied": "完了",
         "failed": "停止",
         "applying": "実行中",
-        "unknown": "結果が不確かです。ブラウザーを確認してください",
-        "undone": "取り消し済み"
+        "unknown": "結果が不確かです。ブラウザーを確認してください"
       },
       "preview": {
         "scope": "{{count}} 件の操作 · この承認は下のバッチのみが対象です",
-        "undoPrefix": "取り消し：",
         "objects": "{{count}} 件のオブジェクトが対象",
         "firstHundred": "（先頭 100 件を表示）",
         "untitled": "タイトルなし",
-        "window": "ウィンドウ {{id}}",
-        "position": "元の位置 {{index}}",
-        "folder": "元のフォルダ {{id}}",
-        "object": "オブジェクト #{{id}}",
-        "current": "現在",
-        "restoreTo": "戻す先",
-        "absent": "存在しません",
+        "inThisWindow": "このウィンドウ内",
+        "inWindow": "ウィンドウ {{n}} 内",
+        "inGroup": "グループ「{{name}}」内",
+        "inUnnamedGroup": "名称未設定グループ内",
+        "unnamed": "名称未設定",
+        "inFolder": "「{{name}}」内",
+        "pinned": "固定済み",
         "lossy": "このバッチは対象を削除します。閉じたタブはリンクを再度開くことでしか復元できず、フォームの入力内容やスクロール位置、ページの状態は保証されません。フォルダを削除すると中身もすべて削除され、ブックマークの復元では新しい ID が作成されます。この種の操作は毎回個別に承認が必要で、どの設定でも自動実行はできません。",
         "warning": "この承認は上の操作だけに適用されます。ここでは何も閉じたり削除したりしません。それらは別の権限が必要な別のツールです。",
-        "undoWarning": "取り消しにも承認が必要で、外部からの変更を見つけた時点で停止します。タブを閉じた操作は URL を開き直すことでしか取り消せず、フォーム、スクロール位置、ページの実行状態は保証されません。ブックマークの復元では新しい ID が発行されます。"
+        "untouched": "他の {{count}} 件のオブジェクトは変更されません"
       },
       "op": {
         "create": "作成",
@@ -1665,22 +1700,25 @@
         "ungroup": "グループから外す"
       },
       "field": {
-        "tab_id": "タブ",
-        "tab_ids": "タブ",
-        "group_id": "グループ",
-        "window_id": "移動先のウィンドウ",
-        "index": "位置（0 から）",
         "pinned": "固定",
         "collapsed": "折りたたみ",
         "title": "タイトル",
-        "id": "オブジェクト",
-        "parent_id": "移動先のフォルダ",
         "url": "アドレス",
         "color": "色",
-        "windowId": "ウィンドウ",
-        "groupId": "グループ",
-        "parentId": "フォルダ",
-        "active": "アクティブ"
+        "folder": "保存先フォルダー",
+        "group": "グループ",
+        "window": "対象ウィンドウ"
+      },
+      "color": {
+        "grey": "グレー",
+        "blue": "ブルー",
+        "red": "レッド",
+        "yellow": "イエロー",
+        "green": "グリーン",
+        "pink": "ピンク",
+        "purple": "パープル",
+        "cyan": "シアン",
+        "orange": "オレンジ"
       },
       "settings": {
         "title": "Browser Agent",
@@ -1694,10 +1732,62 @@
         "urlToggle": "AI に完全な URL の読み取りを許可する",
         "urlHelp": "オン：完全なリンクが現在の AI 会話に送られます。オフ：スキームとホストのみで、パス、クエリ、フラグメントは隠されます。すでに送られたアドレスは取り消せません。",
         "done": "完了"
+      },
+      "tree": {
+        "thisWindow": "このウィンドウ",
+        "window": "ウィンドウ",
+        "windowN": "ウィンドウ {{n}}",
+        "pinned": "固定タブ",
+        "unnamedGroup": "名称未設定グループ",
+        "willReopen": "再度開く",
+        "willCreate": "再追加",
+        "willRestore": "元に戻す",
+        "empty": "ここには何も記録されていません。",
+        "childCount": "({{count}})"
+      },
+      "restore": {
+        "headingBefore": "このバッチ実行前の状態に復元",
+        "headingAfter": "このバッチ実行後の状態に復元",
+        "counts": "元に戻す {{restore}} 件 · 再度開く {{reopen}} 件 · 再追加 {{create}} 件 · そのまま維持 {{keep}} 件",
+        "extra": "その後開いた、または追加された {{count}} 件の項目はそのまま保持されます。閉じられたり削除されたりすることはありません。",
+        "additive": "何も閉じたり削除したりしません。新しいものはすべて保持されます。",
+        "note": "再度開いたページは URL のみが復元されます。フォーム入力、スクロール位置、ページ状態は復元されません。再追加されたブックマークは新規コピーになります。"
+      },
+      "examples": {
+        "group": {
+          "label": "トピック別にタブをグループ化",
+          "text": "このウィンドウ内のタブを確認し、内容ごとにグループ化してください。各グループにトピック名と色を付け、固定タブには触れず、変更前にプランを表示してください。タブは閉じないでください。"
+        },
+        "duplicates": {
+          "label": "重複タブを検索",
+          "text": "複数回開いているタブを検索してください。クエリとフラグメントも一致する場合のみ同一ページと見なします。ページごとにグループ化して古い順に一覧表示し、いくつ整理できるか教えてください（まだ閉じないでください）。"
+        },
+        "stash": {
+          "label": "タブをブックマークに退避",
+          "text": "このウィンドウを今作業している数枚のタブだけに絞りたいです。他のすべてを今日の日付のフォルダーにブックマークし、固定タブと自社ドメインのタブは開いたままにして、閉じる前に一覧を見せてください。"
+        },
+        "bookmarks": {
+          "label": "ブックマークを整理",
+          "text": "ブックマークバーを整理してください。ばらばらのものをトピック別のフォルダーにまとめて移動し、タイトルがページタイトルのままのものをわかりやすい名前に変更し、重複しそうなものを削除せずに教えてください。"
+        },
+        "open": {
+          "label": "ワークスペースを準備",
+          "text": "レビューに必要なタブ（リポジトリ、イシュートラッカー、設計ドキュメント）を開いてください。「Review」という1つのグループにまとめ、リポジトリを固定し、既に開いているタブはそのままにしてください。"
+        },
+        "prune": {
+          "label": "不要なブックマークを整理",
+          "text": "不要と思われるブックマーク（無題のもの、検索結果ページ、二重保存されたもの）を表示してください。各フォルダー名とともに一覧化し、勝手に削除せず自分で選べるようにしてください。"
+        }
+      },
+      "phrasesTitle": "または直接指示",
+      "phrases": {
+        "listTabs": "このウィンドウで開いているタブは何？",
+        "groupThis": "これらのタブをトピック別にグループ化して",
+        "findDupes": "重複しているタブを見つけて",
+        "bookmarkAll": "このウィンドウのタブを新しいフォルダーにブックマークして",
+        "sortBar": "ブックマークバーを整理して",
+        "pinFew": "よく切り替えるタブを固定して"
       }
-    },
-    "switcher": {
-      "label": "エージェントを選択"
     },
     "workspaceIntro": {
       "title": "AI と一緒にワークスペース文書を操作",
@@ -1740,10 +1830,5 @@
     "reasonPreMergeDelete": "一括削除前",
     "reasonPreRestore": "復元前"
   },
-  "spark": {
-    "tasks": "タスク",
-    "schedules": "スケジュール",
-    "skills": "スキル",
-    "apps": "連携アプリ"
-  }
+  "options": {}
 }

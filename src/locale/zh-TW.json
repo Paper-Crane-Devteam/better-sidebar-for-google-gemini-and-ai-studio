@@ -12,11 +12,19 @@
     "copy": "複製",
     "close": "關閉",
     "loading": "載入中...",
+    "move": "移動",
     "settings": "設定",
     "preferences": "偏好設定",
     "untitled": "未命名",
-    "move": "移動",
-    "view": "查看"
+    "view": "查看",
+    "pageRange": "第 {{from}} - {{to}} 筆，共 {{total}} 筆",
+    "prevPage": "上一頁",
+    "nextPage": "下一頁",
+    "copied": "已複製",
+    "download": "下載",
+    "back": "返回",
+    "clear": "清空",
+    "rename": "重新命名"
   },
   "tabs": {
     "files": "檔案",
@@ -31,6 +39,12 @@
     "snippets": "片段",
     "spark": "Spark",
     "agent": "Agent"
+  },
+  "spark": {
+    "tasks": "任務",
+    "schedules": "排程",
+    "skills": "技能",
+    "apps": "已連接應用"
   },
   "sidebar": {
     "newConversation": "新增對話",
@@ -385,25 +399,6 @@
     "chats": "對話",
     "moreFilters": "更多篩選"
   },
-  "outline": {
-    "title": "大綱",
-    "placeholder": "開啟對話以查看大綱",
-    "search": "搜尋大綱",
-    "searchPlaceholder": "全文搜尋...",
-    "filterAll": "全部",
-    "filterHeadings": "標題",
-    "filterCode": "程式碼",
-    "noConversation": "未開啟對話",
-    "noConversationHint": "開啟對話以查看大綱",
-    "empty": "暫無大綱內容",
-    "noResults": "無符合項目",
-    "copy": "複製",
-    "copyQuery": "複製問題",
-    "copyResponse": "複製回覆",
-    "expandAll": "全部展開",
-    "collapseAll": "全部收合",
-    "navigate": "跳轉到訊息"
-  },
   "node": {
     "newFolder": "建立子資料夾",
     "newFolderName": "新增資料夾",
@@ -460,20 +455,6 @@
     "defaultTargetMoved": "「{{name}}」已從「{{from}}」移到這裡",
     "defaultTargetRemoved": "「{{name}}」不再預設儲存到此資料夾",
     "defaultTargetFailed": "更新預設資料夾失敗"
-  },
-  "folderColor": {
-    "indigo": "靛藍",
-    "violet": "紫羅蘭",
-    "pink": "粉紅",
-    "red": "紅色",
-    "orange": "橘色",
-    "yellow": "黃色",
-    "green": "綠色",
-    "teal": "青色",
-    "cyan": "藍綠",
-    "blue": "藍色",
-    "lavender": "薰衣草",
-    "rose": "玫瑰"
   },
   "presetColor": {
     "indigo": "靛藍",
@@ -596,7 +577,6 @@
     "platforms": "支援平台",
     "enablePlatform": "在 {{platform}} 啟用"
   },
-  "options": {},
   "feedback": {
     "title": "聯繫我們",
     "description": "有想法、建議或發現了 Bug？透過以下任一管道聯繫我們。",
@@ -609,6 +589,10 @@
     "emailTitle": "電子郵件",
     "emailButton": "傳送郵件",
     "thankYou": "感謝你幫助我們變得更好"
+  },
+  "dataManagement": {
+    "resetDatabase": "重設資料庫",
+    "resetDatabaseConfirm": "此操作僅重設本地資料，遠端備份（如有）不會受影響。如需清空遠端資料，請在重設後使用「備份到雲端」。"
   },
   "search": {
     "title": "搜尋",
@@ -658,9 +642,6 @@
     "stop": "停止",
     "progress": "正在同步：{{done}} / {{total}}",
     "progressFailed": "{{count}} 個失敗",
-    "pageRange": "第 {{from}} - {{to}} 個，共 {{total}} 個",
-    "prevPage": "上一頁",
-    "nextPage": "下一頁",
     "nothingToSync": "所有對話已全部同步。",
     "loadFailed": "讀取對話列表失敗。",
     "batchDone": "成功同步了 {{count}} 個對話。",
@@ -701,9 +682,21 @@
     "logComplete": "匯入完成：已匯入 {{count}} 則。",
     "logCriticalError": "嚴重錯誤：{{message}}"
   },
-  "dataManagement": {
-    "resetDatabase": "重設資料庫",
-    "resetDatabaseConfirm": "此操作僅重設本地資料，遠端備份（如有）不會受影響。如需清空遠端資料，請在重設後使用「備份到雲端」。"
+  "rating": {
+    "title": "您喜歡這個插件嗎？",
+    "description": "您的回饋對我們非常重要。",
+    "notReally": "不太喜歡",
+    "yes": "很喜歡",
+    "awesome": "太棒了！",
+    "rateDescription": "花一分鐘給個 5 星好評，就是對我們最大的肯定 🌟",
+    "maybeLater": "以後再說",
+    "rateUs": "去給好評",
+    "sorry": "很抱歉給您帶來不好的體驗",
+    "sorryDescription": "您可以透過以下方式告訴我們您的建議或遇到的問題，我們會儘快改進。",
+    "inAppFeedback": "應用內意見回饋 (Feedback 標籤)",
+    "githubIssue": "提交 GitHub Issue",
+    "googleForm": "填寫回饋表單",
+    "skip": "跳過"
   },
   "onboarding": {
     "welcome": "歡迎使用 Better Sidebar",
@@ -792,22 +785,6 @@
         "description": "自訂主題、版面、語言、捷徑等，讓介面更符合您的工作方式。"
       }
     }
-  },
-  "rating": {
-    "title": "您喜歡這個插件嗎？",
-    "description": "您的回饋對我們非常重要。",
-    "notReally": "不太喜歡",
-    "yes": "很喜歡",
-    "awesome": "太棒了！",
-    "rateDescription": "花一分鐘給個 5 星好評，就是對我們最大的肯定 🌟",
-    "maybeLater": "以後再說",
-    "rateUs": "去給好評",
-    "sorry": "很抱歉給您帶來不好的體驗",
-    "sorryDescription": "您可以透過以下方式告訴我們您的建議或遇到的問題，我們會儘快改進。",
-    "inAppFeedback": "應用內意見回饋 (Feedback 標籤)",
-    "githubIssue": "提交 GitHub Issue",
-    "googleForm": "填寫回饋表單",
-    "skip": "跳過"
   },
   "errors": {
     "profileNotFound": "找不到 Profile {{profileId}}"
@@ -1007,6 +984,25 @@
     "eraseConfirmAction": "清空並重新載入",
     "eraseNoConversation": "目前還沒有載入對話",
     "eraseFailed": "清空已儲存的訊息失敗"
+  },
+  "outline": {
+    "title": "大綱",
+    "placeholder": "開啟對話以查看大綱",
+    "search": "搜尋大綱",
+    "searchPlaceholder": "全文搜尋...",
+    "filterAll": "全部",
+    "filterHeadings": "標題",
+    "filterCode": "程式碼",
+    "noConversation": "未開啟對話",
+    "noConversationHint": "開啟對話以查看大綱",
+    "empty": "暫無大綱內容",
+    "noResults": "無符合項目",
+    "copy": "複製",
+    "copyQuery": "複製問題",
+    "copyResponse": "複製回覆",
+    "expandAll": "全部展開",
+    "collapseAll": "全部收合",
+    "navigate": "跳轉到訊息"
   },
   "firstInstall": {
     "title": "是否匯入對話列表？",
@@ -1227,6 +1223,7 @@
       "safety": "只操作本機資料庫，修改前會先向你確認。",
       "freeTier": "免費版只能讀取。升級後 Agent 才能修改資料。",
       "manage": "技能與工具",
+      "workspace": "工作區",
       "stepsTitle": "如何使用",
       "step1": "開啟任意一個聊天視窗。",
       "step2": "在輸入框中鍵入 >，選取 Agent。",
@@ -1297,9 +1294,11 @@
       "paused": "已暫停",
       "error": "出錯"
     },
-    "header": {
-      "step": "第 {{count}} 步",
-      "speedHint": "本次任務剩下的步驟都不會再問你"
+    "dock": {
+      "speedOff": "本次任務自動批准所有操作 — 點擊停止",
+      "settings": "可以做什麼",
+      "collapse": "收合",
+      "expand": "展開"
     },
     "actions": {
       "stop": "停止",
@@ -1314,6 +1313,17 @@
     "interrupt": {
       "errorTitle": "出了點問題",
       "pausedTitle": "迴圈已暫停"
+    },
+    "checkIn": {
+      "title_one": "已自動執行 {{count}} 步",
+      "title_other": "已自動執行 {{count}} 步",
+      "title": "已自動執行 {{count}} 步",
+      "desc": "沒出問題——只是先停一下，讓你看看它已經做了什麼，再決定是否繼續。",
+      "failedNote_one": "過程中有 {{count}} 步失敗了，可以在下面看看。",
+      "failedNote_other": "過程中有 {{count}} 步失敗了，可以在下面看看。",
+      "failedNote": "過程中有 {{count}} 步失敗了，可以在下面看看。",
+      "continue": "繼續",
+      "stop": "就此停止"
     },
     "owed": {
       "title_one": "有 {{count}} 筆結果沒送到 AI",
@@ -1335,7 +1345,6 @@
       "autoContinue": "自己往下走",
       "autoContinueHint": "關閉後，每一步都要你按 Enter",
       "sendHint": "你確認過的步驟仍會等你按 Enter；只有不用確認的步驟才會自動送出。",
-      "taskApproved": "本次任務已全部允許 — 點擊可停止",
       "browserFixed": "讀你的分頁和書籤不需要批准。變更一定要，而且一批一批地問 —— 這條關不掉。"
     },
     "approve": {
@@ -1359,15 +1368,6 @@
       "export": "正在匯出",
       "complete": "正在收尾",
       "generic": "正在執行一個步驟",
-      "readFile": "讀取檔案",
-      "writeFile": "寫入檔案",
-      "editFile": "編輯檔案",
-      "listFiles": "查看工作區",
-      "globFiles": "尋找檔案",
-      "grepFiles": "搜尋檔案內容",
-      "manageFiles": "管理檔案",
-      "docRead": "讀取文件",
-      "docEdit": "標註文件",
       "nameLabel": "操作",
       "statement": "語句",
       "waiting": "等待你的操作",
@@ -1389,6 +1389,15 @@
       "systemPrompt": "系統提示詞",
       "resultsTitle": "工具結果",
       "promptTitle": "提示詞內容",
+      "readFile": "讀取檔案",
+      "writeFile": "寫入檔案",
+      "editFile": "編輯檔案",
+      "listFiles": "查看工作區",
+      "globFiles": "尋找檔案",
+      "grepFiles": "搜尋檔案內容",
+      "manageFiles": "管理檔案",
+      "docRead": "讀取文件",
+      "docEdit": "標註文件",
       "listTabs": "查看分頁",
       "listTabGroups": "查看分頁群組",
       "listBookmarks": "翻看書籤",
@@ -1398,7 +1407,7 @@
       "manageTabGroups": "整理分頁群組",
       "arrangeBookmarks": "整理書籤",
       "deleteBookmarks": "刪除書籤",
-      "undoChanges": "復原之前的變更"
+      "restoreState": "正在還原先前的狀態"
     },
     "sync": {
       "progress": "正在取得對話內容 — {{current}}/{{total}}",
@@ -1408,12 +1417,14 @@
       "donePartial": "已同步 {{count}} 個對話，{{incomplete}} 個未完成",
       "remaining": "還有 {{count}} 個對話沒有訊息 — 再執行一次同步繼續取得"
     },
+    "overlay": {
+      "emptyTitle": "智慧體視圖",
+      "emptyHint": "在下方輸入，或選擇一個智慧體提示詞開始",
+      "scrollToBottom": "回到底部"
+    },
     "instruction": {
       "placeholder": "給 AI 補充說明…",
       "sent": "已送出"
-    },
-    "history": {
-      "title": "步驟"
     },
     "summary": {
       "done": "任務完成",
@@ -1437,19 +1448,8 @@
       "noSteps": "沒有執行任何工具。",
       "upgrade": "查看方案",
       "dismiss": "關閉",
-      "clear": "清除",
-      "keepChanges": "保留變更"
-    },
-    "checkIn": {
-      "title_one": "已自動執行 {{count}} 步",
-      "title_other": "已自動執行 {{count}} 步",
-      "title": "已自動執行 {{count}} 步",
-      "desc": "沒出問題——只是先停一下，讓你看看它已經做了什麼，再決定是否繼續。",
-      "failedNote_one": "過程中有 {{count}} 步失敗了，可以在下面看看。",
-      "failedNote_other": "過程中有 {{count}} 步失敗了，可以在下面看看。",
-      "failedNote": "過程中有 {{count}} 步失敗了，可以在下面看看。",
-      "continue": "繼續",
-      "stop": "就此停止"
+      "keepChanges": "保留變更",
+      "clear": "清除"
     },
     "undo": {
       "action": "復原變更",
@@ -1460,25 +1460,20 @@
       "done_one": "已回退 {{count}} 筆記錄",
       "done_other": "已回退 {{count}} 筆記錄",
       "done": "已回退 {{count}} 筆記錄",
-      "failed": "復原失敗：{{message}}",
-      "unavailable": "這些變更無法自動復原。原因：{{reason}}",
       "aiUnaware": "AI 不知道這個操作 — 繼續對話前請告知它。",
       "reverted": "變更已撤銷",
       "toastPrompt": "智慧體修改了你的資料。",
-      "expired": "沒有可撤銷的內容 — 新任務已開始，或變更已被保留。"
-    },
-    "dock": {
-      "speedOff": "本次任務自動批准所有操作 — 點擊停止",
-      "settings": "可以做什麼",
-      "collapse": "收合",
-      "expand": "展開"
-    },
-    "overlay": {
-      "emptyTitle": "智慧體視圖",
-      "emptyHint": "在下方輸入，或選擇一個智慧體提示詞開始",
-      "scrollToBottom": "回到底部"
+      "expired": "沒有可撤銷的內容 — 新任務已開始，或變更已被保留。",
+      "failed": "復原失敗：{{message}}",
+      "unavailable": "這些變更無法自動復原。原因：{{reason}}"
     },
     "settings": {
+      "skillsTitle": "技能",
+      "skillsDescription": "技能為智慧體定義專門的提示詞指令。內建技能無法刪除。",
+      "maxSkills": "已達自訂技能上限（20 個）。",
+      "mcpTitle": "MCP 伺服器",
+      "mcpDescription": "MCP 伺服器提供智慧體可使用的工具。",
+      "mcpToolCount": "{{count}} 個工具",
       "newSkill": "新增技能",
       "editSkill": "編輯技能",
       "skillTitle": "標題",
@@ -1496,12 +1491,6 @@
       "deleteSkillTitle": "刪除技能",
       "deleteSkillContent": "「{{title}}」將被永久刪除，此操作無法復原。",
       "alwaysOn": "始終啟用",
-      "skillsTitle": "技能",
-      "skillsDescription": "技能為智慧體定義專門的提示詞指令。內建技能無法刪除。",
-      "maxSkills": "已達自訂技能上限（20 個）。",
-      "mcpTitle": "MCP 伺服器",
-      "mcpDescription": "MCP 伺服器提供智慧體可使用的工具。",
-      "mcpToolCount": "{{count}} 個工具",
       "agentsTitle": "Agent",
       "agentsDesc": "每個 Agent 處理的東西不同，工具也各自獨立。在輸入框打 > 就能啟動。",
       "noTools": "沒有可選工具。",
@@ -1562,6 +1551,10 @@
         "grep_files": "用正規表示式搜尋檔案內容",
         "manage_files": "刪除、移動或新建資料夾"
       },
+      "workspace": {
+        "name": "檔案",
+        "description": "讀寫、編輯與搜尋文字檔"
+      },
       "documents": {
         "name": "文件",
         "description": "依大綱與章節讀取 Word 文件"
@@ -1573,10 +1566,6 @@
       "bettersidebar": {
         "name": "Better Sidebar 資料",
         "description": "查詢與修改對話、資料夾、標籤和提示詞"
-      },
-      "workspace": {
-        "name": "檔案",
-        "description": "讀寫、編輯與搜尋文字檔"
       }
     },
     "entry": {
@@ -1584,9 +1573,55 @@
       "autoDescription": "描述一個任務，讓智慧體選擇合適的工具"
     },
     "workspace": {
+      "title": "工作區",
+      "create": "新增工作區",
+      "delete": "刪除此工作區",
+      "clearAll": "清空所有檔案",
+      "clearTitle": "清空工作區",
+      "deleteTitle": "刪除工作區",
+      "namePlaceholder": "工作區名稱",
+      "empty": "暫無檔案。讓 AI 助手寫入內容後會顯示在這裡。",
+      "emptyFile": "檔案為空。",
+      "lockedHint": "此對話已使用「{name}」工作區，如需切換請開啟新對話。",
+      "busyHint": "任務執行中，請完成或停止後再切換。",
       "paywallWorkspaces": "建立多個工作區",
       "paywallFiles": "工作區檔案數超過 {{max}} 個",
-      "paywallFilesSkipped": "已略過 {{files}} 個檔案 —— 免費版工作區最多支援 {{max}} 個檔案"
+      "paywallFilesSkipped": "已略過 {{files}} 個檔案 —— 免費版工作區最多支援 {{max}} 個檔案",
+      "clearWarning": "刪除「{name}」中的所有 {fileCount} 個檔案？此操作無法復原。",
+      "deleteWarning": "刪除工作區「{name}」及其中 {fileCount} 個檔案？已使用此工作區的對話將無法再讀寫檔案。此操作無法復原。",
+      "documentNoPreview": "此處暫不支援直接預覽 Office 文件，但 AI 助手可以讀取該檔案 —— 您可以讓它總結檔案內容、檢視特定章節或分析表格。",
+      "binaryNoPreview": "這是二進位檔案。它已按原樣儲存，但無法作為文字展示，AI 助手也無法讀取其內容。",
+      "largeNoPreview": "此檔案過大，直接預覽可能導致側邊欄卡頓。建議下載檢視，或直接向 AI 助手提問 —— 它可以分段讀取檔案。",
+      "nameNoSlash": "名稱不能包含 \"/\"。",
+      "confirmDeleteOne": "確認刪除 \"{{name}}\"？若為資料夾，其內部內容也將一併刪除。此操作無法復原。",
+      "confirmDeleteMany": "確認刪除選取的 {{count}} 項？資料夾內部的內容將一併刪除。此操作無法復原。",
+      "deleteFailed": "未能刪除 {{total}} 項中的 {{count}} 項。",
+      "moreActions": "更多操作",
+      "exportAll": "匯出為 ZIP",
+      "searchPlaceholder": "搜尋檔案",
+      "add": "新增",
+      "newFile": "新增檔案",
+      "newFolder": "新增資料夾",
+      "importFiles": "匯入檔案…",
+      "importFolder": "匯入資料夾…",
+      "noMatches": "沒有與搜尋相符的檔案。",
+      "dropHint": "拖放檔案或資料夾即可新增到此工作區",
+      "binaryHint": "二進位檔案。已儲存並可下載，但 AI 助手無法讀取。",
+      "open": "開啟",
+      "copyContent": "複製內容",
+      "importHere": "在此匯入檔案…",
+      "downloadZip": "下載為 ZIP",
+      "uploadedCount": "已新增 {{count}} 個檔案",
+      "renamedCount": "為避免覆蓋，已重新命名 {{count}} 個檔案",
+      "binaryCount": "{{count}} 個二進位檔案（已儲存，但 AI 助手無法讀取）",
+      "failedCount": "{{count}} 個失敗",
+      "uploading": "正在上傳 {{done}}/{{total}}…",
+      "dropEmpty": "拖放的內容中沒有可上傳的檔案。",
+      "zipping": "正在封存壓縮…",
+      "zippingProgress": "正在封存壓縮 {{done}}/{{total}}…",
+      "zipEmpty": "沒有可匯出的內容。",
+      "zipPartial": "已匯出 {{count}} 個檔案；其中 {{failed}} 個無法讀取。",
+      "zipDone": "已匯出 {{count}} 個檔案。"
     },
     "agents": {
       "bettersidebar": {
@@ -1602,6 +1637,9 @@
         "description": "整理 Chrome 分頁、分頁群組與書籤"
       }
     },
+    "switcher": {
+      "label": "選擇 Agent"
+    },
     "browserIntro": {
       "title": "讓 AI 幫你收拾分頁和書籤",
       "about": "關於瀏覽器助手",
@@ -1611,48 +1649,45 @@
     "browser": {
       "needsPermission": "🔒 尚未授權 · 點擊開啟權限設定",
       "panel": {
-        "approvalNote": "所有變更都需核准，包括排序。",
-        "permissions": "已允許：{{list}}",
-        "noPermissions": "權限：尚未授權",
-        "urlsShared": "完整 URL：允許 AI 讀取。",
-        "urlsRedacted": "完整 URL：已去識別化。",
-        "auditNote": "稽核記錄僅留在本機。",
         "openSettings": "權限與隱私設定",
         "viewHistory": "檢視本機記錄",
         "noHistory": "暫無可檢視的記錄；讀取歷史也需要對應權限。",
         "detail": "明細",
-        "previewUndo": "預覽還原",
-        "changeDetail": "變更明細",
-        "truncated": "每步最多顯示前 100 筆變更；完整記錄保存在本機，可由 Agent 分頁查詢。",
-        "approveUndo": "核准並還原",
         "cancel": "取消",
         "before": "之前",
         "after": "之後",
-        "outcome": "{{status}}：{{completed}}/{{planned}}。{{error}}"
+        "outcome": "{{status}}：{{completed}}/{{planned}}。{{error}}",
+        "revertToThis": "還原到此狀態",
+        "approveRestore": "核准並還原",
+        "noEndState": "該批次未完成，因此未記錄最終狀態。",
+        "recordsTitle": "本機操作記錄",
+        "recordsIntro": "AI 助手套用過的所有批次記錄均儲存在本機。開啟某筆記錄可檢視執行前後的瀏覽器狀態，並可隨時還原。",
+        "colWhen": "時間",
+        "colOutcome": "結果",
+        "reload": "重新載入",
+        "busySession": "任務正在執行中。此時還原會影響目前操作的瀏覽器，請等待任務結束。"
       },
       "status": {
         "applied": "已完成",
         "failed": "已停止",
         "applying": "執行中",
-        "unknown": "結果不確定，請檢查瀏覽器",
-        "undone": "已還原"
+        "unknown": "結果不確定，請檢查瀏覽器"
       },
       "preview": {
         "scope": "{{count}} 項操作 · 核准僅適用於下面這一批",
-        "undoPrefix": "還原：",
         "objects": "涉及 {{count}} 個物件",
         "firstHundred": "（前 100 個如下）",
         "untitled": "無標題",
-        "window": "目前視窗 {{id}}",
-        "position": "原位置 {{index}}",
-        "folder": "原資料夾 {{id}}",
-        "object": "物件 #{{id}}",
-        "current": "目前",
-        "restoreTo": "還原為",
-        "absent": "不存在",
+        "inThisWindow": "在此視窗中",
+        "inWindow": "在視窗 {{n}} 中",
+        "inGroup": "在群組 {{name}} 中",
+        "inUnnamedGroup": "在未命名群組中",
+        "unnamed": "未命名",
+        "inFolder": "在 {{name}} 中",
+        "pinned": "已固定",
         "lossy": "這一批會刪除東西。關閉的分頁只能靠重新開啟連結來復原，表單內容、捲動位置和頁面狀態都無法保證。刪除資料夾會連裡面的內容一起刪掉，還原書籤會產生新的 ID。這類操作每次都要單獨批准，任何設定都不能讓它自動執行。",
         "warning": "這次批准只涵蓋上面這些操作。這裡不會關閉或刪除任何東西——那是另外的工具，需要單獨授權。",
-        "undoWarning": "還原也需要核准；發現外部變更就停止。關閉分頁只會盡力重新開啟 URL，無法保證還原表單、捲動位置或頁面執行狀態。還原書籤會產生新 ID。"
+        "untouched": "另有 {{count}} 個項目未被變動"
       },
       "op": {
         "create": "建立",
@@ -1665,22 +1700,25 @@
         "ungroup": "取消分組"
       },
       "field": {
-        "tab_id": "分頁",
-        "tab_ids": "分頁",
-        "group_id": "群組",
-        "window_id": "目標視窗",
-        "index": "位置（從 0 開始）",
         "pinned": "釘選",
         "collapsed": "收合",
         "title": "標題",
-        "id": "物件",
-        "parent_id": "目標資料夾",
         "url": "網址",
         "color": "顏色",
-        "windowId": "視窗",
-        "groupId": "群組",
-        "parentId": "資料夾",
-        "active": "使用中"
+        "folder": "目標資料夾",
+        "group": "群組",
+        "window": "目標視窗"
+      },
+      "color": {
+        "grey": "灰色",
+        "blue": "藍色",
+        "red": "紅色",
+        "yellow": "黃色",
+        "green": "綠色",
+        "pink": "粉色",
+        "purple": "紫色",
+        "cyan": "青色",
+        "orange": "橘色"
       },
       "settings": {
         "title": "Browser Agent",
@@ -1694,10 +1732,62 @@
         "urlToggle": "允許 AI 讀取完整 URL",
         "urlHelp": "開啟：完整連結會傳送到目前的 AI 對話。關閉：只提供協定和網域，隱藏路徑、參數與片段。已傳送的網址無法收回。",
         "done": "完成"
+      },
+      "tree": {
+        "thisWindow": "目前視窗",
+        "window": "視窗",
+        "windowN": "視窗 {{n}}",
+        "pinned": "固定分頁",
+        "unnamedGroup": "未命名群組",
+        "willReopen": "重新開啟",
+        "willCreate": "補回",
+        "willRestore": "移回",
+        "empty": "此處未記錄到任何內容。",
+        "childCount": "({{count}})"
+      },
+      "restore": {
+        "headingBefore": "還原到執行此批次前的狀態",
+        "headingAfter": "還原到執行此批次後的狀態",
+        "counts": "移回 {{restore}} 項 · 重新開啟 {{reopen}} 項 · 補回 {{create}} 項 · {{keep}} 項保留在原處",
+        "extra": "此後開啟或新增的 {{count}} 個項目將保留原狀，不會關閉或刪除任何內容。",
+        "additive": "不會關閉或刪除任何內容，所有更新的內容都會保留。",
+        "note": "重新開啟的頁面僅還原其 URL 位址 —— 表單輸入、捲動位置與頁面狀態無法復原。補回的書籤為新複本。"
+      },
+      "examples": {
+        "group": {
+          "label": "依主題為分頁分組",
+          "text": "檢視此視窗中的所有分頁並依主題分組。為每個分組命名並設定顏色，不要改動已固定的分頁；在移動任何內容之前先向我展示計劃，不要關閉任何分頁。"
+        },
+        "duplicates": {
+          "label": "尋找重複分頁",
+          "text": "找出我開啟了多次的分頁。僅當查詢參數與雜湊完全相同時才視為同一頁面。按頁面分組列出，最早開啟的排在前面，並告訴我能省下多少分頁 —— 先不要關閉它們。"
+        },
+        "stash": {
+          "label": "將分頁暫存為書籤",
+          "text": "我希望目前視窗只留下正在處理的幾個分頁。將其餘所有分頁存入以今天日期命名的新資料夾中，保留已固定的分頁與公司網域的分頁；在關閉任何分頁之前，先向我展示清單。"
+        },
+        "bookmarks": {
+          "label": "整理書籤列",
+          "text": "幫我檢查書籤列。將分散的書籤依主題分類到資料夾中，將仍然使用原始網頁標題的書籤重新命名為更好辨識的名稱；指出可能重複的書籤，不要直接刪除。"
+        },
+        "open": {
+          "label": "建立工作環境",
+          "text": "開啟我進行程式碼審查所需的分頁：我們的儲存庫、Issue 追蹤器與設計文件。將它們放入名為 Review 的群組中，固定儲存庫分頁，其他已開啟的內容保持不變。"
+        },
+        "prune": {
+          "label": "清理失效書籤",
+          "text": "找出看起來過時的書籤 —— 無標題的、搜尋結果頁面、重複儲存的內容。列出它們及所在資料夾，讓我來選擇刪除哪些，不要替我做決定。"
+        }
+      },
+      "phrasesTitle": "或者直接吩咐",
+      "phrases": {
+        "listTabs": "這個視窗裡都開啟了些什麼？",
+        "groupThis": "把這些分頁依主題分組",
+        "findDupes": "幫我找出重複開啟的分頁",
+        "bookmarkAll": "把目前視窗的所有分頁存入新資料夾",
+        "sortBar": "整理一下我的書籤列",
+        "pinFew": "固定我頻繁切換的那幾個分頁"
       }
-    },
-    "switcher": {
-      "label": "選擇 Agent"
     },
     "workspaceIntro": {
       "title": "與 AI 一起處理您的工作區文件",
@@ -1740,10 +1830,5 @@
     "reasonPreMergeDelete": "批次刪除前",
     "reasonPreRestore": "還原前"
   },
-  "spark": {
-    "tasks": "任務",
-    "schedules": "排程",
-    "skills": "技能",
-    "apps": "已連接應用"
-  }
+  "options": {}
 }

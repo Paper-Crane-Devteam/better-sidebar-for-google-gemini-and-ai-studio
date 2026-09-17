@@ -12,11 +12,19 @@
     "copy": "Copiar",
     "close": "Fechar",
     "loading": "Carregando...",
+    "move": "Mover",
     "settings": "Configurações",
     "preferences": "Preferências",
     "untitled": "Sem título",
-    "move": "Mover",
-    "view": "Ver"
+    "view": "Ver",
+    "pageRange": "{{from}} - {{to}} de {{total}}",
+    "prevPage": "Anterior",
+    "nextPage": "Próximo",
+    "copied": "Copiado",
+    "download": "Baixar",
+    "back": "Voltar",
+    "clear": "Limpar",
+    "rename": "Renomear"
   },
   "tabs": {
     "files": "Arquivos",
@@ -31,6 +39,12 @@
     "snippets": "Trechos",
     "spark": "Spark",
     "agent": "Agent"
+  },
+  "spark": {
+    "tasks": "Tarefas",
+    "schedules": "Agendamentos",
+    "skills": "Habilidades",
+    "apps": "Apps conectados"
   },
   "sidebar": {
     "newConversation": "Nova Conversa",
@@ -385,25 +399,6 @@
     "chats": "Conversas",
     "moreFilters": "Mais filtros"
   },
-  "outline": {
-    "title": "Esquema",
-    "placeholder": "Abra uma conversa para ver o esquema",
-    "search": "Pesquisar esquema",
-    "searchPlaceholder": "Pesquisa de texto completo...",
-    "filterAll": "Tudo",
-    "filterHeadings": "Títulos",
-    "filterCode": "Código",
-    "noConversation": "Nenhuma conversa aberta",
-    "noConversationHint": "Abra uma conversa para ver o esquema",
-    "empty": "Sem conteúdo de esquema",
-    "noResults": "Nenhum item correspondente",
-    "copy": "Copiar",
-    "copyQuery": "Copiar pergunta",
-    "copyResponse": "Copiar resposta",
-    "expandAll": "Expandir tudo",
-    "collapseAll": "Recolher tudo",
-    "navigate": "Ir para mensagem"
-  },
   "node": {
     "newFolder": "Criar Subpasta",
     "newFolderName": "Nova Pasta",
@@ -460,20 +455,6 @@
     "defaultTargetMoved": "\"{{name}}\" foi movido para cá de \"{{from}}\"",
     "defaultTargetRemoved": "\"{{name}}\" não usa mais esta pasta por padrão",
     "defaultTargetFailed": "Não foi possível atualizar a pasta padrão"
-  },
-  "folderColor": {
-    "indigo": "Índigo",
-    "violet": "Violeta",
-    "pink": "Rosa",
-    "red": "Vermelho",
-    "orange": "Laranja",
-    "yellow": "Amarelo",
-    "green": "Verde",
-    "teal": "Cerceta",
-    "cyan": "Ciano",
-    "blue": "Azul",
-    "lavender": "Lavanda",
-    "rose": "Rosa"
   },
   "presetColor": {
     "indigo": "Índigo",
@@ -596,7 +577,6 @@
     "platforms": "Plataformas compatíveis",
     "enablePlatform": "Ativar em {{platform}}"
   },
-  "options": {},
   "feedback": {
     "title": "Entre em Contato",
     "description": "Tem ideias, sugestões ou encontrou um bug? Entre em contato por qualquer um dos canais abaixo.",
@@ -609,6 +589,10 @@
     "emailTitle": "E-mail",
     "emailButton": "Enviar E-mail",
     "thankYou": "Obrigado por nos ajudar a melhorar"
+  },
+  "dataManagement": {
+    "resetDatabase": "Redefinir Banco de Dados",
+    "resetDatabaseConfirm": "Apenas os dados locais serão excluídos. O backup remoto (se houver) não será afetado. Para limpar os dados remotos, use \"Backup to Drive\" após a redefinição."
   },
   "search": {
     "title": "Pesquisar",
@@ -658,9 +642,6 @@
     "stop": "Parar",
     "progress": "Sincronizando: {{done}} / {{total}}",
     "progressFailed": "{{count}} com falha",
-    "pageRange": "{{from}} - {{to}} de {{total}}",
-    "prevPage": "Anterior",
-    "nextPage": "Próxima",
     "nothingToSync": "Todos os chats já estão sincronizados.",
     "loadFailed": "Falha ao carregar a lista de chats.",
     "batchDone": "Sincronizados com sucesso {{count}} chats.",
@@ -700,10 +681,6 @@
     "logProcessed": "Processado {{current}}/{{total}}...",
     "logComplete": "Importação concluída: {{count}} importadas.",
     "logCriticalError": "Erro crítico: {{message}}"
-  },
-  "dataManagement": {
-    "resetDatabase": "Redefinir Banco de Dados",
-    "resetDatabaseConfirm": "Apenas os dados locais serão excluídos. O backup remoto (se houver) não será afetado. Para limpar os dados remotos, use \"Backup to Drive\" após a redefinição."
   },
   "rating": {
     "title": "Você está gostando desta extensão?",
@@ -1008,6 +985,25 @@
     "eraseNoConversation": "Nenhuma conversa carregada ainda",
     "eraseFailed": "Não foi possível limpar as mensagens salvas"
   },
+  "outline": {
+    "title": "Esquema",
+    "placeholder": "Abra uma conversa para ver o esquema",
+    "search": "Pesquisar esquema",
+    "searchPlaceholder": "Pesquisa de texto completo...",
+    "filterAll": "Tudo",
+    "filterHeadings": "Títulos",
+    "filterCode": "Código",
+    "noConversation": "Nenhuma conversa aberta",
+    "noConversationHint": "Abra uma conversa para ver o esquema",
+    "empty": "Sem conteúdo de esquema",
+    "noResults": "Nenhum item correspondente",
+    "copy": "Copiar",
+    "copyQuery": "Copiar pergunta",
+    "copyResponse": "Copiar resposta",
+    "expandAll": "Expandir tudo",
+    "collapseAll": "Recolher tudo",
+    "navigate": "Ir para mensagem"
+  },
   "firstInstall": {
     "title": "Importar lista de conversas?",
     "description": "Por padrão, a extensão só registra as conversas recentes.",
@@ -1227,6 +1223,7 @@
       "safety": "Apenas o seu banco de dados local é alterado. As mudanças são confirmadas antes de rodar.",
       "freeTier": "O plano gratuito é somente leitura. Faça upgrade para o agente poder alterar dados.",
       "manage": "Habilidades e ferramentas",
+      "workspace": "Espaço de trabalho",
       "stepsTitle": "Como usar",
       "step1": "Abra qualquer chat.",
       "step2": "Digite > no campo de texto e selecione o Agente.",
@@ -1297,9 +1294,11 @@
       "paused": "Pausado",
       "error": "Erro"
     },
-    "header": {
-      "step": "Etapa {{count}}",
-      "speedHint": "Nada será perguntado no restante desta tarefa"
+    "dock": {
+      "speedOff": "Aprovando tudo para esta tarefa — clique para parar",
+      "settings": "O que pode fazer",
+      "collapse": "Recolher",
+      "expand": "Expandir"
     },
     "actions": {
       "stop": "Parar",
@@ -1314,6 +1313,17 @@
     "interrupt": {
       "errorTitle": "Algo deu errado",
       "pausedTitle": "Loop pausado"
+    },
+    "checkIn": {
+      "title_one": "{{count}} etapa concluída por conta própria",
+      "title_other": "{{count}} etapas concluídas por conta própria",
+      "title": "{{count}} etapas concluídas por conta própria",
+      "desc": "Nada de errado — o agente apenas pausou para você revisar o que ele fez antes de continuar.",
+      "failedNote_one": "{{count}} etapa falhou no caminho. Vale conferir abaixo.",
+      "failedNote_other": "{{count}} etapas falharam no caminho. Vale conferir abaixo.",
+      "failedNote": "{{count}} etapas falharam no caminho. Vale conferir abaixo.",
+      "continue": "Continuar",
+      "stop": "Parar aqui"
     },
     "owed": {
       "title_one": "{{count}} resultado nunca chegou à IA",
@@ -1335,7 +1345,6 @@
       "autoContinue": "Seguir sozinho",
       "autoContinueHint": "Se estiver desligado, você precisa pressionar Enter em cada etapa",
       "sendHint": "Uma etapa que você aprova ainda espera você pressionar Enter — só as etapas sem supervisão se enviam sozinhas.",
-      "taskApproved": "Aprovando tudo nesta tarefa — clique para parar",
       "browserFixed": "Ler suas abas e favoritos nunca precisa de aprovação. Toda alteração precisa, um lote por vez — e isso não pode ser desligado."
     },
     "approve": {
@@ -1359,15 +1368,6 @@
       "export": "Exportando",
       "complete": "Finalizando",
       "generic": "Executando uma etapa",
-      "readFile": "Lendo um arquivo",
-      "writeFile": "Gravando um arquivo",
-      "editFile": "Editando um arquivo",
-      "listFiles": "Explorando o espaço de trabalho",
-      "globFiles": "Procurando arquivos",
-      "grepFiles": "Pesquisando dentro dos arquivos",
-      "manageFiles": "Reorganizando arquivos",
-      "docRead": "Lendo um documento",
-      "docEdit": "Marcando alterações em um documento",
       "nameLabel": "Ação",
       "statement": "Instrução",
       "waiting": "Aguardando você",
@@ -1389,6 +1389,15 @@
       "systemPrompt": "Prompt do sistema",
       "resultsTitle": "Resultados das ferramentas",
       "promptTitle": "Conteúdo do prompt",
+      "readFile": "Lendo um arquivo",
+      "writeFile": "Gravando um arquivo",
+      "editFile": "Editando um arquivo",
+      "listFiles": "Explorando o espaço de trabalho",
+      "globFiles": "Procurando arquivos",
+      "grepFiles": "Pesquisando dentro dos arquivos",
+      "manageFiles": "Reorganizando arquivos",
+      "docRead": "Lendo um documento",
+      "docEdit": "Marcando alterações em um documento",
       "listTabs": "Vendo suas abas",
       "listTabGroups": "Vendo seus grupos de abas",
       "listBookmarks": "Procurando nos seus favoritos",
@@ -1398,7 +1407,7 @@
       "manageTabGroups": "Reorganizando grupos de abas",
       "arrangeBookmarks": "Reorganizando favoritos",
       "deleteBookmarks": "Excluindo favoritos",
-      "undoChanges": "Desfazendo uma alteração anterior"
+      "restoreState": "Restaurando um estado anterior"
     },
     "sync": {
       "progress": "Buscando o conteúdo da conversa — {{current}}/{{total}}",
@@ -1408,12 +1417,14 @@
       "donePartial": "{{count}} conversa(s) sincronizada(s), {{incomplete}} incompleta(s)",
       "remaining": "{{count}} conversa(s) ainda estão sem mensagens — execute a sincronização de novo para continuar"
     },
+    "overlay": {
+      "emptyTitle": "Visão do agente",
+      "emptyHint": "Digite abaixo ou escolha um prompt de agente para começar",
+      "scrollToBottom": "Voltar ao final"
+    },
     "instruction": {
       "placeholder": "Adicione uma observação para a IA...",
       "sent": "Observação enviada"
-    },
-    "history": {
-      "title": "Etapas"
     },
     "summary": {
       "done": "Tarefa finalizada",
@@ -1437,19 +1448,8 @@
       "noSteps": "Nenhuma ferramenta foi executada.",
       "upgrade": "Ver planos",
       "dismiss": "Dispensar",
-      "clear": "Limpar",
-      "keepChanges": "Manter alterações"
-    },
-    "checkIn": {
-      "title_one": "{{count}} etapa concluída por conta própria",
-      "title_other": "{{count}} etapas concluídas por conta própria",
-      "title": "{{count}} etapas concluídas por conta própria",
-      "desc": "Nada de errado — o agente apenas pausou para você revisar o que ele fez antes de continuar.",
-      "failedNote_one": "{{count}} etapa falhou no caminho. Vale conferir abaixo.",
-      "failedNote_other": "{{count}} etapas falharam no caminho. Vale conferir abaixo.",
-      "failedNote": "{{count}} etapas falharam no caminho. Vale conferir abaixo.",
-      "continue": "Continuar",
-      "stop": "Parar aqui"
+      "keepChanges": "Manter alterações",
+      "clear": "Limpar"
     },
     "undo": {
       "action": "Desfazer alterações",
@@ -1460,25 +1460,20 @@
       "done_one": "{{count}} linha revertida",
       "done_other": "{{count}} linhas revertidas",
       "done": "{{count}} linhas revertidas",
-      "failed": "Falha ao desfazer: {{message}}",
-      "unavailable": "Estas alterações não podem ser desfeitas automaticamente. Motivo: {{reason}}",
       "aiUnaware": "A IA não sabe disso — avise antes de continuar a conversa.",
       "reverted": "Alterações revertidas",
       "toastPrompt": "O agente alterou seus dados.",
-      "expired": "Não há nada para desfazer — uma nova tarefa foi iniciada ou as alterações foram mantidas."
-    },
-    "dock": {
-      "speedOff": "Aprovando tudo para esta tarefa — clique para parar",
-      "settings": "O que pode fazer",
-      "collapse": "Recolher",
-      "expand": "Expandir"
-    },
-    "overlay": {
-      "emptyTitle": "Visão do agente",
-      "emptyHint": "Digite abaixo ou escolha um prompt de agente para começar",
-      "scrollToBottom": "Voltar ao final"
+      "expired": "Não há nada para desfazer — uma nova tarefa foi iniciada ou as alterações foram mantidas.",
+      "failed": "Falha ao desfazer: {{message}}",
+      "unavailable": "Estas alterações não podem ser desfeitas automaticamente. Motivo: {{reason}}"
     },
     "settings": {
+      "skillsTitle": "Habilidades",
+      "skillsDescription": "As habilidades definem instruções especializadas para o Agente. Habilidades integradas não podem ser excluídas.",
+      "maxSkills": "Limite de 20 habilidades personalizadas atingido.",
+      "mcpTitle": "Servidores MCP",
+      "mcpDescription": "Os servidores MCP fornecem ferramentas que o Agente pode usar.",
+      "mcpToolCount": "{{count}} ferramentas",
       "newSkill": "Nova habilidade",
       "editSkill": "Editar habilidade",
       "skillTitle": "Título",
@@ -1496,12 +1491,6 @@
       "deleteSkillTitle": "Excluir habilidade",
       "deleteSkillContent": "\"{{title}}\" será removido permanentemente. Isso não pode ser desfeito.",
       "alwaysOn": "Sempre ativa",
-      "skillsTitle": "Habilidades",
-      "skillsDescription": "As habilidades definem instruções especializadas para o Agente. Habilidades integradas não podem ser excluídas.",
-      "maxSkills": "Limite de 20 habilidades personalizadas atingido.",
-      "mcpTitle": "Servidores MCP",
-      "mcpDescription": "Os servidores MCP fornecem ferramentas que o Agente pode usar.",
-      "mcpToolCount": "{{count}} ferramentas",
       "agentsTitle": "Agentes",
       "agentsDesc": "Cada agente trabalha em coisas diferentes e tem suas próprias ferramentas. Digite > no chat para iniciar um.",
       "noTools": "Nenhuma ferramenta opcional.",
@@ -1562,6 +1551,10 @@
         "grep_files": "Busca no conteúdo com expressões regulares",
         "manage_files": "Exclui, move ou cria pastas"
       },
+      "workspace": {
+        "name": "Arquivos",
+        "description": "Leia, escreva, edite e pesquise arquivos de texto"
+      },
       "documents": {
         "name": "Documentos",
         "description": "Leia documentos do Word por estrutura e seção"
@@ -1573,10 +1566,6 @@
       "bettersidebar": {
         "name": "Dados do Better Sidebar",
         "description": "Consulte e altere conversas, pastas, tags e prompts"
-      },
-      "workspace": {
-        "name": "Arquivos",
-        "description": "Leia, escreva, edite e pesquise arquivos de texto"
       }
     },
     "entry": {
@@ -1584,9 +1573,55 @@
       "autoDescription": "Descreva uma tarefa e deixe o agente escolher as ferramentas certas"
     },
     "workspace": {
+      "title": "Espaço de trabalho",
+      "create": "Novo espaço de trabalho",
+      "delete": "Excluir este espaço de trabalho",
+      "clearAll": "Limpar todos os arquivos",
+      "clearTitle": "Limpar espaço de trabalho",
+      "deleteTitle": "Excluir espaço de trabalho",
+      "namePlaceholder": "Nome do espaço de trabalho",
+      "empty": "Nenhum arquivo ainda. Peça ao agente para gravar algo e aparecerá aqui.",
+      "emptyFile": "Este arquivo está vazio.",
+      "lockedHint": "Esta conversa está usando \"{name}\". Inicie um novo chat para alternar.",
+      "busyHint": "Uma tarefa está em execução. Termine ou pare-a antes de alternar.",
       "paywallWorkspaces": "Múltiplos espaços de trabalho",
       "paywallFiles": "Mais de {{max}} arquivos por espaço de trabalho",
-      "paywallFilesSkipped": "{{files}} arquivo(s) ignorado(s) — o limite gratuito é de {{max}} por espaço de trabalho"
+      "paywallFilesSkipped": "{{files}} arquivo(s) ignorado(s) — o limite gratuito é de {{max}} por espaço de trabalho",
+      "clearWarning": "Excluir todos os {fileCount} arquivo(s) em \"{name}\"? Esta ação não pode ser desfeita.",
+      "deleteWarning": "Excluir \"{name}\" e todos os {fileCount} arquivo(s) nele? As conversas que já usavam este espaço de trabalho não poderão mais ler ou gravar arquivos. Esta ação não pode ser desfeita.",
+      "documentNoPreview": "Documentos do Office ainda não são exibidos aqui, mas o agente pode ler este — peça para resumir o arquivo, consultar uma seção ou analisar uma planilha.",
+      "binaryNoPreview": "Este é um arquivo binário. Ele é armazenado exatamente como recebido, mas não pode ser exibido como texto e o agente não pode lê-lo.",
+      "largeNoPreview": "Este arquivo é muito grande para pré-visualizar sem congelar a barra lateral. Baixe-o para ler, ou peça ao agente — ele lê arquivos em partes.",
+      "nameNoSlash": "O nome não pode conter \"/\".",
+      "confirmDeleteOne": "Excluir \"{{name}}\"? As pastas removem seu conteúdo junto. Esta ação não pode ser desfeita.",
+      "confirmDeleteMany": "Excluir {{count}} itens? As pastas removem seu conteúdo junto. Esta ação não pode ser desfeita.",
+      "deleteFailed": "Não foi possível excluir {{count}} de {{total}} itens.",
+      "moreActions": "Mais ações",
+      "exportAll": "Exportar como ZIP",
+      "searchPlaceholder": "Pesquisar arquivos",
+      "add": "Adicionar",
+      "newFile": "Novo arquivo",
+      "newFolder": "Nova pasta",
+      "importFiles": "Importar arquivos…",
+      "importFolder": "Importar pasta…",
+      "noMatches": "Nenhum arquivo corresponde a essa pesquisa.",
+      "dropHint": "Arraste e solte arquivos ou pastas para adicioná-los a este espaço de trabalho",
+      "binaryHint": "Arquivo binário. Armazenado e baixável, mas o agente não pode lê-lo.",
+      "open": "Abrir",
+      "copyContent": "Copiar conteúdo",
+      "importHere": "Importar arquivos aqui…",
+      "downloadZip": "Baixar como ZIP",
+      "uploadedCount": "{{count}} arquivo(s) adicionado(s)",
+      "renamedCount": "{{count}} renomeado(s) para evitar sobreposição",
+      "binaryCount": "{{count}} binário(s) (armazenados, mas o agente não pode lê-los)",
+      "failedCount": "{{count}} com falha",
+      "uploading": "Enviando {{done}}/{{total}}…",
+      "dropEmpty": "Nada para enviar a partir desse arrastar e soltar.",
+      "zipping": "Preparando arquivo compactado…",
+      "zippingProgress": "Preparando arquivo compactado {{done}}/{{total}}…",
+      "zipEmpty": "Nada para exportar.",
+      "zipPartial": "Exportado(s) {{count}} arquivo(s); não foi possível ler {{failed}}.",
+      "zipDone": "Exportado(s) {{count}} arquivo(s)."
     },
     "agents": {
       "bettersidebar": {
@@ -1602,6 +1637,9 @@
         "description": "Organiza abas, grupos de abas e favoritos do Chrome"
       }
     },
+    "switcher": {
+      "label": "Escolha um agente"
+    },
     "browserIntro": {
       "title": "Deixe a IA organizar suas abas e favoritos",
       "about": "Sobre o Browser Agent",
@@ -1611,48 +1649,45 @@
     "browser": {
       "needsPermission": "🔒 Sem autorização · clique para abrir as permissões",
       "panel": {
-        "approvalNote": "Toda mudança é aprovada, inclusive a ordenação.",
-        "permissions": "Permitido: {{list}}",
-        "noPermissions": "Permissões: nenhuma concedida ainda",
-        "urlsShared": "URLs completas: a IA pode ler.",
-        "urlsRedacted": "URLs completas: ocultadas.",
-        "auditNote": "O registro de auditoria fica neste computador.",
         "openSettings": "Permissões e privacidade",
         "viewHistory": "Registros locais",
         "noHistory": "Nenhum registro para mostrar. Ler o histórico também exige a permissão correspondente.",
         "detail": "Detalhe",
-        "previewUndo": "Pré-visualizar desfazer",
-        "changeDetail": "Objetos alterados",
-        "truncated": "Cada etapa mostra suas primeiras 100 mudanças. O registro completo fica neste computador e o agente pode percorrê-lo por páginas.",
-        "approveUndo": "Aprovar e desfazer",
         "cancel": "Cancelar",
         "before": "Antes",
         "after": "Depois",
-        "outcome": "{{status}}: {{completed}}/{{planned}}. {{error}}"
+        "outcome": "{{status}}: {{completed}}/{{planned}}. {{error}}",
+        "revertToThis": "Reverter para este",
+        "approveRestore": "Aprovar e restaurar",
+        "noEndState": "Este lote não foi concluído, portanto nenhum estado final foi registrado.",
+        "recordsTitle": "Registros locais",
+        "recordsIntro": "Cada lote aplicado pelo agente é mantido nesta máquina. Abra um para ver o navegador antes e depois, e restaurar qualquer um dos estados.",
+        "colWhen": "Quando",
+        "colOutcome": "Resultado",
+        "reload": "Recarregar",
+        "busySession": "Uma tarefa está em execução. Restaurar alteraria o navegador no qual ela está trabalhando, portanto aguardará até que a tarefa termine."
       },
       "status": {
         "applied": "Concluído",
         "failed": "Interrompido",
         "applying": "Em execução",
-        "unknown": "Resultado incerto — verifique o navegador",
-        "undone": "Desfeito"
+        "unknown": "Resultado incerto — verifique o navegador"
       },
       "preview": {
         "scope": "{{count}} operações · esta aprovação cobre apenas o lote abaixo",
-        "undoPrefix": "Desfazer: ",
         "objects": "{{count}} objetos afetados",
         "firstHundred": " (primeiros 100 exibidos)",
         "untitled": "Sem título",
-        "window": "na janela {{id}}",
-        "position": "estava em {{index}}",
-        "folder": "estava em {{id}}",
-        "object": "Objeto nº {{id}}",
-        "current": "Agora",
-        "restoreTo": "Restaurar para",
-        "absent": "não existe",
+        "inThisWindow": "nesta janela",
+        "inWindow": "na janela {{n}}",
+        "inGroup": "no grupo {{name}}",
+        "inUnnamedGroup": "em um grupo sem nome",
+        "unnamed": "sem nome",
+        "inFolder": "em {{name}}",
+        "pinned": "fixada",
         "lossy": "Este lote remove itens. Uma aba fechada só pode ser recuperada reabrindo a URL: formulários, posição de rolagem e estado da página não são garantidos. Excluir uma pasta exclui tudo o que está nela, e restaurar favoritos cria novos IDs. É aprovado separadamente todas as vezes; nenhuma configuração o executa sem supervisão.",
         "warning": "Esta aprovação cobre apenas as operações acima. Nada aqui é fechado ou excluído: isso fica em ferramentas separadas, com permissão própria.",
-        "undoWarning": "Desfazer também precisa de aprovação e para assim que encontra uma mudança externa. Fechar uma aba só pode ser desfeito reabrindo a URL — formulários, posição de rolagem e estado da página não são garantidos. Restaurar favoritos cria novos IDs."
+        "untouched": "outros {{count}} objetos não foram alterados"
       },
       "op": {
         "create": "Criar",
@@ -1665,22 +1700,25 @@
         "ungroup": "Remover do grupo"
       },
       "field": {
-        "tab_id": "Aba",
-        "tab_ids": "Abas",
-        "group_id": "Grupo",
-        "window_id": "Janela de destino",
-        "index": "Posição (a partir de 0)",
         "pinned": "Fixada",
         "collapsed": "Recolhido",
         "title": "Título",
-        "id": "Objeto",
-        "parent_id": "Pasta de destino",
         "url": "Endereço",
         "color": "Cor",
-        "windowId": "Janela",
-        "groupId": "Grupo",
-        "parentId": "Pasta",
-        "active": "Ativa"
+        "folder": "Pasta de destino",
+        "group": "Grupo",
+        "window": "Janela de destino"
+      },
+      "color": {
+        "grey": "Cinza",
+        "blue": "Azul",
+        "red": "Vermelho",
+        "yellow": "Amarelo",
+        "green": "Verde",
+        "pink": "Rosa",
+        "purple": "Roxo",
+        "cyan": "Ciano",
+        "orange": "Laranja"
       },
       "settings": {
         "title": "Browser Agent",
@@ -1694,10 +1732,62 @@
         "urlToggle": "Permitir que a IA leia URLs completas",
         "urlHelp": "Ligado: o link completo é enviado à conversa de IA atual. Desligado: apenas o esquema e o host; caminho, parâmetros e fragmento ficam ocultos. Endereços já enviados não podem ser retirados.",
         "done": "Concluir"
+      },
+      "tree": {
+        "thisWindow": "Esta janela",
+        "window": "Janela",
+        "windowN": "Janela {{n}}",
+        "pinned": "Fixadas",
+        "unnamedGroup": "Grupo sem nome",
+        "willReopen": "reabrir",
+        "willCreate": "adicionar de volta",
+        "willRestore": "mover de volta",
+        "empty": "Nada foi gravado aqui.",
+        "childCount": "({{count}})"
+      },
+      "restore": {
+        "headingBefore": "Restaurar o estado anterior a este lote",
+        "headingAfter": "Restaurar o estado posterior a este lote",
+        "counts": "{{restore}} para mover de volta · {{reopen}} para reabrir · {{create}} para adicionar de volta · {{keep}} já no lugar",
+        "extra": "{{count}} itens abertos ou adicionados desde então são mantidos como estão. Nada é fechado ou excluído.",
+        "additive": "Nada é fechado ou excluído. Qualquer item mais recente é mantido.",
+        "note": "Uma página reaberta volta apenas no seu endereço: entradas de formulários, posição de rolagem e estado da página não são restaurados. Um favorito adicionado de volta é uma nova cópia."
+      },
+      "examples": {
+        "group": {
+          "label": "Agrupar abas por assunto",
+          "text": "Examine as abas nesta janela e agrupe-as pelo assunto. Dê um nome e uma cor para cada grupo, mantenha as abas fixadas intactas e mostre o plano antes de mover qualquer coisa. Não feche nada."
+        },
+        "duplicates": {
+          "label": "Localizar duplicatas",
+          "text": "Localize as abas que estão abertas mais de uma vez. Trate dois endereços como a mesma página apenas se a consulta e o fragmento também coincidirem. Liste-as agrupadas por página, as mais antigas primeiro, e informe quantas seriam liberadas — não as feche ainda."
+        },
+        "stash": {
+          "label": "Guardar abas como favoritos",
+          "text": "Quero reduzir esta janela apenas às abas em que estou realmente trabalhando. Guarde todas as outras como favoritos em uma nova pasta com a data de hoje, mantenha as abas fixadas e do domínio da minha empresa abertas, e mostre-me a lista antes de fechar qualquer aba."
+        },
+        "bookmarks": {
+          "label": "Organizar os favoritos",
+          "text": "Examine minha barra de favoritos. Agrupe os soltos em pastas por assunto e mova-os, renomeie os que ainda possuem o título da página para algo reconhecível e avise-me sobre duplicatas em vez de excluí-las."
+        },
+        "open": {
+          "label": "Configurar espaço de trabalho",
+          "text": "Abra as abas necessárias para uma sessão de revisão: nosso repositório, o rastreador de problemas e o documento de design. Coloque-as em um grupo chamado Review, fixe o repositório e mantenha tudo o que já tenho aberto onde está."
+        },
+        "prune": {
+          "label": "Limpar favoritos obsoletos",
+          "text": "Mostre os favoritos que parecem obsoletos: sem título, páginas de resultados de busca ou salvos em duplicidade. Liste-os com a pasta em que estão e deixe-me escolher quais excluir em vez de decidir por mim."
+        }
+      },
+      "phrasesTitle": "Ou simplesmente peça",
+      "phrases": {
+        "listTabs": "O que tenho aberto nesta janela?",
+        "groupThis": "Agrupe estas abas por assunto",
+        "findDupes": "Encontre minhas abas duplicadas",
+        "bookmarkAll": "Salve esta janela em uma nova pasta de favoritos",
+        "sortBar": "Organize minha barra de favoritos",
+        "pinFew": "Fixe as abas que alterno com frequência"
       }
-    },
-    "switcher": {
-      "label": "Escolha um agente"
     },
     "workspaceIntro": {
       "title": "Colabore com a IA nos seus documentos do Workspace",
@@ -1740,10 +1830,5 @@
     "reasonPreMergeDelete": "Antes da exclusão em massa",
     "reasonPreRestore": "Antes da restauração"
   },
-  "spark": {
-    "tasks": "Tarefas",
-    "schedules": "Agendamentos",
-    "skills": "Habilidades",
-    "apps": "Apps conectados"
-  }
+  "options": {}
 }
