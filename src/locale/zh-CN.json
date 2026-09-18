@@ -1256,6 +1256,10 @@
           "label": "清理片段收件箱",
           "text": "我的代码片段收件箱太乱了，帮我按主题分类移到不同的文件夹里。如果标题还是我当时的提问，请帮我精简成一句话概括。遇到重复保存的内容只保留最早的一份。在执行任何删除操作前，先让我确认下清单。"
         },
+        "theme": {
+          "label": "设计主题",
+          "text": "为我设计一个温暖的黄昏主题：深靛蓝色背景搭配柔和的琥珀色点缀，适合深夜阅读。确保文字对比度足够高，长时间阅读也不累眼。把它保存为一个自定义主题，在切换启用前先告诉我你选了哪些颜色。"
+        },
         "workspace": {
           "label": "记录讨论结论",
           "text": "把我们这次对话中定下来的结论总结成要点列表，保存到工作区的 notes/decisions.md 文件中，并在最后附上待确认的问题。如果该文件已存在，请在末尾加上今天的日期并追加内容，不要覆盖原文件。"
@@ -1358,8 +1362,7 @@
       "back": "返回",
       "reasonPlaceholder": "哪里不对？（可选）",
       "showDetail": "查看将要执行的操作",
-      "hideDetail": "收起将要执行的操作",
-      "paywallBrowserDesc": "浏览和查询标签页与书签完全免费。应用改动需要升级到 Power Pack —— 升级后重新发起即可确认执行。"
+      "hideDetail": "收起详情"
     },
     "tool": {
       "dataRead": "正在查看你的数据",
@@ -1398,6 +1401,9 @@
       "manageFiles": "管理文件",
       "docRead": "读取文档",
       "docEdit": "标注文档",
+      "listThemes": "查看您的主题",
+      "createTheme": "保存主题",
+      "applyTheme": "切换外观",
       "listTabs": "查看标签页",
       "listTabGroups": "查看标签组",
       "listBookmarks": "翻看书签",
@@ -1516,8 +1522,12 @@
         "description": "创建、重构和整理可复用的提示词 — 包括变量和引用"
       },
       "manageSnippets": {
-        "title": "管理片段",
-        "description": "整理、去重和搜索已保存的片段 — 包括全文内容"
+        "title": "管理代码片段",
+        "description": "整理、去重和搜索保存的代码片段 — 包括其完整文本"
+      },
+      "designTheme": {
+        "title": "设计主题",
+        "description": "与用户一起设计一套自定义配色主题，保存它，并在用户需要时切换过去"
       },
       "workspace": {
         "title": "工作区助手",
@@ -1530,6 +1540,14 @@
       "spreadsheetAnalysis": {
         "title": "处理表格数据",
         "description": "读 .xlsx 先看结构再动手算 — 用加列、加工作表的方式，不改原始数据"
+      },
+      "pdfReview": {
+        "title": "阅读与审阅 PDF",
+        "description": "提取 PDF 页面文本、书签、批注，填写表单字段及页面操作"
+      },
+      "pptxReview": {
+        "title": "阅读与编辑 PPT",
+        "description": "处理 PPTX 幻灯片文本、演讲者备注、形状及幻灯片排序"
       }
     },
     "mcp": {
@@ -1543,14 +1561,36 @@
         "sync_conversation_messages": "为没有消息记录的对话补录历史",
         "export": "将对话导出为文件",
         "complete_task": "结束智能体循环并汇报结果",
-        "doc_read": "读取 Word 文档：大纲、章节与搜索",
+        "doc_read": "读取文档（.docx、.xlsx、.pptx、.pdf）：大纲、章节与搜索",
+        "doc_edit": "编辑文档（.docx、.xlsx、.pptx、.pdf）：修订、表格、幻灯片与批注",
         "read_file": "读取文本文件，带行号",
         "write_file": "新建文件或整体覆盖",
         "edit_file": "替换文件里的指定文本",
         "list_files": "列出文件夹里的内容",
         "glob_files": "按名称模式查找文件",
         "grep_files": "用正则搜索文件内容",
-        "manage_files": "删除、移动或新建文件夹"
+        "manage_files": "删除、移动或新建文件夹",
+        "list_themes": "查看可用主题及当前生效的主题",
+        "create_theme": "将设计好的主题保存为自定义主题",
+        "apply_theme": "切换页面与侧边栏的主题外观",
+        "browser_list_tabs": "查看已打开的标签页及其状态",
+        "browser_list_tab_groups": "查看标签组名称、颜色及折叠状态",
+        "browser_list_bookmarks": "查看或搜索书签及书签文件夹",
+        "browser_query_changes": "查看本地操作记录与变更详情",
+        "browser_arrange_tabs": "批量打开、聚焦、移动或固定标签页",
+        "browser_close_tabs": "关闭指定的标签页",
+        "browser_manage_tab_groups": "创建、重命名、调整颜色、折叠或解散标签组",
+        "browser_arrange_bookmarks": "创建、重命名及移动书签与文件夹",
+        "browser_delete_bookmarks": "删除指定的书签或书签文件夹",
+        "browser_restore_state": "将浏览器还原至指定操作前或操作后的状态"
+      },
+      "theme": {
+        "name": "主题",
+        "description": "设计、保存并切换页面与侧边栏外观"
+      },
+      "browser": {
+        "name": "标签页与书签",
+        "description": "读取并整理 Chrome 标签页、标签组与书签。所有变动均需用户审核后批量执行，并记录在本地日志中支持随时还原。"
       },
       "workspace": {
         "name": "文件",
@@ -1558,7 +1598,7 @@
       },
       "documents": {
         "name": "文档",
-        "description": "按大纲和章节读取 Word 文档"
+        "description": "读取与编辑工作区中的文档（.docx、.xlsx、.pptx、.pdf）"
       },
       "core": {
         "name": "核心",

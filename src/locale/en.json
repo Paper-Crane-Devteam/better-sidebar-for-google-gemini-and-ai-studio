@@ -1541,6 +1541,14 @@
       "spreadsheetAnalysis": {
         "title": "Work Through a Spreadsheet",
         "description": "Read an .xlsx by schema first, then compute — adding columns and sheets rather than changing the data"
+      },
+      "pdfReview": {
+        "title": "Read and Review a PDF",
+        "description": "PDF page text, bookmarks, comments, form fields and page operations"
+      },
+      "pptxReview": {
+        "title": "Read and Edit PowerPoint",
+        "description": "PPTX slide text, speaker notes, shapes and slide ordering"
       }
     },
     "mcp": {
@@ -1554,7 +1562,8 @@
         "sync_conversation_messages": "Record message history for conversations that have none",
         "export": "Download conversations as files",
         "complete_task": "End the agent loop and report results",
-        "doc_read": "Read Word documents: outline, sections and search",
+        "doc_read": "Read documents (.docx, .xlsx, .pptx, .pdf): outline, sections and search",
+        "doc_edit": "Edit documents (.docx, .xlsx, .pptx, .pdf) with tracked changes, sheets, slides or annotations",
         "read_file": "Read a text file, with line numbers",
         "write_file": "Create a file or replace one entirely",
         "edit_file": "Replace exact text inside a file",
@@ -1564,11 +1573,25 @@
         "manage_files": "Delete, move or create folders",
         "list_themes": "List available themes and the active one",
         "create_theme": "Save a designed theme as a custom theme",
-        "apply_theme": "Switch the page and sidebar to a theme"
+        "apply_theme": "Switch the page and sidebar to a theme",
+        "browser_list_tabs": "List open tabs and their status",
+        "browser_list_tab_groups": "List tab groups with title, color and collapsed state",
+        "browser_list_bookmarks": "List or search bookmarks and folders",
+        "browser_query_changes": "Inspect local audit journal of applied changes",
+        "browser_arrange_tabs": "Open, focus, move and pin tabs in batch",
+        "browser_close_tabs": "Close specified tabs",
+        "browser_manage_tab_groups": "Create, rename, recolor, collapse and dissolve tab groups",
+        "browser_arrange_bookmarks": "Create, rename and move bookmarks and folders",
+        "browser_delete_bookmarks": "Delete specified bookmarks or folders",
+        "browser_restore_state": "Restore browser state before or after an applied batch"
       },
       "theme": {
         "name": "Themes",
         "description": "Design, save and switch the appearance of the page and sidebar"
+      },
+      "browser": {
+        "name": "Tabs & Bookmarks",
+        "description": "Read and reorganise Chrome tabs, tab groups and bookmarks. Every change is applied as a batch the user approves, and recorded in a local journal that can undo it."
       },
       "workspace": {
         "name": "Files",
@@ -1576,7 +1599,7 @@
       },
       "documents": {
         "name": "Documents",
-        "description": "Read Word documents by outline and section"
+        "description": "Read and edit documents (.docx, .xlsx, .pptx, .pdf) in your workspace"
       },
       "core": {
         "name": "Core",

@@ -116,8 +116,15 @@ export const SettingsModal = ({ open, onOpenChange }: SettingsModalProps) => {
         }
     };
 
+    // Click on the backdrop (outside the panel) closes the modal.
+    // Uses mousedown + target check so a drag that starts inside the panel and
+    // ends on the backdrop (e.g. text selection) doesn't trigger a close.
+    const handleBackdropMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (e.target === e.currentTarget) onOpenChange(false);
+    };
+
     return (
-        <div className="fixed inset-0 flex items-center justify-center animate-in fade-in-0" style={{ zIndex: Z_INDEX.MODAL, backgroundColor: 'var(--overlay-bg)', backdropFilter: 'var(--overlay-blur)', WebkitBackdropFilter: 'var(--overlay-blur)' }}>
+        <div className="fixed inset-0 flex items-center justify-center animate-in fade-in-0" style={{ zIndex: Z_INDEX.MODAL, backgroundColor: 'var(--overlay-bg)', backdropFilter: 'var(--overlay-blur)', WebkitBackdropFilter: 'var(--overlay-blur)' }} onMouseDown={handleBackdropMouseDown}>
             <div className="relative w-[800px] h-[600px] max-h-[90vh] rounded-lg flex overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4" style={{ backgroundColor: 'var(--panel-bg)', boxShadow: 'var(--shadow-panel)', backdropFilter: 'var(--panel-blur)', WebkitBackdropFilter: 'var(--panel-blur)' }}>
                 {/* Close Button */}
                 <Button

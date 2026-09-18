@@ -42,12 +42,13 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
 /** One tool, as a bullet under its server. */
 const ToolRow: React.FC<{ name: string; description: string }> = ({ name, description }) => {
   const { t } = useI18n();
+  const toolDesc = t(`agent.mcp.tools.${name}`, { defaultValue: description.slice(0, 70) });
   return (
-    <div className="flex items-center gap-2 py-1">
+    <div className="flex items-center gap-2 py-1" title={`${name} — ${toolDesc}`}>
       <div className="h-1 w-1 shrink-0 rounded-full bg-muted-foreground/40" />
       <span className="shrink-0 text-xs text-muted-foreground">{name}</span>
       <span className="truncate text-[10px] text-muted-foreground/60">
-        — {t(`agent.mcp.tools.${name}`, { defaultValue: description.slice(0, 70) })}
+        — {toolDesc}
       </span>
     </div>
   );
