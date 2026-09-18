@@ -88,7 +88,19 @@ function isComposerHeldByEngine(): boolean {
 export const AgentLoopFeature: React.FC = () => {
   useEffect(initializeBrowserAgent, []);
   const { t } = useI18n();
-  const enabled = usePegasusStore((s) => s.enhancedFeatures.aistudio?.slashCommand ?? true);
+  /**
+   * Whether typing `>` in the composer may open the agent launcher.
+   *
+   * Only the trigger is gated. The run interceptor, the Agent tab launcher, the dock and
+   * the conversation renderer stay mounted, so switching this off means "stop reacting to
+   * `>` while I type" rather than "abandon the running session".
+   *
+   * Read separately from `slashCommand`, which this used to piggyback on — `/` prompts and
+   * `>` agents are independent features and are now switched independently.
+   */
+  const agentTriggerEnabled = usePegasusStore(
+    (s) => s.enhancedFeatures.aistudio?.agentTrigger ?? true,
+  );
 
   const adapterRef = useRef<AgentPlatformAdapter | null>(null);
   const getAdapter = useCallback((): AgentPlatformAdapter | null => {
@@ -406,11 +418,22 @@ export const AgentLoopFeature: React.FC = () => {
 
   // ─── Editor integration (`>`) ───────────────────────────────────────
 
+  /**
+   * Kept `true` on purpose, even when the `>` trigger is switched off.
+   *
+   * `enabled: false` tears the integration down, and with it the `onBeforeSend`
+   * registration — the one thing that turns a staged `>Entry title` line into a real agent
+   * prompt. Launching from the Agent tab never touches the trigger, so a torn-down
+   * integration would post those launches as raw skill text. The trigger is refused in
+   * `onInput` below instead.
+   */
   const { popupPosition } = useAIStudioEditorIntegration({
     getTextarea,
-    enabled,
+    enabled: true,
     triggerChar: '>',
     onInput: (text, cursorPos) => {
+      // Switched off: `>` is just a character the user typed.
+      if (!agentTriggerEnabled) return;
       // Suppressed only while the engine's tool results are sitting in the composer:
       // a marker inserted there would ride along with the payload on the next send, and
       // the interceptor would hijack it into a second session. Every other running state
@@ -550,7 +573,13 @@ export const AgentLoopFeature: React.FC = () => {
     return () => observer.disconnect();
   }, []);
 
-  if (!enabled) return null;
+  // Switched off while the popup was up — close it rather than leaving a list on screen
+  // that no keystroke can reach any more.
+  const closeRef = useRef(close);
+  closeRef.current = close;
+  useEffect(() => {
+    if (!agentTriggerEnabled) closeRef.current();
+  }, [agentTriggerEnabled]);
 
   return (
     <>

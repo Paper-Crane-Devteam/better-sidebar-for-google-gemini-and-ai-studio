@@ -842,6 +842,8 @@
     "autoHideInputDesc": "滑鼠懸停在底部區域時才顯示輸入框",
     "slashCommand": "斜線命令",
     "slashCommandDesc": "在輸入框中輸入 / 快速插入提示詞庫中的提示詞",
+    "agentTrigger": "Agent 快捷喚起",
+    "agentTriggerDesc": "在輸入框中輸入 > 快速喚起 Agent 任務；關閉後可正常輸入 > 符號",
     "hotkeyHelper": "快捷鍵助手",
     "hotkeyHelperDesc": "在右下角顯示鍵盤圖示，懸停查看快捷鍵",
     "selectionToolbar": "劃詞工具列",
@@ -873,6 +875,8 @@
     "autoHideRunSettingsDesc": "開啟對話時不自動展開執行設定面板，需手動開啟",
     "slashCommand": "斜線命令",
     "slashCommandDesc": "在輸入框中輸入 / 快速插入提示詞庫中的提示詞",
+    "agentTrigger": "Agent 快捷喚起",
+    "agentTriggerDesc": "在輸入框中輸入 > 快速喚起 Agent 任務；關閉後可正常輸入 > 符號",
     "hotkeyHelper": "快捷鍵助手",
     "hotkeyHelperDesc": "在右下角顯示鍵盤圖示，快速查看快捷鍵"
   },
@@ -1070,6 +1074,7 @@
     "importAndApply": "匯入並套用",
     "importRequiresLicense": "匯入自訂主題需要支持包。",
     "importSuccess": "主題匯入並套用成功！",
+    "themeSaved": "自訂主題已儲存，可在「主題」中切換使用。",
     "promptAlreadyExists": "AI 主題 Prompt 已存在，正在跳轉到 Prompt 管理。",
     "promptCreated": "Prompt 已建立！正在跳轉到 Prompt 管理。",
     "themeDeleted": "自訂主題已刪除。"
@@ -1256,6 +1261,10 @@
           "label": "清理片段收件匣",
           "text": "我的程式碼片段收件匣太亂了，幫我按主題分類移到不同的資料夾裡。如果標題還是我當時的提問，請幫我精簡成一句話概括。遇到重複儲存的內容只保留最早的一份。在執行任何刪除操作前，先讓我確認下清單。"
         },
+        "theme": {
+          "label": "設計主題",
+          "text": "為我設計一個溫暖的黃昏主題：深靛藍色背景搭配柔和的琥珀色點綴，適合深夜閱讀。確保文字對比度足夠高，長時間閱讀也不累眼。把它儲存為一個自訂主題，在切換啟用前先告訴我你選了哪些顏色。"
+        },
         "workspace": {
           "label": "紀錄討論結論",
           "text": "把我們這次對話中定下來的結論總結成要點列表，儲存到工作區的 notes/decisions.md 檔案中，並在最後附上待確認的問題。如果該檔案已存在，請在結尾加上今天的日期並附加內容，不要覆蓋原檔案。"
@@ -1358,8 +1367,7 @@
       "back": "返回",
       "reasonPlaceholder": "哪裡不對？（選填）",
       "showDetail": "檢視將要執行的操作",
-      "hideDetail": "收起將要執行的操作",
-      "paywallBrowserDesc": "瀏覽和查詢分頁與書籤完全免費。套用變更需要升級至 Power Pack —— 升級後重新發起即可確認執行。"
+      "hideDetail": "收起將要執行的操作"
     },
     "tool": {
       "dataRead": "正在查看你的資料",
@@ -1398,6 +1406,9 @@
       "manageFiles": "管理檔案",
       "docRead": "讀取文件",
       "docEdit": "標註文件",
+      "listThemes": "查看您的主題",
+      "createTheme": "儲存主題",
+      "applyTheme": "切換外觀",
       "listTabs": "查看分頁",
       "listTabGroups": "查看分頁群組",
       "listBookmarks": "翻看書籤",
@@ -1519,6 +1530,10 @@
         "title": "管理片段",
         "description": "整理、去重和搜尋已儲存的片段 — 包括全文內容"
       },
+      "designTheme": {
+        "title": "設計主題",
+        "description": "與使用者一起設計一套自訂配色主題，儲存它，並在使用者需要時切換過去"
+      },
       "workspace": {
         "title": "工作區助手",
         "description": "在私有工作區中讀寫、編輯和搜尋檔案"
@@ -1530,6 +1545,14 @@
       "spreadsheetAnalysis": {
         "title": "處理試算表資料",
         "description": "讀 .xlsx 先看結構再動手算 — 用加欄位、加工作表的方式，不改原始資料"
+      },
+      "pdfReview": {
+        "title": "閱讀與審閱 PDF",
+        "description": "提取 PDF 頁面文字、書籤、註解，填寫表單欄位及頁面操作"
+      },
+      "pptxReview": {
+        "title": "閱讀與編輯 PPT",
+        "description": "處理 PPTX 投影片文字、演講者備忘稿、圖形及投影片排序"
       }
     },
     "mcp": {
@@ -1543,14 +1566,36 @@
         "sync_conversation_messages": "為沒有訊息記錄的對話記錄訊息歷史",
         "export": "將對話下載為檔案",
         "complete_task": "結束智慧體迴圈並回報結果",
-        "doc_read": "讀取 Word 文件：大綱、章節與搜尋",
+        "doc_read": "讀取文件（.docx、.xlsx、.pptx、.pdf）：大綱、章節與搜尋",
+        "doc_edit": "編輯文件（.docx、.xlsx、.pptx、.pdf）：修訂、工作表、投影片與註解",
         "read_file": "讀取文字檔，附行號",
         "write_file": "新建檔案或整體覆寫",
         "edit_file": "替換檔案內的指定文字",
         "list_files": "列出資料夾內容",
         "glob_files": "依名稱模式尋找檔案",
         "grep_files": "用正規表示式搜尋檔案內容",
-        "manage_files": "刪除、移動或新建資料夾"
+        "manage_files": "刪除、移動或新建資料夾",
+        "list_themes": "查看可用主題及目前生效的主題",
+        "create_theme": "將設計好的主題儲存為自訂主題",
+        "apply_theme": "切換頁面與側邊欄的主題外觀",
+        "browser_list_tabs": "查看已開啟的分頁及其狀態",
+        "browser_list_tab_groups": "查看分頁群組名稱、顏色及折疊狀態",
+        "browser_list_bookmarks": "查看或搜尋書籤及書籤資料夾",
+        "browser_query_changes": "查看本地操作記錄與變更詳情",
+        "browser_arrange_tabs": "批次開啟、聚焦、移動或固定分頁",
+        "browser_close_tabs": "關閉指定的分頁",
+        "browser_manage_tab_groups": "建立、重新命名、調整顏色、折疊或解散分頁群組",
+        "browser_arrange_bookmarks": "建立、重新命名及移動書籤與資料夾",
+        "browser_delete_bookmarks": "刪除指定的書籤或書籤資料夾",
+        "browser_restore_state": "將瀏覽器還原至指定操作前或操作後的狀態"
+      },
+      "theme": {
+        "name": "主題",
+        "description": "設計、儲存並切換頁面與側邊欄外觀"
+      },
+      "browser": {
+        "name": "分頁與書籤",
+        "description": "讀取並整理 Chrome 分頁、分頁群組與書籤。所有變更均需使用者審核後批次執行，並記錄在本地日誌中支援隨時復原。"
       },
       "workspace": {
         "name": "檔案",
@@ -1558,7 +1603,7 @@
       },
       "documents": {
         "name": "文件",
-        "description": "依大綱與章節讀取 Word 文件"
+        "description": "讀取與編輯工作區中的文件（.docx、.xlsx、.pptx、.pdf）"
       },
       "core": {
         "name": "核心",

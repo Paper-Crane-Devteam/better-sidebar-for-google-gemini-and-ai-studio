@@ -139,8 +139,11 @@ export const IntegrationsSettings = () => {
         <Separator />
       </div>
 
-      {/* Gate: Host permission required first */}
-      {!notionPermission.granted ? (
+      {/* Gate: Host permission required first.
+          While the permission check is still in flight we render nothing below
+          the header — showing the "grant permission" branch optimistically makes
+          the button flash for a frame on every panel switch. */}
+      {notionPermission.checking ? null : !notionPermission.granted ? (
         <div className="space-y-3">
           <p className="text-sm text-muted-foreground">
             {t('integrations.notionPermissionHint')}

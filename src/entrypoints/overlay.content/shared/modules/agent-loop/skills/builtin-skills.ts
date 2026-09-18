@@ -822,6 +822,8 @@ Then \`complete_task\` with what you changed and what you would still check.
   },
   {
     id: 'builtin-pdf-review', type: 'builtin', agentId: 'workspace',
+    titleKey: 'agent.skills.pdfReview.title',
+    descriptionKey: 'agent.skills.pdfReview.description',
     title: 'Read and Review a PDF',
     description: 'PDF page text, bookmarks, comments, AcroForm fields and page operations',
     icon: 'FileText', enabled: true, createdAt: 0, updatedAt: 0,
@@ -858,6 +860,8 @@ Report applied operations and backupPath from the tool result; never claim body 
   },
   {
     id: 'builtin-pptx-review', type: 'builtin', agentId: 'workspace',
+    titleKey: 'agent.skills.pptxReview.title',
+    descriptionKey: 'agent.skills.pptxReview.description',
     title: 'Read and Edit PowerPoint',
     description: 'PPTX slide text, speaker notes, shapes and slide ordering',
     icon: 'FileText', enabled: true, createdAt: 0, updatedAt: 0,

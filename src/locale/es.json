@@ -842,6 +842,8 @@
     "autoHideInputDesc": "Ocultar el cuadro de entrada hasta que pases el cursor por la zona inferior",
     "slashCommand": "Comandos con barra",
     "slashCommandDesc": "Escribe / en la entrada para insertar rápidamente prompts de la biblioteca",
+    "agentTrigger": "Activador de agente",
+    "agentTriggerDesc": "Escribe > en la entrada para iniciar una tarea de agente; desactívalo para escribir > como texto normal",
     "hotkeyHelper": "Ayuda de Atajos",
     "hotkeyHelperDesc": "Mostrar icono de teclado en la esquina inferior derecha para referencia rápida de atajos",
     "selectionToolbar": "Barra de herramientas de selección",
@@ -873,6 +875,8 @@
     "autoHideRunSettingsDesc": "El panel de configuración de ejecución permanece contraído al abrir un chat, expandir manualmente cuando sea necesario",
     "slashCommand": "Comandos con barra",
     "slashCommandDesc": "Escribe / en la entrada para insertar rápidamente prompts de la biblioteca",
+    "agentTrigger": "Activador de agente",
+    "agentTriggerDesc": "Escribe > en la entrada para iniciar una tarea de agente; desactívalo para escribir > como texto normal",
     "hotkeyHelper": "Ayuda de Atajos",
     "hotkeyHelperDesc": "Mostrar icono de teclado en la esquina inferior derecha para referencia rápida de atajos"
   },
@@ -1070,6 +1074,7 @@
     "importAndApply": "Importar y Aplicar",
     "importRequiresLicense": "Importar temas personalizados requiere el Pack de Soporte.",
     "importSuccess": "¡Tema importado y aplicado con éxito!",
+    "themeSaved": "Tema personalizado guardado: puedes cambiar a él en Temas.",
     "promptAlreadyExists": "El prompt de tema con IA ya existe. Cambiando a la pestaña de Prompts.",
     "promptCreated": "¡Prompt creado! Cambiando a la pestaña de Prompts.",
     "themeDeleted": "Tema personalizado eliminado."
@@ -1256,6 +1261,10 @@
           "label": "Organizar fragmentos",
           "text": "Mi bandeja de entrada de fragmentos es un caos. Agrúpalos en carpetas por tema y acorta los títulos que siguen siendo mi pregunta original a un breve resumen. Si el mismo contenido está guardado dos veces, quédate solo con el más antiguo. Enséñame la lista antes de borrar nada."
         },
+        "theme": {
+          "label": "Diseñar un tema",
+          "text": "Diseña para mí un tema cálido de atardecer: fondo índigo profundo con sutiles toques ámbar, cómodo para leer tarde en la noche. Mantén el contraste del texto lo bastante alto como para leer durante horas. Guárdalo como tema personalizado y dime qué colores elegiste antes de activarlo."
+        },
         "workspace": {
           "label": "Guardar decisiones",
           "text": "Resume las conclusiones a las que hemos llegado en este chat en forma de lista de viñetas y guárdalo en notes/decisions.md en el espacio de trabajo. Añade al final las dudas que queden por resolver. Si el archivo ya existe, añade el contenido al final con la fecha de hoy, no lo sobrescribas."
@@ -1397,6 +1406,9 @@
       "manageFiles": "Reorganizando archivos",
       "docRead": "Leyendo un documento",
       "docEdit": "Marcando cambios en un documento",
+      "listThemes": "Mirando tus temas",
+      "createTheme": "Guardando un tema",
+      "applyTheme": "Cambiando el aspecto",
       "listTabs": "Revisando tus pestañas",
       "listTabGroups": "Revisando tus grupos de pestañas",
       "listBookmarks": "Buscando en tus marcadores",
@@ -1518,6 +1530,10 @@
         "title": "Gestionar snippets",
         "description": "Organiza, deduplica y busca snippets guardados — incluyendo su texto completo"
       },
+      "designTheme": {
+        "title": "Diseñar un tema",
+        "description": "Diseña un tema de color personalizado con el usuario, guárdalo y cámbialo si lo desea"
+      },
       "workspace": {
         "title": "Asistente de espacio de trabajo",
         "description": "Lee, escribe, edita y busca archivos en tu espacio de trabajo privado"
@@ -1529,6 +1545,14 @@
       "spreadsheetAnalysis": {
         "title": "Trabajar con una hoja de cálculo",
         "description": "Lee un .xlsx primero por su estructura y luego calcula — añadiendo columnas y hojas en lugar de modificar los datos"
+      },
+      "pdfReview": {
+        "title": "Leer y revisar un PDF",
+        "description": "Texto de páginas PDF, marcadores, comentarios, campos de formulario y operaciones de página"
+      },
+      "pptxReview": {
+        "title": "Leer y editar PowerPoint",
+        "description": "Texto de diapositivas PPTX, notas del orador, formas y orden de diapositivas"
       }
     },
     "mcp": {
@@ -1542,14 +1566,36 @@
         "sync_conversation_messages": "Registrar el historial de mensajes de conversaciones sin contenido",
         "export": "Descargar conversaciones como archivos",
         "complete_task": "Finalizar el bucle del agente y reportar resultados",
-        "doc_read": "Leer documentos de Word: esquema, secciones y búsqueda",
+        "doc_read": "Lee documentos (.docx, .xlsx, .pptx, .pdf): esquema, secciones y búsqueda",
+        "doc_edit": "Edita documentos (.docx, .xlsx, .pptx, .pdf): cambios controlados, hojas, diapositivas y anotaciones",
         "read_file": "Lee un archivo de texto con números de línea",
         "write_file": "Crea un archivo o lo reemplaza por completo",
         "edit_file": "Reemplaza texto exacto dentro de un archivo",
         "list_files": "Lista el contenido de una carpeta",
         "glob_files": "Busca archivos por patrón de nombre",
         "grep_files": "Busca en el contenido con expresiones regulares",
-        "manage_files": "Elimina, mueve o crea carpetas"
+        "manage_files": "Elimina, mueve o crea carpetas",
+        "list_themes": "Lista los temas disponibles y el activo",
+        "create_theme": "Guarda un tema diseñado como personalizado",
+        "apply_theme": "Aplica un tema a la página y a la barra lateral",
+        "browser_list_tabs": "Lista las pestañas abiertas y su estado",
+        "browser_list_tab_groups": "Lista grupos de pestañas con título, color y estado",
+        "browser_list_bookmarks": "Lista o busca marcadores y carpetas de marcadores",
+        "browser_query_changes": "Inspecciona el registro local de cambios aplicados",
+        "browser_arrange_tabs": "Abre, enfoca, mueve y fija pestañas por lotes",
+        "browser_close_tabs": "Cierra las pestañas especificadas",
+        "browser_manage_tab_groups": "Crea, actualiza, mueve y disuelve grupos de pestañas",
+        "browser_arrange_bookmarks": "Crea, renombra y mueve marcadores y carpetas",
+        "browser_delete_bookmarks": "Elimina marcadores o carpetas de marcadores especificados",
+        "browser_restore_state": "Restaura el estado del navegador antes o después de un lote aplicado"
+      },
+      "theme": {
+        "name": "Temas",
+        "description": "Diseña, guarda y cambia la apariencia de la página y la barra lateral"
+      },
+      "browser": {
+        "name": "Pestañas y Marcadores",
+        "description": "Lee y reorganiza pestañas, grupos de pestañas y marcadores de Chrome. Cada cambio se aplica por lotes con tu aprobación y se guarda en un registro local para revertirlo."
       },
       "workspace": {
         "name": "Archivos",
@@ -1557,7 +1603,7 @@
       },
       "documents": {
         "name": "Documentos",
-        "description": "Lee documentos de Word por esquema y sección"
+        "description": "Lee y edita documentos (.docx, .xlsx, .pptx, .pdf) en tu espacio de trabajo"
       },
       "core": {
         "name": "Núcleo",

@@ -373,6 +373,13 @@ const Options = ({ initialEnabledState, detectedPlatform }: OptionsProps) => {
                       </div>
                       <Switch checked={geminiSettings.slashCommand} onCheckedChange={(c) => setGeminiFeature('slashCommand', c)} className="data-[state=checked]:bg-primary data-[state=checked]:border-primary" />
                     </div>
+                    <div className="flex items-center justify-between p-4">
+                      <div className="space-y-1">
+                        <Label className="text-sm font-semibold">{t('geminiUI.agentTrigger')}</Label>
+                        <p className="text-xs text-muted-foreground">{t('geminiUI.agentTriggerDesc')}</p>
+                      </div>
+                      <Switch checked={geminiSettings.agentTrigger ?? true} onCheckedChange={(c) => setGeminiFeature('agentTrigger', c)} className="data-[state=checked]:bg-primary data-[state=checked]:border-primary" />
+                    </div>
                   </div>
                 </div>
               </>
@@ -430,6 +437,13 @@ const Options = ({ initialEnabledState, detectedPlatform }: OptionsProps) => {
                         <p className="text-xs text-muted-foreground">{t('aistudioUI.slashCommandDesc')}</p>
                       </div>
                       <Switch checked={aistudioSettings.slashCommand} onCheckedChange={(c) => setAIStudioFeature('slashCommand', c)} className="data-[state=checked]:bg-primary data-[state=checked]:border-primary" />
+                    </div>
+                    <div className="flex items-center justify-between p-4">
+                      <div className="space-y-1">
+                        <Label className="text-sm font-semibold">{t('aistudioUI.agentTrigger')}</Label>
+                        <p className="text-xs text-muted-foreground">{t('aistudioUI.agentTriggerDesc')}</p>
+                      </div>
+                      <Switch checked={aistudioSettings.agentTrigger ?? true} onCheckedChange={(c) => setAIStudioFeature('agentTrigger', c)} className="data-[state=checked]:bg-primary data-[state=checked]:border-primary" />
                     </div>
                     <div className="flex items-center justify-between p-4">
                       <div className="space-y-1">
