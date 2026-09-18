@@ -347,6 +347,38 @@ export const GeminiPlatformSettings = () => {
               }
             />
           </div>
+
+          {/* Slash Commands (`/`) */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label className="text-sm font-medium">
+                {t('geminiUI.slashCommand')}
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                {t('geminiUI.slashCommandDesc')}
+              </p>
+            </div>
+            <Switch
+              checked={geminiSettings?.slashCommand ?? true}
+              onCheckedChange={(c) => setGeminiFeature('slashCommand', c)}
+            />
+          </div>
+
+          {/* Agent Trigger (`>`) */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label className="text-sm font-medium">
+                {t('geminiUI.agentTrigger')}
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                {t('geminiUI.agentTriggerDesc')}
+              </p>
+            </div>
+            <Switch
+              checked={geminiSettings?.agentTrigger ?? true}
+              onCheckedChange={(c) => setGeminiFeature('agentTrigger', c)}
+            />
+          </div>
         </div>
       </div>
 

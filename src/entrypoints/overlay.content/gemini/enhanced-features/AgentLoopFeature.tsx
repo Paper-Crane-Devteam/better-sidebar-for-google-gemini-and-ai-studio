@@ -87,8 +87,20 @@ function isComposerHeldByEngine(): boolean {
 export const AgentLoopFeature: React.FC = () => {
   useEffect(initializeBrowserAgent, []);
   const { t } = useI18n();
-  const slashCommandEnabled = usePegasusStore(
-    (s) => s.enhancedFeatures.gemini.slashCommand,
+  /**
+   * Whether typing `>` in the composer may open the agent launcher.
+   *
+   * Only the trigger is gated, not the feature: the send interceptor, the Agent tab
+   * launcher, the dock and the conversation renderer all stay mounted. Turning the
+   * switch off means "stop reacting to `>` while I type", not "forget the running
+   * session and hide what the agent already did".
+   *
+   * Read separately from `slashCommand`, which this used to piggyback on — the two
+   * triggers (`/` prompts, `>` agents) are independent features and are now switched
+   * independently.
+   */
+  const agentTriggerEnabled = usePegasusStore(
+    (s) => s.enhancedFeatures.gemini?.agentTrigger ?? true,
   );
 
   const adapterRef = useRef<AgentPlatformAdapter | null>(null);
@@ -485,11 +497,22 @@ export const AgentLoopFeature: React.FC = () => {
 
   // ─── Editor integration (`>`) ───────────────────────────────────────
 
+  /**
+   * Kept `true` on purpose, even when the `>` trigger is switched off.
+   *
+   * `enabled: false` tears the whole integration down, and that includes the
+   * `onBeforeSend` registration — the one thing that turns a staged capsule into a real
+   * agent prompt. Launching from the Agent tab does not go through `>` at all, so
+   * disabling the integration would leave those launches to be posted as raw skill text.
+   * The trigger itself is refused in `onInput` below instead.
+   */
   const { popupPosition, suppressInput } = useEditorIntegration({
     getEditor: () => getAdapter()?.getEditor() || null,
-    enabled: slashCommandEnabled,
+    enabled: true,
     triggerChar: '>',
     onInput: (text, cursorPos) => {
+      // Switched off: `>` is just a character the user typed.
+      if (!agentTriggerEnabled) return;
       // Suppressed only while the engine's tool results are sitting in the composer.
       // Inserting a capsule there would ride along with the payload on the next send,
       // and the send interceptor would hijack it into a second session.
@@ -666,7 +689,13 @@ export const AgentLoopFeature: React.FC = () => {
     return () => observer.disconnect();
   }, []);
 
-  if (!slashCommandEnabled) return null;
+  // Switched off mid-session with the popup up — close it rather than leaving a list
+  // on screen that no keystroke can reach any more.
+  const closeRef = useRef(close);
+  closeRef.current = close;
+  useEffect(() => {
+    if (!agentTriggerEnabled) closeRef.current();
+  }, [agentTriggerEnabled]);
 
   return (
     <>

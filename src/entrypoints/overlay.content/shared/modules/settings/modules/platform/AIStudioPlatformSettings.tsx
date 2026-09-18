@@ -17,6 +17,9 @@ export const AIStudioPlatformSettings = () => {
     sidebarWidth: 320,
     autoHideInput: false,
     autoHideRunSettings: false,
+    showHotkeyHelper: true,
+    slashCommand: true,
+    agentTrigger: true,
   };
   const setAIStudioFeature = usePegasusStore((s) => s.setAIStudioEnhancedFeature);
 
@@ -132,6 +135,22 @@ export const AIStudioPlatformSettings = () => {
             <Switch
               checked={aistudioSettings.slashCommand ?? true}
               onCheckedChange={(c) => setAIStudioFeature('slashCommand', c)}
+            />
+          </div>
+
+          {/* Agent Trigger (`>`) */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label className="text-sm font-medium">
+                {t('aistudioUI.agentTrigger')}
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                {t('aistudioUI.agentTriggerDesc')}
+              </p>
+            </div>
+            <Switch
+              checked={aistudioSettings.agentTrigger ?? true}
+              onCheckedChange={(c) => setAIStudioFeature('agentTrigger', c)}
             />
           </div>
 

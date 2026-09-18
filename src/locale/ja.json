@@ -842,6 +842,8 @@
     "autoHideInputDesc": "下部エリアにホバーするまで入力欄を非表示にする",
     "slashCommand": "スラッシュコマンド",
     "slashCommandDesc": "入力欄で / を入力してライブラリからプロンプトをすばやく挿入",
+    "agentTrigger": "エージェント起動",
+    "agentTriggerDesc": "入力欄で > を入力してエージェントタスクを開始します。オフにすると > を通常の文字として入力できます",
     "hotkeyHelper": "ショートカットヘルパー",
     "hotkeyHelperDesc": "右下にキーボードアイコンを表示してショートカットをすぐに確認",
     "selectionToolbar": "選択ツールバー",
@@ -873,6 +875,8 @@
     "autoHideRunSettingsDesc": "チャットを開いた時に実行設定パネルを自動展開しない（手動で開く）",
     "slashCommand": "スラッシュコマンド",
     "slashCommandDesc": "入力欄で / を入力してライブラリからプロンプトをすばやく挿入",
+    "agentTrigger": "エージェント起動",
+    "agentTriggerDesc": "入力欄で > を入力してエージェントタスクを開始します。オフにすると > を通常の文字として入力できます",
     "hotkeyHelper": "ショートカットヘルパー",
     "hotkeyHelperDesc": "右下にキーボードアイコンを表示してショートカットをすぐに確認"
   },
@@ -1070,6 +1074,7 @@
     "importAndApply": "インポートして適用",
     "importRequiresLicense": "カスタムテーマのインポートにはサポートパックが必要です。",
     "importSuccess": "テーマのインポートと適用に成功しました！",
+    "themeSaved": "カスタムテーマを保存しました。「テーマ」から切り替えられます。",
     "promptAlreadyExists": "AI テーマプロンプトは既に存在します。プロンプトタブに移動します。",
     "promptCreated": "プロンプトを作成しました！プロンプトタブに移動します。",
     "themeDeleted": "カスタムテーマを削除しました。"

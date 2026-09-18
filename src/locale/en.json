@@ -842,6 +842,8 @@
     "autoHideInputDesc": "Hide input box until you hover the bottom area",
     "slashCommand": "Slash Commands",
     "slashCommandDesc": "Type / in input to quickly insert prompts from library",
+    "agentTrigger": "Agent Trigger",
+    "agentTriggerDesc": "Type > in input to start an agent task; turn off to type > normally",
     "hotkeyHelper": "Shortcut Helper",
     "hotkeyHelperDesc": "Show keyboard icon in bottom-right for quick shortcut reference",
     "selectionToolbar": "Selection Toolbar",
@@ -873,6 +875,8 @@
     "autoHideRunSettingsDesc": "Run settings panel stays collapsed when opening a chat, expand manually when needed",
     "slashCommand": "Slash Commands",
     "slashCommandDesc": "Type / in input to quickly insert prompts from library",
+    "agentTrigger": "Agent Trigger",
+    "agentTriggerDesc": "Type > in input to start an agent task; turn off to type > normally",
     "hotkeyHelper": "Shortcut Helper",
     "hotkeyHelperDesc": "Show keyboard icon in bottom-right for quick shortcut reference"
   },

@@ -62,6 +62,8 @@ export interface GeminiEnhancedFeatures {
   autoHideInput: boolean;
   showHotkeyHelper: boolean;
   slashCommand: boolean;
+  /** `>` in the composer opens the agent launcher popup */
+  agentTrigger: boolean;
   removeWatermark: boolean;
   tableAutoWidth: boolean;
   selectionToolbar: SelectionToolbarConfig;
@@ -73,6 +75,8 @@ export interface AIStudioEnhancedFeatures {
   autoHideRunSettings: boolean;
   showHotkeyHelper: boolean;
   slashCommand: boolean;
+  /** `>` in the composer opens the agent launcher popup */
+  agentTrigger: boolean;
 }
 
 interface PegasusState {
@@ -129,6 +133,7 @@ export const usePegasusStore = create<PegasusState>()((set) => ({
       autoHideInput: false,
       showHotkeyHelper: true,
       slashCommand: true,
+      agentTrigger: true,
       removeWatermark: true,
       tableAutoWidth: false,
       selectionToolbar: {
@@ -147,6 +152,7 @@ export const usePegasusStore = create<PegasusState>()((set) => ({
       autoHideRunSettings: false,
       showHotkeyHelper: true,
       slashCommand: true,
+      agentTrigger: true,
     },
   },
   setGeminiEnhancedFeature: (key, value) =>
@@ -203,6 +209,7 @@ const DEFAULT_ENHANCED_FEATURES: PegasusState['enhancedFeatures'] = {
     autoHideInput: false,
     showHotkeyHelper: true,
     slashCommand: true,
+    agentTrigger: true,
     removeWatermark: true,
     tableAutoWidth: false,
     selectionToolbar: {
@@ -221,6 +228,7 @@ const DEFAULT_ENHANCED_FEATURES: PegasusState['enhancedFeatures'] = {
     autoHideRunSettings: false,
     showHotkeyHelper: true,
     slashCommand: true,
+    agentTrigger: true,
   },
 };
 

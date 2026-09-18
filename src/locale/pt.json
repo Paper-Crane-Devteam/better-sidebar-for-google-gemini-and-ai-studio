@@ -842,6 +842,8 @@
     "autoHideInputDesc": "Ocultar a caixa de entrada até passar o cursor na área inferior",
     "slashCommand": "Comandos com barra",
     "slashCommandDesc": "Digite / na entrada para inserir rapidamente prompts da biblioteca",
+    "agentTrigger": "Acionador de agente",
+    "agentTriggerDesc": "Digite > na entrada para iniciar uma tarefa de agente; desative para digitar > como texto normal",
     "hotkeyHelper": "Ajuda de Atalhos",
     "hotkeyHelperDesc": "Mostrar ícone de teclado no canto inferior direito para referência rápida de atalhos",
     "selectionToolbar": "Barra de ferramentas de seleção",
@@ -873,6 +875,8 @@
     "autoHideRunSettingsDesc": "O painel de configurações de execução permanece recolhido ao abrir um chat, expanda manualmente quando necessário",
     "slashCommand": "Comandos com barra",
     "slashCommandDesc": "Digite / na entrada para inserir rapidamente prompts da biblioteca",
+    "agentTrigger": "Acionador de agente",
+    "agentTriggerDesc": "Digite > na entrada para iniciar uma tarefa de agente; desative para digitar > como texto normal",
     "hotkeyHelper": "Ajuda de Atalhos",
     "hotkeyHelperDesc": "Mostrar ícone de teclado no canto inferior direito para referência rápida de atalhos"
   },
@@ -1070,6 +1074,7 @@
     "importAndApply": "Importar e Aplicar",
     "importRequiresLicense": "Importar temas personalizados requer o Pacote de Suporte.",
     "importSuccess": "Tema importado e aplicado com sucesso!",
+    "themeSaved": "Tema personalizado salvo — você pode alternar para ele em Temas.",
     "promptAlreadyExists": "O prompt de tema com IA já existe. Mudando para a aba de Prompts.",
     "promptCreated": "Prompt criado! Mudando para a aba de Prompts.",
     "themeDeleted": "Tema personalizado removido."

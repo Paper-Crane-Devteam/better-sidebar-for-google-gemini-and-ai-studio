@@ -842,6 +842,8 @@
     "autoHideInputDesc": "隐藏输入框，鼠标悬停底部时自动显示",
     "slashCommand": "斜杠命令",
     "slashCommandDesc": "在输入框中输入 / 快速插入提示词库中的提示词",
+    "agentTrigger": "Agent 快捷唤起",
+    "agentTriggerDesc": "在输入框中输入 > 快速唤起 Agent 任务；关闭后可正常输入 > 符号",
     "hotkeyHelper": "快捷键助手",
     "hotkeyHelperDesc": "在右下角显示键盘图标，悬停查看快捷键",
     "selectionToolbar": "划词工具栏",
@@ -873,6 +875,8 @@
     "autoHideRunSettingsDesc": "打开对话时不自动展开运行设置面板，需手动打开",
     "slashCommand": "斜杠命令",
     "slashCommandDesc": "在输入框中输入 / 快速插入提示词库中的提示词",
+    "agentTrigger": "Agent 快捷唤起",
+    "agentTriggerDesc": "在输入框中输入 > 快速唤起 Agent 任务；关闭后可正常输入 > 符号",
     "hotkeyHelper": "快捷键助手",
     "hotkeyHelperDesc": "在右下角显示键盘图标，快速查看快捷键"
   },
@@ -1070,6 +1074,7 @@
     "importAndApply": "导入并应用",
     "importRequiresLicense": "导入自定义主题需要支持包。",
     "importSuccess": "主题导入并应用成功！",
+    "themeSaved": "自定义主题已保存，可在“主题”中切换使用。",
     "promptAlreadyExists": "AI 主题 Prompt 已存在，正在跳转到 Prompt 管理。",
     "promptCreated": "Prompt 已创建！正在跳转到 Prompt 管理。",
     "themeDeleted": "自定义主题已删除。"
