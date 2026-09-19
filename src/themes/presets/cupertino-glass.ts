@@ -238,11 +238,26 @@ body.bs-fonts--cupertino-glass *:not(.material-symbols-outlined):not(.material-s
     { property: '--popover-radius', value: '10px' },
     { property: '--popover-shadow', value: '0 24px 48px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.08)' },
     { property: '--popover-border', value: '0.5px solid rgba(255,255,255,0.35)' },
-    // Frosted glass for modal panels (settings, dialogs)
-    // Only the overlay/mask has blur — panel is just semi-transparent to let the blur show through
+    // Frosted glass for modal panels (settings, dialogs).
+    //
+    // The panel deliberately carries no blur of its own. `--panel-blur` does
+    // work now — GlobalModal no longer nests the panel inside the overlay's
+    // backdrop root — but a backdrop-filter here would put the panel on its own
+    // compositor render surface with its scrolling body inside it, and that is
+    // the exact arrangement that made dialogs blink out mid-scroll. The scrim's
+    // blur is what carries the frosted look; the panel just sits on it.
     { property: '--panel-blur', value: 'none' },
-    { property: '--panel-bg', value: 'rgba(255, 255, 255, 0.55)' },
-    { property: '--overlay-bg', value: 'rgba(255, 255, 255, 0.15)' },
+    // 0.55 was too sheer to read against. At 45% pass-through the effective
+    // background behind body text ran from about #9d9d9d over dark page content
+    // to white over light — 6:1 up to 17:1 contrast inside one dialog. Text on a
+    // gradient that shifts as you scroll is legible on paper and unpleasant in
+    // practice. 0.82 lifts the floor to roughly 13:1 and halves the swing, and
+    // the blurred shapes behind are still plainly visible.
+    { property: '--panel-bg', value: 'rgba(255, 255, 255, 0.82)' },
+    // Raised alongside it. The panel composites over the scrim, so dimming the
+    // surround lifts the panel's own floor as well as defining its edge — which
+    // is also what a macOS sheet does to the window behind it.
+    { property: '--overlay-bg', value: 'rgba(255, 255, 255, 0.32)' },
     { property: '--overlay-blur', value: 'blur(10px) saturate(1.5)' },
   ],
 };
