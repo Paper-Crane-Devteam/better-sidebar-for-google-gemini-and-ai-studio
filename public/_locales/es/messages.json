@@ -1,10 +1,10 @@
 {
   "extensionName": {
-    "message": "Better Sidebar para Gemini & AI Studio: Carpetas, Búsqueda, Exportar",
+    "message": "Better Sidebar: carpetas y búsqueda para Gemini",
     "description": "El nombre de la extensión"
   },
   "extensionDescription": {
-    "message": "Organiza chats de Gemini & AI Studio: carpetas, etiquetas, búsqueda de texto completo, biblioteca de prompts, exportación, sincronización con Google Drive, temas y más.",
+    "message": "Organiza chats de Gemini & AI Studio con carpetas, etiquetas, búsqueda, prompts, exportación, Drive sync, herramientas de IA y más.",
     "description": "La descripción de la extensión"
   }
 }

@@ -228,7 +228,7 @@
   },
   "about": {
     "title": "关于",
-    "appName": "Gemini & AI Studio 增强侧边栏",
+    "appName": "Better Sidebar (Gemini & AI Studio)",
     "version": "版本",
     "versionNumber": "2.1.0",
     "developer": "开发者",
@@ -572,8 +572,8 @@
     "unknownDate": "未知日期"
   },
   "popup": {
-    "title": "增强侧边栏",
-    "description": "配置增强侧边栏生效的平台。禁用某个平台后，扩展将不再响应该网站。",
+    "title": "Better Sidebar",
+    "description": "配置 Better Sidebar 生效的平台。禁用某个平台后，扩展将不再响应该网站。",
     "platforms": "支持的平台",
     "enablePlatform": "在 {{platform}} 上启用"
   },

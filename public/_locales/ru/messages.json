@@ -1,10 +1,10 @@
 {
   "extensionName": {
-    "message": "Better Sidebar для Gemini & AI Studio: Папки, поиск, экспорт, синхронизация",
+    "message": "Better Sidebar: папки и поиск для Gemini",
     "description": "Название расширения"
   },
   "extensionDescription": {
-    "message": "Организуйте чаты Gemini & AI Studio: папки, теги, полнотекстовый поиск, библиотека промптов, экспорт чатов, синхронизация с Google Drive, темы и многое другое.",
+    "message": "Организуйте чаты Gemini & AI Studio: папки, теги, поиск, промпты, экспорт, синхронизация Drive, инструменты ИИ и многое другое.",
     "description": "Описание расширения"
   }
 }

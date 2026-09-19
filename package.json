@@ -3,7 +3,7 @@
   "type": "module",
   "version": "2.11.0",
   "private": true,
-  "description": "Organize Gemini & AI Studio chats: folders, tags, full-text search, prompt library, chat export, Google Drive sync, themes & more.",
+  "description": "Organize Gemini & AI Studio chats with folders, tags, full-text search, prompts, export, Drive sync, AI tools & more.",
   "author": "Paper Crane Devteam",
   "scripts": {
     "dev": "wxt",
