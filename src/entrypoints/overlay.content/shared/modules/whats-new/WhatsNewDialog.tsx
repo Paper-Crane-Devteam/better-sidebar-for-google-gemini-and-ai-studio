@@ -119,7 +119,7 @@ export const WhatsNewDialog = () => {
 
           {/* Content — flows like a document */}
           <div
-            className="px-10 py-8 space-y-12"
+            className="rounded-b-xl px-10 py-8 space-y-12"
             style={{ backgroundColor: 'var(--panel-bg)' }}
           >
             {filteredChangelog.map((item: ChangeLogEntry, index: number) => {
@@ -168,6 +168,44 @@ export const WhatsNewDialog = () => {
                     />
                   )}
 
+                  {isLatest && (
+                    <div className="mt-8 pt-5 border-t border-border/40 flex flex-wrap items-center justify-between gap-2">
+                      <span className="text-xs text-muted-foreground">
+                        {t('whatsNew.enjoyingIt')}
+                      </span>
+                      <div className="flex flex-wrap items-center gap-1">
+                        <a
+                          href="https://chromewebstore.google.com/detail/cjeoaidogoaekodkbhijgljhenknkenj"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors px-2.5 py-1.5 rounded-md hover:bg-muted/50"
+                        >
+                          {t('whatsNew.rateUs')}
+                        </a>
+                        <a
+                          href="https://github.com/Paper-Crane-Devteam/better-sidebar-for-google-ai-studio"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors px-2.5 py-1.5 rounded-md hover:bg-muted/50"
+                        >
+                          {t('whatsNew.starOnGithub')}
+                        </a>
+                        <a
+                          href={
+                            currentLanguage === 'zh-CN'
+                              ? 'https://afdian.com/a/papercranedev'
+                              : 'https://ko-fi.com/papercranedev57397'
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors px-2.5 py-1.5 rounded-md hover:bg-muted/50"
+                        >
+                          {t('whatsNew.buyMeACoffee')}
+                        </a>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Divider */}
                   {index < filteredChangelog.length - 1 && (
                     <div className={`border-b border-border/40 ${isPatch ? 'mt-6' : 'mt-10'}`} />
@@ -175,46 +213,6 @@ export const WhatsNewDialog = () => {
                 </article>
               );
             })}
-          </div>
-
-          {/* Footer */}
-          <div
-            className="rounded-b-xl px-10 py-6 flex items-center justify-between"
-            style={{ backgroundColor: 'var(--panel-bg)' }}
-          >
-            <span className="text-xs text-muted-foreground">
-              {t('whatsNew.enjoyingIt')}
-            </span>
-            <div className="flex items-center gap-1">
-              <a
-                href="https://chromewebstore.google.com/detail/cjeoaidogoaekodkbhijgljhenknkenj"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors px-2.5 py-1.5 rounded-md hover:bg-muted/50"
-              >
-                {t('whatsNew.rateUs')}
-              </a>
-              <a
-                href="https://github.com/Paper-Crane-Devteam/better-sidebar-for-google-ai-studio"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors px-2.5 py-1.5 rounded-md hover:bg-muted/50"
-              >
-                {t('whatsNew.starOnGithub')}
-              </a>
-              <a
-                href={
-                  currentLanguage === 'zh-CN'
-                    ? 'https://afdian.com/a/papercranedev'
-                    : 'https://ko-fi.com/papercranedev57397'
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors px-2.5 py-1.5 rounded-md hover:bg-muted/50"
-              >
-                {t('whatsNew.buyMeACoffee')}
-              </a>
-            </div>
           </div>
         </div>
       </div>

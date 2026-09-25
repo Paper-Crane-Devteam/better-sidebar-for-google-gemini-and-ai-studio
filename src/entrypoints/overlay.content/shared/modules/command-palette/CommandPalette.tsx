@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { CornerDownLeft, Search } from 'lucide-react';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useCommandPaletteStore } from '@/shared/lib/command-palette-store';
+import { isImeComposing } from '@/entrypoints/overlay.content/shared/lib/ime';
 import { Z_INDEX } from '@/shared/lib/z-index';
 import { useCommandItems } from './hooks/useCommandItems';
 import { flattenItems } from './lib/flatten';
@@ -90,6 +91,11 @@ const CommandPaletteContent = () => {
     // Both platforms bind bare keystrokes to "focus the composer", so nothing
     // typed in here may reach the page.
     e.stopPropagation();
+
+    // While an IME is composing, Enter commits the candidate, the arrows move
+    // through the candidate list, and Escape cancels it — none of them are ours.
+    // See `isImeComposing` for the full story.
+    if (isImeComposing(e.nativeEvent)) return;
 
     switch (e.key) {
       case 'Escape':

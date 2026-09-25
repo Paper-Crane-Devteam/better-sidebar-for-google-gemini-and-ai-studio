@@ -45,5 +45,5 @@
 -31. timeline entry height too short
 -32. old user inbox icon not right
 -33. gdrive sync toast popup below modal(z index management)
-34. aistudio slash command
+-34. aistudio slash command
 -35. powerpack modal below snippet drawer

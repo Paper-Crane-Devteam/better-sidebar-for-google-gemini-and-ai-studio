@@ -21,11 +21,11 @@ export const SwitchItem: React.FC<SwitchItemProps> = ({
   children,
 }) => {
   return (
-    <div className="flex items-center justify-between py-2 px-2 rounded hover:bg-accent/30 group">
+    <div className="flex items-start justify-between py-2 px-2 rounded hover:bg-accent/30 group">
       <div className="flex-1 min-w-0">
         <div className="text-sm font-medium text-foreground">{label}</div>
         {description && (
-          <div className="text-xs text-muted-foreground truncate">
+          <div className="text-xs text-muted-foreground">
             {description}
           </div>
         )}
