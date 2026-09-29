@@ -20,7 +20,12 @@ import type { ParsedToolCall, ToolRisk } from './types';
 import { isBrowserTool, isBrowserWrite } from '@/shared/browser-agent/contracts';
 import { useAgentLoopStore } from './agent-loop-store';
 import { useAgentPolicyStore } from './agent-policy-store';
-import { CONTROL_TOOLS, identityParams, isHandoffTool } from './engine/parser/tool-schema';
+import {
+  ALWAYS_ASK_TOOLS,
+  CONTROL_TOOLS,
+  identityParams,
+  isHandoffTool,
+} from './engine/parser/tool-schema';
 
 // ─── Approval ────────────────────────────────────────────────────────────────
 
@@ -100,6 +105,9 @@ export function requiresApproval(toolCall: ParsedToolCall): boolean {
   const risk = getToolRisk(toolCall);
   // Outside the switches by construction — there is no operation here to approve.
   if (risk === 'control') return false;
+
+  // Ahead of the blanket approvals on purpose — see ALWAYS_ASK_TOOLS.
+  if (ALWAYS_ASK_TOOLS.includes(toolCall.name)) return true;
 
   const { speedMode, approveRestOfRound } = useAgentLoopStore.getState();
   if (speedMode || approveRestOfRound) return false;

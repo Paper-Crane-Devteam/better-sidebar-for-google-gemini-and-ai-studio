@@ -32,6 +32,8 @@ export function getToolLabel(toolName: string, t: Translate, query?: string): st
       return t('agent.tool.sync', { defaultValue: 'Fetching conversation content' });
     case 'export':
       return t('agent.tool.export', { defaultValue: 'Exporting' });
+    case 'open_new_chat':
+      return t('agent.tool.openNewChat', { defaultValue: 'Opening a new chat' });
     case 'complete_task':
       return t('agent.tool.complete', { defaultValue: 'Wrapping up' });
     case 'read_file':

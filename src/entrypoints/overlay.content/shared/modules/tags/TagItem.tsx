@@ -10,15 +10,20 @@ import {
 } from '@/entrypoints/overlay.content/shared/components/ui/context-menu';
 import { ExclusiveContextMenu } from '@/entrypoints/overlay.content/shared/components/ui/exclusive-context-menu';
 import { modal } from '@/shared/lib/modal';
+import { toast } from '@/shared/lib/toast';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { NodeActionBar, renderMenuItems } from '@/entrypoints/overlay.content/shared/components/node-action-bar';
 import { useTagMenuItems } from './useTagMenuItems';
 
 interface TagItemProps {
   tag: Tag;
+  /** Number of chats carrying this tag (in the current account's scope) */
+  count: number;
+  /** Drill into the tag to see its chats */
+  onOpen: (tagId: string) => void;
 }
 
-export const TagItem = ({ tag }: TagItemProps) => {
+export const TagItem = ({ tag, count, onOpen }: TagItemProps) => {
   const { t } = useI18n();
   const { deleteTag, updateTag } = useAppStore();
   const rowHeight = 32;
@@ -42,7 +47,17 @@ export const TagItem = ({ tag }: TagItemProps) => {
       setNewName(tag.name);
       return;
     }
-    await updateTag(tag.id, { name: newName.trim() });
+    const name = newName.trim();
+    const duplicate = useAppStore
+      .getState()
+      .tags.find((other) => other.id !== tag.id && other.name.toLowerCase() === name.toLowerCase());
+    if (duplicate) {
+      toast.warning(t('tags.duplicateName', { name: duplicate.name }));
+      setIsEditing(false);
+      setNewName(tag.name);
+      return;
+    }
+    await updateTag(tag.id, { name });
     setIsEditing(false);
   };
 
@@ -61,7 +76,8 @@ export const TagItem = ({ tag }: TagItemProps) => {
   };
 
   const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    // Skip Enter while an IME composition is being confirmed
+    if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
       handleRename();
     } else if (e.key === 'Escape') {
       setIsEditing(false);
@@ -99,8 +115,17 @@ export const TagItem = ({ tag }: TagItemProps) => {
       <ContextMenuTrigger asChild>
         <div style={{ height: rowHeight }} className="w-full px-1">
           <div
+            role="button"
+            tabIndex={0}
+            onClick={() => onOpen(tag.id)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onOpen(tag.id);
+              }
+            }}
             className={cn(
-              'group flex items-center justify-between px-2 pr-2 text-sm border border-transparent transition-colors cursor-default h-[calc(100%-2px)] mt-[1px] relative',
+              'group flex items-center justify-between px-2 pr-2 text-sm border border-transparent transition-colors cursor-pointer outline-none focus-visible:bg-accent/50 h-[calc(100%-2px)] mt-[1px] relative',
               tag.color
                 ? 'tag-item-colored'
                 : isMenuActive
@@ -114,6 +139,10 @@ export const TagItem = ({ tag }: TagItemProps) => {
             <div className="flex-1 min-w-0 flex items-center gap-2 overflow-hidden node-text-content" style={tag.color ? { color: tag.color } : undefined}>
               <TagIcon className="h-4 w-4 shrink-0" />
               <span className="truncate font-medium">{tag.name}</span>
+              {/* Sits inside the masked text area so the hover action bar fades it out */}
+              <span className="ml-auto shrink-0 pl-2 text-xs tabular-nums text-muted-foreground">
+                {count}
+              </span>
             </div>
             <NodeActionBar
               menuItems={menuItems}

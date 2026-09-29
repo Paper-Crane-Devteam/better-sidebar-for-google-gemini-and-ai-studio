@@ -2,6 +2,7 @@
  * Better Sidebar MCP Server — the extension's own data.
  *
  * `execute_sql` and `export`: everything that reads or writes the local database.
+ * `open_new_chat`: continue in a fresh conversation (new tab, prompt pre-filled).
  * Belongs to the Better Sidebar agent and to no other.
  *
  * ⚠️ `activate_skill` and `complete_task` used to live here. They moved to `core-mcp.ts`
@@ -16,6 +17,7 @@ import type { MCPServer } from './types';
 import { sqlProvider } from './providers/sql-provider';
 // import { syncProvider } from './providers/sync-provider';
 import { exportProvider } from './providers/export-provider';
+import { newChatProvider } from './providers/new-chat-provider';
 
 export const BUILTIN_MCP_ID = 'builtin-bettersidebar';
 
@@ -38,5 +40,5 @@ export const BUILTIN_MCP: MCPServer = {
    * user their tab, but it only depends on the DOM, which is the part that has to keep
    * working. Everything under `tools/sync/` is untouched and still exported.
    */
-  tools: [sqlProvider, /* syncProvider, */ exportProvider],
+  tools: [sqlProvider, /* syncProvider, */ exportProvider, newChatProvider],
 };

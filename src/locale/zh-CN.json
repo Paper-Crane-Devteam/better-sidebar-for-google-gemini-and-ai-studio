@@ -551,7 +551,15 @@
     "deleteTagConfirm": "您确定要删除此标签吗？",
     "rename": "重命名",
     "changeColor": "更改颜色",
-    "selectColor": "选择颜色"
+    "selectColor": "选择颜色",
+    "backToTags": "返回标签列表",
+    "switchTag": "切换标签",
+    "showInExplorer": "在文件中查看",
+    "searchInTag": "在此标签中搜索...",
+    "noConversationsInTag": "还没有对话打上这个标签。在文件中右键点击对话，选择「标签」即可添加。",
+    "noMatchingConversations": "没有匹配的对话",
+    "removeFromTag": "从此标签移除",
+    "duplicateName": "已存在名为「{{name}}」的标签"
   },
   "moveItemsDialog": {
     "searchFolders": "搜索文件夹...",
@@ -1269,6 +1277,10 @@
           "label": "记录讨论结论",
           "text": "把我们这次对话中定下来的结论总结成要点列表，保存到工作区的 notes/decisions.md 文件中，并在最后附上待确认的问题。如果该文件已存在，请在末尾加上今天的日期并追加内容，不要覆盖原文件。"
         },
+        "handover": {
+          "label": "在新对话中继续",
+          "text": "这个对话已经很长了。帮我总结一下，方便重新开始：我想做成什么、我们定了哪些结论以及原因、仍然要紧的事实和限制，还有哪些没解决。写成新对话不看这里也能接上的样子，然后在新标签页里开一个新对话，把这份总结放在输入框里。"
+        },
         "stats": {
           "label": "统计对话数据",
           "text": "帮我做一张统计表：列出每个文件夹的对话数量、最近一个月新增的对话数，以及哪些文件夹已经三个月没活跃过了。最后根据这些数据，给我一些合并文件夹的建议。"
@@ -1358,6 +1370,7 @@
     "approve": {
       "readTitle": "允许执行这个查询？",
       "writeTitle": "允许执行这个修改？",
+      "newChatTitle": "打开新对话？",
       "run": "执行",
       "runRest_one": "剩下的 {{count}} 个也一起执行",
       "runRest_other": "剩下的 {{count}} 个也一起执行",
@@ -1369,11 +1382,21 @@
       "showDetail": "查看将要执行的操作",
       "hideDetail": "收起详情"
     },
+    "newChat": {
+      "previewLabel": "将打开一个新标签页，并把这段内容放进输入框。在你发送之前不会发出任何内容。",
+      "previewEmpty": "将在新标签页中打开一个空白对话。",
+      "prefilled": "上一个对话带来的提示词已放进输入框，确认无误后再发送即可。",
+      "occupied": "输入框里已经有内容，所以没有放入上一个对话带来的提示词。要复制一份吗？",
+      "noComposer": "没找到输入框，上一个对话带来的提示词没能放进去。要复制一份吗？",
+      "copy": "复制提示词",
+      "copyFailed": "复制失败"
+    },
     "tool": {
       "dataRead": "正在查看你的数据",
       "dataWrite": "正在修改你的数据",
       "sync": "正在获取对话内容",
       "export": "正在导出",
+      "openNewChat": "正在打开新对话",
       "complete": "正在收尾",
       "generic": "正在执行一个步骤",
       "nameLabel": "操作",
@@ -1774,11 +1797,19 @@
       },
       "settings": {
         "title": "Browser Agent",
+        "section": {
+          "tabs": "标签页",
+          "bookmarks": "书签"
+        },
         "group": {
-          "organize": "整理与归类",
-          "organizeNote": "允许创建书签与文件夹、调整顺序、固定、分组，以及重命名标签页与书签。",
-          "remove": "关闭与删除",
-          "removeNote": "允许关闭标签页及删除书签（敏感操作）。"
+          "tabsOrganize": "整理标签页",
+          "tabsOrganizeNote": "允许打开、调整顺序、固定标签页，以及创建、重命名或解散标签页分组。",
+          "tabsRemove": "关闭标签页",
+          "tabsRemoveNote": "允许关闭你批准的标签页（敏感操作）。",
+          "bookmarksOrganize": "整理书签",
+          "bookmarksOrganizeNote": "允许创建书签与文件夹，以及重命名和移动它们。",
+          "bookmarksRemove": "删除书签",
+          "bookmarksRemoveNote": "允许删除你批准的书签与文件夹（敏感操作）。"
         },
         "denied": "未授予浏览器权限，该功能未开启。",
         "urlToggle": "允许 AI 读取完整网址 (URL)",

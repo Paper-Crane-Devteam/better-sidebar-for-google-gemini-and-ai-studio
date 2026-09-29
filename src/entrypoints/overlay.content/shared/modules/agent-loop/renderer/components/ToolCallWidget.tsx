@@ -44,6 +44,8 @@ import {
 import { getToolLabel } from '../../tool-labels';
 import { isBrowserWrite } from '@/shared/browser-agent/contracts';
 import { BrowserPlanPreview } from '../../browser/BrowserPlanPreview';
+import { ALWAYS_ASK_TOOLS, OPEN_NEW_CHAT_TOOL } from '../../engine/parser/tool-schema';
+import { NewChatPreview } from './NewChatPreview';
 import { isImeComposing } from '@/entrypoints/overlay.content/shared/lib/ime';
 
 interface ToolCallWidgetProps {
@@ -153,6 +155,11 @@ export const ToolCallWidget: React.FC<ToolCallWidgetProps> = ({
     pendingApproval?.fingerprint === fingerprint;
 
   const running = !status && !indeterminate && currentTool === toolName && isLatestResponse;
+
+  /** Its approval is about the prompt it carries, so that is what the card shows. */
+  const isNewChat = toolName === OPEN_NEW_CHAT_TOOL;
+  /** Same rule as the dock's `AgentApproval` — see there. */
+  const allowBlanket = !isBrowserWrite(toolName) && !ALWAYS_ASK_TOOLS.includes(toolName);
 
   /**
    * The output to show when the card is opened.
@@ -312,7 +319,9 @@ export const ToolCallWidget: React.FC<ToolCallWidgetProps> = ({
       {isPending && (
         <div className="space-y-2 bg-background/60 px-3 py-2">
           {pendingApproval?.browserPlan && <BrowserPlanPreview plan={pendingApproval.browserPlan} />}
-          {changeSummary ? (
+          {isNewChat ? (
+            <NewChatPreview prompt={parsed?.params.initial_prompt} />
+          ) : changeSummary ? (
             <div className="max-h-[240px] overflow-y-auto rounded border border-border/40 bg-background/50 px-2.5 py-2">
               <MarkdownRenderer className="text-xs text-foreground">
                 {changeSummary}
@@ -386,7 +395,7 @@ export const ToolCallWidget: React.FC<ToolCallWidgetProps> = ({
                 <Play className="h-3 w-3" /> {t('agent.approve.run', { defaultValue: 'Run' })}
               </button>
               {/* Only when there is actually a rest to approve */}
-              {!isBrowserWrite(toolName) && (pendingApproval?.remaining ?? 0) > 0 && (
+              {allowBlanket && (pendingApproval?.remaining ?? 0) > 0 && (
                 <button
                   type="button"
                   onClick={() => decide(true, 'round')}

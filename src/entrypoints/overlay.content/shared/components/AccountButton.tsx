@@ -26,6 +26,7 @@ import {
   queryFirst,
 } from '@/shared/lib/dom-selectors';
 import { clickHiddenNativeElement } from '@/shared/lib/native-anchor-click';
+import { readAiStudioAccount } from '@/entrypoints/content/shared/detect-account';
 
 export interface AccountButtonConfig {
   /** Selector for the native `<img>` holding the signed-in user's avatar. */
@@ -64,10 +65,7 @@ export const AISTUDIO_ACCOUNT: AccountButtonConfig = {
   avatarSelector: AISTUDIO_SELECTORS.accountAvatar,
   menuSelectors: AISTUDIO_SELECTORS.accountMenu,
   popupSelectors: AISTUDIO_SELECTORS.accountPanel,
-  readAccountName: () =>
-    document
-      .querySelector('.account-switcher-container .account-switcher-text')
-      ?.textContent?.trim() || null,
+  readAccountName: readAiStudioAccount,
 };
 
 /**

@@ -42,21 +42,47 @@ function waitForSelector(
 export const DEFAULT_DETECT_TIMEOUT_MS = 10000;
 
 /**
+ * AI Studio's account switcher button. Anchored on the `ms-account-switcher`
+ * component tag rather than wrapper classes: the old `.account-switcher-container`
+ * wrapper was removed in a redesign, which silently broke detection.
+ */
+const AISTUDIO_ACCOUNT_BUTTON = 'ms-account-switcher button.account-switcher-button';
+
+/**
+ * Read the signed-in AI Studio account synchronously.
+ *
+ * Prefers the visible `.account-switcher-text` (the email). That span has a
+ * fade animation and can be absent while the nav is collapsed, so fall back to
+ * the email inside the button's aria-label, e.g.
+ * "Google Account: Name (someone@gmail.com)". Only the email is extracted, so
+ * the localized prefix does not matter.
+ */
+export function readAiStudioAccount(): string | null {
+  const text = document
+    .querySelector(`${AISTUDIO_ACCOUNT_BUTTON} .account-switcher-text`)
+    ?.textContent?.trim();
+  if (text) return text;
+
+  const aria = document
+    .querySelector(AISTUDIO_ACCOUNT_BUTTON)
+    ?.getAttribute('aria-label');
+  const email = aria?.match(/[^\s()]+@[^\s()]+/)?.[0];
+  return email || null;
+}
+
+/**
  * Detect current user on AI Studio.
- * Reads `.account-switcher-container .account-switcher-text` text content.
+ * Waits for the account switcher button, then reads the account via `readAiStudioAccount`.
  */
 export async function detectAiStudioAccount(
   timeoutMs = DEFAULT_DETECT_TIMEOUT_MS,
 ): Promise<string | null> {
   try {
-    const el = await waitForSelector(
-      '.account-switcher-container .account-switcher-text',
-      timeoutMs,
-    );
-    const text = el?.textContent?.trim();
-    if (text) {
-      trace('[DetectAccount] AI Studio account:', text);
-      return text;
+    await waitForSelector(AISTUDIO_ACCOUNT_BUTTON, timeoutMs);
+    const account = readAiStudioAccount();
+    if (account) {
+      trace('[DetectAccount] AI Studio account:', account);
+      return account;
     }
   } catch (e) {
     console.warn('[DetectAccount] AI Studio detection failed:', e);

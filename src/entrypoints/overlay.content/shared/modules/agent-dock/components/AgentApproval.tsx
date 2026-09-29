@@ -11,7 +11,7 @@
  */
 
 import React, { useState } from 'react';
-import { AlertTriangle, FastForward, Play, Search } from 'lucide-react';
+import { AlertTriangle, FastForward, MessageSquarePlus, Play, Search } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { MarkdownRenderer } from '@/shared/components/MarkdownRenderer';
 import { cn } from '@/shared/lib/utils/utils';
@@ -21,6 +21,8 @@ import { getToolLabel } from '../../agent-loop/tool-labels';
 import type { ApprovalScope } from '../../agent-loop/types';
 import { isBrowserWrite } from '@/shared/browser-agent/contracts';
 import { BrowserPlanPreview } from '../../agent-loop/browser/BrowserPlanPreview';
+import { NewChatPreview } from '../../agent-loop/renderer/components/NewChatPreview';
+import { ALWAYS_ASK_TOOLS, OPEN_NEW_CHAT_TOOL } from '../../agent-loop/engine/parser/tool-schema';
 import { isImeComposing } from '@/entrypoints/overlay.content/shared/lib/ime';
 
 export const AgentApproval: React.FC = () => {
@@ -34,6 +36,14 @@ export const AgentApproval: React.FC = () => {
 
   const { toolName, description, params, risk, remaining, resolve, browserPlan } = pendingApproval;
   const isWrite = risk === 'write';
+  const isNewChat = toolName === OPEN_NEW_CHAT_TOOL;
+  /**
+   * "Run the rest" and "don't ask again" are offered only where they mean something.
+   * A browser batch is approved batch by batch, and an always-ask tool asks regardless
+   * (`requiresApproval`) — a blanket approval button there would be a promise the next
+   * question breaks.
+   */
+  const allowBlanket = !isBrowserWrite(toolName) && !ALWAYS_ASK_TOOLS.includes(toolName);
   const detail = params.query || params.summary || params.ids || '';
   /** What the AI said it's doing, falling back to a label when it said nothing. */
   const summary = description || getToolLabel(toolName, t, params.query);
@@ -56,7 +66,7 @@ export const AgentApproval: React.FC = () => {
    * so it is gone whenever there is something better to show. But *nothing* readable is
    * worse than SQL, so the toggle comes back when the summary is missing.
    */
-  const showSqlFallback = !changeSummary && !!detail;
+  const showSqlFallback = !changeSummary && !!detail && !isNewChat;
 
   const decide = (approved: boolean, scope: ApprovalScope = 'once') => {
     resolve({ approved, scope, reason: approved ? undefined : reason.trim() || undefined });
@@ -72,21 +82,26 @@ export const AgentApproval: React.FC = () => {
       )}
     >
       <div className="flex items-center gap-2">
-        {isWrite ? (
+        {isNewChat ? (
+          <MessageSquarePlus className="h-3 w-3 shrink-0 text-muted-foreground" />
+        ) : isWrite ? (
           <AlertTriangle className="h-3 w-3 shrink-0 text-orange-500" />
         ) : (
           <Search className="h-3 w-3 shrink-0 text-muted-foreground" />
         )}
         <span className="text-xs font-medium text-muted-foreground">
-          {isWrite
-            ? t('agent.approve.writeTitle', { defaultValue: 'Approve this change?' })
-            : t('agent.approve.readTitle', { defaultValue: 'Approve this query?' })}
+          {isNewChat
+            ? t('agent.approve.newChatTitle', { defaultValue: 'Open a new chat?' })
+            : isWrite
+              ? t('agent.approve.writeTitle', { defaultValue: 'Approve this change?' })
+              : t('agent.approve.readTitle', { defaultValue: 'Approve this query?' })}
         </span>
       </div>
 
       {/* The headline: which step this is. */}
       <p className="text-sm font-medium leading-relaxed text-foreground">{summary}</p>
       {browserPlan && <BrowserPlanPreview plan={browserPlan} />}
+      {isNewChat && <NewChatPreview prompt={params.initial_prompt} />}
 
       {/* What it will actually do, in the user's language. Shown in full rather than
           folded — this is the decision, not a detail behind it. Capped in height because
@@ -173,7 +188,7 @@ export const AgentApproval: React.FC = () => {
               <Play className="h-3 w-3" />
               {t('agent.approve.run', { defaultValue: 'Run' })}
             </Button>
-            {!isBrowserWrite(toolName) && remaining > 0 && (
+            {allowBlanket && remaining > 0 && (
               <Button
                 size="sm"
                 variant="outline"
@@ -196,7 +211,7 @@ export const AgentApproval: React.FC = () => {
               {t('agent.approve.reject', { defaultValue: 'Reject' })}
             </Button>
           </div>
-          {!isBrowserWrite(toolName) && <button
+          {allowBlanket && <button
             type="button"
             onClick={() => decide(true, 'task')}
             className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"

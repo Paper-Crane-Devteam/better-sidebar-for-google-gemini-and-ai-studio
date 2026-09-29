@@ -28,6 +28,7 @@ export const SUPPORTED_TOOLS = [
   'execute_sql',
   'sync_conversation_messages',
   'export',
+  'open_new_chat',
   'complete_task',
   'activate_skill',
   // Workspace file tools (see mcp/workspace-mcp.ts). Listed here even when the
@@ -69,6 +70,8 @@ export const REQUIRED_PARAMS: Record<string, string[]> = {
   // `format` is deliberately absent: omitting it is how the model says "the user
   // didn't specify", which makes the tool open the format picker instead.
   export: ['ids'],
+  // `initial_prompt` is optional: without it the tool opens an empty chat.
+  open_new_chat: [],
   complete_task: ['summary'],
   activate_skill: ['skill_id'],
   read_file: ['path'],
@@ -115,8 +118,25 @@ export const CONTROL_TOOLS: readonly string[] = ['complete_task'];
  * Treated as terminal on purpose rather than left to fail: without this the engine
  * would stage results and start waiting for a reply on a page that is being torn
  * down, which reads to the user as a hang.
+ *
+ * `open_new_chat` leaves this page intact but moves the user to a new tab, with the
+ * next message sitting unsent in *that* composer. Nothing further is coming in this
+ * conversation, so it ends the same way — and, like sync, must never be re-run by
+ * auto-pickup after a reload (`hasUnrunToolWork`): that would open a second tab.
  */
-export const HANDOFF_TOOLS: readonly string[] = ['sync_conversation_messages'];
+export const HANDOFF_TOOLS: readonly string[] = ['sync_conversation_messages', 'open_new_chat'];
+
+/** Opens a fresh chat in a new tab. Named for the UI, which previews its prompt. */
+export const OPEN_NEW_CHAT_TOOL = 'open_new_chat';
+
+/**
+ * Tools that ask before running every time, whatever the user waved through earlier.
+ *
+ * `speedMode` ("don't ask again for this task") and `approveRestOfRound` are about the
+ * task's own work. Opening a tab is a step out of the task, and its prompt is the thing
+ * the user is meant to read — so it is asked about on its own.
+ */
+export const ALWAYS_ASK_TOOLS: readonly string[] = [OPEN_NEW_CHAT_TOOL];
 
 /** Whether a successful call to this tool ends the session by navigating away */
 export function isHandoffTool(name: string): boolean {

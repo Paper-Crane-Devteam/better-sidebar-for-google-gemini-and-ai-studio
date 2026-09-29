@@ -75,19 +75,35 @@ export function permissionsFor(caps: readonly Capability[]): ('tabs' | 'tabGroup
  * deleted without first being read, so the read capabilities are `dependencies()` of the
  * two that are.
  *
- * What is left is the only distinction worth a switch: rearranging things, versus throwing
- * them away.
+ * What is left is two distinctions worth a switch: rearranging things versus throwing them
+ * away, and tabs versus bookmarks. The second one matters because the two are different
+ * Chrome permissions guarding very different data — someone who wants their tabs grouped
+ * has no reason to hand over their whole bookmark tree, and the reverse.
  *
- * ⚠️ The two are independent. "Delete" pulls its own read dependencies, so turning
- * "Organize" off does not silently disarm it — a user who allows closing tabs but not
- * reordering them gets exactly that.
+ * ⚠️ All four are independent. A "remove" switch pulls its own read dependencies, so
+ * turning "organize" off does not silently disarm it — a user who allows closing tabs but
+ * not reordering them gets exactly that. And no tab switch grants anything under
+ * `bookmarks.*`, or vice versa, so each side requests only its own Chrome permission.
+ *
+ * ⚠️ Every capability belongs to exactly one switch. A list stored by the older two-switch
+ * build (`organize` = both arranges + group writes, `remove` = both deletes) is a union of
+ * these four, so `groupsOf` reads it back without losing anything.
  */
 export const CAPABILITY_GROUPS = {
-  organize: ['tabs.arrange', 'tabGroups.write', 'bookmarks.arrange'],
-  remove: ['tabs.close', 'bookmarks.delete'],
+  tabsOrganize: ['tabs.arrange', 'tabGroups.write'],
+  tabsRemove: ['tabs.close'],
+  bookmarksOrganize: ['bookmarks.arrange'],
+  bookmarksRemove: ['bookmarks.delete'],
 } as const satisfies Record<string, readonly Capability[]>;
 export type CapabilityGroup = keyof typeof CAPABILITY_GROUPS;
 export const CAPABILITY_GROUP_IDS = Object.keys(CAPABILITY_GROUPS) as CapabilityGroup[];
+/** How the settings window lays the switches out: one section per kind of object. */
+export const CAPABILITY_SECTIONS = {
+  tabs: ['tabsOrganize', 'tabsRemove'],
+  bookmarks: ['bookmarksOrganize', 'bookmarksRemove'],
+} as const satisfies Record<string, readonly CapabilityGroup[]>;
+export type CapabilitySection = keyof typeof CAPABILITY_SECTIONS;
+export const CAPABILITY_SECTION_IDS = Object.keys(CAPABILITY_SECTIONS) as CapabilitySection[];
 /** Every capability a set of switches grants, read dependencies included. */
 export const capabilitiesForGroups = (groups: readonly CapabilityGroup[]): Capability[] =>
   [...new Set(groups.flatMap(g => CAPABILITY_GROUPS[g] as readonly Capability[]).flatMap(dependencies))];
@@ -96,7 +112,7 @@ export const capabilitiesForGroups = (groups: readonly CapabilityGroup[]): Capab
  *
  * All-or-nothing on purpose: a switch counts as on only when every capability it grants is
  * present. A stored list holding only some of them reads as *off*, which is the honest
- * answer — two switches cannot describe it — and the page narrows the stored list to match
+ * answer — the switches cannot describe it — and the page narrows the stored list to match
  * rather than drawing a switch that lies about what the agent may do.
  */
 export const groupsOf = (caps: readonly Capability[]): CapabilityGroup[] =>

@@ -551,7 +551,15 @@
     "deleteTagConfirm": "Are you sure you want to delete this tag?",
     "rename": "Rename",
     "changeColor": "Change Color",
-    "selectColor": "Select Color"
+    "selectColor": "Select Color",
+    "backToTags": "Back to tags",
+    "switchTag": "Switch tag",
+    "showInExplorer": "Show in Files",
+    "searchInTag": "Search in this tag...",
+    "noConversationsInTag": "No chats with this tag yet. Right-click a chat in Files and choose Tags to add one.",
+    "noMatchingConversations": "No matching chats",
+    "removeFromTag": "Remove from this tag",
+    "duplicateName": "A tag named \"{{name}}\" already exists"
   },
   "moveItemsDialog": {
     "searchFolders": "Search folders...",
@@ -1269,6 +1277,10 @@
           "label": "Record decisions",
           "text": "Summarize our conclusions from this chat as a bulleted list and save it to notes/decisions.md in the workspace. Append any unresolved questions at the end. If the file already exists, append the content at the end with today's date instead of overwriting."
         },
+        "handover": {
+          "label": "Continue in a new chat",
+          "text": "This chat has gotten long. Summarize it for a fresh start: what I'm trying to do, what we decided and why, the facts and constraints that still matter, and what's still open. Write it so a new chat can pick up without seeing this one, then open a new chat in a new tab with that summary waiting in the input box."
+        },
         "stats": {
           "label": "Analyze statistics",
           "text": "Create a stats table for me: how many chats are in each folder, how many new chats were created last month, and which folders haven't been active for over three months. Based on this data, suggest which folders I should merge."
@@ -1358,6 +1370,7 @@
     "approve": {
       "readTitle": "Approve this query?",
       "writeTitle": "Approve this change?",
+      "newChatTitle": "Open a new chat?",
       "run": "Run",
       "runRest_one": "Run this {{count}} too",
       "runRest_other": "Run these {{count}} too",
@@ -1369,11 +1382,21 @@
       "showDetail": "Show what will run",
       "hideDetail": "Hide what will run"
     },
+    "newChat": {
+      "previewLabel": "Opens a new tab with this in the input box. Nothing is sent until you send it.",
+      "previewEmpty": "Opens an empty chat in a new tab.",
+      "prefilled": "Your prompt from the previous chat is in the input box. Review it, then send.",
+      "occupied": "The input box already had text, so the prompt from the previous chat was not put in. Copy it instead?",
+      "noComposer": "Could not find the input box for the prompt from the previous chat. Copy it instead?",
+      "copy": "Copy prompt",
+      "copyFailed": "Could not copy"
+    },
     "tool": {
       "dataRead": "Looking through your data",
       "dataWrite": "Changing your data",
       "sync": "Fetching conversation content",
       "export": "Exporting",
+      "openNewChat": "Opening a new chat",
       "complete": "Wrapping up",
       "generic": "Running a step",
       "nameLabel": "Action",
@@ -1774,11 +1797,19 @@
       },
       "settings": {
         "title": "Browser Agent",
+        "section": {
+          "tabs": "Tabs",
+          "bookmarks": "Bookmarks"
+        },
         "group": {
-          "organize": "Organize",
-          "organizeNote": "Create bookmarks and folders, reorder, pin, group, and rename tabs and bookmarks.",
-          "remove": "Delete",
-          "removeNote": "Close tabs and remove bookmarks."
+          "tabsOrganize": "Organize tabs",
+          "tabsOrganizeNote": "Open, reorder and pin tabs, and create, rename or ungroup tab groups.",
+          "tabsRemove": "Close tabs",
+          "tabsRemoveNote": "Close the tabs you approve.",
+          "bookmarksOrganize": "Organize bookmarks",
+          "bookmarksOrganizeNote": "Create bookmarks and folders, rename and move them.",
+          "bookmarksRemove": "Delete bookmarks",
+          "bookmarksRemoveNote": "Remove the bookmarks and folders you approve."
         },
         "denied": "Not granted. The switch stays off.",
         "urlToggle": "Let the AI read full URLs",

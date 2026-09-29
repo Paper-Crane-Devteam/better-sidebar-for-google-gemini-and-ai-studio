@@ -76,5 +76,12 @@ export default defineContentScript({
           `Better Sidebar: Unknown platform (${platform}), overlay not loaded`,
         );
     }
+
+    // Text the agent's `open_new_chat` left for this tab, if this tab is one it opened.
+    // After the overlay is up so the toast has somewhere to render.
+    const { applyPendingComposerPrefill } = await import('./shared/lib/composer-prefill');
+    applyPendingComposerPrefill(platform).catch((e) =>
+      console.error('Better Sidebar: composer prefill failed', e),
+    );
   },
 });

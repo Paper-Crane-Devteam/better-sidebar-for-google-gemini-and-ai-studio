@@ -1,13 +1,14 @@
 /**
  * The Browser Agent permission window.
  *
- * ## Two switches, not eight
+ * ## Four switches, not eight
  *
  * This page used to render one checkbox per `Capability` — eight of them, six of which
  * only differed by which object they read. That was the tool layer's vocabulary leaking
  * into the one screen where a user has to make a decision, and it read as "why does a
  * browser have eight permissions". `CAPABILITY_GROUPS` is the answer to the question the
- * user is actually being asked; the eight still exist underneath, unchanged.
+ * user is actually being asked — organize or remove, for tabs and for bookmarks
+ * separately — and the eight still exist underneath, unchanged.
  *
  * ## And almost no prose
  *
@@ -21,7 +22,7 @@ import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { HelpCircle } from 'lucide-react';
 import {
-  CAPABILITY_GROUP_IDS, DEFAULT_SETTINGS, capabilitiesForGroups, groupsOf, permissionsFor,
+  CAPABILITY_SECTIONS, CAPABILITY_SECTION_IDS, DEFAULT_SETTINGS, capabilitiesForGroups, groupsOf, permissionsFor,
   type BrowserSettings, type Capability, type CapabilityGroup,
 } from '@/shared/browser-agent/contracts';
 import { applyCachedExtensionPageTheme, syncExtensionPageTheme, watchExtensionPageTheme } from '@/shared/lib/extension-page-theme';
@@ -77,7 +78,7 @@ function Settings() {
 
   useEffect(() => {
     request().then(async loaded => {
-      // A list stored by the per-object build cannot be drawn on two switches without one
+      // A list stored by the per-object build cannot be drawn on the switches without one
       // of them lying, so it is narrowed to what they can express. Always a subset, which
       // is why this needs no permission request and can run without a user gesture.
       const capabilities = capabilitiesForGroups(groupsOf(loaded.capabilities));
@@ -112,16 +113,21 @@ function Settings() {
       {t('agent.browser.settings.title', { defaultValue: 'Browser Agent' })}
     </h1>
 
-    <div className="mt-3 divide-y divide-border/40">
-      {CAPABILITY_GROUP_IDS.map(group => <Row
-        key={group}
-        label={t(`agent.browser.settings.group.${group}`, { defaultValue: group })}
-        note={t(`agent.browser.settings.group.${group}Note`, { defaultValue: '' })}
-        checked={groups.includes(group)}
-        disabled={busy}
-        onChange={on => toggleGroup(group, on)}
-      />)}
-    </div>
+    {CAPABILITY_SECTION_IDS.map(section => <section key={section} className="mt-4">
+      <h2 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {t(`agent.browser.settings.section.${section}`, { defaultValue: section })}
+      </h2>
+      <div className="mt-1 divide-y divide-border/40">
+        {CAPABILITY_SECTIONS[section].map(group => <Row
+          key={group}
+          label={t(`agent.browser.settings.group.${group}`, { defaultValue: group })}
+          note={t(`agent.browser.settings.group.${group}Note`, { defaultValue: '' })}
+          checked={groups.includes(group)}
+          disabled={busy}
+          onChange={on => toggleGroup(group, on)}
+        />)}
+      </div>
+    </section>)}
 
     <Separator className="my-2 bg-border/40" />
 

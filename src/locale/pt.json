@@ -551,7 +551,15 @@
     "deleteTagConfirm": "Tem certeza de que deseja excluir esta tag?",
     "rename": "Renomear",
     "changeColor": "Alterar Cor",
-    "selectColor": "Selecionar Cor"
+    "selectColor": "Selecionar Cor",
+    "backToTags": "Voltar para tags",
+    "switchTag": "Trocar tag",
+    "showInExplorer": "Mostrar em Arquivos",
+    "searchInTag": "Pesquisar nesta tag...",
+    "noConversationsInTag": "Ainda não há chats com esta tag. Clique com o botão direito em um chat em Arquivos e escolha Tags para adicionar.",
+    "noMatchingConversations": "Nenhum chat correspondente",
+    "removeFromTag": "Remover desta tag",
+    "duplicateName": "Já existe uma tag chamada \"{{name}}\""
   },
   "moveItemsDialog": {
     "searchFolders": "Buscar pastas...",
@@ -1269,6 +1277,10 @@
           "label": "Guardar decisões",
           "text": "Resuma as conclusões deste chat em formato de tópicos e salve no arquivo notes/decisions.md no workspace. Adicione no final as dúvidas que ainda não foram resolvidas. Se o arquivo já existir, adicione o conteúdo no final com a data de hoje, não sobrescreva."
         },
+        "handover": {
+          "label": "Continuar em um novo chat",
+          "text": "Este chat ficou longo. Resuma-o para um novo começo: o que estou tentando fazer, o que decidimos e por quê, os fatos e restrições que ainda importam e o que ficou em aberto. Escreva de forma que um novo chat possa continuar sem ver este e, depois, abra um novo chat em uma nova aba com esse resumo esperando na caixa de entrada."
+        },
         "stats": {
           "label": "Analisar estatísticas",
           "text": "Faça uma tabela estatística: quantos chats existem em cada pasta, quantos chats novos foram criados no último mês e quais pastas não são usadas há mais de três meses. Com esses dados, sugira quais pastas eu poderia mesclar."
@@ -1358,6 +1370,7 @@
     "approve": {
       "readTitle": "Aprovar esta consulta?",
       "writeTitle": "Aprovar esta alteração?",
+      "newChatTitle": "Abrir um novo chat?",
       "run": "Executar",
       "runRest_one": "Executar também esta {{count}}",
       "runRest_other": "Executar também estas {{count}}",
@@ -1369,11 +1382,21 @@
       "showDetail": "Mostrar o que será executado",
       "hideDetail": "Ocultar o que será executado"
     },
+    "newChat": {
+      "previewLabel": "Abre uma nova aba com este texto na caixa de entrada. Nada é enviado até você enviar.",
+      "previewEmpty": "Abre um chat vazio em uma nova aba.",
+      "prefilled": "Seu prompt do chat anterior está na caixa de entrada. Revise e depois envie.",
+      "occupied": "A caixa de entrada já tinha texto, então o prompt do chat anterior não foi inserido. Quer copiá-lo?",
+      "noComposer": "Não foi possível encontrar a caixa de entrada para o prompt do chat anterior. Quer copiá-lo?",
+      "copy": "Copiar prompt",
+      "copyFailed": "Não foi possível copiar"
+    },
     "tool": {
       "dataRead": "Consultando seus dados",
       "dataWrite": "Alterando seus dados",
       "sync": "Buscando o conteúdo da conversa",
       "export": "Exportando",
+      "openNewChat": "Abrindo um novo chat",
       "complete": "Finalizando",
       "generic": "Executando uma etapa",
       "nameLabel": "Ação",
@@ -1774,11 +1797,19 @@
       },
       "settings": {
         "title": "Browser Agent",
+        "section": {
+          "tabs": "Abas",
+          "bookmarks": "Favoritos"
+        },
         "group": {
-          "organize": "Organizar",
-          "organizeNote": "Permite criar favoritos e pastas, reordenar, fixar, agrupar e renomear abas e favoritos.",
-          "remove": "Excluir",
-          "removeNote": "Fechar abas e remover favoritos."
+          "tabsOrganize": "Organizar abas",
+          "tabsOrganizeNote": "Abrir, reordenar e fixar abas, e criar, renomear ou desagrupar grupos de abas.",
+          "tabsRemove": "Fechar abas",
+          "tabsRemoveNote": "Fechar as abas que você aprovar.",
+          "bookmarksOrganize": "Organizar favoritos",
+          "bookmarksOrganizeNote": "Criar favoritos e pastas, renomeá-los e movê-los.",
+          "bookmarksRemove": "Excluir favoritos",
+          "bookmarksRemoveNote": "Remover os favoritos e pastas que você aprovar."
         },
         "denied": "Não concedido. A chave permanece desligada.",
         "urlToggle": "Permitir que a IA leia URLs completas",

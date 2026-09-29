@@ -551,7 +551,15 @@
     "deleteTagConfirm": "您確定要刪除此標籤嗎？",
     "rename": "重新命名",
     "changeColor": "更改顏色",
-    "selectColor": "選擇顏色"
+    "selectColor": "選擇顏色",
+    "backToTags": "返回標籤列表",
+    "switchTag": "切換標籤",
+    "showInExplorer": "在檔案中檢視",
+    "searchInTag": "在此標籤中搜尋...",
+    "noConversationsInTag": "還沒有對話加上這個標籤。在檔案中右鍵點擊對話，選擇「標籤」即可新增。",
+    "noMatchingConversations": "沒有符合的對話",
+    "removeFromTag": "從此標籤移除",
+    "duplicateName": "已存在名為「{{name}}」的標籤"
   },
   "moveItemsDialog": {
     "searchFolders": "搜尋資料夾...",
@@ -1269,6 +1277,10 @@
           "label": "紀錄討論結論",
           "text": "把我們這次對話中定下來的結論總結成要點列表，儲存到工作區的 notes/decisions.md 檔案中，並在最後附上待確認的問題。如果該檔案已存在，請在結尾加上今天的日期並附加內容，不要覆蓋原檔案。"
         },
+        "handover": {
+          "label": "在新對話中繼續",
+          "text": "這個對話已經很長了。幫我總結一下，方便重新開始：我想做成什麼、我們定了哪些結論以及原因、仍然要緊的事實和限制，還有哪些沒解決。寫成新對話不看這裡也能接上的樣子，然後在新分頁裡開一個新對話，把這份總結放在輸入框裡。"
+        },
         "stats": {
           "label": "統計對話數據",
           "text": "幫我做一張統計表：列出每個資料夾的對話數量、最近一個月新增的對話數，以及哪些資料夾已經三個月沒活躍過了。最後根據這些數據，給我一些合併資料夾的建議。"
@@ -1358,6 +1370,7 @@
     "approve": {
       "readTitle": "允許執行這個查詢？",
       "writeTitle": "允許執行這個修改？",
+      "newChatTitle": "開啟新對話？",
       "run": "執行",
       "runRest_one": "剩下的 {{count}} 個也一起執行",
       "runRest_other": "剩下的 {{count}} 個也一起執行",
@@ -1369,11 +1382,21 @@
       "showDetail": "檢視將要執行的操作",
       "hideDetail": "收起將要執行的操作"
     },
+    "newChat": {
+      "previewLabel": "將開啟一個新分頁，並把這段內容放進輸入框。在你送出之前不會送出任何內容。",
+      "previewEmpty": "將在新分頁中開啟一個空白對話。",
+      "prefilled": "上一個對話帶來的提示詞已放進輸入框，確認無誤後再送出即可。",
+      "occupied": "輸入框裡已經有內容，所以沒有放入上一個對話帶來的提示詞。要複製一份嗎？",
+      "noComposer": "找不到輸入框，上一個對話帶來的提示詞沒能放進去。要複製一份嗎？",
+      "copy": "複製提示詞",
+      "copyFailed": "複製失敗"
+    },
     "tool": {
       "dataRead": "正在查看你的資料",
       "dataWrite": "正在修改你的資料",
       "sync": "正在取得對話內容",
       "export": "正在匯出",
+      "openNewChat": "正在開啟新對話",
       "complete": "正在收尾",
       "generic": "正在執行一個步驟",
       "nameLabel": "操作",
@@ -1774,11 +1797,19 @@
       },
       "settings": {
         "title": "Browser Agent",
+        "section": {
+          "tabs": "分頁",
+          "bookmarks": "書籤"
+        },
         "group": {
-          "organize": "整理與歸類",
-          "organizeNote": "允許新增書籤與資料夾、調整順序、釘選、分組，以及重新命名分頁與書籤。",
-          "remove": "關閉與刪除",
-          "removeNote": "允許關閉分頁及刪除書籤（敏感操作）。"
+          "tabsOrganize": "整理分頁",
+          "tabsOrganizeNote": "允許開啟、調整順序、釘選分頁，以及建立、重新命名或解散分頁群組。",
+          "tabsRemove": "關閉分頁",
+          "tabsRemoveNote": "允許關閉你核准的分頁（敏感操作）。",
+          "bookmarksOrganize": "整理書籤",
+          "bookmarksOrganizeNote": "允許新增書籤與資料夾，以及重新命名和移動它們。",
+          "bookmarksRemove": "刪除書籤",
+          "bookmarksRemoveNote": "允許刪除你核准的書籤與資料夾（敏感操作）。"
         },
         "denied": "未授予瀏覽器權限，該功能未開啟。",
         "urlToggle": "允許 AI 讀取完整網址 (URL)",

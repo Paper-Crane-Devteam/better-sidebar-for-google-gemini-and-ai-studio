@@ -97,6 +97,16 @@ export const AGENT_EXAMPLES: AgentExample[] = [
       'and tell me what you picked before you switch anything on.',
   },
   {
+    icon: 'MessageSquarePlus',
+    key: 'handover',
+    label: 'Continue in a new chat',
+    text:
+      'This chat has gotten long. Summarize it for a fresh start: what I am trying to do, what we ' +
+      'decided and why, the facts and constraints that still matter, and what is left open. Write ' +
+      'it so a new chat can pick up without seeing this one, then open a new chat in a new tab ' +
+      'with that summary waiting in the input box.',
+  },
+  {
     icon: 'BarChart3',
     key: 'stats',
     label: 'Look at the numbers',

@@ -1137,9 +1137,9 @@ export async function handleBrowserAgent(request: BrowserRequest, sender: Messag
       const existing = (await chrome.windows.getAll({ populate: true, windowTypes: ['popup'] }))
         .find(w => w.tabs?.some(t => t.url === chrome.runtime.getURL('browser-agent-settings.html')));
       if (existing?.id !== undefined) await chrome.windows.update(existing.id, { focused: true });
-      // Sized to the content, which is now three switches and a button. The old
-      // 540×720 was measured against a page of explanatory paragraphs.
-      else await chrome.windows.create({ url: chrome.runtime.getURL('browser-agent-settings.html'), type: 'popup', width: 460, height: 420 });
+      // Sized to the content: two sections of two switches, the URL switch and a button.
+      // The old 540×720 was measured against a page of explanatory paragraphs.
+      else await chrome.windows.create({ url: chrome.runtime.getURL('browser-agent-settings.html'), type: 'popup', width: 460, height: 580 });
       return { success: true };
     }
     if (request.action === 'cancel') {

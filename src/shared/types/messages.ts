@@ -167,6 +167,15 @@ export type ExtensionMessage = (
     }
   | { type: 'RESET_DATABASE' }
   | { type: 'OPEN_URL'; payload: { url: string } }
+  /**
+   * Open a fresh chat in a new tab next to the sender, optionally with text waiting in
+   * its composer. The text is parked in the background under the new tab's id and handed
+   * over by `CLAIM_COMPOSER_PREFILL` once that tab's content script is up — see
+   * `overlay.content/shared/lib/composer-prefill.ts`.
+   */
+  | { type: 'OPEN_NEW_CHAT_TAB'; payload: { url: string; prompt?: string } }
+  /** Sent by every page load: "is there text waiting for my composer?" Consumes it. */
+  | { type: 'CLAIM_COMPOSER_PREFILL' }
   | {
       type: 'ADD_FAVORITE';
       payload: {

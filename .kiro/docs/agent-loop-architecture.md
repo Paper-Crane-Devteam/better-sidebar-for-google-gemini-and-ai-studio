@@ -1510,6 +1510,39 @@ scrollHeight 9478 → 30698   ← 高度是在滚过去的时候才被量出来�
 
 ---
 
+## open_new_chat：在新标签页开新对话（可带初始 prompt）
+
+Better Sidebar agent 的工具（`mcp/providers/new-chat-provider.ts` → `tools/new-chat-tool.ts`）。
+典型用法是范例句「总结当前对话 → 新 tab 里接着聊」：AI 自己写总结（对话本来就在它上下文里，不用查库），
+作为 `initial_prompt` 传进来。
+
+| 性质 | 怎么实现的 |
+|------|-----------|
+| 每次都要批准，speedMode / 本轮全放行都不算 | `ALWAYS_ASK_TOOLS`，`requiresApproval` 里排在 blanket 判断**之前**；两个批准面板对它隐藏「Run these too / 本次任务不再问」 |
+| 批准看的是 prompt 原文 | `NewChatPreview`（卡片和 Dock 共用），纯文本 pre-wrap，因为输入框里就是原字符 |
+| 成功即结束会话 | 在 `HANDOFF_TOOLS` 里：不回传结果、账本不存正文、auto-pickup 永不重跑（重跑 = 再开一个 tab） |
+| 同账号 | Gemini 保留 `/u/N`，AI Studio 保留 `?authuser=N`；裸 URL 会开到账号 0 |
+| 超长 | 超过 `ROUND_BUDGET` 直接 ERROR 让 AI 缩短，不静默截断 |
+
+**往新 tab 输入框塞内容**（`overlay.content/shared/lib/composer-prefill.ts`）：
+
+```
+旧 tab: OPEN_NEW_CHAT_TAB → background tabs.create（紧挨 opener）
+        → chrome.storage.session['composerPrefill:<newTabId>'] = { prompt, createdAt }
+新 tab: overlay 启动后 CLAIM_COMPOSER_PREFILL（按 sender.tab.id 取并删除，TTL 2min）
+        → 轮询等输入框（setTimeout，不用 rAF）→ 停 400ms → 写入
+        → 0 / 600 / 1500 / 3000ms 复查：内容没了且输入框为空 → 重写；有别的文字 → 那是用户的，绝不覆盖
+        → 失败 / 被占用 → toast 带「复制」按钮（剪贴板需要用户手势）
+```
+
+⚠️ 按 tabId 存在 background，不走 URL hash/query：两个平台都会改写新对话 URL（AI Studio
+`new_chat` → `/prompts/<id>`），而且一整段总结不该进地址栏和历史记录。
+⚠️ 复查是必需的：两边首屏都会分阶段搭页面（Gemini 可能换掉 Quill 节点，AI Studio 的 Angular 表单
+初始化时会重置 textarea），只写一次会被静默吃掉。
+⚠️ 写入走 `replaceAllContent`（Gemini）/ `setValue` 原生 setter（AI Studio），和 agent 自己塞 prompt 同一条路。
+
+---
+
 ## 开发常见操作
 
 ### 在 agent-loop 里访问数据库

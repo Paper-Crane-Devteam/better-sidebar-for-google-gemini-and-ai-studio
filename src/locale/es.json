@@ -551,7 +551,15 @@
     "deleteTagConfirm": "¿Estás seguro de que deseas eliminar esta etiqueta?",
     "rename": "Renombrar",
     "changeColor": "Cambiar Color",
-    "selectColor": "Seleccionar Color"
+    "selectColor": "Seleccionar Color",
+    "backToTags": "Volver a etiquetas",
+    "switchTag": "Cambiar etiqueta",
+    "showInExplorer": "Mostrar en Archivos",
+    "searchInTag": "Buscar en esta etiqueta...",
+    "noConversationsInTag": "Aún no hay chats con esta etiqueta. Haz clic derecho en un chat en Archivos y elige Etiquetas para añadir una.",
+    "noMatchingConversations": "No hay chats que coincidan",
+    "removeFromTag": "Quitar de esta etiqueta",
+    "duplicateName": "Ya existe una etiqueta llamada \"{{name}}\""
   },
   "moveItemsDialog": {
     "searchFolders": "Buscar carpetas...",
@@ -1269,6 +1277,10 @@
           "label": "Guardar decisiones",
           "text": "Resume las conclusiones a las que hemos llegado en este chat en forma de lista de viñetas y guárdalo en notes/decisions.md en el espacio de trabajo. Añade al final las dudas que queden por resolver. Si el archivo ya existe, añade el contenido al final con la fecha de hoy, no lo sobrescribas."
         },
+        "handover": {
+          "label": "Continuar en un chat nuevo",
+          "text": "Este chat se ha alargado mucho. Resúmelo para empezar de cero: qué intento conseguir, qué decidimos y por qué, los datos y restricciones que siguen importando y lo que queda pendiente. Escríbelo de forma que un chat nuevo pueda continuar sin ver este, y luego abre un chat nuevo en una pestaña nueva con ese resumen esperando en el cuadro de entrada."
+        },
         "stats": {
           "label": "Analizar estadísticas",
           "text": "Hazme una tabla estadística: cuántos chats hay en cada carpeta, cuántos chats nuevos se han creado el último mes y qué carpetas llevan más de tres meses sin usarse. Con esos datos, recomiéndame qué carpetas podría fusionar."
@@ -1358,6 +1370,7 @@
     "approve": {
       "readTitle": "¿Aprobar esta consulta?",
       "writeTitle": "¿Aprobar este cambio?",
+      "newChatTitle": "¿Abrir un chat nuevo?",
       "run": "Ejecutar",
       "runRest_one": "Ejecutar también este {{count}}",
       "runRest_other": "Ejecutar también estos {{count}}",
@@ -1369,11 +1382,21 @@
       "showDetail": "Ver qué se va a ejecutar",
       "hideDetail": "Ocultar qué se va a ejecutar"
     },
+    "newChat": {
+      "previewLabel": "Se abrirá una pestaña nueva con este texto en el cuadro de entrada. No se envía nada hasta que lo envíes tú.",
+      "previewEmpty": "Se abrirá un chat vacío en una pestaña nueva.",
+      "prefilled": "Tu prompt del chat anterior está en el cuadro de entrada. Revísalo y luego envíalo.",
+      "occupied": "El cuadro de entrada ya tenía texto, así que no se insertó el prompt del chat anterior. ¿Quieres copiarlo?",
+      "noComposer": "No se encontró el cuadro de entrada para el prompt del chat anterior. ¿Quieres copiarlo?",
+      "copy": "Copiar prompt",
+      "copyFailed": "No se pudo copiar"
+    },
     "tool": {
       "dataRead": "Consultando tus datos",
       "dataWrite": "Modificando tus datos",
       "sync": "Obteniendo el contenido de la conversación",
       "export": "Exportando",
+      "openNewChat": "Abriendo un chat nuevo",
       "complete": "Finalizando",
       "generic": "Ejecutando un paso",
       "nameLabel": "Acción",
@@ -1774,11 +1797,19 @@
       },
       "settings": {
         "title": "Browser Agent",
+        "section": {
+          "tabs": "Pestañas",
+          "bookmarks": "Marcadores"
+        },
         "group": {
-          "organize": "Organizar",
-          "organizeNote": "Permite crear marcadores y carpetas, reordenar, fijar, agrupar y renombrar pestañas y marcadores.",
-          "remove": "Eliminar",
-          "removeNote": "Cerrar pestañas y quitar marcadores."
+          "tabsOrganize": "Organizar pestañas",
+          "tabsOrganizeNote": "Abrir, reordenar y fijar pestañas, y crear, renombrar o desagrupar grupos de pestañas.",
+          "tabsRemove": "Cerrar pestañas",
+          "tabsRemoveNote": "Cerrar las pestañas que apruebes.",
+          "bookmarksOrganize": "Organizar marcadores",
+          "bookmarksOrganizeNote": "Crear marcadores y carpetas, renombrarlos y moverlos.",
+          "bookmarksRemove": "Eliminar marcadores",
+          "bookmarksRemoveNote": "Quitar los marcadores y carpetas que apruebes."
         },
         "denied": "No concedido. El interruptor sigue desactivado.",
         "urlToggle": "Permitir que la IA lea las URL completas",
