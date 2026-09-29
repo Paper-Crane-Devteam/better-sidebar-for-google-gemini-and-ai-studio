@@ -27,7 +27,7 @@
     "rename": "Renombrar"
   },
   "tabs": {
-    "files": "Archivos",
+    "files": "Biblioteca",
     "favorites": "Favoritos",
     "prompts": "Prompts",
     "search": "Buscar",
@@ -255,7 +255,7 @@
   "data": {
     "librarySync": "Sincronización de Datos",
     "scanLibrary": "Escanear Biblioteca",
-    "scanLibraryDescription": "Escanear tu biblioteca para poblar el explorador",
+    "scanLibraryDescription": "Escanea todos tus chats para llenar la Biblioteca",
     "importConversationData": "Importar Datos de Conversación",
     "importConversationDataDescription": "Importar historial de conversaciones desde un ZIP exportado de Google AI Studio",
     "storageManagement": "Gestión de Almacenamiento",
@@ -299,7 +299,7 @@
   "explorerSettings": {
     "viewOptions": "Opciones de Vista",
     "defaultViewMode": "Modo de Vista Predeterminado",
-    "defaultViewModeDescription": "Cómo se muestran los elementos en el explorador",
+    "defaultViewModeDescription": "Cómo se muestran los elementos en la Biblioteca",
     "treeView": "Vista de Árbol",
     "timelineView": "Vista de Línea de Tiempo",
     "tree": "Árbol",
@@ -390,7 +390,7 @@
   },
   "favorites": {
     "noFavoritesFound": "No se encontraron favoritos que coincidan con tus filtros.",
-    "noFavoritesYet": "Aún no hay favoritos. Haz clic derecho en un archivo para añadirlo a favoritos.",
+    "noFavoritesYet": "Aún no hay favoritos. Haz clic derecho en un chat de la Biblioteca para añadirlo a favoritos.",
     "favorites": "Favoritos"
   },
   "explorerHeader": {
@@ -554,9 +554,9 @@
     "selectColor": "Seleccionar Color",
     "backToTags": "Volver a etiquetas",
     "switchTag": "Cambiar etiqueta",
-    "showInExplorer": "Mostrar en Archivos",
+    "showInExplorer": "Mostrar en Biblioteca",
     "searchInTag": "Buscar en esta etiqueta...",
-    "noConversationsInTag": "Aún no hay chats con esta etiqueta. Haz clic derecho en un chat en Archivos y elige Etiquetas para añadir una.",
+    "noConversationsInTag": "Aún no hay chats con esta etiqueta. Haz clic derecho en un chat de la Biblioteca y elige Etiquetas para añadir una.",
     "noMatchingConversations": "No hay chats que coincidan",
     "removeFromTag": "Quitar de esta etiqueta",
     "duplicateName": "Ya existe una etiqueta llamada \"{{name}}\""
@@ -708,7 +708,7 @@
   },
   "onboarding": {
     "welcome": "Bienvenido a Better Sidebar",
-    "description": "Potencia tu flujo de trabajo en Google AI Studio, Gemini, ChatGPT y Claude con gestión de archivos mejorada y una interfaz atractiva.",
+    "description": "Potencia tu flujo de trabajo en Google AI Studio, Gemini, ChatGPT y Claude con una mejor forma de organizar tus chats y una interfaz atractiva.",
     "getStarted": "Comenzar ahora",
     "comingSoon": "Próximamente",
     "unsupported": "Actualmente no compatible",
@@ -753,7 +753,7 @@
     },
     "steps": {
       "files": {
-        "title": "Explorador de conversaciones",
+        "title": "Biblioteca",
         "description": "Explora, organiza y gestiona todas tus conversaciones. Crea carpetas, arrastra para ordenar y haz clic derecho para más opciones.<br/>Las conversaciones recientes se escanean automáticamente. Para ver la lista completa, usa la opción \"<span style='color:#a5b4fc;font-weight:600'>Escanear</span>\" en el menú <b>⋮</b>."
       },
       "search": {
@@ -1178,7 +1178,7 @@
     "newConversation": "Nueva conversación",
     "openSearch": "Abrir búsqueda",
     "openSettings": "Abrir configuración",
-    "navExplorer": "Ir al explorador",
+    "navExplorer": "Ir a la Biblioteca",
     "navSearch": "Ir a búsqueda",
     "navPrompts": "Ir a prompts",
     "navTags": "Ir a etiquetas",

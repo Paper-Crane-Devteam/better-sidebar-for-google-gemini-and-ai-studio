@@ -27,7 +27,7 @@
     "rename": "Rename"
   },
   "tabs": {
-    "files": "Files",
+    "files": "Library",
     "favorites": "Favorites",
     "prompts": "Prompts",
     "search": "Search",
@@ -255,7 +255,7 @@
   "data": {
     "librarySync": "Data Sync",
     "scanLibrary": "Scan Library",
-    "scanLibraryDescription": "Scan your library to populate the explorer",
+    "scanLibraryDescription": "Scan all your chats to populate the Library",
     "importConversationData": "Import Chat Data",
     "importConversationDataDescription": "Import chat history from a ZIP exported from Google AI Studio",
     "storageManagement": "Storage Management",
@@ -299,7 +299,7 @@
   "explorerSettings": {
     "viewOptions": "View Options",
     "defaultViewMode": "Default View Mode",
-    "defaultViewModeDescription": "How items are displayed in the explorer",
+    "defaultViewModeDescription": "How items are displayed in the Library",
     "treeView": "Tree View",
     "timelineView": "Timeline View",
     "tree": "Tree",
@@ -390,7 +390,7 @@
   },
   "favorites": {
     "noFavoritesFound": "No favorites found matching your filters.",
-    "noFavoritesYet": "No favorites yet. Right-click on a file to add it to favorites.",
+    "noFavoritesYet": "No favorites yet. Right-click a chat in Library to add it to favorites.",
     "favorites": "Favorites"
   },
   "explorerHeader": {
@@ -554,9 +554,9 @@
     "selectColor": "Select Color",
     "backToTags": "Back to tags",
     "switchTag": "Switch tag",
-    "showInExplorer": "Show in Files",
+    "showInExplorer": "Show in Library",
     "searchInTag": "Search in this tag...",
-    "noConversationsInTag": "No chats with this tag yet. Right-click a chat in Files and choose Tags to add one.",
+    "noConversationsInTag": "No chats with this tag yet. Right-click a chat in Library and choose Tags to add one.",
     "noMatchingConversations": "No matching chats",
     "removeFromTag": "Remove from this tag",
     "duplicateName": "A tag named \"{{name}}\" already exists"
@@ -708,7 +708,7 @@
   },
   "onboarding": {
     "welcome": "Welcome to Better Sidebar",
-    "description": "Supercharge your workflow on Google AI Studio, Gemini, ChatGPT, and Claude with enhanced file management and beautiful UI.",
+    "description": "Supercharge your workflow on Google AI Studio, Gemini, ChatGPT, and Claude with a better way to organize your chats and a beautiful UI.",
     "getStarted": "Get Started now",
     "comingSoon": "Coming Soon",
     "unsupported": "Currently Unsupported",
@@ -753,7 +753,7 @@
     },
     "steps": {
       "files": {
-        "title": "Conversation Explorer",
+        "title": "Library",
         "description": "Browse, organize, and manage all your conversations. Create folders, drag to sort, and right-click for more options.<br/>Recent conversations are scanned automatically. To view the full list, use the \"<span style='color:#a5b4fc;font-weight:600'>Scan</span>\" option in the <b>⋮</b> menu."
       },
       "search": {
@@ -1178,7 +1178,7 @@
     "newConversation": "New Chat",
     "openSearch": "Open Search",
     "openSettings": "Open Settings",
-    "navExplorer": "Go to Explorer",
+    "navExplorer": "Go to Library",
     "navSearch": "Go to Search",
     "navPrompts": "Go to Prompts",
     "navTags": "Go to Tags",

@@ -27,7 +27,7 @@
     "rename": "重新命名"
   },
   "tabs": {
-    "files": "檔案",
+    "files": "資料庫",
     "favorites": "收藏",
     "prompts": "Prompt",
     "search": "搜尋",
@@ -255,7 +255,7 @@
   "data": {
     "librarySync": "資料同步",
     "scanLibrary": "掃描資料庫",
-    "scanLibraryDescription": "掃描您的資料庫以填入資源管理器",
+    "scanLibraryDescription": "掃描全部對話，填入資料庫",
     "importConversationData": "匯入對話資料",
     "importConversationDataDescription": "從 Google AI Studio 匯出的 ZIP 匯入對話歷史",
     "storageManagement": "儲存管理",
@@ -299,7 +299,7 @@
   "explorerSettings": {
     "viewOptions": "檢視選項",
     "defaultViewMode": "預設檢視模式",
-    "defaultViewModeDescription": "資源管理器中項目的顯示方式",
+    "defaultViewModeDescription": "資料庫中項目的顯示方式",
     "treeView": "樹狀檢視",
     "timelineView": "時間軸檢視",
     "tree": "樹狀",
@@ -390,7 +390,7 @@
   },
   "favorites": {
     "noFavoritesFound": "找不到符合篩選條件的收藏",
-    "noFavoritesYet": "還沒有收藏。右鍵點選檔案可新增至收藏。",
+    "noFavoritesYet": "還沒有收藏。在資料庫中右鍵點擊對話即可加入收藏。",
     "favorites": "收藏"
   },
   "explorerHeader": {
@@ -554,9 +554,9 @@
     "selectColor": "選擇顏色",
     "backToTags": "返回標籤列表",
     "switchTag": "切換標籤",
-    "showInExplorer": "在檔案中檢視",
+    "showInExplorer": "在資料庫中檢視",
     "searchInTag": "在此標籤中搜尋...",
-    "noConversationsInTag": "還沒有對話加上這個標籤。在檔案中右鍵點擊對話，選擇「標籤」即可新增。",
+    "noConversationsInTag": "還沒有帶此標籤的對話。在資料庫中右鍵點擊對話，選擇「標籤」即可新增。",
     "noMatchingConversations": "沒有符合的對話",
     "removeFromTag": "從此標籤移除",
     "duplicateName": "已存在名為「{{name}}」的標籤"
@@ -708,7 +708,7 @@
   },
   "onboarding": {
     "welcome": "歡迎使用 Better Sidebar",
-    "description": "在 Google AI Studio、Gemini、ChatGPT 與 Claude 上強化檔案管理與介面，提升您的工作流程。",
+    "description": "為 Google AI Studio、Gemini、ChatGPT 和 Claude 提升工作效率，更好地整理對話，介面更美觀。",
     "getStarted": "立即開始",
     "comingSoon": "即將推出",
     "unsupported": "目前不支援",
@@ -753,7 +753,7 @@
     },
     "steps": {
       "files": {
-        "title": "對話總管",
+        "title": "資料庫",
         "description": "瀏覽、整理並管理所有對話。建立資料夾、拖曳排序，右鍵可進行更多操作。<br/>最近的對話會自動掃描。如需查看完整列表，請點擊 <b>⋮</b> 選單中的「<span style='color:#a5b4fc;font-weight:600'>掃描</span>」選項。"
       },
       "search": {
@@ -1178,7 +1178,7 @@
     "newConversation": "新增對話",
     "openSearch": "開啟搜尋",
     "openSettings": "開啟設定",
-    "navExplorer": "前往資源管理器",
+    "navExplorer": "前往資料庫",
     "navSearch": "前往搜尋",
     "navPrompts": "前往 Prompt",
     "navTags": "前往標籤",

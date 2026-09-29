@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import {
-  MessageSquare,
-  Image as ImageIcon,
   Star,
   StarOff,
   Tag as TagIcon,
@@ -54,7 +52,6 @@ export const TagConversationItem = ({
   const isMenuActive = isContextMenuOpen || isDropdownOpen;
 
   const title = conversation.title || t('common.untitled');
-  const isImage = conversation.type === 'text-to-image';
 
   const open = () => navigateToConversation(conversation.id);
   const removeFromTag = () => removeTagFromConversation(conversation.id, tag.id);
@@ -146,11 +143,6 @@ export const TagConversationItem = ({
             )}
           >
             <div className="flex-1 min-w-0 flex items-center gap-1.5 overflow-hidden node-text-content">
-              {isImage ? (
-                <ImageIcon className="w-4 h-4 shrink-0 text-muted-foreground" />
-              ) : (
-                <MessageSquare className="w-4 h-4 shrink-0 text-muted-foreground" />
-              )}
               <span className="truncate">{title}</span>
               {isFavorite && (
                 <Star className="h-3 w-3 shrink-0 fill-highlight text-highlight" />

@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Tag } from '@/shared/types/db';
 import { useAppStore } from '@/shared/lib/store';
-import { Tag as TagIcon } from 'lucide-react';
 import { Input } from '@/entrypoints/overlay.content/shared/components/ui/input';
 import { cn } from '@/shared/lib/utils/utils';
 import {
@@ -137,7 +136,6 @@ export const TagItem = ({ tag, count, onOpen }: TagItemProps) => {
             style={tag.color ? { '--tag-color': tag.color } as React.CSSProperties : undefined}
           >
             <div className="flex-1 min-w-0 flex items-center gap-2 overflow-hidden node-text-content" style={tag.color ? { color: tag.color } : undefined}>
-              <TagIcon className="h-4 w-4 shrink-0" />
               <span className="truncate font-medium">{tag.name}</span>
               {/* Sits inside the masked text area so the hover action bar fades it out */}
               <span className="ml-auto shrink-0 pl-2 text-xs tabular-nums text-muted-foreground">

@@ -27,7 +27,7 @@
     "rename": "重命名"
   },
   "tabs": {
-    "files": "文件",
+    "files": "库",
     "favorites": "收藏",
     "prompts": "Prompt",
     "search": "搜索",
@@ -255,7 +255,7 @@
   "data": {
     "librarySync": "数据同步",
     "scanLibrary": "扫描库",
-    "scanLibraryDescription": "扫描您的库以填充资源管理器",
+    "scanLibraryDescription": "扫描全部对话，填充到库中",
     "importConversationData": "导入对话数据",
     "importConversationDataDescription": "从 Google AI Studio 导出的 ZIP 导入对话历史",
     "storageManagement": "存储管理",
@@ -299,7 +299,7 @@
   "explorerSettings": {
     "viewOptions": "视图选项",
     "defaultViewMode": "默认视图模式",
-    "defaultViewModeDescription": "资源管理器中项目的显示方式",
+    "defaultViewModeDescription": "库中项目的显示方式",
     "treeView": "树形视图",
     "timelineView": "时间线视图",
     "tree": "树形",
@@ -390,7 +390,7 @@
   },
   "favorites": {
     "noFavoritesFound": "未找到匹配筛选条件的收藏",
-    "noFavoritesYet": "还没有收藏。右键点击文件可添加到收藏。",
+    "noFavoritesYet": "还没有收藏。在库中右键点击对话即可添加到收藏。",
     "favorites": "收藏"
   },
   "explorerHeader": {
@@ -554,9 +554,9 @@
     "selectColor": "选择颜色",
     "backToTags": "返回标签列表",
     "switchTag": "切换标签",
-    "showInExplorer": "在文件中查看",
+    "showInExplorer": "在库中查看",
     "searchInTag": "在此标签中搜索...",
-    "noConversationsInTag": "还没有对话打上这个标签。在文件中右键点击对话，选择「标签」即可添加。",
+    "noConversationsInTag": "还没有带此标签的对话。在库中右键点击对话，选择「标签」即可添加。",
     "noMatchingConversations": "没有匹配的对话",
     "removeFromTag": "从此标签移除",
     "duplicateName": "已存在名为「{{name}}」的标签"
@@ -708,7 +708,7 @@
   },
   "onboarding": {
     "welcome": "欢迎使用 Better Sidebar",
-    "description": "在 Google AI Studio、Gemini、ChatGPT 和 Claude 上增强您的工作流程，体验更强大的文件管理和精美的 UI 界面。",
+    "description": "为 Google AI Studio、Gemini、ChatGPT 和 Claude 提升工作效率，更好地整理对话，界面更美观。",
     "getStarted": "立即开始使用",
     "comingSoon": "即将推出",
     "unsupported": "暂不支持",
@@ -753,7 +753,7 @@
     },
     "steps": {
       "files": {
-        "title": "对话管理器",
+        "title": "库",
         "description": "浏览、整理和管理所有对话。可创建文件夹、拖拽排序，右键可查看更多操作。<br/>插件会自动扫描最近的对话；如需查看完整对话列表，请点击右上角 <b>⋮</b> 菜单中的「<span style='color:#a5b4fc;font-weight:600'>扫描</span>」功能。"
       },
       "search": {
@@ -1178,7 +1178,7 @@
     "newConversation": "新建对话",
     "openSearch": "打开搜索",
     "openSettings": "打开设置",
-    "navExplorer": "跳转到文件管理器",
+    "navExplorer": "跳转到库",
     "navSearch": "跳转到搜索",
     "navPrompts": "跳转到 Prompt 库",
     "navTags": "跳转到标签",

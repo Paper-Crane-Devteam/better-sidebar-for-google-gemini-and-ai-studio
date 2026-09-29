@@ -27,7 +27,7 @@
     "rename": "名前を変更"
   },
   "tabs": {
-    "files": "ファイル",
+    "files": "ライブラリ",
     "favorites": "お気に入り",
     "prompts": "プロンプト",
     "search": "検索",
@@ -255,7 +255,7 @@
   "data": {
     "librarySync": "データ同期",
     "scanLibrary": "ライブラリをスキャン",
-    "scanLibraryDescription": "ライブラリをスキャンしてエクスプローラーに追加",
+    "scanLibraryDescription": "すべてのチャットをスキャンしてライブラリに取り込みます",
     "importConversationData": "会話データをインポート",
     "importConversationDataDescription": "Google AI Studio からエクスポートした ZIP で会話履歴をインポート",
     "storageManagement": "ストレージ管理",
@@ -299,7 +299,7 @@
   "explorerSettings": {
     "viewOptions": "表示オプション",
     "defaultViewMode": "デフォルト表示モード",
-    "defaultViewModeDescription": "エクスプローラーでの項目の表示方法",
+    "defaultViewModeDescription": "ライブラリでの項目の表示方法",
     "treeView": "ツリービュー",
     "timelineView": "タイムラインビュー",
     "tree": "ツリー",
@@ -390,7 +390,7 @@
   },
   "favorites": {
     "noFavoritesFound": "フィルタに一致するお気に入りが見つかりません。",
-    "noFavoritesYet": "お気に入りはまだありません。ファイルを右クリックしてお気に入りに追加できます。",
+    "noFavoritesYet": "お気に入りはまだありません。ライブラリでチャットを右クリックしてお気に入りに追加してください。",
     "favorites": "お気に入り"
   },
   "explorerHeader": {
@@ -554,9 +554,9 @@
     "selectColor": "色を選択",
     "backToTags": "タグ一覧に戻る",
     "switchTag": "タグを切り替え",
-    "showInExplorer": "ファイルで表示",
+    "showInExplorer": "ライブラリで表示",
     "searchInTag": "このタグ内を検索...",
-    "noConversationsInTag": "このタグが付いたチャットはまだありません。ファイルでチャットを右クリックし、「タグ」から追加してください。",
+    "noConversationsInTag": "このタグが付いたチャットはまだありません。ライブラリでチャットを右クリックし、「タグ」を選んで追加してください。",
     "noMatchingConversations": "一致するチャットはありません",
     "removeFromTag": "このタグから外す",
     "duplicateName": "「{{name}}」という名前のタグはすでに存在します"
@@ -708,7 +708,7 @@
   },
   "onboarding": {
     "welcome": "Better Sidebar へようこそ",
-    "description": "Google AI Studio、Gemini、ChatGPT、Claude で、強化されたファイル管理と美しい UI でワークフローを効率化。",
+    "description": "Google AI Studio、Gemini、ChatGPT、Claude でのワークフローを強化。チャットをもっと整理しやすく、美しい UI で。",
     "getStarted": "今すぐ始める",
     "comingSoon": "近日公開",
     "unsupported": "現在非対応",
@@ -753,7 +753,7 @@
     },
     "steps": {
       "files": {
-        "title": "会話エクスプローラー",
+        "title": "ライブラリ",
         "description": "会話の閲覧、整理、管理。フォルダ作成、ドラッグで並べ替え、右クリックでその他の操作。<br/>最近の会話は自動的にスキャンされます。完全なリストを表示するには、<b>⋮</b> メニューの「<span style='color:#a5b4fc;font-weight:600'>スキャン</span>」オプションをご利用ください。"
       },
       "search": {
@@ -1178,7 +1178,7 @@
     "newConversation": "新しい会話",
     "openSearch": "検索を開く",
     "openSettings": "設定を開く",
-    "navExplorer": "エクスプローラーへ移動",
+    "navExplorer": "ライブラリへ移動",
     "navSearch": "検索へ移動",
     "navPrompts": "プロンプトへ移動",
     "navTags": "タグへ移動",

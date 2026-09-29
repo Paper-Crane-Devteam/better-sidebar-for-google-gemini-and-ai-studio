@@ -27,7 +27,7 @@
     "rename": "Renomear"
   },
   "tabs": {
-    "files": "Arquivos",
+    "files": "Biblioteca",
     "favorites": "Favoritos",
     "prompts": "Prompts",
     "search": "Pesquisar",
@@ -255,7 +255,7 @@
   "data": {
     "librarySync": "Sincronização de Dados",
     "scanLibrary": "Escanear Biblioteca",
-    "scanLibraryDescription": "Escanear sua biblioteca para preencher o explorador",
+    "scanLibraryDescription": "Escaneie todos os seus chats para preencher a Biblioteca",
     "importConversationData": "Importar Dados de Conversa",
     "importConversationDataDescription": "Importar histórico de conversas de um ZIP exportado do Google AI Studio",
     "storageManagement": "Gerenciamento de Armazenamento",
@@ -299,7 +299,7 @@
   "explorerSettings": {
     "viewOptions": "Opções de Visualização",
     "defaultViewMode": "Modo de Visualização Padrão",
-    "defaultViewModeDescription": "Como os itens são exibidos no explorador",
+    "defaultViewModeDescription": "Como os itens são exibidos na Biblioteca",
     "treeView": "Visualização em Árvore",
     "timelineView": "Visualização de Linha do Tempo",
     "tree": "Árvore",
@@ -390,7 +390,7 @@
   },
   "favorites": {
     "noFavoritesFound": "Nenhum favorito encontrado correspondendo aos seus filtros.",
-    "noFavoritesYet": "Ainda não há favoritos. Clique com o botão direito em um arquivo para adicioná-lo aos favoritos.",
+    "noFavoritesYet": "Nenhum favorito ainda. Clique com o botão direito em um chat na Biblioteca para adicioná-lo aos favoritos.",
     "favorites": "Favoritos"
   },
   "explorerHeader": {
@@ -554,9 +554,9 @@
     "selectColor": "Selecionar Cor",
     "backToTags": "Voltar para tags",
     "switchTag": "Trocar tag",
-    "showInExplorer": "Mostrar em Arquivos",
+    "showInExplorer": "Mostrar na Biblioteca",
     "searchInTag": "Pesquisar nesta tag...",
-    "noConversationsInTag": "Ainda não há chats com esta tag. Clique com o botão direito em um chat em Arquivos e escolha Tags para adicionar.",
+    "noConversationsInTag": "Ainda não há chats com esta tag. Clique com o botão direito em um chat na Biblioteca e escolha Tags para adicionar uma.",
     "noMatchingConversations": "Nenhum chat correspondente",
     "removeFromTag": "Remover desta tag",
     "duplicateName": "Já existe uma tag chamada \"{{name}}\""
@@ -708,7 +708,7 @@
   },
   "onboarding": {
     "welcome": "Bem-vindo ao Better Sidebar",
-    "description": "Potencialize seu fluxo de trabalho no Google AI Studio, Gemini, ChatGPT e Claude com gerenciamento de arquivos aprimorado e interface elegante.",
+    "description": "Turbine seu fluxo de trabalho no Google AI Studio, Gemini, ChatGPT e Claude com uma forma melhor de organizar seus chats e uma interface bonita.",
     "getStarted": "Começar agora",
     "comingSoon": "Em breve",
     "unsupported": "Atualmente não suportado",
@@ -753,7 +753,7 @@
     },
     "steps": {
       "files": {
-        "title": "Explorador de conversas",
+        "title": "Biblioteca",
         "description": "Navegue, organize e gerencie todas as suas conversas. Crie pastas, arraste para ordenar e clique com o botão direito para mais opções.<br/>As conversas recentes são escaneadas automaticamente. Para ver a lista completa, use a opção \"<span style='color:#a5b4fc;font-weight:600'>Escanear</span>\" no menu <b>⋮</b>."
       },
       "search": {
@@ -1178,7 +1178,7 @@
     "newConversation": "Nova conversa",
     "openSearch": "Abrir pesquisa",
     "openSettings": "Abrir configurações",
-    "navExplorer": "Ir para o explorador",
+    "navExplorer": "Ir para a Biblioteca",
     "navSearch": "Ir para pesquisa",
     "navPrompts": "Ir para prompts",
     "navTags": "Ir para tags",
