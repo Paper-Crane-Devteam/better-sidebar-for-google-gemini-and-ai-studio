@@ -1,153 +1,156 @@
 El organizador todo-en-uno de chats, gestor de prompts y kit de productividad para Google Gemini y AI Studio.
-Organiza conversaciones en carpetas, busca en todos los mensajes, exporta chats, sincroniza con Google Drive, y ahora — deja que un Agente IA gestione tus datos por ti.
+Organiza conversaciones en carpetas, busca en todos los mensajes, exporta chats, sincroniza con Google Drive y, si quieres, deja que un Agente IA te ayude a gestionar tus datos.
 
-Conoce BETTER SIDEBAR FOR GEMINI & AI STUDIO — el impulsor definitivo para desarrolladores, ingenieros de prompts y power users de IA.
+Te presentamos BETTER SIDEBAR FOR GEMINI & AI STUDIO, pensado para ayudar a desarrolladores, ingenieros de prompts y usuarios intensivos de IA en su trabajo diario. Queremos convertir la interfaz por defecto en una base de conocimiento más ordenada, para que encuentres lo que necesitas sin hacer scroll sin fin.
 
-Transformamos la interfaz por defecto en una base de conocimiento potente y organizada. Deja de hacer scroll infinito por el historial y empieza a trabajar eficientemente.
-
-🔥 NOVEDADES (v2.11.0)
-
-⌨️ Paleta de comandos Cmd+K (Estilo Raycast):
-• Pulsa Cmd+K (Mac) o Ctrl+K (Windows) para invocar un panel central de acciones rápidas. Busca títulos, contenido de mensajes y ejecuta herramientas con flujo total desde el teclado.
-
-🔄 Sincronización silenciosa en segundo plano (Búsqueda completa entre dispositivos):
-• ¡No vuelvas a perder un resultado de búsqueda! Ahora los mensajes se indexan silenciosamente en segundo plano sin requerir que abras cada chat. Con panel de estado y opción de sincronización manual (opcional y con control de velocidad).
-
-🤖 Browser Agent (Tu asistente para el navegador, Experimental):
-• La IA llega a la gestión de tu navegador: deduplicación inteligente de pestañas, agrupación temática y limpieza a fondo de carpetas de marcadores caóticas. Con instantáneas previas y reversión en un clic.
-
-🎨 Creador de temas en vivo con BetterSidebar Agent:
-• Olvídate de copiar y pegar prompts y archivos JSON. Describe el estilo que buscas y el agente creará y aplicará el tema de inmediato, permitiendo ajustes por conversación.
-
-🧩 Barra de iconos lateral personalizable y reordenable:
-• Oculta las pestañas que no utilices a diario y arrastra los iconos para reorganizarlos a tu gusto.
-
-🛠️ Correcciones y mejoras:
-• Despliegue en AI Studio: Solucionado el problema con el colapso de la barra tras los recientes cambios de Google.
-• Enrutamiento de carpetas: Arreglado el error por el que los nuevos chats caían siempre en «Inbox» teniendo otra carpeta activa.
-• Contraste del tema Retro: Reducida la saturación excesiva del tema Retro Terminal para proteger la vista en sesiones prolongadas.
+La mayoría de las funciones son gratuitas. Las pocas que requieren un pack están marcadas como (Support Pack) o (Power Pack). Power Pack incluye todo lo de Support Pack.
 
 ---
 
-🚀 FUNCIONES PRINCIPALES
+📂 ORGANIZA TUS CHATS
 
-🤖 AI AGENT & WORKSPACE
+📂 Carpetas y colores
+Arrastra y suelta chats en carpetas anidadas dentro de la pestaña Biblioteca. Asigna colores a carpetas y etiquetas para distinguirlas de un vistazo.
 
-Escribe ">" para invocar al Agent. Describe tus tareas y te ayudará a ejecutarlas.
-• Workspace Agent: Arrastra y suelta documentos (Word, Excel, PDF, código, etc.) y deja que la IA los analice o edite mientras preserva estrictamente tus formatos originales.
-• Browser Agent (Nuevo): Limpia el desorden de pestañas (deduplicación y agrupación inteligente) y organiza marcadores con copias de seguridad automáticas y reversión en un clic.
-• BetterSidebar Agent: Diseña y aplica temas personalizados al vuelo, organiza chats y consulta datos. Funciona incluso con la sidebar cerrada vía Agent Dock.
+🏷️ Etiquetas
+Etiqueta conversaciones y ve las etiquetas directamente en la cabecera del chat. Haz clic en una etiqueta para abrir todos los chats que la llevan; desde ahí puedes cambiar de etiqueta, buscar dentro de ella o añadir y quitar etiquetas al momento.
 
-📂 SIDEBAR Y ORGANIZACIÓN
+⭐ Favoritos y fijados
+Fija tus chats o prompts más importantes arriba para tenerlos siempre a mano.
 
-📂 Carpetas y Colores
-Arrastra chats a carpetas anidadas. Asigna colores personalizados.
+📊 Vista de línea de tiempo
+Ve tus chats agrupados en "Hoy", "Ayer" y "La semana pasada".
 
-🧩 Barra de iconos personalizable
-Muestra u oculta herramientas en la barra lateral izquierda y ordénalas arrastrando para un entorno de trabajo limpio.
+📝 Notas de chat y tooltips enriquecidos
+Añade descripciones a los chats; pasa el cursor para ver fecha de creación, etiquetas y notas.
 
-🔍 Búsqueda y Filtros
+🗑️ Eliminación en lote
+Selecciona muchas conversaciones y elimínalas de tu cuenta de Google de una vez, no solo ocultarlas de la lista. Se acabaron los chats fantasma.
 
-⌨️ Paleta de comandos Cmd+K & Sincronización silenciosa
-Pulsa Cmd+K / Ctrl+K para abrir la búsqueda global de títulos, descripciones, herramientas y texto completo de mensajes. Potenciada con sincronización silenciosa en segundo plano para una búsqueda entre dispositivos 100% fiable. Filtros combinados y búsqueda dentro del chat activo.
+---
 
-🏷️ Etiquetas Inteligentes
-Tags personalizados visibles en el encabezado. Filtrado instantáneo.
+🔍 ENCUENTRA CUALQUIER COSA
 
-⭐ Favoritos y Fijados
-Fija chats o prompts importantes arriba.
+⌨️ Paleta de comandos Cmd+K
+Pulsa Cmd+K (Mac) o Ctrl+K (Windows) para abrir un panel de búsqueda centrado. Busca títulos, descripciones, el texto completo de los mensajes y herramientas de la extensión, todo desde el teclado. Combina filtros o busca solo dentro de la conversación actual.
 
-📊 Vista Timeline
-Agrupación por "Hoy", "Ayer", "Semana pasada".
+🔄 Sincronización de mensajes en segundo plano
+Los mensajes del historial se sincronizan discretamente en segundo plano, así la búsqueda de texto completo también cubre chats que aún no has abierto, incluidos los iniciados en otros dispositivos. Se activa manualmente, con un ritmo suave, resumen del estado de sincronización y un botón para sincronizar chats individuales.
 
-🗑️ Eliminación en Lote
-Eliminación real del lado del servidor. Sin chats fantasma.
+👀 Esquema de la conversación
+Abre la vista de esquema para ver la estructura de una conversación larga de un vistazo.
 
-📤 Exportar Conversaciones
-Markdown, texto plano o JSON. Exportación en lote con Powerpack.
+---
+
+📝 PROMPTS, SNIPPETS Y EXPORTACIÓN
+
+📝 Biblioteca de prompts
+Crea tu propia biblioteca de prompts reutilizables. Admite variables de opción, composición de prompts e importación de system prompts. Escribe "/" para insertar un prompt tanto en Gemini como en AI Studio.
 
 ✂️ Snippets
-Extrae lo mejor de respuestas IA a una biblioteca con carpetas.
+Guarda fragmentos destacados de cualquier respuesta de la IA en una biblioteca de Snippets con gestión de carpetas.
 
-👀 Esquema de Conversación
-Vista Outline para ver la estructura de conversaciones largas.
+📤 Exportación de conversaciones
+Exporta una conversación o muchas a la vez en Markdown, texto plano o JSON, para documentación o copias de seguridad.
 
-📝 Notas y Tooltips Enriquecidos
-Añade descripciones; hover muestra fecha, tags y notas.
-
-💾 Backups Locales Automáticos
-Respaldo automático por cronograma. Snapshots manuales y rollback.
+🔗 Exportar a Notion y Obsidian (Power Pack)
+Envía conversaciones y snippets a Notion u Obsidian, conservando el formato lo mejor posible. También funciona en lote.
 
 ---
 
-🎨 PERSONALIZACIÓN DE UI
-
-Gemini:
-• Ajustar ancho de sidebar, contenido y caja de entrada
-• Modo Focus — ocultar elementos innecesarios (logo, disclaimer, botón upgrade)
-• Smart Scrollbar — saltar a cualquier mensaje; expandible a lista completa
-• Descarga de imágenes sin marca de agua (incluido Pro HD)
-• Animación de cambio de tema
-
-AI Studio:
-• Ancho de sidebar configurable
-• Auto-ocultar caja de entrada
-• Auto-ocultar panel de configuración de ejecución
-• Comando "/" para Biblioteca de Prompts
-
-🎨 Temas
-13+ temas exclusivos (incluidos temas generados por IA). Detección automática dark/light. Transiciones animadas.
-
----
-
-💎 GEMS, NOTEBOOKS Y PROMPTS
+💎 GEMS Y NOTEBOOKS
 
 💎 Gestión de Gems
-Integración completa — navegar, filtrar, crear e iniciar conversaciones Gem desde la sidebar.
+Explora, filtra, crea e inicia conversaciones con Gems directamente desde la barra lateral.
 
-📓 Integración Notebooks
-Soporte completo de Notebooks Gemini — navegar, organizar y gestionar desde la sidebar.
+📓 Integración con Notebooks
+Explora, organiza y gestiona tus notebooks de Gemini desde la barra lateral.
 
-📝 Biblioteca de Prompts
-Construye tu biblioteca personal. Variables de opción, composición de prompts, importación de system prompts. Atajo "/" en Gemini y AI Studio.
-
-☁️ Google Drive Sync
-Subida automática de configuración y prompts. Restauración solo manual — datos locales son la verdad.
-
-🔗 Powerpack — Exportar a Notion & Obsidian
-Exportación perfecta a Notion y Obsidian con formato preservado. Lote disponible. Incluye AI Agent. 7 días devolución sin preguntas.
+⚡ Gemini Spark
+Si Spark está disponible en tu cuenta de Google, aparece como una pestaña nativa, sin configuración.
 
 ---
 
-⚙️ MÁS
+🎨 PERSONALIZACIÓN DE LA INTERFAZ
 
-🌟 Multi-Plataforma
-Gestiona Gemini y AI Studio en una sidebar unificada.
+Gemini:
+• Ajusta el ancho de la barra lateral, del contenido del chat y del cuadro de entrada
+• Modo enfoque: oculta el logo, el aviso legal, el botón de mejora y otros elementos innecesarios
+• Barra de desplazamiento inteligente: salta a cualquier mensaje; se despliega como lista completa de mensajes
+• Descarga de imágenes sin marca de agua (incluidas imágenes HD de Pro)
+• Animación al cambiar de tema
 
-👤 Perfiles Multi-Cuenta
-Perfiles separados para trabajo o personal. Cada uno con base de datos independiente.
+AI Studio:
+• Ancho de barra lateral configurable
+• Ocultar automáticamente el cuadro de entrada
+• Ocultar automáticamente el panel de ajustes de ejecución
+• Comando "/" para la biblioteca de prompts
 
-💾 Control de Datos
-Tus datos son tuyos. Exporta SQL en cualquier momento. Backups automáticos + rollback.
+🧩 Barra de iconos personalizable
+Muestra u oculta los iconos de herramientas de la barra izquierda y arrástralos al orden que prefieras.
 
-⚡ Gemini Spark
-Si disponible en tu cuenta, aparece como tab nativo — cero configuración.
+🎨 Temas (Support Pack)
+19 temas cuidadosamente ajustados, con transiciones animadas suaves. El modo claro/oscuro se detecta automáticamente. Puedes previsualizar cualquier tema gratis antes de decidir.
 
-🎛️ Panel del Icono
-Clic en icono de la barra para panel de control rápido.
+---
+
+☁️ SINCRONIZACIÓN, COPIAS DE SEGURIDAD Y CUENTAS
+
+☁️ Sincronización con Google Drive
+Los ajustes y prompts se suben automáticamente a tu propio Google Drive. La restauración es solo manual, así tus datos locales siempre son la fuente de verdad.
+
+💾 Copias de seguridad locales automáticas
+Los datos de la extensión se respaldan de forma periódica. Crea instantáneas manuales y vuelve a estados anteriores cuando quieras.
+
+💾 Control de datos
+Exporta tu estructura de organización (volcado SQL) en cualquier momento como copia de seguridad.
+
+👤 Perfiles multicuenta
+Crea perfiles separados para el trabajo o uso personal, cada uno con su propia base de datos independiente.
+
+🌟 Soporte multiplataforma
+Gestiona las conversaciones de Gemini y Google AI Studio en una sola barra lateral.
+
+🎛️ Panel del icono de la extensión
+Haz clic en el icono de la barra de herramientas del navegador para abrir un panel de control rápido. Activa o desactiva plataformas y funciones sin buscar en menús.
+
+---
+
+🤖 AGENTES DE IA
+
+Escribe ">" para elegir un agente y describe lo que quieres con tus propias palabras. Cada agente muestra una fila de botones de inicio rápido para que sepas qué pedirle. Los agentes funcionan a través de tu propia sesión de Gemini, sin claves de API ni coste adicional.
+
+🧭 BetterSidebar Agent
+• Busca y consulta tus chats, carpetas y etiquetas (gratis)
+• Organiza por ti: crea carpetas, mueve chats, etiqueta en lote, renombra y ordena (Power Pack)
+• Continuar en un chat nuevo: cuando un chat se alarga demasiado, redacta un resumen de traspaso y abre un chat nuevo con el resumen esperando en el cuadro de entrada. No se envía nada hasta que pulses Enter.
+• Taller de temas: describe el ambiente que buscas y crea y aplica un tema que puedes seguir afinando conversando (aplicar temas personalizados: Support Pack)
+• Funciona incluso con la barra lateral cerrada, a través del Agent Dock
+
+📁 Workspace Agent
+Arrastra documentos (Word, Excel, PDF, archivos de código y más) y deja que la IA los analice o edite conservando el formato original. Gratis para 1 espacio de trabajo con hasta 5 archivos; más espacios y archivos con Power Pack.
+
+🌐 Browser Agent (experimental)
+Elimina pestañas duplicadas en todas tus ventanas, agrupa pestañas relacionadas y ordena carpetas de marcadores desordenadas. Interruptores de permiso separados para organizar pestañas, cerrar pestañas, organizar marcadores y eliminar marcadores. Antes de cada ejecución se toma una instantánea, con reversión en un clic. Leer pestañas y marcadores es gratis; aplicar cambios requiere Power Pack.
 
 ---
 
 🔒 PRIVACIDAD PRIMERO
 
-• 100% Local: Base de datos SQLite embebida en tu navegador.
-• Sin sync a nuestros servidores: Carpetas, tags y notas NO se envían a nosotros.
-• Sin entrenamiento: No leemos tus conversaciones para entrenar IA.
-• Agent local: Usa tu propia sesión Gemini. Sin API keys, sin tokens extra, sin datos saliendo.
+Nos tomamos tu privacidad en serio.
+
+• 100 % local: tus carpetas, etiquetas, notas y prompts viven en una base de datos SQLite integrada en tu navegador.
+• Sin backend para tus datos: la extensión no tiene ningún servidor que almacene o reciba tus chats o tus datos de organización. La sincronización con Google Drive va a tu propio Drive. La única solicitud que gestionamos es la verificación de la clave de licencia al activar un pack.
+• Sin entrenamiento: nunca leemos tus conversaciones para entrenar modelos de IA.
+• Los agentes usan tu propia sesión: los agentes de IA se comunican con Gemini a través de tu sesión de Google existente, igual que lo haces tú. No se envía nada a nosotros ni a ningún otro tercero.
+
+¿POR QUÉ NECESITA PERMISOS LA EXTENSIÓN?
+
+Necesitamos acceso a aistudio.google.com y gemini.google.com para añadir la barra lateral mejorada y leer los títulos de los chats para organizarlos. El acceso a pestañas y marcadores es opcional: solo se solicita cuando activas el Browser Agent, y solo se usa dentro de los interruptores que actives. No leemos tu historial de navegación.
 
 ---
 
-Aviso: Esta extensión es un proyecto independiente sin afiliación, respaldo ni patrocinio de Google.
+Aviso: esta extensión es un proyecto independiente y no está afiliada, respaldada ni patrocinada por Google.
 
 🔗 ENLACES
 • GitHub: https://github.com/Paper-Crane-Devteam/better-sidebar-for-google-gemini-and-ai-studio
