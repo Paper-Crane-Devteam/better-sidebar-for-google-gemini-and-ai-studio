@@ -56,8 +56,15 @@ Chrome's tabs, tab groups and bookmarks — the objects, not the pages.
   restore gets a new one.
 - **Some things are off limits and will be refused:** the tab hosting this conversation, and
   anything in an incognito window.
-- One window at a time by default — the one this conversation is in. Pass \`window_id\` to look
-  elsewhere.`;
+- **The user usually has more than one window, so work across all of them.** The list tools
+  cover every window unless you pass \`window_id\`, and every tab says which window it is in.
+  "Organize my tabs" or "close duplicates" means every window, not only the one this
+  conversation is in — page through the whole list before deciding what is a duplicate, and
+  say which window each change touches.
+- **This conversation may be running in an app window** — the Gemini web app installed as its
+  own window, marked \`kind: "app"\` in \`browser_list_tabs\`. Such a window holds only this
+  conversation; the user's real tabs are in the \`normal\` windows. Chrome cannot move or group
+  tabs in an app window or move anything into one, so plan inside the normal windows.`;
 }
 
 /**
@@ -137,8 +144,8 @@ which means the AI provider sees them. That is the reason the redaction setting 
 
 /** The one thing here that can eat the whole budget: a window with 200 tabs in it. */
 function heavyFieldNote(): string {
-  return `The thing to be deliberate about is listing a large window or a big bookmark folder
-whole. Every read takes \`limit\` and \`offset\` and reports \`next_offset\` — use them, and use
+  return `The thing to be deliberate about is listing a few hundred tabs across several windows,
+or a big bookmark folder, whole. Every read takes \`limit\` and \`offset\` and reports \`next_offset\` — use them, and use
 \`browser_list_bookmarks\` with \`query\` instead of walking a tree when you are looking for
 something specific.`;
 }

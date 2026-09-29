@@ -62,14 +62,18 @@ const SCHEMAS: Record<string, ToolDefinition['schema']> = {
   browser_list_tabs: {
     name: 'browser_list_tabs',
     description:
-      'List open tabs. Defaults to the window this conversation is in. Returns id, ' +
-      'window_id, index, title, url, group_id, pinned, active and protected — the tab ' +
-      'hosting this conversation is protected and cannot be moved or closed. Incognito ' +
-      'windows are never listed. Read this before planning any change to tabs.',
+      'List open tabs across every browser window. Returns `windows` — each window_id, its ' +
+      'kind ("normal", or "app" for an installed web app or popup), whether it is the host ' +
+      'window and how many tabs it has — and the tabs themselves with id, window_id, index, ' +
+      'title, url, group_id, pinned, active and protected. The tab hosting this conversation ' +
+      'is protected and cannot be moved or closed. Tabs in an "app" window cannot be moved ' +
+      'or grouped, and nothing can be moved into one. Incognito windows are never listed. ' +
+      'Read this before planning any change to tabs, and page through every result: ' +
+      'duplicates are often in different windows.',
     parameters: {
       type: 'object',
       properties: {
-        window_id: { type: 'string', description: 'Optional window to list. Defaults to the host window.' },
+        window_id: { type: 'string', description: 'Optional: list only this window. Omit (or "all") for every window.' },
         ...PAGING,
       },
       required: [],
@@ -79,11 +83,12 @@ const SCHEMAS: Record<string, ToolDefinition['schema']> = {
     name: 'browser_list_tab_groups',
     description:
       'List tab groups with their id, title, color and collapsed state. Group membership ' +
-      'is on the tabs themselves (group_id from browser_list_tabs), not here.',
+      'is on the tabs themselves (group_id from browser_list_tabs), not here. Covers every ' +
+      'window, each group with its window_id.',
     parameters: {
       type: 'object',
       properties: {
-        window_id: { type: 'string', description: 'Optional window to list. Defaults to the host window.' },
+        window_id: { type: 'string', description: 'Optional: list only this window. Omit (or "all") for every window.' },
         ...PAGING,
       },
       required: [],
@@ -135,8 +140,10 @@ const SCHEMAS: Record<string, ToolDefinition['schema']> = {
       properties: {
         operations: OPERATIONS(
           'Types: create {url, window_id?, index?} — url must be http(s) and carry no ' +
-            'credentials; activate {tab_id}; ' +
-            'move {tab_id, window_id?, index}; pin {tab_id, pinned}.',
+            'credentials; without window_id it opens in the host window, or the last used ' +
+            'normal window when the host is an app window; activate {tab_id}; ' +
+            'move {tab_id, window_id?, index} — window_id moves it to another normal window; ' +
+            'pin {tab_id, pinned}.',
         ),
         change_summary: CHANGE_SUMMARY,
       },

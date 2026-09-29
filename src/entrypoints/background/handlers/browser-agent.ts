@@ -189,11 +189,36 @@ function checkCloseTarget(op: Operation, before: Snapshot, live: Snapshot) {
     throw new Error('This tab now holds a different page. Prepare and approve a new plan.');
   }
 }
+/**
+ * Refuse, before approval, what Chrome would refuse or quietly reroute — see `isNormalWindow`.
+ *
+ * Checked once at prepare time rather than per step: a window never changes kind, and a
+ * batch that gets as far as the preview should be one Chrome will actually carry out.
+ */
+async function checkWindowKinds(tool: string, operations: Operation[], s: Snapshot) {
+  if (tool !== 'browser_arrange_tabs' && tool !== 'browser_manage_tab_groups') return;
+  const cache = new Map<number, boolean>();
+  const appWindow = 'is an app window (an installed web app or a popup). Chrome only moves and groups tabs in normal browser windows';
+  for (const op of operations) {
+    if (op.window_id !== undefined && !(await isNormalWindow(Number(op.window_id), cache))) {
+      throw new Error(`Window ${op.window_id} ${appWindow}; pick a window whose kind is "normal".`);
+    }
+    const movesTabs = op.type === 'move' || (tool === 'browser_manage_tab_groups' && op.type === 'create');
+    if (!movesTabs) continue;
+    const ids = op.tab_ids as number[] | undefined ?? (op.tab_id !== undefined ? [Number(op.tab_id)] : []);
+    for (const id of ids) {
+      const windowId = s.tabs!.find(t => t.id === id)?.windowId;
+      if (windowId !== undefined && !(await isNormalWindow(windowId, cache))) {
+        throw new Error(`Tab ${id} is in window ${windowId}, which ${appWindow}. Leave it where it is.`);
+      }
+    }
+  }
+}
 async function apply(tool: string, op: Operation, owner: number) {
   const tabId = Number(op.tab_id);
   if (tool === 'browser_arrange_tabs') {
     switch (op.type) {
-      case 'create': await chrome.tabs.create({ url: String(op.url), active: false, windowId: op.window_id as number | undefined ?? (await chrome.tabs.get(owner)).windowId, index: op.index as number | undefined }); break;
+      case 'create': await chrome.tabs.create({ url: String(op.url), active: false, windowId: op.window_id as number | undefined ?? await defaultTabWindow(owner), index: op.index as number | undefined }); break;
       case 'activate': await chrome.tabs.update(tabId, { active: true }); break;
       case 'pin': await chrome.tabs.update(tabId, { pinned: Boolean(op.pinned) }); break;
       case 'move': await chrome.tabs.move(tabId, { windowId: op.window_id as number | undefined, index: Number(op.index) }); break;
@@ -875,6 +900,7 @@ async function prepare(tool: string, params: Record<string, string>, owner: numb
   const before = await snapshot(tool);
   const operations = parseOperations(tool, params.operations);
   for (const op of operations) validateTargets(tool, op, before, owner);
+  await checkWindowKinds(tool, operations, before);
   const batch: Batch = { id: crypto.randomUUID(), owner, epoch: await epoch(), tool, operations, before, createdAt: Date.now(), status: 'prepared', steps: [] };
   // Awaited before the preview is shown: a plan the journal never accepted must not be
   // approvable, because approval is what makes it executable.
@@ -1077,16 +1103,87 @@ async function trees(batchId: string, owner: number): Promise<BatchTrees> {
   };
 }
 
+/**
+ * Whether a window can hold moved and grouped tabs — Chrome only allows either in a
+ * `normal` one.
+ *
+ * Everything else is reported to the model as an `app` window, whatever Chrome calls it:
+ * an installed web app (the Gemini PWA) and a popup behave the same way here. Their tabs
+ * cannot be moved in or out, `tabs.group` silently drags a tab out of one into some normal
+ * window, and `tabs.create` aimed at one lands in a normal window instead. A window
+ * `windows.get` cannot see is treated the same, since it is certainly not a normal one.
+ */
+async function isNormalWindow(windowId: number, cache?: Map<number, boolean>): Promise<boolean> {
+  const known = cache?.get(windowId);
+  if (known !== undefined) return known;
+  const normal = (await chrome.windows.get(windowId).catch(() => undefined))?.type === 'normal';
+  cache?.set(windowId, normal);
+  return normal;
+}
+
+/**
+ * Where a new tab goes when the model names no window.
+ *
+ * The host window, unless the conversation is running in an app window — then the last
+ * focused normal window, which is the one the user thinks of as "my browser". Left to
+ * itself Chrome would pick one too, but the preview has to be able to say where.
+ */
+async function defaultTabWindow(owner: number): Promise<number | undefined> {
+  const host = (await chrome.tabs.get(owner)).windowId;
+  if (await isNormalWindow(host)) return host;
+  return (await chrome.windows.getLastFocused({ windowTypes: ['normal'] }).catch(() => undefined))?.id;
+}
+
+/**
+ * `window_id` on the two list tools: every window by default, one window when given a number.
+ *
+ * ⚠️ The default used to be the host window, and that was the multi-window bug. The model had
+ * no way to learn any other window's id, so "find duplicate tabs" only ever looked at the
+ * window the conversation was in — and in the Gemini PWA that window holds nothing but the
+ * conversation itself. Listing everything and saying which window each tab is in lets it plan
+ * across windows without first having to discover them.
+ */
+function windowScope(value: string | undefined): number | undefined {
+  if (value === undefined || value === '' || value.toLowerCase() === 'all') return undefined;
+  return numberParam(value, 0);
+}
+
 async function read(tool: string, params: Record<string, string>, owner: number) {
   if (!(READ_TOOLS as readonly string[]).includes(tool)) throw new Error('Unknown read tool.');
   await requireTool(tool);
-  const windowId = numberParam(params.window_id, (await chrome.tabs.get(owner)).windowId);
+  const hostWindow = (await chrome.tabs.get(owner)).windowId;
+  const scope = windowScope(params.window_id);
   if (tool === 'browser_list_tabs') {
-    return page((await chrome.tabs.query({ windowId })).filter(t => !t.incognito).map(t => ({ id: t.id, window_id: t.windowId, index: t.index, title: t.title, url: tabUrl(t), group_id: t.groupId, pinned: t.pinned, active: t.active, protected: t.id === owner })), params);
+    const tabs = (await chrome.tabs.query(scope === undefined ? {} : { windowId: scope })).filter(t => !t.incognito);
+    const cache = new Map<number, boolean>();
+    const ids = [...new Set(tabs.map(t => t.windowId))].sort((a, b) => Number(b === hostWindow) - Number(a === hostWindow) || a - b);
+    // Host window first, then by id, and by position inside each — so a page boundary never
+    // interleaves two windows and the model reads each one as a run.
+    const rank = new Map(ids.map((id, i) => [id, i]));
+    tabs.sort((a, b) => rank.get(a.windowId)! - rank.get(b.windowId)! || a.index - b.index);
+    const windows = [];
+    for (const id of ids) {
+      windows.push({
+        window_id: id,
+        kind: (await isNormalWindow(id, cache)) ? 'normal' : 'app',
+        host: id === hostWindow,
+        tab_count: tabs.filter(t => t.windowId === id).length,
+      });
+    }
+    return {
+      windows,
+      ...page(tabs.map(t => ({ id: t.id, window_id: t.windowId, index: t.index, title: t.title, url: tabUrl(t), group_id: t.groupId, pinned: t.pinned, active: t.active, protected: t.id === owner })), params),
+    };
   }
   if (tool === 'browser_list_tab_groups') {
-    if ((await chrome.windows.get(windowId)).incognito) throw new Error('Private windows are excluded.');
-    return page(await chrome.tabGroups.query({ windowId }), params);
+    if (scope !== undefined) {
+      if ((await chrome.windows.get(scope)).incognito) throw new Error('Private windows are excluded.');
+      return page(await chrome.tabGroups.query({ windowId: scope }), params);
+    }
+    const visible = new Set((await chrome.tabs.query({})).filter(t => !t.incognito).map(t => t.windowId));
+    const groups = (await chrome.tabGroups.query({})).filter(g => visible.has(g.windowId))
+      .sort((a, b) => Number(b.windowId === hostWindow) - Number(a.windowId === hostWindow) || a.windowId - b.windowId || a.id - b.id);
+    return page(groups, params);
   }
   if (tool === 'browser_list_bookmarks') {
     const nodes = params.query ? await chrome.bookmarks.search(params.query.slice(0, 500)) : await chrome.bookmarks.getChildren(params.parent_id || '0');

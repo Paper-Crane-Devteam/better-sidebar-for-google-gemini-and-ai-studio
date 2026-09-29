@@ -405,10 +405,19 @@ Chrome 强制固定标签占据窗口最前面，新固定的标签无论如何�
 
 读工具的形态：
 
-- `browser_list_tabs`：默认当前宿主窗口，可指定 `window_id`；`limit`/`offset` 分页。
+- `browser_list_tabs`：默认**所有窗口**（`window_id` 省略或 `"all"`），传数字只看一个窗口；
+  `limit`/`offset` 分页。宿主窗口排最前，同一窗口内按 index 排，分页不会把两个窗口交错。
   每项含 `id`、`title`、`url`、`window_id`、`group_id`、`pinned`、`active`、`protected`、
-  以及 §8 的 `duplicate_of` / `similar_to`。
-- `browser_list_tab_groups`：默认当前宿主窗口，返回标题、颜色、折叠状态、成员数。
+  以及 §8 的 `duplicate_of` / `similar_to`。另带 `windows` 摘要：`window_id`、
+  `kind`（`normal` / `app`）、`host`、`tab_count`。
+  ⚠️ 以前默认宿主窗口，这就是「多窗口识别不到」的根因：模型拿不到其它窗口的 id，
+  而 Gemini PWA 的宿主窗口里只有对话本身。
+- `browser_list_tab_groups`：同样默认所有窗口，每个组带 `windowId`。
+
+非 `normal` 窗口（PWA、popup）一律报成 `app`。Chrome 在这类窗口里不能移入/移出标签、
+`tabs.group` 会把标签悄悄拖进某个普通窗口、`tabs.create` 指向它会落到别的普通窗口——
+所以 prepare 阶段（`checkWindowKinds`）直接拒绝，`create` 不指定窗口时宿主若是 app 窗口
+就落到最近聚焦的普通窗口。
 - `browser_list_bookmarks`：按 `parent_id` 读一层，或按 `query` 搜索。**不返回整棵树。**
   根节点 ID 由扩展解析后提供，AI 不需要也不允许硬编码（见 §12）。
 - `browser_query_changes`：分页列出本机批次，每条带 `can_restore_before` / `can_restore_after`；
