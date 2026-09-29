@@ -1712,6 +1712,111 @@
     "switcher": {
       "label": "選擇 Agent"
     },
+    "quickPrompts": {
+      "label": "快速開始",
+      "bettersidebar": {
+        "organize": {
+          "label": "整理對話",
+          "text": "把我未歸檔的對話整理到資料夾裡"
+        },
+        "search": {
+          "label": "尋找對話",
+          "text": "找出關於這個話題的對話："
+        },
+        "tag": {
+          "label": "加標籤",
+          "text": "依主題幫我最近的對話加上標籤"
+        },
+        "export": {
+          "label": "匯出對話",
+          "text": "把關於這個話題的對話匯出為 Markdown："
+        },
+        "prompts": {
+          "label": "整理提示詞",
+          "text": "整理一下我的提示詞庫"
+        },
+        "snippets": {
+          "label": "整理片段",
+          "text": "把我的片段整理到資料夾裡"
+        },
+        "theme": {
+          "label": "設計主題",
+          "text": "幫我做一個這種感覺的主題："
+        },
+        "handover": {
+          "label": "新對話繼續",
+          "text": "總結這個對話，並在新對話裡繼續"
+        },
+        "stats": {
+          "label": "看看統計",
+          "text": "每個資料夾裡有多少個對話？"
+        }
+      },
+      "workspace": {
+        "list": {
+          "label": "列出檔案",
+          "text": "我的工作區裡有哪些檔案？"
+        },
+        "summarize": {
+          "label": "總結檔案",
+          "text": "總結一下這個檔案："
+        },
+        "review": {
+          "label": "審閱文件",
+          "text": "審閱一下這份文件："
+        },
+        "analyze": {
+          "label": "分析表格",
+          "text": "分析一下這個表格："
+        },
+        "search": {
+          "label": "搜尋檔案",
+          "text": "在我的檔案裡搜尋："
+        },
+        "notes": {
+          "label": "對話存成筆記",
+          "text": "把這個對話的重點存成一篇筆記"
+        },
+        "create": {
+          "label": "新增檔案",
+          "text": "新增一個檔案，用來"
+        },
+        "translate": {
+          "label": "翻譯字幕",
+          "text": "把字幕翻譯成"
+        }
+      },
+      "browser": {
+        "listTabs": {
+          "label": "列出分頁",
+          "text": "這個視窗裡開著哪些頁面？"
+        },
+        "group": {
+          "label": "分頁分組",
+          "text": "依主題幫我的分頁分組"
+        },
+        "duplicates": {
+          "label": "尋找重複",
+          "text": "找出重複開啟的分頁"
+        },
+        "bookmarkWindow": {
+          "label": "收藏本視窗",
+          "text": "把這個視窗收藏到一個新的書籤資料夾"
+        },
+        "sortBookmarks": {
+          "label": "整理書籤",
+          "text": "把書籤列整理到資料夾裡"
+        },
+        "findBookmark": {
+          "label": "尋找書籤",
+          "text": "找出關於這個話題的書籤："
+        },
+        "open": {
+          "label": "開啟分頁",
+          "text": "幫我開啟這些頁面："
+        }
+      }
+    },
     "browserIntro": {
       "title": "讓 AI 幫您高效整理分頁與書籤",
       "about": "關於 Browser Agent",

@@ -28,7 +28,7 @@ import {
   getActiveEngine,
   agentEventBus,
 } from '@/entrypoints/overlay.content/shared/modules/agent-loop';
-import { AgentDock } from '@/entrypoints/overlay.content/shared/modules/agent-dock';
+import { AgentDock, AgentQuickPrompts } from '@/entrypoints/overlay.content/shared/modules/agent-dock';
 import { canUndo, runUndoFlow } from '@/entrypoints/overlay.content/shared/modules/agent-loop/undo';
 import { toast } from '@/shared/lib/toast';
 import i18n from '@/locale/i18n';
@@ -44,7 +44,10 @@ import { buildInitialMessage } from '@/entrypoints/overlay.content/shared/module
 import type { AgentId } from '@/entrypoints/overlay.content/shared/modules/agent-loop/agents/types';
 import { initMCPRegistry } from '@/entrypoints/overlay.content/shared/modules/agent-loop/mcp/setup';
 import { resolveAgentForRecoveredSession } from '@/entrypoints/overlay.content/shared/modules/agent-loop/conversation-agent';
-import { getAgentEntryById } from '@/entrypoints/overlay.content/shared/modules/agent-loop/agent-entry';
+import {
+  agentIdFromEntry,
+  getAgentEntryById,
+} from '@/entrypoints/overlay.content/shared/modules/agent-loop/agent-entry';
 import { useAgentRecordStore } from '@/entrypoints/overlay.content/shared/modules/agent-loop/agent-record-store';
 import { buildOwedPayload } from '@/entrypoints/overlay.content/shared/modules/agent-loop/recovery';
 import type { AgentPlatformAdapter } from '@/entrypoints/overlay.content/shared/modules/agent-loop';
@@ -59,6 +62,7 @@ import {
   installSendButtonInterceptor,
   appendCapsule,
   insertTextAtEnd,
+  replaceTextAfterCapsule,
   triggerSend,
   CAPSULE_ATTR_ID,
   CAPSULE_ATTR_CONTENT,
@@ -535,6 +539,37 @@ export const AgentLoopFeature: React.FC = () => {
   const suppressInputRef = useRef(suppressInput);
   suppressInputRef.current = suppressInput;
 
+  // ─── Quick prompts (row above the composer) ─────────────────────────
+
+  const findAgentCapsule = useCallback((): { editor: HTMLElement; capsule: HTMLElement } | null => {
+    const editor = getAdapter()?.getEditor();
+    const capsule = editor?.querySelector<HTMLElement>(`.${CAPSULE_CLASS}[data-trigger=">"]`);
+    return editor && capsule ? { editor, capsule } : null;
+  }, [getAdapter]);
+
+  /** The staged agent, only while the capsule is followed by exactly one space. */
+  const readStagedAgent = useCallback((): AgentId | null => {
+    const found = findAgentCapsule();
+    if (!found) return null;
+    const after = document.createRange();
+    after.setStartAfter(found.capsule);
+    after.setEnd(found.editor, found.editor.childNodes.length);
+    if (!/^[\u00A0 ]$/.test(after.toString())) return null;
+    // Range text has no line breaks, so an Enter after the space would still read as
+    // "one space" — the capsule's paragraph must also be the last one.
+    if (found.capsule.closest('p')?.nextElementSibling) return null;
+    const entryId = found.capsule.getAttribute(CAPSULE_ATTR_ID);
+    return entryId ? agentIdFromEntry(entryId) : null;
+  }, [findAgentCapsule]);
+
+  const fillQuickPrompt = useCallback((text: string) => {
+    const found = findAgentCapsule();
+    if (!found) return;
+    // The write fires input events; keep them from being read as a new `>` trigger.
+    suppressInputRef.current();
+    replaceTextAfterCapsule(found.editor, found.capsule, text);
+  }, [findAgentCapsule]);
+
   // ─── Launcher bridge (Agent tab → editor) ───────────────────────────
 
   useEffect(() => {
@@ -705,6 +740,13 @@ export const AgentLoopFeature: React.FC = () => {
       {/* Everything the running loop needs from the user, docked to the composer.
           Hidden while the `>` popup is up — both anchor to the same corner. */}
       <AgentDock hidden={triggerState.isOpen} />
+
+      {/* Short starters for the agent just staged in the composer */}
+      <AgentQuickPrompts
+        readStagedAgent={readStagedAgent}
+        onPick={fillQuickPrompt}
+        hidden={triggerState.isOpen || isSlashCommandActive}
+      />
 
       {/* Agent entry popup (>) — auto entry first, then skills */}
       {triggerState.isOpen && (

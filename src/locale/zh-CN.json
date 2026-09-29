@@ -1712,6 +1712,111 @@
     "switcher": {
       "label": "选择 Agent"
     },
+    "quickPrompts": {
+      "label": "快速开始",
+      "bettersidebar": {
+        "organize": {
+          "label": "整理对话",
+          "text": "把我未归档的对话整理到文件夹里"
+        },
+        "search": {
+          "label": "查找对话",
+          "text": "找出关于这个话题的对话："
+        },
+        "tag": {
+          "label": "打标签",
+          "text": "按主题给我最近的对话打标签"
+        },
+        "export": {
+          "label": "导出对话",
+          "text": "把关于这个话题的对话导出为 Markdown："
+        },
+        "prompts": {
+          "label": "整理提示词",
+          "text": "整理一下我的提示词库"
+        },
+        "snippets": {
+          "label": "整理片段",
+          "text": "把我的片段整理到文件夹里"
+        },
+        "theme": {
+          "label": "设计主题",
+          "text": "帮我做一个这种感觉的主题："
+        },
+        "handover": {
+          "label": "新对话继续",
+          "text": "总结这个对话，并在新对话里继续"
+        },
+        "stats": {
+          "label": "看看统计",
+          "text": "每个文件夹里有多少个对话？"
+        }
+      },
+      "workspace": {
+        "list": {
+          "label": "列出文件",
+          "text": "我的工作区里有哪些文件？"
+        },
+        "summarize": {
+          "label": "总结文件",
+          "text": "总结一下这个文件："
+        },
+        "review": {
+          "label": "审阅文档",
+          "text": "审阅一下这份文档："
+        },
+        "analyze": {
+          "label": "分析表格",
+          "text": "分析一下这个表格："
+        },
+        "search": {
+          "label": "搜索文件",
+          "text": "在我的文件里搜索："
+        },
+        "notes": {
+          "label": "对话存为笔记",
+          "text": "把这个对话的要点存成一篇笔记"
+        },
+        "create": {
+          "label": "新建文件",
+          "text": "新建一个文件，用来"
+        },
+        "translate": {
+          "label": "翻译字幕",
+          "text": "把字幕翻译成"
+        }
+      },
+      "browser": {
+        "listTabs": {
+          "label": "列出标签页",
+          "text": "这个窗口里开着哪些页面？"
+        },
+        "group": {
+          "label": "标签页分组",
+          "text": "按主题给我的标签页分组"
+        },
+        "duplicates": {
+          "label": "查找重复",
+          "text": "找出重复打开的标签页"
+        },
+        "bookmarkWindow": {
+          "label": "收藏本窗口",
+          "text": "把这个窗口收藏到一个新的书签文件夹"
+        },
+        "sortBookmarks": {
+          "label": "整理书签",
+          "text": "把书签栏整理到文件夹里"
+        },
+        "findBookmark": {
+          "label": "查找书签",
+          "text": "找出关于这个话题的书签："
+        },
+        "open": {
+          "label": "打开标签页",
+          "text": "帮我打开这些页面："
+        }
+      }
+    },
     "browserIntro": {
       "title": "让 AI 帮您高效整理标签页与书签",
       "about": "关于 Browser Agent",

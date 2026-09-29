@@ -245,6 +245,38 @@ export function appendCapsule(
 }
 
 /**
+ * Replace everything after `capsule` with `text`, leaving the capsule and anything before it.
+ *
+ * Starts past the capsule's trailing nbsp when it is still there, so the new text sits in
+ * the plain text node rather than inheriting the capsule's `<strong>`. If the user deleted
+ * that separator, one is put back. execCommand keeps Quill's Delta in sync.
+ */
+export function replaceTextAfterCapsule(
+  editor: HTMLElement,
+  capsule: HTMLElement,
+  text: string,
+): void {
+  editor.focus();
+  const sel = window.getSelection();
+  if (!sel) return;
+
+  const range = document.createRange();
+  const next = capsule.nextSibling;
+  let separator = '';
+  if (next?.nodeType === Node.TEXT_NODE && /^[\u00A0 ]/.test(next.textContent || '')) {
+    range.setStart(next, 1);
+  } else {
+    range.setStartAfter(capsule);
+    separator = '\u00A0';
+  }
+  range.setEnd(editor, editor.childNodes.length);
+
+  sel.removeAllRanges();
+  sel.addRange(range);
+  document.execCommand('insertText', false, separator + text);
+}
+
+/**
  * Select the editor's whole content so the next execCommand replaces it.
  *
  * Deliberately not `innerHTML = ''`: wiping the DOM leaves Quill without its

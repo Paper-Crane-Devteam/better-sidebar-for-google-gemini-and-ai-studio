@@ -1712,6 +1712,111 @@
     "switcher": {
       "label": "Escolha um agente"
     },
+    "quickPrompts": {
+      "label": "Início rápido",
+      "bettersidebar": {
+        "organize": {
+          "label": "Organizar chats",
+          "text": "Organize minhas conversas sem pasta em pastas"
+        },
+        "search": {
+          "label": "Encontrar chats",
+          "text": "Encontre conversas sobre "
+        },
+        "tag": {
+          "label": "Marcar chats",
+          "text": "Adicione tags às minhas conversas recentes por tema"
+        },
+        "export": {
+          "label": "Exportar chats",
+          "text": "Exporte em Markdown as conversas sobre "
+        },
+        "prompts": {
+          "label": "Arrumar prompts",
+          "text": "Organize minha biblioteca de prompts"
+        },
+        "snippets": {
+          "label": "Arrumar trechos",
+          "text": "Organize meus trechos em pastas"
+        },
+        "theme": {
+          "label": "Criar um tema",
+          "text": "Crie um tema que transmita "
+        },
+        "handover": {
+          "label": "Continuar em novo chat",
+          "text": "Resuma este chat e continue em um novo chat"
+        },
+        "stats": {
+          "label": "Ver estatísticas",
+          "text": "Quantas conversas há em cada pasta?"
+        }
+      },
+      "workspace": {
+        "list": {
+          "label": "Listar arquivos",
+          "text": "Quais arquivos estão no meu workspace?"
+        },
+        "summarize": {
+          "label": "Resumir um arquivo",
+          "text": "Resuma o arquivo "
+        },
+        "review": {
+          "label": "Revisar um documento",
+          "text": "Revise o documento "
+        },
+        "analyze": {
+          "label": "Analisar uma planilha",
+          "text": "Analise a planilha "
+        },
+        "search": {
+          "label": "Buscar nos arquivos",
+          "text": "Procure nos meus arquivos por "
+        },
+        "notes": {
+          "label": "Salvar chat como nota",
+          "text": "Salve os pontos principais deste chat como uma nota"
+        },
+        "create": {
+          "label": "Criar um arquivo",
+          "text": "Crie um arquivo que "
+        },
+        "translate": {
+          "label": "Traduzir legendas",
+          "text": "Traduza as legendas para "
+        }
+      },
+      "browser": {
+        "listTabs": {
+          "label": "Ver abas abertas",
+          "text": "O que tenho aberto nesta janela?"
+        },
+        "group": {
+          "label": "Agrupar abas",
+          "text": "Agrupe minhas abas por tema"
+        },
+        "duplicates": {
+          "label": "Encontrar duplicadas",
+          "text": "Encontre minhas abas duplicadas"
+        },
+        "bookmarkWindow": {
+          "label": "Salvar esta janela",
+          "text": "Salve esta janela em uma nova pasta de favoritos"
+        },
+        "sortBookmarks": {
+          "label": "Organizar favoritos",
+          "text": "Organize minha barra de favoritos em pastas"
+        },
+        "findBookmark": {
+          "label": "Encontrar favoritos",
+          "text": "Encontre meus favoritos sobre "
+        },
+        "open": {
+          "label": "Abrir abas",
+          "text": "Abra abas para "
+        }
+      }
+    },
     "browserIntro": {
       "title": "Deixe a IA organizar suas abas e favoritos",
       "about": "Sobre o Browser Agent",

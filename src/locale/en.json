@@ -1712,6 +1712,111 @@
     "switcher": {
       "label": "Choose an agent"
     },
+    "quickPrompts": {
+      "label": "Quick starts",
+      "bettersidebar": {
+        "organize": {
+          "label": "Organize chats",
+          "text": "Sort my unfiled conversations into folders"
+        },
+        "search": {
+          "label": "Find chats",
+          "text": "Find conversations about "
+        },
+        "tag": {
+          "label": "Tag chats",
+          "text": "Tag my recent conversations by topic"
+        },
+        "export": {
+          "label": "Export chats",
+          "text": "Export as Markdown the conversations about "
+        },
+        "prompts": {
+          "label": "Tidy prompts",
+          "text": "Clean up my prompt library"
+        },
+        "snippets": {
+          "label": "Tidy snippets",
+          "text": "Sort my snippets into folders"
+        },
+        "theme": {
+          "label": "Design a theme",
+          "text": "Make me a theme that feels "
+        },
+        "handover": {
+          "label": "Continue in a new chat",
+          "text": "Summarize this chat and continue it in a new chat"
+        },
+        "stats": {
+          "label": "Show stats",
+          "text": "How many conversations are in each folder?"
+        }
+      },
+      "workspace": {
+        "list": {
+          "label": "List files",
+          "text": "What files are in my workspace?"
+        },
+        "summarize": {
+          "label": "Summarize a file",
+          "text": "Summarize the file "
+        },
+        "review": {
+          "label": "Review a document",
+          "text": "Review the document "
+        },
+        "analyze": {
+          "label": "Analyze a spreadsheet",
+          "text": "Analyze the spreadsheet "
+        },
+        "search": {
+          "label": "Search files",
+          "text": "Search my files for "
+        },
+        "notes": {
+          "label": "Save chat as notes",
+          "text": "Save the key points of this chat as a note"
+        },
+        "create": {
+          "label": "Create a file",
+          "text": "Create a file that "
+        },
+        "translate": {
+          "label": "Translate subtitles",
+          "text": "Translate the subtitles into "
+        }
+      },
+      "browser": {
+        "listTabs": {
+          "label": "List open tabs",
+          "text": "What have I got open in this window?"
+        },
+        "group": {
+          "label": "Group tabs",
+          "text": "Group my tabs by topic"
+        },
+        "duplicates": {
+          "label": "Find duplicates",
+          "text": "Find my duplicate tabs"
+        },
+        "bookmarkWindow": {
+          "label": "Bookmark this window",
+          "text": "Bookmark this window into a new folder"
+        },
+        "sortBookmarks": {
+          "label": "Sort bookmarks",
+          "text": "Sort my bookmarks bar into folders"
+        },
+        "findBookmark": {
+          "label": "Find bookmarks",
+          "text": "Find my bookmarks about "
+        },
+        "open": {
+          "label": "Open tabs",
+          "text": "Open tabs for "
+        }
+      }
+    },
     "browserIntro": {
       "title": "Let AI tidy up your tabs and bookmarks",
       "about": "About the Browser Agent",

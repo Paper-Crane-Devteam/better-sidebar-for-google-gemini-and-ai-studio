@@ -5,3 +5,4 @@
  */
 
 export { AgentDock } from './AgentDock';
+export { AgentQuickPrompts } from './AgentQuickPrompts';

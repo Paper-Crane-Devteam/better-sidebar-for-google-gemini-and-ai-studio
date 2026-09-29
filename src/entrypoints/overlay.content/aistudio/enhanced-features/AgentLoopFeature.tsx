@@ -41,7 +41,7 @@ import {
   ConversationViewSwitcher,
 } from '@/entrypoints/overlay.content/shared/modules/agent-loop';
 import type { AgentPlatformAdapter } from '@/entrypoints/overlay.content/shared/modules/agent-loop';
-import { AgentDock } from '@/entrypoints/overlay.content/shared/modules/agent-dock';
+import { AgentDock, AgentQuickPrompts } from '@/entrypoints/overlay.content/shared/modules/agent-dock';
 import { canUndo, runUndoFlow } from '@/entrypoints/overlay.content/shared/modules/agent-loop/undo';
 import {
   getAgentEntryById,
@@ -66,6 +66,7 @@ import {
   getTextarea,
   insertTextAtEnd,
   replaceRange,
+  setValue,
   triggerRun,
 } from '@/entrypoints/overlay.content/shared/lib/aistudio-editor';
 import { useAIStudioEditorIntegration } from './useAIStudioEditorIntegration';
@@ -449,6 +450,30 @@ export const AgentLoopFeature: React.FC = () => {
     onBeforeSend: () => composeAndSend(),
   });
 
+  // ─── Quick prompts (row above the composer) ─────────────────────────
+
+  // The marker is plain text here, so both halves recover it from the value itself —
+  // the same self-describing lookup the send path uses.
+  // Only while the marker is followed by exactly one space — the state picking from the
+  // popup leaves behind.
+  const readStagedAgent = useCallback((): AgentId | null => {
+    const text = getTextarea()?.value;
+    if (!text) return null;
+    const match = matchAgentEntryInText(text);
+    if (!match || !/^[\u00A0 ]$/.test(text.slice(match.end))) return null;
+    return match.entry.agent.id;
+  }, []);
+
+  const fillQuickPrompt = useCallback((text: string) => {
+    const textarea = getTextarea();
+    if (!textarea) return;
+    const match = matchAgentEntryInText(textarea.value);
+    if (!match) return;
+    // Keep the marker and whatever precedes it; replace what follows. Cursor lands at the end.
+    setValue(textarea, `${textarea.value.slice(0, match.end)} ${text}`);
+    textarea.focus();
+  }, []);
+
   // ─── Launcher bridge (Agent tab → composer) ─────────────────────────
 
   useEffect(() => {
@@ -589,6 +614,13 @@ export const AgentLoopFeature: React.FC = () => {
       {/* Everything the running loop needs from the user, docked to the composer.
           Hidden while the `>` popup is up — both anchor to the same corner. */}
       <AgentDock hidden={triggerState.isOpen} />
+
+      {/* Short starters for the agent just staged in the composer */}
+      <AgentQuickPrompts
+        readStagedAgent={readStagedAgent}
+        onPick={fillQuickPrompt}
+        hidden={triggerState.isOpen || isSlashCommandActive}
+      />
 
       {/* Agent entry popup (>) — auto entry first, then skills */}
       {triggerState.isOpen && (
