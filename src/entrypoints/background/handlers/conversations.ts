@@ -204,6 +204,11 @@ export async function handleConversations(
       triggerAutoSync();
       return { success: true };
     }
+    case 'REORDER_CONVERSATIONS': {
+      await conversationRepo.reorder(message.payload.orderedIds);
+      triggerAutoSync();
+      return { success: true };
+    }
     case 'SYNC_CONVERSATIONS': {
       const { items } = message.payload;
       const platform = message.platform ?? 'aistudio';

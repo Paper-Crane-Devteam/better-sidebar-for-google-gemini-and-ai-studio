@@ -138,18 +138,25 @@ export const TagConversationItem = ({
               'rounded-md cursor-pointer outline-none focus-visible:bg-accent/50',
               'text-density text-foreground/80 font-medium',
               isCurrent ? 'node-item-current' : !isMenuActive && 'hover:bg-accent/50',
-              isFavorite && 'node-item-favorited',
               isMenuActive && 'bg-accent/50 node-menu-active',
             )}
           >
             <div className="flex-1 min-w-0 flex items-center gap-1.5 overflow-hidden node-text-content">
               <span className="truncate">{title}</span>
-              {isFavorite && (
-                <Star className="h-3 w-3 shrink-0 fill-highlight text-highlight" />
-              )}
             </div>
             <NodeActionBar
               actions={[
+                // Unfavorite button for favorited conversations — always shown, leftmost
+                ...(isFavorite ? [{
+                  icon: <Star className="h-3.5 w-3.5 fill-highlight text-highlight" />,
+                  tooltip: t('tooltip.removeFromFavorites'),
+                  onClick: (e: React.MouseEvent) => {
+                    e.stopPropagation();
+                    void toggleFavorite(conversation.id, 'conversation', true);
+                  },
+                  className: 'text-highlight hover:text-highlight/80',
+                  persistent: true,
+                }] : []),
                 {
                   icon: <X className="h-3.5 w-3.5" />,
                   tooltip: t('tags.removeFromTag'),

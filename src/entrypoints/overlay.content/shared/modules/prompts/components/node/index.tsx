@@ -5,6 +5,7 @@ import {
   ChevronRight,
   ChevronDown,
   Star,
+  Pin,
   FilePlus,
   Pencil,
 } from 'lucide-react';
@@ -238,15 +239,7 @@ export const Node = ({
   const quickActions: ActionButtonDef[] = [];
 
   if (isFile) {
-    // Edit button for files
-    if (onEdit) {
-      quickActions.push({
-        icon: <Pencil className="h-3.5 w-3.5" />,
-        tooltip: t('prompts.editPrompt'),
-        onClick: handleEdit,
-      });
-    }
-    // Favorite star for favorited files
+    // Favorite star for favorited files — always shown, leftmost
     if (isFavorite) {
       quickActions.push({
         icon: <Star className="h-3.5 w-3.5 fill-highlight text-highlight" />,
@@ -257,9 +250,31 @@ export const Node = ({
           toggleFavorite(node.data.id, 'prompt', isFavorite);
         },
         className: 'text-highlight hover:text-highlight/80',
+        persistent: true,
+      });
+    }
+    // Edit button for files
+    if (onEdit) {
+      quickActions.push({
+        icon: <Pencil className="h-3.5 w-3.5" />,
+        tooltip: t('prompts.editPrompt'),
+        onClick: handleEdit,
       });
     }
   } else {
+    // Unpin button for pinned folders — always shown, leftmost
+    if (node.data.data?.is_pinned) {
+      quickActions.push({
+        icon: <Pin className="h-3.5 w-3.5 rotate-45 fill-current" />,
+        tooltip: t('node.unpinFromTop'),
+        onClick: (e: React.MouseEvent) => {
+          e.stopPropagation();
+          e.preventDefault();
+          useAppStore.getState().togglePin(node.data.id, 'prompt_folders', true);
+        },
+        persistent: true,
+      });
+    }
     // New prompt button for folders
     if (onCreateInFolder) {
       quickActions.push({
@@ -336,8 +351,6 @@ export const Node = ({
     'flex items-center gap-1.5 px-1 cursor-pointer group relative pr-2 h-full no-underline outline-none text-density font-medium text-foreground/80',
     !((node.isSelected && !isFile) || isBatchSelected) && 'hover:bg-accent/50',
     ((node.isSelected && !isFile) || isBatchSelected) && 'node-item-selected',
-    !isFile && node.data.data?.is_pinned && 'node-item-pinned',
-    isFile && isFavorite && 'node-item-favorited',
     node.willReceiveDrop && 'bg-accent/50 border border-primary/40',
     isMenuActive && 'bg-accent/50',
     isMenuActive && 'node-menu-active',

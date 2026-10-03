@@ -4,6 +4,7 @@ import {
   ChevronRight,
   ChevronDown,
   Star,
+  Pin,
   FilePlus,
   Pencil,
 } from 'lucide-react';
@@ -216,6 +217,20 @@ export const SnippetNode = ({
   const quickActions: ActionButtonDef[] = [];
 
   if (isFile) {
+    // Favorite star for favorited files — always shown, leftmost
+    if (isFavorite) {
+      quickActions.push({
+        icon: <Star className="h-3.5 w-3.5 fill-highlight text-highlight" />,
+        tooltip: t('node.removeFromFavorites'),
+        onClick: (e) => {
+          e?.stopPropagation();
+          e?.preventDefault();
+          toggleFavorite(node.data.id, 'snippet', true);
+        },
+        className: 'text-highlight hover:text-highlight/80',
+        persistent: true,
+      });
+    }
     // Edit button for files
     if (onEdit) {
       quickActions.push({
@@ -228,20 +243,20 @@ export const SnippetNode = ({
         },
       });
     }
-    // Favorite star for favorited files
-    if (isFavorite) {
+  } else {
+    // Unpin button for pinned folders — always shown, leftmost
+    if (node.data.data?.is_pinned) {
       quickActions.push({
-        icon: <Star className="h-3.5 w-3.5 fill-highlight text-highlight" />,
-        tooltip: t('node.removeFromFavorites'),
+        icon: <Pin className="h-3.5 w-3.5 rotate-45 fill-current" />,
+        tooltip: t('node.unpinFromTop'),
         onClick: (e) => {
-          e?.stopPropagation();
-          e?.preventDefault();
-          toggleFavorite(node.data.id, 'snippet', true);
+          e.stopPropagation();
+          e.preventDefault();
+          useAppStore.getState().togglePin(node.data.id, 'snippet_folders', true);
         },
-        className: 'text-highlight hover:text-highlight/80',
+        persistent: true,
       });
     }
-  } else {
     // New prompt button for folders
     if (onCreateInFolder) {
       quickActions.push({
@@ -313,8 +328,6 @@ export const SnippetNode = ({
     'flex items-center gap-1.5 px-1 cursor-pointer group relative pr-2 h-full no-underline outline-none text-density font-medium text-foreground/80',
     !(node.isSelected || isBatchSelected) && 'hover:bg-accent/50',
     (node.isSelected || isBatchSelected) && 'node-item-selected',
-    !isFile && node.data.data?.is_pinned && 'node-item-pinned',
-    isFile && isFavorite && 'node-item-favorited',
     node.willReceiveDrop && 'bg-accent/50 border border-primary/40',
     isMenuActive && 'bg-accent/50',
     isMenuActive && 'node-menu-active',

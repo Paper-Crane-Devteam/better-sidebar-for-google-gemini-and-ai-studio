@@ -80,6 +80,7 @@ export function createDataActions(
   | 'updateFolderColor'
   | 'togglePin'
   | 'reorderFolders'
+  | 'reorderConversations'
 > {
   return {
     setFolders: (folders) => set({ folders }),
@@ -494,6 +495,28 @@ export function createDataActions(
         await get().fetchData(true);
       } catch (error) {
         console.error('Failed to reorder folders:', error);
+      }
+    },
+
+    reorderConversations: async (folderId, orderedIds) => {
+      if (orderedIds.length === 0) return;
+      // Apply locally first so the row lands where it was dropped instead of
+      // snapping back for a round trip; fetchData below replaces it with the DB.
+      const rank = new Map(orderedIds.map((id, i) => [id, i + 1]));
+      set((state) => ({
+        conversations: state.conversations.map((c) =>
+          rank.has(c.id) ? { ...c, order_index: rank.get(c.id) } : c,
+        ),
+      }));
+      try {
+        await browser.runtime.sendMessage({
+          type: 'REORDER_CONVERSATIONS',
+          payload: { folderId, orderedIds },
+        });
+        await get().fetchData(true);
+      } catch (error) {
+        console.error('Failed to reorder conversations:', error);
+        await get().fetchData(true);
       }
     },
   };

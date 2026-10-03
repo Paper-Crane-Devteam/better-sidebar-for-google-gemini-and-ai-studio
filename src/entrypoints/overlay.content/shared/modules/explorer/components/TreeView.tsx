@@ -16,6 +16,7 @@ import { useDeleteHandler } from '../hooks/useDeleteHandler';
 import { useExplorerContext } from '../ExplorerContext';
 import { isInboxFolder } from '@/shared/constants/inbox';
 import { PENDING_NODE_ID } from '../hooks/usePendingNewChat';
+import { useToastStore } from '@/shared/lib/toast';
 
 interface TreeViewProps {
   onSelect: (item: any) => void;
@@ -39,6 +40,8 @@ export const TreeView = forwardRef<ArboristTreeHandle, TreeViewProps>(
       renameItem,
       createFolder,
       reorderFolders,
+      reorderConversations,
+      setExplorerSortOrder,
       ui,
     } = useAppStore();
     const { explorer } = useSettingsStore();
@@ -52,6 +55,14 @@ export const TreeView = forwardRef<ArboristTreeHandle, TreeViewProps>(
     } = ui.explorer;
     const { query: searchTerm } = ui.explorer.search;
     const { ignoredFolders } = explorer;
+
+    // While filtering, a folder shows only some of its chats, so a drop position
+    // among them says nothing about where the hidden ones should go.
+    const isFiltering =
+      tagFilter.selected.length > 0 ||
+      typeFilter !== 'all' ||
+      onlyFavorites ||
+      !!searchTerm;
 
     const folderTreeRef = React.useRef<FolderTreeHandle>(null);
 
@@ -152,6 +163,13 @@ export const TreeView = forwardRef<ArboristTreeHandle, TreeViewProps>(
           .map((f) => f.target_id),
       );
 
+      // Newest first.
+      const compareByDate = (a: FolderTreeNodeData, b: FolderTreeNodeData) => {
+        const dateA = a.data?.last_active_at || a.data?.updated_at || a.data?.created_at || 0;
+        const dateB = b.data?.last_active_at || b.data?.updated_at || b.data?.created_at || 0;
+        return dateB - dateA;
+      };
+
       const sortNodes = (nodes: FolderTreeNodeData[]) => {
         nodes.sort((a, b) => {
           // Pinned items always come first
@@ -173,13 +191,19 @@ export const TreeView = forwardRef<ArboristTreeHandle, TreeViewProps>(
             return a.name.localeCompare(b.name);
           }
 
-          if (sortOrder === 'date') {
-            let dateA = a.data?.last_active_at || a.data?.updated_at || a.data?.created_at || 0;
-            let dateB = b.data?.last_active_at || b.data?.updated_at || b.data?.created_at || 0;
-            if (dateA > 0) dateA *= 1000;
-            if (dateB > 0) dateB *= 1000;
-            return dateB - dateA;
+          if (sortOrder === 'custom') {
+            // 0 = never ranked: chats that arrived after the folder was arranged.
+            // They sit on top, newest first, until the next drag in the folder
+            // ranks the whole folder again.
+            const rankA = a.data?.order_index ?? 0;
+            const rankB = b.data?.order_index ?? 0;
+            const rankedA = rankA > 0;
+            const rankedB = rankB > 0;
+            if (rankedA !== rankedB) return rankedA ? 1 : -1;
+            if (rankedA && rankA !== rankB) return rankA - rankB;
+            return compareByDate(a, b);
           }
+          if (sortOrder === 'date') return compareByDate(a, b);
           return a.name.localeCompare(b.name);
         });
         nodes.forEach((node) => {
@@ -193,12 +217,6 @@ export const TreeView = forwardRef<ArboristTreeHandle, TreeViewProps>(
         node.children = node.children.filter((child) => hasContent(child));
         return node.children.length > 0;
       };
-
-      const isFiltering =
-        tagFilter.selected.length > 0 ||
-        typeFilter !== 'all' ||
-        onlyFavorites ||
-        !!searchTerm;
 
       if (isFiltering) {
         // When search is active, also prune folders whose descendants don't match
@@ -286,8 +304,53 @@ export const TreeView = forwardRef<ArboristTreeHandle, TreeViewProps>(
       folders, conversations, sortOrder, favorites,
       tagFilter.selected, conversationTags, typeFilter,
       onlyFavorites, ignoredFolders, searchTerm, t,
-      pendingNewChatFolderId, pendingEntry,
+      pendingNewChatFolderId, pendingEntry, isFiltering,
     ]);
+
+    const handleReorderFiles = async (
+      parentId: string | null,
+      orderedIds: string[],
+      { draggedId, crossParent }: { draggedId: string; crossParent: boolean },
+    ) => {
+      // Rendered rows include placeholders (pending entry, loading shimmer).
+      const known = new Set(conversations.map((c) => c.id));
+      if (!known.has(draggedId)) return;
+      const ids = orderedIds.filter((id) => known.has(id));
+      if (isFiltering) return;
+
+      if (crossParent) {
+        // A plain move already left it unranked; only a folder that is being
+        // arranged by hand cares where in it the chat was dropped.
+        if (sortOrder === 'custom') await reorderConversations(parentId, ids);
+        return;
+      }
+
+      // Dragging within a folder is asking for manual order.
+      if (sortOrder !== 'custom') {
+        // A folder arranged before must not be rebuilt from the alpha/date order
+        // on screen — that would silently discard the arrangement. Show it instead
+        // and let the user drag again against what they actually saved.
+        const idSet = new Set(ids);
+        const alreadyArranged = conversations.some(
+          (c) => idSet.has(c.id) && (c.order_index ?? 0) > 0,
+        );
+        if (alreadyArranged) {
+          setExplorerSortOrder('custom');
+          useSettingsStore.getState().setExplorerSortOrder('custom');
+          useToastStore.getState().addToast(t('explorer.showingSavedCustomSort'), 'info', 4000);
+          return;
+        }
+
+        // Never arranged: start from the order on screen (alpha or date), so
+        // nothing moves except the dragged row.
+        setExplorerSortOrder('custom');
+        // Persisted as the default too: after a reload the arrangement would
+        // otherwise look lost behind the previous default.
+        useSettingsStore.getState().setExplorerSortOrder('custom');
+        useToastStore.getState().addToast(t('explorer.switchedToCustomSort'), 'info');
+      }
+      await reorderConversations(parentId, ids);
+    };
 
     useImperativeHandle(ref, () => ({
       collapseAll: () => folderTreeRef.current?.collapseAll(),
@@ -339,6 +402,7 @@ export const TreeView = forwardRef<ArboristTreeHandle, TreeViewProps>(
         onReorderFolders={async (parentId, orderedIds) => {
           await reorderFolders(parentId, orderedIds);
         }}
+        onReorderFiles={handleReorderFiles}
         renderNode={NodeWrapper}
         renderRow={FolderTintRow}
       />

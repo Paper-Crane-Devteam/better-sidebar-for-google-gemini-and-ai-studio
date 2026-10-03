@@ -10,6 +10,7 @@ import {
   Image,
   Star,
   Inbox,
+  Pin,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils/utils';
 import { UIcon } from '@/shared/components/ui/icon';
@@ -84,6 +85,7 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
   // Gem / Notebook that uses this folder as its default folder.
   // When present, the hover action bar gets an extra "new gem/notebook chat" button.
   const isPlainFolder = isFolder && !isTimeGroup;
+  const isPinned = isPlainFolder && !!node.data.data?.is_pinned;
   const boundGem = isPlainFolder
     ? gems.find((g) => g.default_folder_id === node.data.id && !g.is_deleted)
     : undefined;
@@ -367,10 +369,6 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
     isActive && !folderColor && 'node-item-selected',
     // Current conversation state: lighter highlight when not actively selected (lower priority)
     !isActive && isCurrentConversation && 'node-item-current',
-    // Pinned folder indicator
-    isFolder && node.data.data?.is_pinned && 'node-item-pinned',
-    // Favorited file indicator
-    isFile && isFavorite && 'node-item-favorited',
     // Drag-over state
     node.willReceiveDrop && 'bg-accent/50 border border-primary/40',
     // Context menu or dropdown open state
@@ -438,7 +436,7 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
             {hasHoverActions && !node.isEditing && (
               <NodeActionBar
                 actions={[
-                  // Unfavorite button for favorited conversations
+                  // Unfavorite button for favorited conversations — always shown, leftmost
                   ...(isFile && isFavorite ? [{
                     icon: <Star className="h-3.5 w-3.5 fill-highlight text-highlight" />,
                     tooltip: t('tooltip.removeFromFavorites'),
@@ -448,6 +446,18 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
                       toggleFavorite(node.data.id, 'conversation', isFavorite);
                     },
                     className: 'text-highlight hover:text-highlight/80',
+                    persistent: true,
+                  }] : []),
+                  // Unpin button for pinned folders — always shown, leftmost
+                  ...(isPlainFolder && isPinned ? [{
+                    icon: <Pin className="h-3.5 w-3.5 rotate-45 fill-current" />,
+                    tooltip: t('node.unpinFromTop'),
+                    onClick: (e: React.MouseEvent) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      useAppStore.getState().togglePin(node.data.id, 'folders', true);
+                    },
+                    persistent: true,
                   }] : []),
                   // New chat button for folders
                   ...(!isFile && !isTimeGroup && onNewChatInFolder ? [{

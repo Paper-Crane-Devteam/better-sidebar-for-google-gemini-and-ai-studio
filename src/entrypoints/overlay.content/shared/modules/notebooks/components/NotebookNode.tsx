@@ -284,7 +284,6 @@ export const NotebookNode = ({
     !isActive && !isCurrentConversation && 'hover:bg-accent/50',
     isActive && 'node-item-selected',
     !isActive && isCurrentConversation && 'node-item-current',
-    isNotebook && node.data.data?.is_pinned && 'node-item-pinned',
     node.willReceiveDrop && 'bg-accent/50 border border-primary/40',
     isMenuActive && 'bg-accent/50',
     isMenuActive && 'node-menu-active',
@@ -335,15 +334,28 @@ export const NotebookNode = ({
               <NodeActionBar
                 actions={
                   isNotebook
-                    ? [{
-                        icon: <UIcon icon="tabler:notebook" className="h-3.5 w-3.5" />,
-                        tooltip: t('notebooks.newNotebookChat'),
-                        onClick: (e: React.MouseEvent) => {
-                          e.stopPropagation();
-                          e.preventDefault();
-                          handleOpenNotebook();
+                    ? [
+                        // Unpin button for pinned notebooks — always shown, leftmost
+                        ...(node.data.data?.is_pinned ? [{
+                          icon: <Pin className="h-3.5 w-3.5 rotate-45 fill-current" />,
+                          tooltip: t('node.unpinFromTop'),
+                          onClick: (e: React.MouseEvent) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            useAppStore.getState().togglePin(node.data.id, 'notebooks', true);
+                          },
+                          persistent: true,
+                        }] : []),
+                        {
+                          icon: <UIcon icon="tabler:notebook" className="h-3.5 w-3.5" />,
+                          tooltip: t('notebooks.newNotebookChat'),
+                          onClick: (e: React.MouseEvent) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            handleOpenNotebook();
+                          },
                         },
-                      }]
+                      ]
                     : isFile && isFavorite
                       ? [{
                           icon: <Star className="h-3.5 w-3.5 fill-highlight text-highlight" />,
@@ -354,6 +366,7 @@ export const NotebookNode = ({
                             toggleFavorite(node.data.id, 'conversation', isFavorite);
                           },
                           className: 'text-highlight hover:text-highlight/80',
+                          persistent: true,
                         }]
                       : []
                 }

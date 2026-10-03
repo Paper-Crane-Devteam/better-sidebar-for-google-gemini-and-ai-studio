@@ -19,7 +19,9 @@ import {
   Image as ImageIcon,
   LayoutGrid,
   Star,
+  GripVertical,
 } from 'lucide-react';
+import type { ExplorerSortOrder } from '@/shared/lib/store/types';
 import { UIcon } from '@/shared/components/ui/icon';
 import { debounce } from 'lodash';
 import { SidePanelMenu } from '@/entrypoints/overlay.content/shared/components/menu/SidePanelMenu';
@@ -198,9 +200,22 @@ export const ExplorerHeader = ({
     searchInputRef.current?.focus();
   };
 
+  // date → alpha → custom → date. Switching away from custom keeps the stored
+  // ranks, so coming back restores the user's arrangement.
+  const nextSortOrder: Record<ExplorerSortOrder, ExplorerSortOrder> = {
+    date: 'alpha',
+    alpha: 'custom',
+    custom: 'date',
+  };
+  // Describes the order currently applied, matching the icon, not the next one.
+  const sortTooltip: Record<ExplorerSortOrder, string> = {
+    date: t('menu.sortedByDate'),
+    alpha: t('menu.sortedAlphabetically'),
+    custom: t('menu.sortedCustom'),
+  };
+
   const handleSort = () => {
-    const newOrder = sortOrder === 'alpha' ? 'date' : 'alpha';
-    setExplorerSortOrder(newOrder);
+    setExplorerSortOrder(nextSortOrder[sortOrder] ?? 'date');
   };
 
   const handleToggleViewMode = () => {
@@ -309,13 +324,7 @@ export const ExplorerHeader = ({
                 </Button>
               </SimpleTooltip>
 
-              <SimpleTooltip
-                content={
-                  sortOrder === 'alpha'
-                    ? t('menu.sortByDate')
-                    : t('menu.sortAlphabetically')
-                }
-              >
+              <SimpleTooltip content={sortTooltip[sortOrder] ?? t('menu.sortedByDate')}>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -324,6 +333,8 @@ export const ExplorerHeader = ({
                 >
                   {sortOrder === 'alpha' ? (
                     <ArrowDownAZ className="h-4 w-4" />
+                  ) : sortOrder === 'custom' ? (
+                    <GripVertical className="h-4 w-4" />
                   ) : (
                     <Clock className="h-4 w-4" />
                   )}

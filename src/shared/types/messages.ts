@@ -79,6 +79,11 @@ export type ExtensionMessage = (
       payload: { ids: string[]; folderId: string | null };
     }
   | {
+      /** Manual (custom-sort) order of the conversations inside one folder. */
+      type: 'REORDER_CONVERSATIONS';
+      payload: { folderId: string | null; orderedIds: string[] };
+    }
+  | {
       type: 'UPDATE_CONVERSATION';
       payload: { id: string; title?: string; description?: string; updated_at?: number };
     }

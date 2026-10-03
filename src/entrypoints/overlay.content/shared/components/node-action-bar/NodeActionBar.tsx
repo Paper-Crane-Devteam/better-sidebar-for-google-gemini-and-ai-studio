@@ -15,6 +15,16 @@ export interface ActionButtonDef {
   tooltip: string;
   onClick: (e: React.MouseEvent) => void;
   className?: string;
+  /**
+   * Keep this button on screen while the row is idle.
+   *
+   * Used for state markers such as the star on a favorited item or the pin on
+   * a pinned folder. When any action is persistent the bar is always shown,
+   * but only the persistent buttons appear until the row is hovered (or its
+   * menu is open); then the full bar appears. Put persistent actions first so
+   * they stay leftmost in the full bar.
+   */
+  persistent?: boolean;
 }
 
 export interface NodeActionBarProps {
@@ -41,6 +51,14 @@ export const NodeActionBar = ({
 
   const hasMenu = !!menuItems && menuItems.length > 0;
   const slotCount = (actions?.length ?? 0) + (hasMenu ? 1 : 0);
+  const hasPersistent = !!actions?.some((a) => a.persistent);
+  // The full bar is pinned open while a menu belongs to this row.
+  const expanded = !!forceVisible || isDropdownOpen;
+  // Display classes for a button that only shows on hover. In a bar with a
+  // persistent button the bar itself stays visible, so the other buttons are
+  // removed from layout instead — that lets the persistent one sit at the
+  // right edge while idle. In a normal bar the whole bar toggles visibility.
+  const hoverOnlyDisplay = hasPersistent && !expanded ? 'hidden group-hover:flex' : 'flex';
 
   /**
    * Tell the row about the bar: `data-node-actions` marks that a floating bar
@@ -52,6 +70,11 @@ export const NodeActionBar = ({
    * row carries one button or four, and it survives changes to button size or
    * gap. `visibility: hidden` still produces layout, so the measurement is
    * valid while the bar is idle.
+   *
+   * `data-node-actions-persistent` marks a bar that stays on screen while the
+   * row is idle (see `persistent` on ActionButtonDef), so the title is cut
+   * even without hover. Its width changes between idle and hover; the
+   * ResizeObserver keeps --node-actions-w in step.
    */
   useLayoutEffect(() => {
     const el = barRef.current;
@@ -63,6 +86,7 @@ export const NodeActionBar = ({
     };
     publish();
     row.dataset.nodeActions = '';
+    if (hasPersistent) row.dataset.nodeActionsPersistent = '';
 
     const observer = new ResizeObserver(publish);
     observer.observe(el);
@@ -70,8 +94,9 @@ export const NodeActionBar = ({
       observer.disconnect();
       row.style.removeProperty('--node-actions-w');
       delete row.dataset.nodeActions;
+      delete row.dataset.nodeActionsPersistent;
     };
-  }, [slotCount]);
+  }, [slotCount, hasPersistent]);
 
   const cancelOpen = useCallback(() => {
     if (openTimerRef.current) {
@@ -121,7 +146,7 @@ export const NodeActionBar = ({
         // the region that has to be cleared from the title. Keep them in sync.
         'invisible group-hover:visible flex items-center gap-1 absolute inset-y-0 right-2',
         'node-action-bar',
-        (forceVisible || isDropdownOpen) && 'visible',
+        (hasPersistent || expanded) && 'visible',
       )}
       data-tooltip-suppress
       onClick={(e) => e.stopPropagation()}
@@ -134,7 +159,8 @@ export const NodeActionBar = ({
           <div
             role="button"
             className={cn(
-              'h-5 w-5 flex items-center justify-center rounded-sm cursor-pointer transition-colors',
+              'h-5 w-5 items-center justify-center rounded-sm cursor-pointer transition-colors',
+              action.persistent ? 'flex' : hoverOnlyDisplay,
               action.className || 'text-muted-foreground hover:text-foreground',
             )}
             onClick={action.onClick}
@@ -150,7 +176,10 @@ export const NodeActionBar = ({
           <DropdownMenuTrigger asChild>
             <div
               role="button"
-              className="h-5 w-5 flex items-center justify-center cursor-pointer text-muted-foreground"
+              className={cn(
+                'h-5 w-5 items-center justify-center cursor-pointer text-muted-foreground',
+                hoverOnlyDisplay,
+              )}
               onMouseEnter={handleTriggerEnter}
               onMouseLeave={scheduleClose}
               onClick={(e) => {
