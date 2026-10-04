@@ -7,8 +7,9 @@ import { FolderTreeNodeData } from './types';
  *
  * react-arborist's default preview renders the dragged node at `opacity: 0.2` with a
  * transparent background and no height, so all that shows is faint text. This one draws
- * the node inside a solid card (background + border + shadow) at the real row height, so
- * the thing under the cursor still looks like an entry.
+ * the node inside a card (background + border + shadow) at the real row height, so the
+ * thing being dragged still looks like an entry. The card is partly transparent, so the
+ * drop line and the rows underneath stay visible through it.
  *
  * react-arborist does not export its tree context, so the preview reads the tree through
  * the same ref `FolderTree` passes to `<Tree>`.
@@ -32,18 +33,23 @@ export function createTreeDragPreview(
 
     return (
       <div style={LAYER_STYLE}>
+        {/* Partly transparent so the drop line and the rows underneath stay visible.
+            Applied to the whole card, so the card still reads as a single surface. */}
         <div
-          // Background is only half opaque so the rows underneath stay readable
-          // while the card's own text and border stay clear.
-          className="relative rounded-md border border-border bg-popover/50 text-popover-foreground shadow-md"
+          className="relative rounded-md border border-border bg-background shadow-[0_2px_6px_rgba(0,0,0,0.12)]"
           style={{
             width,
             height: tree.rowHeight,
             transform: `translate(${offset.x}px, ${offset.y}px)`,
-            opacity: 0.9,
+            opacity: 0.7,
           }}
         >
-          <PreviewNode tree={tree} node={node} />
+          {/* One surface in the theme's selected color, so the card reads as the
+              picked-up row. The row inside drops its own background (see
+              `.tree-drag-preview-node` in _common.scss). */}
+          <div className="node-item-selected tree-drag-preview-node h-full w-full rounded-[5px]">
+            <PreviewNode tree={tree} node={node} />
+          </div>
           {count > 1 && (
             <div className="absolute -top-2 -right-2 min-w-5 h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold flex items-center justify-center shadow">
               {count}
