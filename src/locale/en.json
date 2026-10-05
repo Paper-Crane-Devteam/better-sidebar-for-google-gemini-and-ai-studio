@@ -1091,12 +1091,16 @@
     "themeSaved": "Custom theme saved — you can switch to it in Themes.",
     "promptAlreadyExists": "AI theme prompt already exists — switching to Prompts tab.",
     "promptCreated": "Prompt created! Switching to Prompts tab.",
-    "themeDeleted": "Custom theme removed."
+    "themeDeleted": "Custom theme removed.",
+    "supporterTitle": "Supporter",
+    "supporterDescription": "Thanks for backing Better Sidebar. Every premium theme is yours, including the ones still to come.",
+    "premiumUnlocked": "Unlocked with your pack"
   },
   "packs": {
     "title": "Packs",
     "subtitle": "Unlock advanced features to supercharge your AI workflow.",
     "active": "Active",
+    "welcomeAboard": "Welcome aboard, and thank you for your support!",
     "activatedDescriptionSupport": "All premium themes are unlocked. Thank you for supporting Better Sidebar!",
     "activatedDescriptionPower": "All Power Pack features are active. Your AI assistant has full capabilities unlocked.",
     "upgradePrompt": "Ready for more?",

@@ -2,10 +2,11 @@ import { useCallback, useMemo } from 'react';
 import { Button } from '@/shared/components/ui/button';
 import { Separator } from '../../../components/ui/separator';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
-import { Moon, Sun, Monitor, Check, Sparkles, Eye, ShoppingCart, Wand2, Download, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Moon, Sun, Monitor, Check, Sparkles, Eye, ShoppingCart, Wand2, Download, Trash2, ChevronLeft, ChevronRight, Crown } from 'lucide-react';
+import { UIcon } from '@/shared/components/ui/icon';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { usePegasusStore } from '@/shared/lib/pegasus-store';
-import { useLicenseStore, isLicenseValid } from '@/shared/lib/license-store';
+import { useLicenseStore, isLicenseValid, type LicenseTier } from '@/shared/lib/license-store';
 import { openPurchasePage } from '@/shared/lib/license-links';
 import { useTheme } from '../hooks/useTheme';
 import { useI18n } from '@/shared/hooks/useI18n';
@@ -313,6 +314,9 @@ export const ThemeSettings = () => {
         <Separator />
       </div>
 
+      {/* Supporter banner — only for users with a valid pack */}
+      {hasLicense && <SupporterBanner t={t} tier={licenseState.tier} />}
+
       {/* Light/Dark/System Toggle — visible when using the default theme */}
       {isDefaultTheme && (
         <div className="space-y-2">
@@ -416,6 +420,60 @@ export const ThemeSettings = () => {
     </div>
   );
 };
+
+/**
+ * Banner for pack owners. Support Pack gets a warm gold look; Power Pack / Pro
+ * reuse the violet of the Power Pack card in the Packs page, so the two tiers
+ * read the same everywhere.
+ */
+function SupporterBanner({ t, tier }: { t: (key: string) => string; tier: LicenseTier }) {
+  const isPowerOrPro = tier === 'power_pack' || tier === 'pro';
+  const tierLabel = tier === 'pro' ? 'Pro' : isPowerOrPro ? 'Power Pack' : 'Support Pack';
+
+  const styles = isPowerOrPro
+    ? {
+        bg: 'from-violet-500/20 via-purple-500/10 to-fuchsia-500/20',
+        glow: 'bg-violet-500/20',
+        iconWrap: 'bg-violet-500/15 ring-violet-500/30',
+        chip: 'bg-violet-500/20 text-violet-700 dark:text-violet-300',
+        icon: 'fluent-color:premium-24',
+      }
+    : {
+        bg: 'from-amber-400/20 via-yellow-300/10 to-orange-400/20',
+        glow: 'bg-amber-400/25',
+        iconWrap: 'bg-amber-400/15 ring-amber-500/30',
+        chip: 'bg-amber-500/20 text-amber-700 dark:text-amber-300',
+        icon: 'fluent-color:ribbon-star-24',
+      };
+
+  return (
+    <div className={`relative overflow-hidden rounded-xl bg-gradient-to-r ${styles.bg} p-4`}>
+      {/* Soft corner glow, decorative only */}
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full blur-2xl ${styles.glow}`}
+      />
+      <div className="relative flex items-center gap-3">
+        <div
+          className={`h-9 w-9 shrink-0 rounded-full ring-1 flex items-center justify-center ${styles.iconWrap}`}
+        >
+          <UIcon icon={styles.icon} width={20} height={20} />
+        </div>
+        <div className="min-w-0 space-y-0.5">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold">{t('themeSettings.supporterTitle')}</span>
+            <span
+              className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${styles.chip}`}
+            >
+              {tierLabel}
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground">{t('themeSettings.supporterDescription')}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /** Preview banner — tells user the theme will revert in 5 min, with a purchase CTA */
 function PreviewBanner({ t }: { t: (key: string) => string }) {
@@ -560,6 +618,7 @@ function PaginatedThemeGrid({
             hasLicense={hasLicense}
             isPreviewing={card.isPreviewing}
             isUserTheme={card.isUserTheme}
+            unlockedLabel={t('themeSettings.premiumUnlocked')}
             onClick={card.onClick}
             onDelete={card.onDelete}
           />
@@ -614,9 +673,11 @@ function ThemeCard({
   hasLicense,
   isPreviewing,
   isUserTheme,
+  unlockedLabel,
   onClick,
   onDelete,
 }: {
+  unlockedLabel?: string;
   name: string;
   description: string;
   colors: { bg: string; fg: string; accent: string; secondary: string };
@@ -656,6 +717,18 @@ function ThemeCard({
         <div className="absolute top-2 right-2 flex items-center gap-0.5 rounded-full bg-highlight/15 px-1.5 py-0.5">
           <Sparkles className="h-3 w-3 text-highlight" />
         </div>
+      )}
+
+      {/* Unlocked badge — premium theme the user owns through their pack */}
+      {isPremium && hasLicense && !isActive && !isUserTheme && (
+        <SimpleTooltip content={unlockedLabel}>
+          <div
+            aria-label={unlockedLabel}
+            className="absolute top-2 right-2 h-5 w-5 rounded-full bg-amber-400/20 ring-1 ring-amber-500/30 flex items-center justify-center"
+          >
+            <Crown className="h-3 w-3 text-amber-600 dark:text-amber-400" />
+          </div>
+        </SimpleTooltip>
       )}
 
       {/* User theme delete button */}

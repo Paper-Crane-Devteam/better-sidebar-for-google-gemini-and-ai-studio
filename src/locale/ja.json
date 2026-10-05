@@ -1091,12 +1091,16 @@
     "themeSaved": "カスタムテーマを保存しました。「テーマ」から切り替えられます。",
     "promptAlreadyExists": "AI テーマプロンプトは既に存在します。プロンプトタブに移動します。",
     "promptCreated": "プロンプトを作成しました！プロンプトタブに移動します。",
-    "themeDeleted": "カスタムテーマを削除しました。"
+    "themeDeleted": "カスタムテーマを削除しました。",
+    "supporterTitle": "サポーター",
+    "supporterDescription": "Better Sidebar を応援していただきありがとうございます。すべてのプレミアムテーマが解放済みです。今後追加されるテーマも含まれます。",
+    "premiumUnlocked": "パックで解放済み"
   },
   "packs": {
     "title": "パック",
     "subtitle": "高度な機能をアンロックして、AI ワークフローを加速させましょう。",
     "active": "有効",
+    "welcomeAboard": "ようこそ。ご支援ありがとうございます！",
     "activatedDescriptionSupport": "すべてのプレミアムテーマがアンロックされています。Better Sidebar をご支援いただきありがとうございます！",
     "activatedDescriptionPower": "Power Pack のすべての機能が有効です。AI アシスタントの全機能がアンロックされました。",
     "upgradePrompt": "もっと必要ですか？",

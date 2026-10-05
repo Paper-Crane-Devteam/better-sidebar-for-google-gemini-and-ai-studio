@@ -1091,12 +1091,16 @@
     "themeSaved": "自定义主题已保存，可在“主题”中切换使用。",
     "promptAlreadyExists": "AI 主题 Prompt 已存在，正在跳转到 Prompt 管理。",
     "promptCreated": "Prompt 已创建！正在跳转到 Prompt 管理。",
-    "themeDeleted": "自定义主题已删除。"
+    "themeDeleted": "自定义主题已删除。",
+    "supporterTitle": "支持者",
+    "supporterDescription": "感谢你支持 Better Sidebar。所有高级主题都已为你解锁，以后上线的新主题也包含在内。",
+    "premiumUnlocked": "已通过你的功能包解锁"
   },
   "packs": {
     "title": "功能包",
     "subtitle": "解锁高级功能，让你的 AI 工作流如虎添翼。",
     "active": "已激活",
+    "welcomeAboard": "欢迎加入，感谢你的支持！",
     "activatedDescriptionSupport": "所有高级主题已解锁。感谢你对 Better Sidebar 的支持！",
     "activatedDescriptionPower": "Power Pack 全部功能已激活。你的 AI 助手已解锁完整能力。",
     "upgradePrompt": "想要更多？",

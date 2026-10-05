@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Separator } from '../../../components/ui/separator';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -26,15 +26,27 @@ import {
 } from '@/shared/lib/license-api';
 import { renewLicenseIfNeeded } from '@/shared/lib/license-renewal';
 import { openPurchasePage, getPurchaseLinks } from '@/shared/lib/license-links';
+import { Fireworks } from '../../../components/Fireworks';
 
 export const SupportPackSettings = () => {
   const { t } = useI18n();
   const licenseState = useLicenseStore();
   const hasLicense = isLicenseValid(licenseState);
   const inGracePeriod = isLicenseInGracePeriod(licenseState);
+  // Set only by a successful activation in this panel, so renewals and other tabs
+  // syncing the license never set off the fireworks.
+  const [celebrating, setCelebrating] = useState(false);
+  const [justActivated, setJustActivated] = useState(false);
+
+  const handleActivated = useCallback(() => {
+    setCelebrating(true);
+    setJustActivated(true);
+  }, []);
 
   return (
     <div className="space-y-6">
+      {celebrating && <Fireworks onDone={() => setCelebrating(false)} />}
+
       {/* Header */}
       <div className="space-y-2">
         <h3 className="text-lg font-medium flex items-center gap-2">
@@ -48,9 +60,14 @@ export const SupportPackSettings = () => {
       </div>
 
       {hasLicense ? (
-        <ActivatedView t={t} tier={licenseState.tier} inGracePeriod={inGracePeriod} />
+        <ActivatedView
+          t={t}
+          tier={licenseState.tier}
+          inGracePeriod={inGracePeriod}
+          justActivated={justActivated}
+        />
       ) : (
-        <PurchaseView t={t} />
+        <PurchaseView t={t} onActivated={handleActivated} />
       )}
     </div>
   );
@@ -177,10 +194,12 @@ function ActivatedView({
   t,
   tier,
   inGracePeriod,
+  justActivated,
 }: {
   t: (key: string) => string;
   tier: LicenseTier;
   inGracePeriod: boolean;
+  justActivated?: boolean;
 }) {
   const token = useLicenseStore((s) => s.token);
 
@@ -191,8 +210,20 @@ function ActivatedView({
     <div className="space-y-6">
       {inGracePeriod && <RenewalWarning t={t} />}
 
+      {/* Welcome line, only right after activating in this panel */}
+      {justActivated && (
+        <div className="flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-500">
+          <UIcon icon="fluent-color:ribbon-star-24" width={20} height={20} />
+          <p className="text-sm font-medium">{t('packs.welcomeAboard')}</p>
+        </div>
+      )}
+
       {/* Success card */}
-      <div className="rounded-xl bg-primary/10 p-6">
+      <div
+        className={`rounded-xl bg-primary/10 p-6 ${
+          justActivated ? 'animate-in fade-in zoom-in-95 duration-500' : ''
+        }`}
+      >
         <div className="flex items-center gap-3 mb-3">
           <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
             <Check className="h-5 w-5 text-primary" />
@@ -340,7 +371,13 @@ function ReleaseDeviceSection({ t }: { t: (key: string) => string }) {
 }
 
 /** View shown when the user hasn't purchased yet */
-function PurchaseView({ t }: { t: (key: string) => string }) {
+function PurchaseView({
+  t,
+  onActivated,
+}: {
+  t: (key: string) => string;
+  onActivated: () => void;
+}) {
   const links = getPurchaseLinks();
   // A leftover token means a previously working license was rejected on renewal,
   // rather than this being a first-time visitor.
@@ -496,13 +533,19 @@ function PurchaseView({ t }: { t: (key: string) => string }) {
       <Separator />
 
       {/* Token activation section */}
-      <ActivationInput t={t} />
+      <ActivationInput t={t} onActivated={onActivated} />
     </div>
   );
 }
 
 /** Token input and activation form */
-function ActivationInput({ t }: { t: (key: string) => string }) {
+function ActivationInput({
+  t,
+  onActivated,
+}: {
+  t: (key: string) => string;
+  onActivated: () => void;
+}) {
   const { deviceId, activate } = useLicenseStore();
   const [inputToken, setInputToken] = useState('');
   const [loading, setLoading] = useState(false);
@@ -531,6 +574,7 @@ function ActivationInput({ t }: { t: (key: string) => string }) {
       activate(trimmed, result.signedPayload, result.expiresAt, result.tier);
       setSuccess(true);
       setInputToken('');
+      onActivated();
     } else {
       const errorMsg =
         result.error === 'network_error'

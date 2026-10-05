@@ -1091,12 +1091,16 @@
     "themeSaved": "Tema personalizado salvo — você pode alternar para ele em Temas.",
     "promptAlreadyExists": "O prompt de tema com IA já existe. Mudando para a aba de Prompts.",
     "promptCreated": "Prompt criado! Mudando para a aba de Prompts.",
-    "themeDeleted": "Tema personalizado removido."
+    "themeDeleted": "Tema personalizado removido.",
+    "supporterTitle": "Apoiador",
+    "supporterDescription": "Obrigado por apoiar o Better Sidebar. Todos os temas premium são seus, incluindo os que ainda virão.",
+    "premiumUnlocked": "Desbloqueado com o seu pacote"
   },
   "packs": {
     "title": "Pacotes",
     "subtitle": "Desbloqueie recursos avançados para turbinar seu fluxo de trabalho com IA.",
     "active": "Ativo",
+    "welcomeAboard": "Bem-vindo e obrigado pelo seu apoio!",
     "activatedDescriptionSupport": "Todos os temas premium estão desbloqueados. Obrigado por apoiar o Better Sidebar!",
     "activatedDescriptionPower": "Todos os recursos do Power Pack estão ativos. Seu assistente de IA tem todas as capacidades desbloqueadas.",
     "upgradePrompt": "Quer mais?",
