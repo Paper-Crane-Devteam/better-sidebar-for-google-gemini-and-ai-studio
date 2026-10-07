@@ -58,29 +58,29 @@ Wysyłaj rozmowy i fragmenty do Notion lub Obsidian, zachowując formatowanie w 
 
 ---
 
-💎 KLEJNOTY I NOTATNIKI
+💎 GEMS I NOTEBOOKI
 
-💎 Zarządzanie klejnotami
-Przeglądaj, filtruj, twórz i rozpoczynaj rozmowy w Gem bezpośrednio z paska bocznego.
+💎 Zarządzanie Gems
+Przeglądaj, filtruj, twórz i rozpoczynaj rozmowy z Gems bezpośrednio z paska bocznego.
 
-📓 Integracja z notebookiem
-Przeglądaj, organizuj i zarządzaj swoimi notatnikami Gemini z paska bocznego.
+📓 Integracja z Notebookami
+Przeglądaj, organizuj i zarządzaj swoimi notebookami Gemini z paska bocznego.
 
-⚡ Bliźnięta Iskra
+⚡ Gemini Spark
 Jeśli Spark jest dostępny na Twoim koncie Google, pojawia się jako natywna karta bez konfiguracji.
 
 ---
 
 🎨 DOSTOSOWANIE UI
 
-Bliźnięta:
+Gemini:
 • Dostosuj szerokość paska bocznego, zawartości czatu i pola wprowadzania
 • Tryb skupienia: ukryj logo, zastrzeżenie, przycisk aktualizacji i inne bałagany
 • Inteligentny pasek przewijania: przejście do dowolnej wiadomości; rozwija się do pełnej listy wiadomości
 • Pobieranie obrazów bez znaku wodnego (w tym obrazów Pro HD)
 • Animacja zmiany motywu
 
-Studio AI:
+AI Studio:
 • Konfigurowalna szerokość paska bocznego
 • Automatyczne ukrywanie pola wprowadzania
 • Automatyczne ukrywanie panelu ustawień uruchamiania
@@ -120,28 +120,28 @@ Kliknij ikonę paska narzędzi przeglądarki, aby wyświetlić szybki panel ster
 
 Wpisz „>”, aby wybrać agenta, a następnie opisz, czego chcesz, w języku potocznym. Każdy agent pokazuje rząd przycisków szybkiego startu, dzięki czemu wiesz, o co zapytać. Agenci działają w ramach Twojej własnej sesji Gemini, bez kluczy API i bez dodatkowych kosztów.
 
-🧭 Agent BetterSidebar
+🧭 BetterSidebar Agent
 • Znajdź i przeszukaj swoje czaty, foldery i tagi (bezpłatnie)
 • Porządkuj za siebie: twórz foldery, przenoś czaty, grupuj tagi, zmieniaj nazwy i porządkuj (Power Pack)
 • Kontynuuj na nowym czacie: gdy czat stanie się zbyt długi, zapisuje podsumowanie przekazania i otwiera nowy czat z podsumowaniem oczekującym w polu wprowadzania. Nic nie zostanie wysłane, dopóki nie naciśniesz Enter.
 • Warsztat tematyczny: opisz pożądany klimat, a następnie zbudujesz i zastosujesz motyw, który możesz udoskonalać, rozmawiając na czacie (stosując niestandardowe motywy: pakiet wsparcia)
 • Działa nawet przy zamkniętym pasku bocznym za pośrednictwem Doku agenta
 
-📁 Agent przestrzeni roboczej
+📁 Workspace Agent
 Przeciągaj dokumenty (Word, Excel, PDF, pliki kodu i inne) i pozwól sztucznej inteligencji analizować je lub edytować, zachowując oryginalne formatowanie. Bezpłatnie dla 1 obszaru roboczego z maksymalnie 5 plikami; więcej obszarów roboczych i plików dzięki Power Pack.
 
-🌐 Agent przeglądarki (eksperymentalny)
-Deduplikuj karty we wszystkich oknach, grupuj powiązane karty i sprzątaj bałagan w folderach zakładek. Oddzielne przełączniki uprawnień do porządkowania kart, zamykania kart, porządkowania zakładek i usuwania zakładek. Przed każdym uruchomieniem wykonywana jest migawka, którą można cofnąć jednym kliknięciem. Czytanie zakładek i zakładek jest bezpłatne; zastosowanie zmian wymaga pakietu Power Pack.
+🌐 Browser Agent (eksperymentalny)
+Deduplikuj karty we wszystkich oknach, grupuj powiązane karty i sprzątaj bałagan w folderach zakładek. Oddzielne przełączniki uprawnień do porządkowania kart, zamykania kart, porządkowania zakładek i usuwania zakładek. Przed każdym uruchomieniem wykonywana jest migawka, którą można cofnąć jednym kliknięciem. Czytanie kart i zakładek jest bezpłatne; zastosowanie zmian wymaga pakietu Power Pack.
 
 ---
 
-🔒 PRYWATNOŚĆ NAJPIERW
+🔒 PRYWATNOŚĆ PRZEDE WSZYSTKIM
 
 Poważnie podchodzimy do Twojej prywatności.
 
-• 100% lokalnie: Twoje foldery, znaczniki, notatki i podpowiedzi znajdują się w wbudowanej bazie danych SQLite w Twojej przeglądarce.
+• 100% lokalnie: Twoje foldery, znaczniki, notatki i prompty znajdują się w wbudowanej bazie danych SQLite w Twojej przeglądarce.
 • Brak backendu dla Twoich danych: rozszerzenie nie ma serwera, który przechowuje lub odbiera Twoje czaty lub dane organizacji. Synchronizacja Dysku Google trafia na Twój własny Dysk. Jedynym żądaniem, które obsługujemy, jest sprawdzenie klucza licencyjnego podczas aktywacji pakietu.
-• Brak szkolenia: nigdy nie czytamy Twoich rozmów w celu szkolenia modeli sztucznej inteligencji.
+• Brak trenowania modeli AI: nigdy nie czytamy Twoich rozmów do trenowania modeli sztucznej inteligencji.
 • Agenci korzystają z własnej sesji: agenci AI rozmawiają z Gemini poprzez istniejącą sesję Google w taki sam sposób, jak Ty. Nic nie jest wysyłane do nas ani do żadnej innej strony trzeciej.
 
 DLACZEGO ROZSZERZENIE WYMAGA UPRAWNIEŃ?

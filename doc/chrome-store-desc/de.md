@@ -58,22 +58,22 @@ Senden Sie Konversationen und Snippets an Notion oder Obsidian und behalten Sie 
 
 ---
 
-💎 EDELSTEINE & NOTIZBÜCHER
+💎 GEMS & NOTEBOOKS
 
-💎 Edelsteinmanagement
+💎 Gem-Verwaltung
 Durchsuchen, filtern, erstellen und starten Sie Gem-Konversationen direkt in der Seitenleiste.
 
 📓 Notebook-Integration
-Durchsuchen, organisieren und verwalten Sie Ihre Gemini-Notizbücher über die Seitenleiste.
+Durchsuchen, organisieren und verwalten Sie Ihre Gemini-Notebooks über die Seitenleiste.
 
-⚡ Zwillinge Funke
+⚡ Gemini Spark
 Wenn Spark in Ihrem Google-Konto verfügbar ist, wird es als nativer Tab ohne Einrichtung angezeigt.
 
 ---
 
 🎨 UI-ANPASSUNG
 
-Zwillinge:
+Gemini:
 • Passen Sie die Seitenleiste, den Chatinhalt und die Breite des Eingabefelds an
 • Fokusmodus: Blenden Sie das Logo, den Haftungsausschluss, die Upgrade-Schaltfläche und andere Unordnung aus
 • Intelligente Bildlaufleiste: Springen Sie zu einer beliebigen Nachricht. wird zu einer vollständigen Nachrichtenliste erweitert
@@ -135,13 +135,13 @@ Deduplizieren Sie Tabs in allen Ihren Fenstern, gruppieren Sie verwandte Tabs un
 
 ---
 
-🔒 DATENSCHUTZ ERSTE
+🔒 DATENSCHUTZ AN ERSTER STELLE
 
 Wir nehmen Ihre Privatsphäre ernst.
 
-• 100 % lokal: Ihre Ordner, Tags, Notizen und Eingabeaufforderungen befinden sich in einer eingebetteten SQLite-Datenbank in Ihrem Browser.
+• 100 % lokal: Ihre Ordner, Tags, Notizen und Prompts befinden sich in einer eingebetteten SQLite-Datenbank in Ihrem Browser.
 • Kein Backend für Ihre Daten: Die Erweiterung verfügt über keinen Server, der Ihre Chats oder Organisationsdaten speichert oder empfängt. Die Google Drive-Synchronisierung erfolgt auf Ihrem eigenen Drive. Die einzige Anfrage, die wir bearbeiten, ist eine Lizenzschlüsselprüfung, wenn Sie ein Paket aktivieren.
-• Kein Training: Wir lesen Ihre Gespräche niemals, um KI-Modelle zu trainieren.
+• Kein Modell-Training: Wir lesen Ihre Gespräche niemals, um KI-Modelle zu trainieren.
 • Agenten nutzen Ihre eigene Sitzung: KI-Agenten kommunizieren mit Gemini über Ihre bestehende Google-Sitzung, genau wie Sie. Es wird nichts an uns oder andere Dritte gesendet.
 
 WARUM BENÖTIGT DIE ERWEITERUNG BERECHTIGUNGEN?

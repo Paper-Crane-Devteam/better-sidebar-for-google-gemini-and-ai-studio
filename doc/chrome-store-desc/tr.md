@@ -58,29 +58,29 @@ Biçimlendirmeyi elimizden geldiğince bozulmadan tutarak konuşmaları ve parç
 
 ---
 
-💎 TAŞLAR VE DEFTERLER
+💎 GEMS & NOTEBOOK'LAR
 
-💎 Mücevher Yönetimi
+💎 Gem Yönetimi
 Doğrudan kenar çubuğundan Gem konuşmalarına göz atın, filtreleyin, oluşturun ve başlatın.
 
-📓 Defter Entegrasyonu
-Kenar çubuğundan Gemini not defterlerinize göz atın, bunları düzenleyin ve yönetin.
+📓 Notebook Entegrasyonu
+Kenar çubuğundan Gemini notebook'larınıza göz atın, bunları düzenleyin ve yönetin.
 
-⚡ İkizler Kıvılcımı
+⚡ Gemini Spark
 Spark Google hesabınızda mevcutsa kurulum gerektirmeyen yerel bir sekme olarak görünür.
 
 ---
 
 🎨 UI ÖZELLEŞTİRME
 
-İkizler burcu:
+Gemini:
 • Kenar çubuğunu, sohbet içeriğini ve giriş kutusu genişliklerini ayarlayın
 • Odak Modu: logoyu, sorumluluk reddi beyanını, yükseltme düğmesini ve diğer dağınıklığı gizleyin
 • Akıllı Kaydırma Çubuğu: herhangi bir mesaja atlayın; tam mesaj listesine genişler
 • Filigransız görüntü indirmeleri (Pro HD görüntüler dahil)
 • Tema değiştirme animasyonu
 
-Yapay Zeka Stüdyosu:
+AI Studio:
 • Yapılandırılabilir kenar çubuğu genişliği
 • Giriş kutusunu otomatik gizle
 • Çalıştırma ayarları panelini otomatik gizle
@@ -116,22 +116,22 @@ Hızlı bir kontrol paneli için tarayıcı araç çubuğu simgesini tıklayın.
 
 ---
 
-🤖 AI AJANLARI
+🤖 AI AGENT'LARI
 
-Bir temsilci seçmek için ">" yazın, ardından ne istediğinizi günlük dilde açıklayın. Her temsilci bir dizi hızlı başlangıç ​​düğmesi gösterir, böylece ne soracağınızı bilirsiniz. Temsilciler, API anahtarı olmadan ve ekstra maliyet olmadan kendi Gemini oturumunuz üzerinden çalışır.
+Bir Agent seçmek için ">" yazın, ardından ne istediğinizi günlük dilde açıklayın. Her Agent bir dizi hızlı başlangıç düğmesi gösterir, böylece ne soracağınızı bilirsiniz. Agent'lar, API anahtarı olmadan ve ekstra maliyet olmadan kendi Gemini oturumunuz üzerinden çalışır.
 
-🧭 Daha İyi Kenar Çubuğu Temsilcisi
+🧭 BetterSidebar Agent
 • Sohbetlerinizi, klasörlerinizi ve etiketlerinizi bulun ve sorgulayın (ücretsiz)
 • Sizin için düzenleyin: klasörler oluşturun, sohbetleri taşıyın, toplu etiketleyin, yeniden adlandırın ve düzenleyin (Power Pack)
 • Yeni Sohbette Devam Et: sohbet çok uzadığında, bir geçiş özeti yazar ve giriş kutusunda bekleyen özet ile yeni bir sohbet açar. Enter tuşuna basana kadar hiçbir şey gönderilmez.
 • Tema Atölyesi: istediğiniz atmosferi tanımlayın; sohbet ederek geliştirmeye devam edebileceğiniz bir tema oluşturup uygular (özel temalar uygulama: Destek Paketi)
 • Agent Dock aracılığıyla kenar çubuğu kapalıyken bile çalışır
 
-📁 Çalışma Alanı Temsilcisi
+📁 Workspace Agent
 Belgeleri (Word, Excel, PDF, kod dosyaları ve daha fazlası) sürükleyin ve orijinal biçimlendirmeyi korurken yapay zekanın bunları analiz etmesine veya düzenlemesine izin verin. En fazla 5 dosya içeren 1 çalışma alanı için ücretsiz; Power Pack ile daha fazla çalışma alanı ve dosya.
 
-🌐 Tarayıcı Aracısı (Deneysel)
-Tüm pencerelerinizde sekmeleri tekilleştirin, ilgili sekmeleri gruplayın ve dağınık yer imi klasörlerini temizleyin. Sekmeleri düzenlemek, sekmeleri kapatmak, yer imlerini düzenlemek ve yer imlerini silmek için ayrı izin anahtarları. Tek tıklamayla geri alma ile her çalıştırmadan önce bir anlık görüntü alınır. Sekmeleri ve yer imlerini okumak ücretsizdir; Değişikliklerin uygulanması Güç Paketi gerektirir.
+🌐 Browser Agent (Deneysel)
+Tüm pencerelerinizde sekmeleri tekilleştirin, ilgili sekmeleri gruplayın ve dağınık yer imi klasörlerini temizleyin. Sekmeleri düzenlemek, sekmeleri kapatmak, yer imlerini düzenlemek ve yer imlerini silmek için ayrı izin anahtarları. Tek tıklamayla geri alma ile her çalıştırmadan önce bir anlık görüntü alınır. Sekmeleri ve yer imlerini okumak ücretsizdir; Değişikliklerin uygulanması Power Pack gerektirir.
 
 ---
 
@@ -141,12 +141,12 @@ Gizliliğinizi ciddiye alıyoruz.
 
 • %100 Yerel: Klasörleriniz, etiketleriniz, notlarınız ve istemleriniz, tarayıcınızın içindeki yerleşik bir SQLite veritabanında bulunur.
 • Verileriniz için Arka Uç Yok: Uzantının sohbetlerinizi veya organizasyon verilerinizi saklayan veya alan bir sunucusu yoktur. Google Drive senkronizasyonu kendi Drive'ınıza gider. İşleme aldığımız tek talep, bir paketi etkinleştirdiğinizde lisans anahtarı kontrolüdür.
-• Eğitim Yok: Yapay zeka modellerini eğitmek için konuşmalarınızı asla okumayız.
-• Temsilciler Kendi Oturumunuzu Kullanır: AI Temsilcileri, sizin yaptığınız gibi Gemini ile mevcut Google oturumunuz aracılığıyla konuşur. Bize veya herhangi bir üçüncü tarafa hiçbir şey gönderilmez.
+• Model Eğitimi Yok: AI modellerini eğitmek için konuşmalarınızı asla okumayız.
+• Agent'lar Kendi Oturumunuzu Kullanır: AI Agent'ları, sizin yaptığınız gibi Gemini ile mevcut Google oturumunuz aracılığıyla konuşur. Bize veya herhangi bir üçüncü tarafa hiçbir şey gönderilmez.
 
-UZATMA NEDEN İZİNLERE İHTİYAÇ VAR?
+UZANTI NEDEN İZİNLERE İHTİYAÇ DUYAR?
 
-Gelişmiş kenar çubuğunu eklemek ve organizasyon için sohbet başlıklarını okumak için aistudio.google.com ve gemini.google.com'a erişmemiz gerekiyor. Sekme ve yer imi erişimi isteğe bağlıdır: yalnızca Tarayıcı Aracısını etkinleştirdiğinizde istenir ve yalnızca açtığınız anahtarlar içinde kullanılır. Tarama geçmişinizi okumuyoruz.
+Gelişmiş kenar çubuğunu eklemek ve organizasyon için sohbet başlıklarını okumak için aistudio.google.com ve gemini.google.com'a erişmemiz gerekiyor. Sekme ve yer imi erişimi isteğe bağlıdır: yalnızca Browser Agent'ı etkinleştirdiğinizde istenir ve yalnızca açtığınız anahtarlar içinde kullanılır. Tarama geçmişinizi okumuyoruz.
 
 ---
 

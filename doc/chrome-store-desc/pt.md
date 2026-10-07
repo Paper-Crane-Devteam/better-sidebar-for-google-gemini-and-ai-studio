@@ -58,29 +58,29 @@ Envie conversas e trechos para Notion ou Obsidian, mantendo a formatação o mai
 
 ---
 
-💎 GEMAS E CADERNOS
+💎 GEMS & NOTEBOOKS
 
-💎 Gerenciamento de gemas
+💎 Gerenciamento de Gems
 Navegue, filtre, crie e inicie conversas do Gem diretamente na barra lateral.
 
-📓 Integração com notebook
-Navegue, organize e gerencie seus blocos de anotações Gemini na barra lateral.
+📓 Integração com Notebooks
+Navegue, organize e gerencie seus notebooks Gemini na barra lateral.
 
-⚡ Centelha de Gêmeos
+⚡ Gemini Spark
 Se o Spark estiver disponível na sua conta do Google, ele aparecerá como uma guia nativa sem configuração.
 
 ---
 
 🎨 PERSONALIZAÇÃO DA IU
 
-Gêmeos:
+Gemini:
 • Ajuste a largura da barra lateral, do conteúdo do bate-papo e da caixa de entrada
 • Modo Foco: oculte o logotipo, o aviso de isenção de responsabilidade, o botão de atualização e outros itens desnecessários
 • Barra de rolagem inteligente: salta para qualquer mensagem; se expande em uma lista completa de mensagens
 • Downloads de imagens sem marca d'água (incluindo imagens Pro HD)
 • Animação de mudança de tema
 
-Estúdio de IA:
+AI Studio:
 • Largura da barra lateral configurável
 • Ocultar automaticamente a caixa de entrada
 • Ocultar automaticamente o painel de configurações de execução
@@ -120,17 +120,17 @@ Clique no ícone da barra de ferramentas do navegador para obter um painel de co
 
 Digite ">" para escolher um agente e descreva o que deseja em linguagem cotidiana. Cada agente mostra uma linha de botões de início rápido para que você saiba o que perguntar. Os agentes executam sua própria sessão Gemini, sem chaves de API e sem custo extra.
 
-🧭 Agente BetterSidebar
+🧭 BetterSidebar Agent
 • Encontre e consulte seus bate-papos, pastas e tags (gratuito)
 • Organize para você: crie pastas, mova bate-papos, marque em lote, renomeie e organize (Power Pack)
 • Continuar em um novo bate-papo: quando um bate-papo fica muito longo, ele escreve um resumo da transferência e abre um novo bate-papo com o resumo aguardando na caixa de entrada. Nada é enviado até que você pressione Enter.
 • Workshop Temático: descreva a vibração que você deseja e crie e aplique um tema que você pode continuar refinando conversando (aplicando temas personalizados: Support Pack)
 • Funciona mesmo com a barra lateral fechada, através do Agent Dock
 
-📁 Agente de espaço de trabalho
+📁 Workspace Agent
 Arraste documentos (Word, Excel, PDF, arquivos de código e muito mais) e deixe a IA analisá-los ou editá-los, mantendo a formatação original. Gratuito para 1 espaço de trabalho com até 5 arquivos; mais espaços de trabalho e arquivos com o Power Pack.
 
-🌐 Agente de navegador (experimental)
+🌐 Browser Agent (experimental)
 Elimine a duplicação de guias em todas as suas janelas, agrupe guias relacionadas e limpe pastas bagunçadas de favoritos. Chaves de permissão separadas para organizar guias, fechar guias, organizar marcadores e excluir marcadores. Um instantâneo é obtido antes de cada execução, com reversão com um clique. A leitura de guias e marcadores é gratuita; a aplicação de mudanças precisa do Power Pack.
 
 ---
@@ -141,12 +141,12 @@ Levamos a sua privacidade a sério.
 
 • 100% local: suas pastas, tags, notas e prompts ficam em um banco de dados SQLite incorporado em seu navegador.
 • Sem back-end para seus dados: a extensão não possui servidor que armazene ou receba seus bate-papos ou dados da organização. A sincronização do Google Drive vai para o seu próprio Drive. A única solicitação que atendemos é uma verificação da chave de licença quando você ativa um pacote.
-• Sem treinamento: nunca lemos suas conversas para treinar modelos de IA.
+• Sem treinamento de modelos: nunca lemos suas conversas para treinar modelos de IA.
 • Os agentes usam sua própria sessão: os agentes de IA conversam com o Gemini por meio de sua sessão existente do Google, da mesma forma que você. Nada é enviado para nós ou para terceiros.
 
 POR QUE A EXTENSÃO PRECISA DE PERMISSÕES?
 
-Precisamos de acesso a aistudio.google.com e gemini.google.com para adicionar a barra lateral aprimorada e ler os títulos dos bate-papos para organização. O acesso às guias e aos favoritos é opcional: ele só é solicitado quando você ativa o Agente do Navegador e é usado apenas nos switches que você ativa. Não lemos seu histórico de navegação.
+Precisamos de acesso a aistudio.google.com e gemini.google.com para adicionar a barra lateral aprimorada e ler os títulos dos bate-papos para organização. O acesso às guias e aos favoritos é opcional: ele só é solicitado quando você ativa o Browser Agent e é usado apenas nos switches que você ativa. Não lemos seu histórico de navegação.
 
 ---
 

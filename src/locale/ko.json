@@ -34,7 +34,7 @@
     "tags": "태그",
     "feedback": "피드백",
     "settings": "설정",
-    "gems": "보석",
+    "gems": "Gems",
     "notebooks": "노트북",
     "snippets": "스니펫",
     "spark": "Spark",
@@ -337,7 +337,7 @@
     "apps": "앱",
     "codex": "Codex",
     "myStuff": "내 항목",
-    "gems": "보석",
+    "gems": "Gems",
     "notebooks": "노트북",
     "originalUI": "원본 사이드바로 전환",
     "openCommandPalette": "명령 팔레트 열기"
@@ -367,7 +367,7 @@
     "filterSystemPrompts": "필터: 시스템 프롬프트",
     "filterConversations": "필터: 채팅",
     "filterImages": "필터: 이미지",
-    "filterGems": "필터: 보석",
+    "filterGems": "필터: Gems",
     "filterNotebooks": "필터: 노트북",
     "filterFavorites": "필터: 즐겨찾기",
     "addToFavorites": "즐겨찾기에 추가",
@@ -471,7 +471,7 @@
   "presetColor": {
     "indigo": "Indigo",
     "violet": "Violet",
-    "pink": "Pink",
+    "pink": "분홍색",
     "red": "빨간색",
     "orange": "주황색",
     "yellow": "노란색",
@@ -668,7 +668,9 @@
     "batchDoneWithFailures": "{{count}} 채팅을 동기화했습니다({{failed}} 실패).",
     "batchWarnTitle": "동기화되지 않은 모든 채팅을 동기화하시겠습니까?",
     "batchWarnBody": "이렇게 하면 메시지가 하나씩 가져옵니다. 채팅 수가 많은 경우 시간이 다소 걸릴 수 있습니다. 요청이 너무 많으면 Google에서 일시적으로 속도를 제한하거나 다시 로그인하도록 요청할 수 있습니다. 이 경우 동기화가 일시 중지되며 나중에 다시 시작할 수 있습니다. 또는 설정에서 백그라운드 동기화 옵션을 활성화하여 자동으로 실행할 수 있습니다.",
-    "batchWarnConfirm": "동기화 시작"
+    "batchWarnConfirm": "동기화 시작",
+    "notFound": "찾을 수 없음",
+    "notFoundHint": "이 계정의 플랫폼에 해당 대화가 더 이상 존재하지 않습니다. 플랫폼에서 삭제되었거나 다른 계정의 백업에서 가져온 대화일 수 있습니다."
   },
   "importHistory": {
     "selectZipHint": "채팅 기록이 포함된 Google Drive에서 다운로드한 ZIP 파일을 선택하세요.",
@@ -737,7 +739,7 @@
     "previewCaption": "아름답게 정리된 대화",
     "basics": "필수적인 것부터 시작하세요.",
     "organizeTitle": "모든 채팅을 폴더로 만들고 태그를 추가하여 프로젝트를 보관하세요. 함께.",
-    "organizeBody": "Group conversations into folders and add tags to keep projects together.",
+    "organizeBody": "대화를 폴더로 정리하고 태그를 추가하여 프로젝트를 깔끔하게 관리하세요.",
     "findTitle": "좋은 것을 찾으세요",
     "findBody": "대화 기록을 검색하고 보관하고 싶은 아이디어로 돌아가세요.",
     "reuseTitle": "가장 좋은 메시지를 보관하세요",
@@ -789,7 +791,7 @@
         "description": "Gemini 라이브러리에 빠르게 액세스하세요 - 저장된 대화, 파일 등."
       },
       "gems": {
-        "title": "보석",
+        "title": "Gems",
         "description": "Gemini Gems에 액세스하세요 - 특정 작업을 위한 맞춤형 AI 전문가."
       },
       "originalUI": {
@@ -930,27 +932,27 @@
     "madeWith": "더 나은 사이드바 • Paper Crane Dev가 ♥️로 제작"
   },
   "gems": {
-    "title": "보석",
-    "untitledGem": "제목 없는 보석",
+    "title": "Gems",
+    "untitledGem": "제목 없는 Gem",
     "scanFailed": "스캔 실패",
-    "noGems": "보석을 찾을 수 없습니다.",
-    "noGemsDescription": "보석은 다음에서 동기화될 때 여기에 표시됩니다. Gemini.",
-    "newGemChat": "새 Gem 채팅",
+    "noGems": "Gem이 없습니다.",
+    "noGemsDescription": "Gemini에서 동기화하면 여기에 Gem이 표시됩니다.",
+    "newGemChat": "새 Gem 대화",
     "conversations": "대화",
     "openGem": "Gem 열기",
     "openInNewTab": "새 탭에서 열기",
     "editGem": "Gem 편집",
     "copyGem": "Gem 복사",
     "hideGem": "Gem 숨기기",
-    "hideGemConfirm": "정말로 \"{{name}}\"을 숨기시겠습니까? 다시 스캔하여 이 Gem을 검색할 수 있습니다.",
+    "hideGemConfirm": "정말로 \"{{name}}\"을(를) 숨기시겠습니까? 다시 스캔하여 이 Gem을 복원할 수 있습니다.",
     "deleteGem": "Gem 삭제",
     "deleteGemConfirm": "정말로 \"{{name}}\"을(를) 삭제하시겠습니까? 이렇게 하면 Gemini에서 Gem이 영구적으로 삭제됩니다.",
     "renameGem": "Gem 이름 바꾸기",
     "createGem": "Gem 만들기",
     "selectGem": "Gem 선택",
-    "searchGems": "보석 검색...",
+    "searchGems": "Gems 검색...",
     "chatWithLastGem": "{{name}}과 채팅",
-    "empty": "아직 보석이 없습니다. 하나를 만들거나 Gemini에서 동기화하세요.",
+    "empty": "아직 Gem이 없습니다. 새로 만들거나 Gemini에서 동기화하세요.",
     "viewGems": "Gem 보기",
     "scanGems": "Gem 가져오기",
     "scanningGems": "가져오는 중...",
@@ -1176,7 +1178,7 @@
     "renewalWarningTitle": "라이선스 서버에 연결할 수 없습니다.",
     "renewalWarningDesc": "귀하의 라이선스가 아직 활성 상태이며 백그라운드에서 계속 재시도합니다. 문제가 지속되면 인터넷 연결이나 VPN/프록시를 확인하세요.",
     "renewalGraceUntil": "지금 다시 시도",
-    "retryNow": "Retry now",
+    "retryNow": "지금 다시 시도",
     "dismiss": "해제",
     "rejectedTitle": "이 라이선스가 더 이상 활성화되지 않을 때까지 활성 상태를 유지합니다.",
     "rejectedRevoked": "일반적으로 환불 또는 지불 거절 후 라이선스가 취소됩니다. 이것이 잘못되었다고 생각되면 지원팀에 문의하세요.",
@@ -1199,7 +1201,7 @@
     "navPrompts": "프롬프트로 이동",
     "navTags": "태그로 이동",
     "navFavorites": "즐겨찾기로 이동",
-    "navGems": "보석으로 이동",
+    "navGems": "Gems로 이동",
     "navNotebooks": "노트북으로 이동",
     "toggleZenMode": "Zen 모드 전환",
     "switchOriginalUI": "Original 사이드바 전환",
@@ -1798,7 +1800,7 @@
           "text": "자막 번역"
         },
         "translate": {
-          "label": "Translate subtitles",
+          "label": "자막 번역",
           "text": "자막 번역 "
         }
       },
@@ -1828,7 +1830,7 @@
           "text": "다음에 대한 북마크 찾기<p class=\"i5\">탭 열기"
         },
         "open": {
-          "label": "Open tabs",
+          "label": "탭 열기",
           "text": "다음에 대한 탭 열기"
         }
       }
@@ -1911,7 +1913,7 @@
         "red": "빨간색",
         "yellow": "노란색",
         "green": "녹색",
-        "pink": "Pink",
+        "pink": "분홍색",
         "purple": "보라색",
         "cyan": "청록색",
         "orange": "주황색"
