@@ -57,8 +57,14 @@ export const GeneralSettings = () => {
                     {language === 'zh-CN' && t('settings.chinese')}
                     {language === 'ja' && t('settings.japanese')}
                     {language === 'zh-TW' && t('settings.chineseTraditional')}
-                    {language === 'pt' && t('settings.portuguese')}
+                    {language === 'ko' && t('settings.korean')}
+                    {language === 'de' && t('settings.german')}
+                    {language === 'fr' && t('settings.french')}
                     {language === 'es' && t('settings.spanish')}
+                    {language === 'pt' && t('settings.portuguese')}
+                    {language === 'it' && t('settings.italian')}
+                    {language === 'pl' && t('settings.polish')}
+                    {language === 'tr' && t('settings.turkish')}
                     {language === 'ru' && t('settings.russian')}
                   </span>
                   <ChevronDown className="h-3 w-3 ml-2 opacity-50" />
@@ -68,16 +74,23 @@ export const GeneralSettings = () => {
                 <DropdownMenuRadioGroup
                   value={language}
                   onValueChange={(value) => {
-                    if (
-                      value === 'zh-CN' ||
-                      value === 'zh-TW' ||
-                      value === 'en' ||
-                      value === 'ja' ||
-                      value === 'pt' ||
-                      value === 'es' ||
-                      value === 'ru'
-                    ) {
-                      setLanguage(value);
+                    const validLanguages = [
+                      'zh-CN',
+                      'zh-TW',
+                      'en',
+                      'ja',
+                      'pt',
+                      'es',
+                      'ru',
+                      'ko',
+                      'de',
+                      'fr',
+                      'it',
+                      'pl',
+                      'tr',
+                    ] as const;
+                    if ((validLanguages as readonly string[]).includes(value)) {
+                      setLanguage(value as any);
                     }
                   }}
                 >
@@ -93,11 +106,29 @@ export const GeneralSettings = () => {
                   <DropdownMenuRadioItem value="zh-TW">
                     {t('settings.chineseTraditional')}
                   </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="pt">
-                    {t('settings.portuguese')}
+                  <DropdownMenuRadioItem value="ko">
+                    {t('settings.korean')}
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="de">
+                    {t('settings.german')}
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="fr">
+                    {t('settings.french')}
                   </DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value="es">
                     {t('settings.spanish')}
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="pt">
+                    {t('settings.portuguese')}
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="it">
+                    {t('settings.italian')}
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="pl">
+                    {t('settings.polish')}
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="tr">
+                    {t('settings.turkish')}
                   </DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value="ru">
                     {t('settings.russian')}

@@ -8,6 +8,12 @@ import 'dayjs/locale/ja';
 import 'dayjs/locale/pt';
 import 'dayjs/locale/es';
 import 'dayjs/locale/ru';
+import 'dayjs/locale/ko';
+import 'dayjs/locale/de';
+import 'dayjs/locale/fr';
+import 'dayjs/locale/it';
+import 'dayjs/locale/pl';
+import 'dayjs/locale/tr';
 import zhCN from './zh-CN.json';
 import zhTW from './zh-TW.json';
 import en from './en.json';
@@ -15,6 +21,12 @@ import ja from './ja.json';
 import pt from './pt.json';
 import es from './es.json';
 import ru from './ru.json';
+import ko from './ko.json';
+import de from './de.json';
+import fr from './fr.json';
+import it from './it.json';
+import pl from './pl.json';
+import tr from './tr.json';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { usePegasusStore } from '@/shared/lib/pegasus-store';
 
@@ -40,6 +52,24 @@ const getInitialLanguage = (): string => {
   }
   if (browserLang.startsWith('ja')) {
     return 'ja';
+  }
+  if (browserLang.startsWith('ko')) {
+    return 'ko';
+  }
+  if (browserLang.startsWith('de')) {
+    return 'de';
+  }
+  if (browserLang.startsWith('fr')) {
+    return 'fr';
+  }
+  if (browserLang.startsWith('it')) {
+    return 'it';
+  }
+  if (browserLang.startsWith('pl')) {
+    return 'pl';
+  }
+  if (browserLang.startsWith('tr')) {
+    return 'tr';
   }
   if (browserLang.startsWith('pt')) {
     return 'pt';
@@ -68,6 +98,18 @@ const mapLanguageToDayjs = (lang: string): string => {
       return 'es';
     case 'ru':
       return 'ru';
+    case 'ko':
+      return 'ko';
+    case 'de':
+      return 'de';
+    case 'fr':
+      return 'fr';
+    case 'it':
+      return 'it';
+    case 'pl':
+      return 'pl';
+    case 'tr':
+      return 'tr';
     default:
       return 'en';
   }
@@ -104,6 +146,24 @@ const initI18n = () => {
       ru: {
         translation: ru,
       },
+      ko: {
+        translation: ko,
+      },
+      de: {
+        translation: de,
+      },
+      fr: {
+        translation: fr,
+      },
+      it: {
+        translation: it,
+      },
+      pl: {
+        translation: pl,
+      },
+      tr: {
+        translation: tr,
+      },
     },
     lng,
     fallbackLng: 'en',
@@ -125,6 +185,12 @@ const initI18n = () => {
         'pt',
         'es',
         'ru',
+        'ko',
+        'de',
+        'fr',
+        'it',
+        'pl',
+        'tr',
       ];
       if (
         currentLanguage !== previousLanguage &&

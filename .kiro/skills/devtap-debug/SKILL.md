@@ -11,7 +11,9 @@ description: >
   数据库, database, sql, sqlite, 查库, 表, table, 数据不对, background, service worker,
   offscreen, worker, dbw, 后台, main-world, content script, 拦截器, interceptor,
   agent loop, 同步, sync, gdrive, 快照, snapshot, 现场, devtap, cdp, 9222,
-  详细日志, verbose, trace, __bsTrace, 日志开关, 噪声, noise, 看不到日志, 日志太多.
+  详细日志, verbose, trace, __bsTrace, 日志开关, 噪声, noise, 看不到日志, 日志太多,
+  生产, 正式环境, production, prod, 商店版, 用户的浏览器, 日常 Chrome, 其他 profile,
+  --chrome, relay, 中继, remote-debugging, DevToolsActivePort, Extension context invalidated.
 ---
 
 # devtap：读取运行中的扩展
@@ -127,6 +129,49 @@ SQL 执行失败不受开关影响：`[DB] Failed:` 会带上出错的语句。
 - `.kiro/devlog/` 已 gitignore：里面是真实对话数据。
 - `state` / `snapshot` 会把 token、signedPayload 脱敏成 `[redacted N chars]`。
   不要绕过它去打印原值。
+
+## 连正式环境（日常 Chrome / 其他 profile）
+
+dev 浏览器之外的 Chrome（装商店版的 profile）没有 9222 端口，而且 Chrome 136+
+**不允许**在默认 user-data-dir 上用 `--remote-debugging-port`。只能走 Chrome 144+ 的开关：
+
+1. **让用户**在那个 Chrome 打开 `chrome://inspect/#remote-debugging`，勾上允许远程调试。
+   Chrome 会在 `~/Library/Application Support/Google/Chrome/DevToolsActivePort` 写入端口。
+2. 起中继（后台常驻）：`node scripts/devtap/relay.mjs`。**每个新连接 Chrome 都会弹确认框**，
+   中继只连一次，让用户点一次「允许」即可。输出 `relay: connected` 才算连上。
+3. 所有命令加 `--chrome`，会自动走中继（`127.0.0.1:9339`）：
+
+```bash
+node scripts/devtap.mjs --chrome --bctx 7bbe6cb7 targets
+node scripts/devtap.mjs --chrome --bctx 7bbe6cb7 eval bg 'chrome.runtime.getManifest().version'
+node scripts/devtap.mjs --chrome --bctx 7bbe6cb7 msg GET_MESSAGE_SYNC_STATUS '{"platform":"gemini"}' --page gemini
+```
+
+要点：
+
+- **所有 profile 在同一个浏览器进程里**，每个 profile 是一个 `browserContextId`，
+  同一个扩展会出现多份。`--bctx <前缀>` 必须带，不带会混在一起。
+  不知道哪个是哪个：对每个前缀 `eval bg` 读 `profile-registry`（里面有账号邮箱）和
+  `getManifest().version`。
+- **这种模式没有 `/json/list`，也不接受 per-target WebSocket**，全部是在浏览器 socket 上
+  `Target.attachToTarget({flatten:true})`（见 `cdp.mjs` 的 browser mode）。
+- **`watch` 不支持走中继**（中继一次只跑一条命令）。
+- 中继额外有 `POST /js`：请求体是一段 async 函数体，参数 `h = { cdp, contexts }`，
+  用于 devtap 命令覆盖不到的临时探针（比如在 main world 里 hook `fetch` 抓原始响应）。
+- **中继没有鉴权**，本机任何进程都能借它操纵用户的浏览器。查完立刻停掉。
+- 读写边界和 dev 一样：这是用户真实数据，只读；要触发「同步 / 点击」这类有副作用的
+  动作，先跟用户说清楚。
+
+### 正式环境常见坑
+
+- **扩展更新后旧标签页里的 content script 变孤儿**：`chrome.runtime` 没了，发消息报
+  `Extension context invalidated`。`sql` / `msg` / `snapshot` 会自动跳过这种标签页；
+  全是孤儿时让用户刷新标签页。要指定标签页用 `--page <url 片段或 targetId 前缀>`。
+- **「unpacked」profile 不等于商店版**：先看 profile 的 `Preferences` 里
+  `extensions.settings.<id>.path`。指向 `.output/chrome-mv3` 的是本地构建，重新 build
+  之后页面会注入新的 content script，但 service worker 还在跑旧代码，于是出现
+  `Unknown message type`。对比运行中代码（`Debugger.getScriptSource`）和磁盘上的
+  `background.js` 就能确认；修法是在 `chrome://extensions` 里重载。
 
 ## 和浏览器 MCP 的分工
 

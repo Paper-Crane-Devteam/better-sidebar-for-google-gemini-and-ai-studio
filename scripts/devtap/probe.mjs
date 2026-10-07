@@ -32,14 +32,49 @@ async function findExtensionWorld(session, extId, timeoutMs = 1500) {
 
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
-    const hit = found.find((c) => c.origin === `chrome-extension://${extId}`);
-    if (hit) return hit.id;
+    if (found.some((c) => c.origin === `chrome-extension://${extId}`)) break;
     await new Promise((r) => setTimeout(r, 50));
+  }
+  // Let late contexts finish replaying: a tab can hold several worlds with this
+  // origin. After an extension update or reload, the old content script stays in
+  // the page with `chrome.runtime` gone ("Extension context invalidated"), next to
+  // the new one. Only a world whose runtime still has an id can send messages.
+  await new Promise((r) => setTimeout(r, 150));
+  const candidates = found.filter((c) => c.origin === `chrome-extension://${extId}`).reverse();
+  for (const c of candidates) {
+    const alive = await evaluate(session, '!!(globalThis.chrome && chrome.runtime && chrome.runtime.id)', {
+      contextId: c.id,
+    }).catch(() => false);
+    if (alive) return c.id;
+  }
+  if (candidates.length) {
+    throw new OrphanedTabError(
+      'Only orphaned content scripts in this tab (extension was updated or reloaded). Reload the tab.',
+    );
   }
   throw new Error(
     'The content script world is not present in this tab. Reload the tab, or check ' +
       'that the platform is enabled in the extension settings.',
   );
+}
+
+class OrphanedTabError extends Error {}
+
+/**
+ * `inExtensionWorld` over the first page that has a live content script, so one
+ * stale tab left over from an extension update does not fail the whole command.
+ */
+export async function inAnyExtensionWorld(pageContexts, extId, fn) {
+  let lastError;
+  for (const page of pageContexts) {
+    try {
+      return await inExtensionWorld(page, extId, fn);
+    } catch (err) {
+      if (!(err instanceof OrphanedTabError)) throw err;
+      lastError = err;
+    }
+  }
+  throw lastError ?? new Error('No Gemini / AI Studio tab open.');
 }
 
 /** Run `fn(session, contextId)` inside the content script's world. */

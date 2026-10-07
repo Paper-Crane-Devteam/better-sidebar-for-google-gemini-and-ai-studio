@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "Better Sidebar: dossiers et recherche Gemini",
+    "description": "Nom de l'extension"
+  },
+  "extensionDescription": {
+    "message": "Organisez vos chats Gemini & AI Studio avec dossiers, tags, recherche intégrale, prompts, export, synchronisation Drive, outils IA, etc.",
+    "description": "Description de l'extension"
+  }
+}

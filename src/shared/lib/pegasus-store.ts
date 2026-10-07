@@ -13,7 +13,13 @@ const getDefaultLanguage = ():
   | 'ja'
   | 'pt'
   | 'es'
-  | 'ru' => {
+  | 'ru'
+  | 'ko'
+  | 'de'
+  | 'fr'
+  | 'it'
+  | 'pl'
+  | 'tr' => {
   const browserLang = navigator.language || navigator.languages?.[0] || 'en';
   if (browserLang.startsWith('zh-TW') || browserLang.startsWith('zh-Hant')) {
     return 'zh-TW';
@@ -23,6 +29,24 @@ const getDefaultLanguage = ():
   }
   if (browserLang.startsWith('ja')) {
     return 'ja';
+  }
+  if (browserLang.startsWith('ko')) {
+    return 'ko';
+  }
+  if (browserLang.startsWith('de')) {
+    return 'de';
+  }
+  if (browserLang.startsWith('fr')) {
+    return 'fr';
+  }
+  if (browserLang.startsWith('it')) {
+    return 'it';
+  }
+  if (browserLang.startsWith('pl')) {
+    return 'pl';
+  }
+  if (browserLang.startsWith('tr')) {
+    return 'tr';
   }
   if (browserLang.startsWith('pt')) {
     return 'pt';
@@ -79,8 +103,23 @@ export interface AIStudioEnhancedFeatures {
   agentTrigger: boolean;
 }
 
+export type SupportedLanguage =
+  | 'zh-CN'
+  | 'zh-TW'
+  | 'en'
+  | 'ja'
+  | 'pt'
+  | 'es'
+  | 'ru'
+  | 'ko'
+  | 'de'
+  | 'fr'
+  | 'it'
+  | 'pl'
+  | 'tr';
+
 interface PegasusState {
-  language: 'zh-CN' | 'zh-TW' | 'en' | 'ja' | 'pt' | 'es' | 'ru';
+  language: SupportedLanguage;
   gdriveAutoSync: boolean;
   gdriveSyncing: boolean;
   theme: 'light' | 'dark' | 'system';
@@ -100,7 +139,7 @@ interface PegasusState {
     value: AIStudioEnhancedFeatures[K],
   ) => void;
   setLanguage: (
-    language: 'zh-CN' | 'zh-TW' | 'en' | 'ja' | 'pt' | 'es' | 'ru',
+    language: SupportedLanguage,
   ) => void;
   setTheme: (theme: 'light' | 'dark' | 'system') => void;
   setCustomTheme: (themeId: ThemePresetId | null) => void;

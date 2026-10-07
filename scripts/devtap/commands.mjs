@@ -17,13 +17,35 @@ import {
 import { emit, parseDuration } from './args.mjs';
 import {
   BACKGROUND_PROBE,
-  inExtensionWorld,
+  inAnyExtensionWorld,
   isWriteSql,
   runSql,
   sendExtensionMessage,
 } from './probe.mjs';
 
 const DEFAULT_LOG_DIR = '.kiro/devlog';
+
+/**
+ * Tabs to send extension messages from, in order of preference.
+ *
+ * `--page <substr>` pins it to tabs whose url contains that string (or whose
+ * target id starts with it), for when the answer depends on which tab asks.
+ */
+function messengers(roots, flags) {
+  pickMessenger(roots); // throws the friendly "open a tab" error when there is none
+  let pages = roots.filter((r) => r.ctx === CTX.PAGE);
+  if (flags.page) {
+    const want = String(flags.page).toLowerCase();
+    pages = pages.filter(
+      (r) =>
+        r.url.toLowerCase().includes(want) ||
+        String(r.target.targetId ?? r.target.id ?? '').toLowerCase().startsWith(want),
+    );
+    if (!pages.length) throw new Error(`No Gemini / AI Studio tab matches --page ${flags.page}`);
+    return pages;
+  }
+  return [...pages, ...roots.filter((r) => r.ctx === CTX.EXTPAGE)];
+}
 
 /** Contexts that exist but are not currently running, and why that is normal. */
 function absentNotes(nodes) {
@@ -224,9 +246,7 @@ export async function cmdSql(flags) {
   }
 
   const { extId, roots } = await discover(flags.port);
-  const page = pickMessenger(roots);
-
-  const rows = await inExtensionWorld(page, extId, (session, contextId) =>
+  const rows = await inAnyExtensionWorld(messengers(roots, flags), extId, (session, contextId) =>
     runSql(session, contextId, sql),
   );
 
@@ -304,9 +324,7 @@ export async function cmdMsg(flags) {
   const payload = rest.length ? JSON.parse(rest.join(' ')) : undefined;
 
   const { extId, roots } = await discover(flags.port);
-  const page = pickMessenger(roots);
-
-  const reply = await inExtensionWorld(page, extId, (session, contextId) =>
+  const reply = await inAnyExtensionWorld(messengers(roots, flags), extId, (session, contextId) =>
     sendExtensionMessage(session, contextId, payload === undefined ? { type } : { type, payload }),
   );
 
@@ -369,10 +387,10 @@ export async function cmdSnapshot(flags) {
       section('BACKGROUND STATE', 'service worker asleep');
     }
 
-    const page = roots.find((r) => r.ctx === CTX.PAGE);
-    if (page) {
+    const pages = roots.filter((r) => r.ctx === CTX.PAGE);
+    if (pages.length) {
       try {
-        const counts = await inExtensionWorld(page, extId, async (session, contextId) => {
+        const counts = await inAnyExtensionWorld(pages, extId, async (session, contextId) => {
           const tables = await runSql(
             session,
             contextId,

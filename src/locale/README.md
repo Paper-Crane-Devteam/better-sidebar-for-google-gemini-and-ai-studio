@@ -1,14 +1,15 @@
 # 国际化 (i18n) 使用指南
 
-本项目使用 `i18next` 和 `react-i18next` 进行国际化支持。
+本项目使用 `i18next` 和 `react-i18next` 进行国际化支持，支持 13 种语言：`en`、`zh-CN`、`zh-TW`、`ja`、`ko`、`de`、`fr`、`es`、`pt`、`it`、`pl`、`tr`、`ru`。
 
 ## 文件结构
 
 ```
 src/locale/
-  ├── zh.json      # 中文翻译
-  ├── en.json      # 英文翻译
-  └── i18n.ts      # i18n 配置文件
+  ├── en.json          # 英文基准（Source of Truth）
+  ├── zh-CN.json …     # 其余 12 种语言翻译
+  ├── i18n.ts          # 完整 i18n 配置（带 dayjs locale）
+  └── i18n-lite.ts     # 懒加载轻量 i18n 配置（popup / onboarding）
 ```
 
 ## 使用方法

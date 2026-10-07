@@ -93,3 +93,23 @@ export function parseResponsePayloads(responseBody: string): any[] {
   const chunks = retChunks.map((chunk) => chunk[0]);
   return extractWrbFrPayloads(chunks);
 }
+
+/**
+ * The RPC status code of a failed `wrb.fr` chunk, or null when there is none.
+ *
+ * batchexecute reports per-RPC errors inside an HTTP 200: the payload slot (index
+ * 2) is null and index 5 holds a google.rpc.Status-shaped array whose first
+ * element is the canonical code — e.g.
+ * `["wrb.fr","hNvQHb",null,null,null,[5,null,[["…BardErrorInfo",[1167]]]],"generic"]`
+ * for a conversation that does not exist (5 = NOT_FOUND).
+ */
+export function getWrbFrErrorCode(responseBody: string): number | null {
+  for (const raw of parseStreamingResponse(responseBody)) {
+    const chunk = Array.isArray(raw) ? raw[0] : null;
+    if (!Array.isArray(chunk) || chunk[0] !== 'wrb.fr') continue;
+    if (typeof chunk[2] === 'string') continue;
+    const status = chunk[5];
+    if (Array.isArray(status) && typeof status[0] === 'number') return status[0];
+  }
+  return null;
+}

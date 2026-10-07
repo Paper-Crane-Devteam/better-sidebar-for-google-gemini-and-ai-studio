@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "Better Sidebar: Gemini 폴더 및 검색",
+    "description": "확장 프로그램 이름"
+  },
+  "extensionDescription": {
+    "message": "폴더, 태그, 전체 텍스트 검색, 프롬프트, 내보내기, Drive 동기화, AI 도구 등으로 Gemini & AI Studio 대화를 정리하세요.",
+    "description": "확장 프로그램 설명"
+  }
+}
