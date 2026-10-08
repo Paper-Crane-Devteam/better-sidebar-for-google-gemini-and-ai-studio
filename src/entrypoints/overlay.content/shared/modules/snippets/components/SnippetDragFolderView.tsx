@@ -5,6 +5,7 @@ import { useAppStore } from '@/shared/lib/store';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { snippetDragBus } from '../snippet-drag-bus';
 import type { SnippetFolder } from '@/shared/types/db';
+import { useShallow } from 'zustand/react/shallow';
 
 interface FolderNodeProps {
   folder: SnippetFolder;
@@ -59,7 +60,13 @@ const FolderNode = ({ folder, children, allFolders, depth }: FolderNodeProps) =>
  */
 export const SnippetDragDrawer = () => {
   const { t } = useI18n();
-  const { snippetFolders } = useAppStore();
+  const {
+    snippetFolders,
+  } = useAppStore(
+    useShallow((s) => ({
+      snippetFolders: s.snippetFolders,
+    })),
+  );
   const [isActive, setIsActive] = useState(snippetDragBus.isDragging);
   const sidebarRef = useRef<HTMLElement | null>(null);
 

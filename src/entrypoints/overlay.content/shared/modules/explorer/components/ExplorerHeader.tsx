@@ -35,6 +35,7 @@ import { Input } from '@/entrypoints/overlay.content/shared/components/ui/input'
 import { CollapsibleSection } from '../../../components/CollapsibleSection';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { toggleCompactMode } from '@/shared/lib/compact-mode';
+import { useShallow } from 'zustand/react/shallow';
 
 // ── Type Filter Dropdown ────────────────────────────────────────────
 interface TypeFilterDropdownProps {
@@ -159,7 +160,14 @@ export const ExplorerHeader = ({
     setExplorerSortOrder,
     setExplorerViewMode,
     setExplorerBatchMode,
-  } = useAppStore();
+  } = useAppStore(
+    useShallow((s) => ({
+      ui: s.ui,
+      setExplorerSortOrder: s.setExplorerSortOrder,
+      setExplorerViewMode: s.setExplorerViewMode,
+      setExplorerBatchMode: s.setExplorerBatchMode,
+    })),
+  );
 
   const { sortOrder, viewMode } = ui.explorer;
   const { isBatchMode } = ui.explorer.batch;

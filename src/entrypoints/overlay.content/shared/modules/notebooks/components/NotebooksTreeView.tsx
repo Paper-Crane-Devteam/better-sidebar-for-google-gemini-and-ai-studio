@@ -9,6 +9,7 @@ import {
   NodeRendererProps,
 } from '../../../components/folder-tree';
 import { NotebookNode } from './NotebookNode';
+import { useShallow } from 'zustand/react/shallow';
 
 const STORAGE_KEY = 'notebooks-tree-open-state';
 
@@ -30,8 +31,21 @@ export const NotebooksTreeView = forwardRef<
   NotebooksTreeViewProps
 >(({ onSelect }, ref) => {
   const { t } = useI18n();
-  const { notebooks, conversations, conversationTags, favorites, ui } =
-    useAppStore();
+  const {
+    notebooks,
+    conversations,
+    conversationTags,
+    favorites,
+    ui,
+  } = useAppStore(
+    useShallow((s) => ({
+      notebooks: s.notebooks,
+      conversations: s.conversations,
+      conversationTags: s.conversationTags,
+      favorites: s.favorites,
+      ui: s.ui,
+    })),
+  );
 
   const { sortOrder, tags: tagFilter, onlyFavorites } = ui.notebooks;
   const { query: searchTerm } = ui.notebooks.search;

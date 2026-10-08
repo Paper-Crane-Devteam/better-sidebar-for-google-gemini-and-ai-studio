@@ -11,6 +11,7 @@ import { useSettingsStore } from '@/shared/lib/settings-store';
 import { Button } from '@/shared/components/ui/button';
 import { toast } from '@/shared/lib/toast';
 import type { Gem } from '@/shared/types/db';
+import { useShallow } from 'zustand/react/shallow';
 
 const ITEM_HEIGHT = 36;
 const VISIBLE_COUNT = 10;
@@ -44,7 +45,17 @@ export const GemPickerContent = ({
   showDefaultFolderHint,
 }: GemPickerContentProps) => {
   const { t } = useI18n();
-  const { gems, folders, fetchData } = useAppStore();
+  const {
+    gems,
+    folders,
+    fetchData,
+  } = useAppStore(
+    useShallow((s) => ({
+      gems: s.gems,
+      folders: s.folders,
+      fetchData: s.fetchData,
+    })),
+  );
   const close = useModalStore((s) => s.close);
   const closePopover = usePopoverPickerStore((s) => s.close);
   const [search, setSearch] = useState('');

@@ -11,6 +11,7 @@ import {
 } from '../../../components/folder-tree';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useDeleteHandler } from '../hooks/useDeleteHandler';
+import { useShallow } from 'zustand/react/shallow';
 
 const STORAGE_KEY = 'snippets-tree-open-state';
 
@@ -40,7 +41,18 @@ export const SnippetsTree = forwardRef<SnippetsTreeHandle, SnippetsTreeProps>(
       createSnippetFolder,
       createSnippet,
       ui,
-    } = useAppStore();
+    } = useAppStore(
+      useShallow((s) => ({
+        snippetFolders: s.snippetFolders,
+        snippets: s.snippets,
+        favorites: s.favorites,
+        moveSnippetItem: s.moveSnippetItem,
+        renameSnippetItem: s.renameSnippetItem,
+        createSnippetFolder: s.createSnippetFolder,
+        createSnippet: s.createSnippet,
+        ui: s.ui,
+      })),
+    );
     const { handleDelete } = useDeleteHandler();
     const { sortOrder, onlyFavorites } = ui.snippets;
     const { query: searchTerm } = ui.snippets.search;

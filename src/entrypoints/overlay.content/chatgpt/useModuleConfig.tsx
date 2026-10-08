@@ -5,9 +5,16 @@ import { useAppStore } from '@/shared/lib/store';
 import { useI18n } from '@/shared/hooks/useI18n';
 import type { ModuleConfig } from '../shared/types/moduleConfig';
 import { handleSearchNavigation } from '../shared/utils';
+import { useShallow } from 'zustand/react/shallow';
 
 export const useModuleConfig = (): ModuleConfig => {
-  const { setOverlayOpen } = useAppStore();
+  const {
+    setOverlayOpen,
+  } = useAppStore(
+    useShallow((s) => ({
+      setOverlayOpen: s.setOverlayOpen,
+    })),
+  );
   const { t } = useI18n();
 
   return {

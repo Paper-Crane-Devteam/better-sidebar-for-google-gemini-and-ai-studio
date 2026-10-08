@@ -5,10 +5,21 @@ import { modal } from '@/shared/lib/modal';
 import { toast } from '@/shared/lib/toast';
 import { isInboxFolder } from '@/shared/constants/inbox';
 import { useSettingsStore } from '@/shared/lib/settings-store';
+import { useShallow } from 'zustand/react/shallow';
 
 export const useDeleteHandler = () => {
   const { t } = useI18n();
-  const { folders, deleteItem, conversations } = useAppStore();
+  const {
+    folders,
+    deleteItem,
+    conversations,
+  } = useAppStore(
+    useShallow((s) => ({
+      folders: s.folders,
+      deleteItem: s.deleteItem,
+      conversations: s.conversations,
+    })),
+  );
 
   /** Recursively collect all conversation IDs inside a folder */
   const getConversationsInFolder = (folderId: string): string[] => {

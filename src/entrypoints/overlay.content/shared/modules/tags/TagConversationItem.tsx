@@ -23,6 +23,7 @@ import {
 } from '@/entrypoints/overlay.content/shared/components/node-action-bar';
 import type { MenuEntryDef } from '@/entrypoints/overlay.content/shared/components/node-action-bar';
 import { useDeleteHandler } from '../explorer/hooks/useDeleteHandler';
+import { useShallow } from 'zustand/react/shallow';
 
 interface TagConversationItemProps {
   conversation: Conversation;
@@ -44,8 +45,19 @@ export const TagConversationItem = ({
   isCurrent,
 }: TagConversationItemProps) => {
   const { t } = useI18n();
-  const { tags, addTagToConversation, removeTagFromConversation, toggleFavorite } =
-    useAppStore();
+  const {
+    tags,
+    addTagToConversation,
+    removeTagFromConversation,
+    toggleFavorite,
+  } = useAppStore(
+    useShallow((s) => ({
+      tags: s.tags,
+      addTagToConversation: s.addTagToConversation,
+      removeTagFromConversation: s.removeTagFromConversation,
+      toggleFavorite: s.toggleFavorite,
+    })),
+  );
   const { handleDelete } = useDeleteHandler();
   const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);

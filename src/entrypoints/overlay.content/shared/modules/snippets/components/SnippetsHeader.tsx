@@ -28,6 +28,7 @@ import { useExport } from '../../../features/export';
 import { openExportDialog } from '../../../features/export/ExportFormatDialog';
 import type { ExportFormat } from '../../../features/export/types';
 import type { FilterState, ExplorerTypeFilter } from '../../../types/filter';
+import { useShallow } from 'zustand/react/shallow';
 
 interface SnippetsHeaderProps {
   onNewFolder: () => void;
@@ -57,7 +58,16 @@ export const SnippetsHeader = ({
     setSnippetsBatchSelection,
     deleteSnippetItems,
     moveSnippetItems,
-  } = useAppStore();
+  } = useAppStore(
+    useShallow((s) => ({
+      ui: s.ui,
+      setSnippetsSortOrder: s.setSnippetsSortOrder,
+      setSnippetsBatchMode: s.setSnippetsBatchMode,
+      setSnippetsBatchSelection: s.setSnippetsBatchSelection,
+      deleteSnippetItems: s.deleteSnippetItems,
+      moveSnippetItems: s.moveSnippetItems,
+    })),
+  );
 
   const { sortOrder } = ui.snippets;
   const { isBatchMode, selectedIds } = ui.snippets.batch;

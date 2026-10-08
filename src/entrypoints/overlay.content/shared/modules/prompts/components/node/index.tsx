@@ -37,6 +37,7 @@ import { toast } from '@/shared/lib/toast';
 import { NodeActionBar } from '@/entrypoints/overlay.content/shared/components/node-action-bar';
 import type { ActionButtonDef } from '@/entrypoints/overlay.content/shared/components/node-action-bar';
 import { usePromptsMenuItems } from './usePromptsMenuItems';
+import { useShallow } from 'zustand/react/shallow';
 
 export const Node = ({
   node,
@@ -56,7 +57,16 @@ export const Node = ({
     toggleFavorite,
     createPromptFolder,
     createPrompt,
-  } = useAppStore();
+  } = useAppStore(
+    useShallow((s) => ({
+      ui: s.ui,
+      togglePromptsBatchSelection: s.togglePromptsBatchSelection,
+      favorites: s.favorites,
+      toggleFavorite: s.toggleFavorite,
+      createPromptFolder: s.createPromptFolder,
+      createPrompt: s.createPrompt,
+    })),
+  );
   const { handleDelete: deleteHandler } = useDeleteHandler();
   const [newName, setNewName] = useState(node.data.name);
   const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);

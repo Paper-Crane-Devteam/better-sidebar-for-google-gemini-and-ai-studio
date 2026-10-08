@@ -8,6 +8,7 @@ import type { FilterState, PromptsTypeFilter } from '../../../types/filter';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { SidePanelMenu } from '@/entrypoints/overlay.content/shared/components/menu/SidePanelMenu';
 import { BatchToolbar } from './batch/BatchToolbar';
+import { useShallow } from 'zustand/react/shallow';
 
 interface PromptsHeaderProps {
   onNewFolder: () => void;
@@ -32,7 +33,17 @@ export const PromptsHeader = ({
   menuActions,
 }: PromptsHeaderProps) => {
   const { t } = useI18n();
-  const { ui, setPromptsSortOrder, setPromptsBatchMode } = useAppStore();
+  const {
+    ui,
+    setPromptsSortOrder,
+    setPromptsBatchMode,
+  } = useAppStore(
+    useShallow((s) => ({
+      ui: s.ui,
+      setPromptsSortOrder: s.setPromptsSortOrder,
+      setPromptsBatchMode: s.setPromptsBatchMode,
+    })),
+  );
 
   const { sortOrder } = ui.prompts;
   const { isBatchMode } = ui.prompts.batch;

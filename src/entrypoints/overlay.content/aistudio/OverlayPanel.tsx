@@ -55,6 +55,7 @@ import {
   IconBarGroup,
   useIconBar,
 } from '../shared/modules/icon-bar';
+import { useShallow } from 'zustand/react/shallow';
 
 export const OverlayPanel = ({ className }: { className?: string }) => {
   const moduleConfig = useModuleConfig();
@@ -78,8 +79,22 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
     setExplorerSortOrder,
     setTempHiddenToken,
     setSettingsOpen: setIsSettingsOpen,
-    setOverlayOpen
-  } = useAppStore();
+    setOverlayOpen,
+  } = useAppStore(
+    useShallow((s) => ({
+      fetchData: s.fetchData,
+      ui: s.ui,
+      setOverlayOpen: s.setOverlayOpen,
+      setActiveTab: s.setActiveTab,
+      setIsScanning: s.setIsScanning,
+      setShowSqlInterface: s.setShowSqlInterface,
+      setExplorerViewMode: s.setExplorerViewMode,
+      setExplorerSortOrder: s.setExplorerSortOrder,
+      setTempHiddenToken: s.setTempHiddenToken,
+      setSettingsOpen: s.setSettingsOpen,
+      setOverlayOpen: s.setOverlayOpen,
+    })),
+  );
 
   const {
     isOpen: isUIVisible,

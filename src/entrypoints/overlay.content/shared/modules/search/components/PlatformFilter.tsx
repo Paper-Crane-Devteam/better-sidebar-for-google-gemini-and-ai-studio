@@ -13,12 +13,21 @@ import { Filter } from 'lucide-react';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { Platform, PLATFORM_CONFIG } from '@/shared/types/platform';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
+import { useShallow } from 'zustand/react/shallow';
 
 export const PlatformFilter = () => {
   const { t } = useI18n();
   const { options } = useAppStore((state) => state.ui.search);
   const { currentPlatform } = useAppStore((state) => state.ui.overlay);
-  const { setSearchOptions, performGlobalSearch } = useAppStore();
+  const {
+    setSearchOptions,
+    performGlobalSearch,
+  } = useAppStore(
+    useShallow((s) => ({
+      setSearchOptions: s.setSearchOptions,
+      performGlobalSearch: s.performGlobalSearch,
+    })),
+  );
 
   useEffect(() => {
     // If no platforms selected, select current platform by default

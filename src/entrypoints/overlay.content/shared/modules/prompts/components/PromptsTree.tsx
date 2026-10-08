@@ -13,6 +13,7 @@ import { ArboristTreeHandle } from '../types';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useDeleteHandler } from '../hooks/useDeleteHandler';
 import { STORAGE_KEY } from '../hooks/usePromptsTree';
+import { useShallow } from 'zustand/react/shallow';
 
 export type { ArboristTreeHandle } from '../types';
 
@@ -34,7 +35,18 @@ export const PromptsTree = forwardRef<ArboristTreeHandle, PromptsTreeProps>(
       createPromptFolder,
       createPrompt,
       ui,
-    } = useAppStore();
+    } = useAppStore(
+      useShallow((s) => ({
+        promptFolders: s.promptFolders,
+        prompts: s.prompts,
+        favorites: s.favorites,
+        movePromptItem: s.movePromptItem,
+        renamePromptItem: s.renamePromptItem,
+        createPromptFolder: s.createPromptFolder,
+        createPrompt: s.createPrompt,
+        ui: s.ui,
+      })),
+    );
     const { handleDelete } = useDeleteHandler();
     const { sortOrder, typeFilter, onlyFavorites } = ui.prompts;
     const { query: searchTerm } = ui.prompts.search;

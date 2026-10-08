@@ -2,10 +2,21 @@ import React from 'react';
 import { useAppStore } from '@/shared/lib/store';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { modal } from '@/shared/lib/modal';
+import { useShallow } from 'zustand/react/shallow';
 
 export const useDeleteHandler = () => {
   const { t } = useI18n();
-  const { promptFolders, deletePromptItem, prompts } = useAppStore();
+  const {
+    promptFolders,
+    deletePromptItem,
+    prompts,
+  } = useAppStore(
+    useShallow((s) => ({
+      promptFolders: s.promptFolders,
+      deletePromptItem: s.deletePromptItem,
+      prompts: s.prompts,
+    })),
+  );
 
   const handleDelete = async (ids: string[]) => {
     if (!ids.length) return;

@@ -1,6 +1,7 @@
 import { useAppStore } from '@/shared/lib/store';
 import { useFolderTree } from '../../../components/folder-tree';
 import { useDeleteHandler } from './useDeleteHandler';
+import { useShallow } from 'zustand/react/shallow';
 
 export const STORAGE_KEY = 'AI_STUDIO_EXPANDED_PROMPT_FOLDERS';
 
@@ -14,7 +15,18 @@ export const usePromptsTree = () => {
     toggleFavorite,
     createPromptFolder,
     ui,
-  } = useAppStore();
+  } = useAppStore(
+    useShallow((s) => ({
+      promptFolders: s.promptFolders,
+      prompts: s.prompts,
+      movePromptItem: s.movePromptItem,
+      renamePromptItem: s.renamePromptItem,
+      favorites: s.favorites,
+      toggleFavorite: s.toggleFavorite,
+      createPromptFolder: s.createPromptFolder,
+      ui: s.ui,
+    })),
+  );
   const { handleDelete } = useDeleteHandler();
   const { query: searchTerm } = ui.prompts.search;
 

@@ -17,6 +17,7 @@ import { useExplorerContext } from '../ExplorerContext';
 import { isInboxFolder } from '@/shared/constants/inbox';
 import { PENDING_NODE_ID } from '../hooks/usePendingNewChat';
 import { useToastStore } from '@/shared/lib/toast';
+import { useShallow } from 'zustand/react/shallow';
 
 interface TreeViewProps {
   onSelect: (item: any) => void;
@@ -43,7 +44,22 @@ export const TreeView = forwardRef<ArboristTreeHandle, TreeViewProps>(
       reorderConversations,
       setExplorerSortOrder,
       ui,
-    } = useAppStore();
+    } = useAppStore(
+      useShallow((s) => ({
+        folders: s.folders,
+        conversations: s.conversations,
+        conversationTags: s.conversationTags,
+        favorites: s.favorites,
+        setExplorerBatchSelection: s.setExplorerBatchSelection,
+        moveItem: s.moveItem,
+        renameItem: s.renameItem,
+        createFolder: s.createFolder,
+        reorderFolders: s.reorderFolders,
+        reorderConversations: s.reorderConversations,
+        setExplorerSortOrder: s.setExplorerSortOrder,
+        ui: s.ui,
+      })),
+    );
     const { explorer } = useSettingsStore();
     const { handleDelete } = useDeleteHandler();
 

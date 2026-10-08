@@ -17,6 +17,7 @@ import {
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
 import mainStyles from '@/index.scss?inline';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { useShallow } from 'zustand/react/shallow';
 
 const TopBarTagUI = ({ container }: { container: Element }) => {
   const { t } = useI18n();
@@ -26,7 +27,14 @@ const TopBarTagUI = ({ container }: { container: Element }) => {
     conversationTags,
     addTagToConversation,
     removeTagFromConversation,
-  } = useAppStore();
+  } = useAppStore(
+    useShallow((s) => ({
+      tags: s.tags,
+      conversationTags: s.conversationTags,
+      addTagToConversation: s.addTagToConversation,
+      removeTagFromConversation: s.removeTagFromConversation,
+    })),
+  );
 
   const [isOpen, setIsOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);

@@ -8,6 +8,7 @@ import { cn } from '@/shared/lib/utils/utils';
 import { useCurrentConversationId } from '../../../hooks/useCurrentConversationId';
 import type { ExplorerTypeFilter } from '../../../types/filter';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { useShallow } from 'zustand/react/shallow';
 
 interface FavoritesListProps {
   searchQuery?: string;
@@ -21,8 +22,19 @@ export const FavoritesList = ({
   typeFilter = 'all',
 }: FavoritesListProps) => {
   const { t } = useI18n();
-  const { favorites, conversations, conversationTags, toggleFavorite } =
-    useAppStore();
+  const {
+    favorites,
+    conversations,
+    conversationTags,
+    toggleFavorite,
+  } = useAppStore(
+    useShallow((s) => ({
+      favorites: s.favorites,
+      conversations: s.conversations,
+      conversationTags: s.conversationTags,
+      toggleFavorite: s.toggleFavorite,
+    })),
+  );
   const currentConversationId = useCurrentConversationId();
   const rowHeight = 32;
 

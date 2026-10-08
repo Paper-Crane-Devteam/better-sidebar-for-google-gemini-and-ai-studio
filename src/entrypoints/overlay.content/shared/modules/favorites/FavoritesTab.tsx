@@ -6,6 +6,7 @@ import { useStoreFilter } from '../../hooks/useStoreFilter';
 import { FilterBar } from '../../components/FilterBar';
 import { FilterActions } from '../../components/FilterActions';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { useShallow } from 'zustand/react/shallow';
 
 interface FavoritesTabProps {
   menuActions?: {
@@ -19,7 +20,13 @@ interface FavoritesTabProps {
 
 export const FavoritesTab = ({ menuActions, visibleFilters }: FavoritesTabProps) => {
   const { t } = useI18n();
-  const { tags: allTags } = useAppStore();
+  const {
+    tags: allTags,
+  } = useAppStore(
+    useShallow((s) => ({
+      tags: s.tags,
+    })),
+  );
   const filter = useStoreFilter('favorites');
 
   return (

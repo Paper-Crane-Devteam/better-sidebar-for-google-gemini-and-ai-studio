@@ -15,6 +15,7 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import type { ModuleConfig } from '../shared/types/moduleConfig';
 import { handleSearchNavigation } from '../shared/utils';
 import { toast } from '@/shared/lib/toast';
+import { useShallow } from 'zustand/react/shallow';
 
 const ImportHistoryButton = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -45,7 +46,19 @@ interface AiStudioSystemItem {
 }
 
 export const useModuleConfig = (): ModuleConfig => {
-  const { setOverlayOpen, createPrompt, createPromptFolder, promptFolders } = useAppStore();
+  const {
+    setOverlayOpen,
+    createPrompt,
+    createPromptFolder,
+    promptFolders,
+  } = useAppStore(
+    useShallow((s) => ({
+      setOverlayOpen: s.setOverlayOpen,
+      createPrompt: s.createPrompt,
+      createPromptFolder: s.createPromptFolder,
+      promptFolders: s.promptFolders,
+    })),
+  );
   const { t } = useI18n();
 
   const handleImportAiStudioSystem = async () => {

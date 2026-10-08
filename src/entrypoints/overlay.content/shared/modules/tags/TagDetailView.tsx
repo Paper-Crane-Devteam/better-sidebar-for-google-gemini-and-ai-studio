@@ -15,6 +15,7 @@ import { Input } from '../../components/ui/input';
 import { useCurrentConversationId } from '../../hooks/useCurrentConversationId';
 import { TagConversationItem } from './TagConversationItem';
 import { useTagsViewStore } from './tags-view-store';
+import { useShallow } from 'zustand/react/shallow';
 
 interface TagDetailViewProps {
   tag: Tag;
@@ -28,8 +29,23 @@ const toMs = (ts: number | null | undefined) =>
 
 export const TagDetailView = ({ tag, counts }: TagDetailViewProps) => {
   const { t } = useI18n();
-  const { tags, conversations, conversationTags, favorites, setActiveTab, setExplorerTags } =
-    useAppStore();
+  const {
+    tags,
+    conversations,
+    conversationTags,
+    favorites,
+    setActiveTab,
+    setExplorerTags,
+  } = useAppStore(
+    useShallow((s) => ({
+      tags: s.tags,
+      conversations: s.conversations,
+      conversationTags: s.conversationTags,
+      favorites: s.favorites,
+      setActiveTab: s.setActiveTab,
+      setExplorerTags: s.setExplorerTags,
+    })),
+  );
   const { backToList, switchTag } = useTagsViewStore();
   const currentConversationId = useCurrentConversationId();
   const [query, setQuery] = useState('');

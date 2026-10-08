@@ -13,20 +13,23 @@ export function useStoreFilter(slice: 'snippets'): FilterState<ExplorerTypeFilte
 export function useStoreFilter(
   slice: 'explorer' | 'favorites' | 'prompts' | 'gems' | 'notebooks' | 'snippets',
 ): FilterState<ExplorerTypeFilter> | FilterState<PromptsTypeFilter> {
-  const store = useAppStore();
+  // Only `ui` is reactive here. Subscribing to the whole store re-rendered every
+  // header and filter bar on each data refresh. Actions are stable, read them directly.
+  const ui = useAppStore((s) => s.ui);
+  const store = useAppStore.getState();
 
   const uiState =
     slice === 'explorer'
-      ? store.ui.explorer
+      ? ui.explorer
       : slice === 'favorites'
-        ? store.ui.favorites
+        ? ui.favorites
         : slice === 'gems'
-          ? store.ui.gems
+          ? ui.gems
           : slice === 'notebooks'
-            ? store.ui.notebooks
+            ? ui.notebooks
             : slice === 'snippets'
-              ? store.ui.snippets
-              : store.ui.prompts;
+              ? ui.snippets
+              : ui.prompts;
 
   const setIsSearchOpen = (isOpen: boolean) => {
     if (slice === 'explorer') store.setExplorerSearch(isOpen);
@@ -94,15 +97,15 @@ export function useStoreFilter(
     onlyFavorites: {
       value:
         slice === 'explorer'
-          ? store.ui.explorer.onlyFavorites
+          ? ui.explorer.onlyFavorites
           : slice === 'gems'
-            ? store.ui.gems.onlyFavorites
+            ? ui.gems.onlyFavorites
             : slice === 'notebooks'
-              ? store.ui.notebooks.onlyFavorites
+              ? ui.notebooks.onlyFavorites
               : slice === 'snippets'
-                ? store.ui.snippets.onlyFavorites
+                ? ui.snippets.onlyFavorites
                 : slice === 'prompts'
-                  ? store.ui.prompts.onlyFavorites
+                  ? ui.prompts.onlyFavorites
                   : false,
       setValue: setOnlyFavorites,
     },

@@ -22,6 +22,7 @@ import { ExplorerContext } from './ExplorerContext';
 import { usePendingNewChat, PENDING_NODE_ID } from './hooks/usePendingNewChat';
 import { INBOX_FOLDER_ID } from '@/shared/constants/inbox';
 import { detectGeminiContext } from '@/shared/lib/gemini-context';
+import { useShallow } from 'zustand/react/shallow';
 
 interface ExplorerTabProps {
   onNewChat: () => void;
@@ -51,7 +52,19 @@ export const ExplorerTab = ({
     ui,
     tags: allTags,
     setIsScanning,
-  } = useAppStore();
+  } = useAppStore(
+    useShallow((s) => ({
+      folders: s.folders,
+      conversations: s.conversations,
+      isLoading: s.isLoading,
+      createFolder: s.createFolder,
+      fetchData: s.fetchData,
+      renameItem: s.renameItem,
+      ui: s.ui,
+      tags: s.tags,
+      setIsScanning: s.setIsScanning,
+    })),
+  );
 
   const { isScanning } = ui.overlay;
   const { viewMode } = ui.explorer;

@@ -6,6 +6,7 @@ import { modal } from '@/shared/lib/modal';
 import { MoveItemsDialog } from './MoveItemsDialog';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
+import { useShallow } from 'zustand/react/shallow';
 
 interface BatchToolbarProps {
   onSelectAll?: () => void;
@@ -13,7 +14,21 @@ interface BatchToolbarProps {
 
 export const BatchToolbar = ({ onSelectAll }: BatchToolbarProps) => {
   const { t } = useI18n();
-  const { ui, setPromptsBatchMode, setPromptsBatchSelection, deletePromptItems, movePromptItems } = useAppStore();
+  const {
+    ui,
+    setPromptsBatchMode,
+    setPromptsBatchSelection,
+    deletePromptItems,
+    movePromptItems,
+  } = useAppStore(
+    useShallow((s) => ({
+      ui: s.ui,
+      setPromptsBatchMode: s.setPromptsBatchMode,
+      setPromptsBatchSelection: s.setPromptsBatchSelection,
+      deletePromptItems: s.deletePromptItems,
+      movePromptItems: s.movePromptItems,
+    })),
+  );
   const { selectedIds } = ui.prompts.batch;
 
   const handleDelete = async () => {

@@ -31,6 +31,7 @@ import { snippetDragBus } from '../../snippet-drag-bus';
 import type { NodeRendererProps } from '../../../../components/folder-tree/types';
 import type { FolderTreeNodeData } from '../../../../components/folder-tree/types';
 import type { ExportFormat } from '../../../../features/export/types';
+import { useShallow } from 'zustand/react/shallow';
 
 interface SnippetNodeProps extends NodeRendererProps<FolderTreeNodeData> {
   onPreview?: (snippet: any) => void;
@@ -56,7 +57,16 @@ export const SnippetNode = ({
     favorites,
     toggleFavorite,
     moveSnippetItem,
-  } = useAppStore();
+  } = useAppStore(
+    useShallow((s) => ({
+      ui: s.ui,
+      toggleSnippetsBatchSelection: s.toggleSnippetsBatchSelection,
+      createSnippetFolder: s.createSnippetFolder,
+      favorites: s.favorites,
+      toggleFavorite: s.toggleFavorite,
+      moveSnippetItem: s.moveSnippetItem,
+    })),
+  );
   const { handleDelete: deleteHandler } = useDeleteHandler();
   const { exportItem } = useExport();
   const [newName, setNewName] = useState(node.data.name);

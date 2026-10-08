@@ -13,6 +13,7 @@ import { toast } from '@/shared/lib/toast';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { NodeActionBar, renderMenuItems } from '@/entrypoints/overlay.content/shared/components/node-action-bar';
 import { useTagMenuItems } from './useTagMenuItems';
+import { useShallow } from 'zustand/react/shallow';
 
 interface TagItemProps {
   tag: Tag;
@@ -24,7 +25,15 @@ interface TagItemProps {
 
 export const TagItem = ({ tag, count, onOpen }: TagItemProps) => {
   const { t } = useI18n();
-  const { deleteTag, updateTag } = useAppStore();
+  const {
+    deleteTag,
+    updateTag,
+  } = useAppStore(
+    useShallow((s) => ({
+      deleteTag: s.deleteTag,
+      updateTag: s.updateTag,
+    })),
+  );
   const rowHeight = 32;
 
   const [isEditing, setIsEditing] = useState(false);

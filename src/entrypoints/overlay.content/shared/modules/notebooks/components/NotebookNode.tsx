@@ -37,6 +37,7 @@ import type { MenuEntryDef } from '@/entrypoints/overlay.content/shared/componen
 import { FolderTreeNodeContent } from '../../../components/folder-tree';
 import { useNodeTooltip } from '../../../hooks/useNodeTooltip';
 import { MoveItemsDialog } from '../../explorer/components/batch/MoveItemsDialog';
+import { useShallow } from 'zustand/react/shallow';
 
 export const NotebookNode = ({
   node,
@@ -53,7 +54,16 @@ export const NotebookNode = ({
     conversationTags,
     addTagToConversation,
     removeTagFromConversation,
-  } = useAppStore();
+  } = useAppStore(
+    useShallow((s) => ({
+      favorites: s.favorites,
+      toggleFavorite: s.toggleFavorite,
+      fetchData: s.fetchData,
+      conversationTags: s.conversationTags,
+      addTagToConversation: s.addTagToConversation,
+      removeTagFromConversation: s.removeTagFromConversation,
+    })),
+  );
   const currentConversationId = useCurrentConversationId();
   const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);

@@ -34,6 +34,7 @@ import { NodeActionBar } from '@/entrypoints/overlay.content/shared/components/n
 import { useExplorerMenuItems } from './useExplorerMenuItems';
 import { PendingEntryNode } from './PendingEntryNode';
 import { isInboxFolder } from '@/shared/constants/inbox';
+import { useShallow } from 'zustand/react/shallow';
 
 export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
   const { t } = useI18n();
@@ -52,7 +53,23 @@ export const Node = ({ node, style, dragHandle, tree, preview }: NodeProps) => {
     createFolder,
     updateFolderColor,
     renameItem,
-  } = useAppStore();
+  } = useAppStore(
+    useShallow((s) => ({
+      gems: s.gems,
+      notebooks: s.notebooks,
+      conversationTags: s.conversationTags,
+      addTagToConversation: s.addTagToConversation,
+      removeTagFromConversation: s.removeTagFromConversation,
+      ui: s.ui,
+      toggleExplorerBatchSelection: s.toggleExplorerBatchSelection,
+      setExplorerBatchSelection: s.setExplorerBatchSelection,
+      favorites: s.favorites,
+      toggleFavorite: s.toggleFavorite,
+      createFolder: s.createFolder,
+      updateFolderColor: s.updateFolderColor,
+      renameItem: s.renameItem,
+    })),
+  );
   const { handleDelete: deleteHandler } = useDeleteHandler();
   const currentConversationId = useCurrentConversationId();
   const [newName, setNewName] = useState(node.data.name);

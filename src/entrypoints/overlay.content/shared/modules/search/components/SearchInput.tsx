@@ -8,6 +8,7 @@ import { cn } from '@/shared/lib/utils/utils';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
 import { useCurrentConversationId } from '../../../hooks/useCurrentConversationId';
+import { useShallow } from 'zustand/react/shallow';
 
 const SEARCH_DEBOUNCE_MS = 500;
 
@@ -17,8 +18,17 @@ export const SearchInput = () => {
     (state) => state.ui.search,
   );
 
-  const { setSearchQuery, setSearchOptions, performGlobalSearch } =
-    useAppStore();
+  const {
+    setSearchQuery,
+    setSearchOptions,
+    performGlobalSearch,
+  } = useAppStore(
+    useShallow((s) => ({
+      setSearchQuery: s.setSearchQuery,
+      setSearchOptions: s.setSearchOptions,
+      performGlobalSearch: s.performGlobalSearch,
+    })),
+  );
 
   const currentConversationId = useCurrentConversationId();
 
