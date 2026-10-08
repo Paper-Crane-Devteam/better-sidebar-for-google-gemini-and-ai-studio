@@ -92,7 +92,6 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
       setExplorerSortOrder: s.setExplorerSortOrder,
       setTempHiddenToken: s.setTempHiddenToken,
       setSettingsOpen: s.setSettingsOpen,
-      setOverlayOpen: s.setOverlayOpen,
     })),
   );
 
