@@ -8,6 +8,7 @@ export { handleTags } from './tags';
 export { handleMessages } from './messages';
 export { handlePrompts } from './prompts';
 export { handleMisc } from './misc';
+export { handleExtensionUpdate } from './extension-update';
 export { handleProfile } from './profile';
 export { handleGdriveSync } from './gdrive-sync';
 export { handleGems } from './gems';

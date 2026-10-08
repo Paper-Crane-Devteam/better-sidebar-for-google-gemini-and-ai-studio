@@ -248,7 +248,27 @@
     "sourceCode": "源代码",
     "githubRepository": "GitHub 仓库",
     "viewChangelog": "查看更新日志",
-    "userGuide": "使用教程"
+    "userGuide": "使用教程",
+    "moreExtensions": "Paper Crane Dev 的其他插件",
+    "betterPlaylistsDesc": "用侧边栏管理 YouTube 播放列表，支持批量移动、复制和删除，还有搜索与分页。",
+    "update": {
+      "check": "检查更新",
+      "checking": "正在检查…",
+      "upToDate": "已是最新版本。",
+      "available": "发现新版本 {{version}}，正在下载。",
+      "ready": "新版本 {{version}} 已下载好，可以安装。",
+      "throttled": "检查得太频繁了，请过几分钟再试。",
+      "unsupported": "当前浏览器不支持在这里检查更新，它会自动更新。",
+      "updateNow": "立即更新",
+      "applying": "正在更新…",
+      "confirmTitle": "更新到 {{version}}？",
+      "confirmContent": "插件会重启，当前页面会自动刷新。其他已打开的 Gemini、AI Studio 或 ChatGPT 标签页需要手动刷新一下。",
+      "notReady": "新版本还没下载完。请稍后再试，浏览器也会自动安装。",
+      "checkFailed": "检查更新失败。",
+      "applyFailed": "更新失败。",
+      "toastTitle": "Better Sidebar {{version}} 已准备就绪",
+      "dismiss": "关闭"
+    }
   },
   "sponsor": {
     "title": "分享给朋友",

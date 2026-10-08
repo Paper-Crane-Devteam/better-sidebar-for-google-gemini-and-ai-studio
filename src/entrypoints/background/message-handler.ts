@@ -17,6 +17,7 @@ import {
   handleMessages,
   handlePrompts,
   handleMisc,
+  handleExtensionUpdate,
   handleProfile,
   handleGdriveSync,
   handleGems,
@@ -81,6 +82,11 @@ export async function handleMessage(
     // OPEN_PERMISSION_PAGE and OPEN_URL just need to interact with browser APIs
     const miscResult = await handleMisc(message, sender);
     if (miscResult !== null) return miscResult;
+
+    // Store update checks touch no data, and must keep working when the DB fails to
+    // open — updating may be exactly what fixes it.
+    const updateResult = await handleExtensionUpdate(message);
+    if (updateResult !== null) return updateResult;
 
     // The agent workspace is OPFS, not SQLite. Answering it before
     // `ensureDbReady()` keeps file operations working while the database is still

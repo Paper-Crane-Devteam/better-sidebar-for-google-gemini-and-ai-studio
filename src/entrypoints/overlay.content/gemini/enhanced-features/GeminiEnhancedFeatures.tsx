@@ -22,6 +22,7 @@ import { useInitConversationMessages } from '@/shared/hooks/useInitConversationM
 import { useModelStream } from '@/shared/hooks/useModelStream';
 import { ProfilePickerDialog } from '@/entrypoints/overlay.content/shared/components/ProfilePickerDialog';
 import { RatingPromptDialog } from '@/entrypoints/overlay.content/shared/modules/feedback/RatingPromptDialog';
+import { UpdateAvailableToast } from '@/entrypoints/overlay.content/shared/modules/extension-update/UpdateAvailableToast';
 import { PowerPackPaywall } from '@/shared/components/PowerPackPaywall';
 import { HotkeyCheatsheet } from '@/entrypoints/overlay.content/shared/components/HotkeyCheatsheet';
 import { CommandPalette } from '@/entrypoints/overlay.content/shared/modules/command-palette';
@@ -81,6 +82,7 @@ export const GeminiEnhancedFeatures = () => {
       <WhatsNewDialog />
       <ProfilePickerDialog />
       <RatingPromptDialog />
+      <UpdateAvailableToast />
       <PowerPackPaywall />
       <HotkeyCheatsheet />
       <CommandPalette />

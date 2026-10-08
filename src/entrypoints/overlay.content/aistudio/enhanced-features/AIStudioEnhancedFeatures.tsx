@@ -13,6 +13,7 @@ import { SettingsModal } from '@/entrypoints/overlay.content/shared/modules/sett
 import { WhatsNewDialog } from '@/entrypoints/overlay.content/shared/modules/whats-new/WhatsNewDialog';
 import { ProfilePickerDialog } from '@/entrypoints/overlay.content/shared/components/ProfilePickerDialog';
 import { RatingPromptDialog } from '@/entrypoints/overlay.content/shared/modules/feedback/RatingPromptDialog';
+import { UpdateAvailableToast } from '@/entrypoints/overlay.content/shared/modules/extension-update/UpdateAvailableToast';
 import { PowerPackPaywall } from '@/shared/components/PowerPackPaywall';
 import { HotkeyCheatsheet } from '@/entrypoints/overlay.content/shared/components/HotkeyCheatsheet';
 import { CommandPalette } from '@/entrypoints/overlay.content/shared/modules/command-palette';
@@ -58,6 +59,7 @@ export const AIStudioEnhancedFeatures = () => {
       <WhatsNewDialog />
       <ProfilePickerDialog />
       <RatingPromptDialog />
+      <UpdateAvailableToast />
       <PowerPackPaywall />
       <HotkeyCheatsheet />
       <CommandPalette />

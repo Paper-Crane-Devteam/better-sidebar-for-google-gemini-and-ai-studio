@@ -248,7 +248,27 @@
     "sourceCode": "ソースコード",
     "githubRepository": "GitHub リポジトリ",
     "viewChangelog": "更新履歴を見る",
-    "userGuide": "使い方ガイド"
+    "userGuide": "使い方ガイド",
+    "moreExtensions": "Paper Crane Dev のその他の拡張機能",
+    "betterPlaylistsDesc": "サイドバーで YouTube の再生リストを整理。一括移動・コピー・削除、検索やページ分割にも対応します。",
+    "update": {
+      "check": "アップデートを確認",
+      "checking": "確認中…",
+      "upToDate": "最新バージョンをご利用中です。",
+      "available": "バージョン {{version}} が見つかりました。ダウンロード中です。",
+      "ready": "バージョン {{version}} のインストール準備ができました。",
+      "throttled": "確認の間隔が短すぎます。数分後にもう一度お試しください。",
+      "unsupported": "このブラウザではここからアップデートを確認できません。自動的に更新されます。",
+      "updateNow": "今すぐ更新",
+      "applying": "更新中…",
+      "confirmTitle": "{{version}} に更新しますか？",
+      "confirmContent": "拡張機能が再起動し、このページは再読み込みされます。開いている他の Gemini、AI Studio、ChatGPT のタブは、更新後に再読み込みしてください。",
+      "notReady": "ダウンロードがまだ完了していません。少し待ってからもう一度お試しください。ブラウザが自動でインストールすることもあります。",
+      "checkFailed": "アップデートを確認できませんでした。",
+      "applyFailed": "アップデートを適用できませんでした。",
+      "toastTitle": "Better Sidebar {{version}} の準備ができました",
+      "dismiss": "閉じる"
+    }
   },
   "sponsor": {
     "title": "友達にシェア",

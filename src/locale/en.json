@@ -248,7 +248,27 @@
     "sourceCode": "Source Code",
     "githubRepository": "GitHub Repository",
     "viewChangelog": "View Changelog",
-    "userGuide": "Getting started guide"
+    "userGuide": "Getting started guide",
+    "moreExtensions": "More from Paper Crane Dev",
+    "betterPlaylistsDesc": "Organize YouTube playlists with a sidebar, batch move, copy and remove, plus search and pagination.",
+    "update": {
+      "check": "Check for updates",
+      "checking": "Checking…",
+      "upToDate": "You're on the latest version.",
+      "available": "Version {{version}} is available and downloading.",
+      "ready": "Version {{version}} is ready to install.",
+      "throttled": "Checked too recently. Please try again in a few minutes.",
+      "unsupported": "This browser doesn't support checking for updates from here. It will update automatically.",
+      "updateNow": "Update now",
+      "applying": "Updating…",
+      "confirmTitle": "Update to {{version}}?",
+      "confirmContent": "The extension will restart and this page will reload. Other open Gemini, AI Studio or ChatGPT tabs need a refresh afterwards.",
+      "notReady": "The download hasn't finished yet. Try again shortly, or the browser will install it on its own.",
+      "checkFailed": "Couldn't check for updates.",
+      "applyFailed": "Couldn't apply the update.",
+      "toastTitle": "Better Sidebar {{version}} is ready",
+      "dismiss": "Dismiss"
+    }
   },
   "sponsor": {
     "title": "Share with Friends",

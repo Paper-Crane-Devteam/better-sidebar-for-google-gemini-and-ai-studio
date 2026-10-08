@@ -56,15 +56,28 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
   const [showContent, setShowContent] = useState(false);
   const portalRef = useRef<HTMLDivElement | null>(null);
 
-  // Filter out optional steps whose target elements don't exist in the DOM
+  // Resolve steps against the live icon bar: drop steps whose target isn't
+  // rendered (unavailable or hidden by the user), then sort by DOM position so
+  // the tour always walks the icons top to bottom, whatever order the user
+  // arranged them in.
   const steps = useMemo(() => {
     const shadowRoot = getShadowRoot();
     if (!shadowRoot) return allSteps.filter((s) => !s.optional);
 
-    return allSteps.filter((step) => {
-      if (!step.optional) return true;
-      return !!shadowRoot.querySelector(`[data-tour-id="${step.targetId}"]`);
-    });
+    return allSteps
+      .map((step) => ({
+        step,
+        el: shadowRoot.querySelector<HTMLElement>(
+          `[data-tour-id="${step.targetId}"]`,
+        ),
+      }))
+      .filter((entry): entry is { step: TourStep; el: HTMLElement } => !!entry.el)
+      .sort((a, b) =>
+        a.el.compareDocumentPosition(b.el) & Node.DOCUMENT_POSITION_FOLLOWING
+          ? -1
+          : 1,
+      )
+      .map((entry) => entry.step);
   }, [allSteps, isActive]);
 
   const step = steps[currentStep];

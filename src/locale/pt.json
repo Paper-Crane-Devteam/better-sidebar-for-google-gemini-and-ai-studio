@@ -248,7 +248,27 @@
     "sourceCode": "Código Fonte",
     "githubRepository": "Repositório GitHub",
     "viewChangelog": "Ver registro de alterações",
-    "userGuide": "Guia de primeiros passos"
+    "userGuide": "Guia de primeiros passos",
+    "moreExtensions": "Mais da Paper Crane Dev",
+    "betterPlaylistsDesc": "Organize suas playlists do YouTube com uma barra lateral, mova, copie e remova em lote, com busca e paginação.",
+    "update": {
+      "check": "Verificar atualizações",
+      "checking": "Verificando…",
+      "upToDate": "Você já está na versão mais recente.",
+      "available": "A versão {{version}} está disponível e sendo baixada.",
+      "ready": "A versão {{version}} está pronta para instalar.",
+      "throttled": "Verificado há pouco tempo. Tente novamente em alguns minutos.",
+      "unsupported": "Este navegador não permite verificar atualizações por aqui. Ele será atualizado automaticamente.",
+      "updateNow": "Atualizar agora",
+      "applying": "Atualizando…",
+      "confirmTitle": "Atualizar para {{version}}?",
+      "confirmContent": "A extensão será reiniciada e esta página será recarregada. Outras abas abertas do Gemini, AI Studio ou ChatGPT precisarão ser recarregadas depois.",
+      "notReady": "O download ainda não terminou. Tente novamente em instantes, ou o navegador fará a instalação sozinho.",
+      "checkFailed": "Não foi possível verificar atualizações.",
+      "applyFailed": "Não foi possível aplicar a atualização.",
+      "toastTitle": "Better Sidebar {{version}} está pronto",
+      "dismiss": "Dispensar"
+    }
   },
   "sponsor": {
     "title": "Compartilhar",

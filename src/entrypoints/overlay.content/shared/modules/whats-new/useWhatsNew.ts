@@ -28,6 +28,14 @@ export const useWhatsNew = () => {
         const result = await browser.storage.local.get(STORAGE_KEY);
         const lastSeenVersion = result[STORAGE_KEY] as string | undefined;
 
+        // Fresh install: no version has ever been recorded. A brand-new user has
+        // nothing to compare against, so skip the changelog and just record the
+        // current version as the baseline for future updates.
+        if (lastSeenVersion === undefined) {
+          await browser.storage.local.set({ [STORAGE_KEY]: CURRENT_VERSION });
+          return;
+        }
+
         if (lastSeenVersion !== CURRENT_VERSION) {
           // If the user hasn't seen the major version (e.g. new install or older version),
           // show the major version modal directly. Otherwise, show the minor update toast.
