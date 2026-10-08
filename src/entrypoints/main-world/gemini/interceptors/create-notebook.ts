@@ -1,6 +1,6 @@
 import { parseResponsePayloads } from '../lib/response-parser';
 import { parseBatchExecuteRequest } from '../lib/request-parser';
-import i18n from '@/locale/i18n';
+import i18n from '@/locale/i18n-bundled';
 
 /**
  * Extracts the notebook name from the request body of an `oMH3Zd` call.

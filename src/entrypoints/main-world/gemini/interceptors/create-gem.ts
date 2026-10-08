@@ -2,7 +2,7 @@ import {
   parseStreamingResponse,
   extractWrbFrPayloads,
 } from '../lib/response-parser';
-import i18n from '@/locale/i18n';
+import i18n from '@/locale/i18n-bundled';
 
 /**
  * The rpcid `CNgdBe` is used for two distinct operations:

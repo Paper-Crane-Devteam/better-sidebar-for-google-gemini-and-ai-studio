@@ -25,7 +25,8 @@
  * Parsing is shared — see `turn-assembly.ts`. Only the reading differs.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
+import { create } from 'zustand';
 import throttle from 'lodash/throttle';
 import { findConversationScroller } from './constants';
 import { useCurrentConversationId } from '@/entrypoints/overlay.content/shared/hooks/useCurrentConversationId';
@@ -339,19 +340,78 @@ function savedModelText(exchangeId: string | null): string | null {
   return model?.content || null;
 }
 
-function useDomConversationTurns(enabled: boolean): DisplayMessageTurn[] {
-  const [turns, setTurns] = useState<DisplayMessageTurn[]>([]);
-  // Navigating between conversations must force a re-parse and re-bind
-  const conversationId = useCurrentConversationId();
+// ─── Shared DOM reader (Gemini) ──────────────────────────────────────────────
+//
+// ⚠️ Performance-critical. This used to live inside the hook, so each caller
+// (AgentLoopFeature, ConversationViewSwitcher, ConversationOverlay — always mounted on
+// Gemini, agent in use or not) ran its own unthrottled observer over the whole
+// transcript, with `characterData`. Gemini mutates the DOM on every streamed token, and
+// every mutation re-cloned and re-converted *every* turn to markdown, three times over.
+// Long conversations made the page stall while the model was answering.
+//
+// Now: one observer for the page however many components read it, the DOM signal is
+// throttled like the store signals, and a turn's markdown is only recomputed when a
+// mutation landed inside that turn.
 
-  const parseConversationDOM = useCallback(() => {
+const TURN_SELECTOR = 'user-query, model-response';
+
+/** Throttle window for re-parsing. Leading edge, so a structural change shows at once. */
+const REPARSE_THROTTLE_MS = 200;
+
+const EMPTY_TURNS: DisplayMessageTurn[] = [];
+
+const useDomTurnsStore = create<{ turns: DisplayMessageTurn[] }>(() => ({
+  turns: EMPTY_TURNS,
+}));
+
+const domReader = (() => {
+  let refs = 0;
+  /** `undefined` = not reported yet, so the first report does not count as a switch. */
+  let conversationId: string | null | undefined;
+  let observed: HTMLElement | null = null;
+  let observer: MutationObserver | null = null;
+  let bindTimer: ReturnType<typeof setInterval> | null = null;
+  let unsubscribers: Array<() => void> = [];
+
+  /** `extractMarkdown` per turn element. Dropped for an element when a mutation lands in it. */
+  let markdownCache = new WeakMap<Element, string>();
+  let lastRaw: RawTurn[] = [];
+
+  const cachedMarkdown = (el: Element): string => {
+    let md = markdownCache.get(el);
+    if (md === undefined) {
+      md = extractMarkdown(el);
+      markdownCache.set(el, md);
+    }
+    return md;
+  };
+
+  const sameRaw = (a: RawTurn[], b: RawTurn[]) =>
+    a.length === b.length &&
+    a.every(
+      (t, i) =>
+        t.id === b[i].id &&
+        t.role === b[i].role &&
+        t.text === b[i].text &&
+        t.isStreaming === b[i].isStreaming,
+    );
+
+  const setTurns = (next: DisplayMessageTurn[]) => {
+    const prev = useDomTurnsStore.getState().turns;
+    if (prev === next) return;
+    if (JSON.stringify(prev) === JSON.stringify(next)) return;
+    useDomTurnsStore.setState({ turns: next });
+  };
+
+  const parse = () => {
     const container = findConversationScroller();
     if (!container) {
-      setTurns([]);
+      lastRaw = [];
+      setTurns(EMPTY_TURNS);
       return;
     }
 
-    const elements = Array.from(container.querySelectorAll('user-query, model-response'));
+    const elements = Array.from(container.querySelectorAll(TURN_SELECTOR));
 
     /**
      * Index of the newest **model** turn, which is not the same as the last element.
@@ -381,75 +441,131 @@ function useDomConversationTurns(enabled: boolean): DisplayMessageTurn[] {
         id: `${isUser ? 'user' : 'model'}-${index}`,
         role: isUser ? ('user' as const) : ('model' as const),
         text: isUser
-          ? extractMarkdown(el)
-          : (verbatimModelText(el, index === lastModelIndex) ?? extractMarkdown(el)),
+          ? cachedMarkdown(el)
+          : (verbatimModelText(el, index === lastModelIndex) ?? cachedMarkdown(el)),
         isStreaming,
       };
     });
 
-    const next = assembleTurns(raw);
-    setTurns((prev) => (JSON.stringify(prev) === JSON.stringify(next) ? prev : next));
-  }, []);
+    // Nothing moved (the common case for a mutation outside any turn, or a store tick
+    // that did not touch the text): skip assembly and keep the same array reference.
+    if (sameRaw(raw, lastRaw)) return;
+    lastRaw = raw;
+    setTurns(assembleTurns(raw));
+  };
+
+  /**
+   * Re-parse on DOM mutations and when the verbatim sources move.
+   *
+   * `verbatimModelText` reads both stores, and neither one mutates the document — the
+   * save landing is a store merge, and stream progress is a store write. Without the store
+   * subscriptions the turn would keep whatever text it had at the last DOM mutation, so a
+   * card would sit on the renderer-damaged copy until Gemini touched the subtree again.
+   *
+   * One throttle for all three signals. Leading edge, so the first change of a burst
+   * (a new turn appearing) is not delayed; trailing edge, so the last one is not lost.
+   */
+  const schedule = throttle(parse, REPARSE_THROTTLE_MS, { leading: true, trailing: true });
+
+  const onMutations = (records: MutationRecord[]) => {
+    for (const record of records) {
+      const target =
+        record.target instanceof Element ? record.target : record.target.parentElement;
+      const turn = target?.closest(TURN_SELECTOR);
+      if (turn) markdownCache.delete(turn);
+    }
+    schedule();
+  };
+
+  /**
+   * (Re)bind to the current scroll container.
+   *
+   * Gemini swaps this element out on SPA navigation. The observer used to be bound once
+   * on mount, so after switching conversations it was watching a detached node — no more
+   * mutations arrived and the overlay kept showing the previous conversation forever.
+   */
+  const bind = () => {
+    const next = findConversationScroller();
+    if (next === observed) return;
+
+    observed = next;
+    observer?.disconnect();
+    if (next) {
+      observer?.observe(next, { childList: true, subtree: true, characterData: true });
+    }
+    parse();
+  };
+
+  const start = () => {
+    observer = new MutationObserver(onMutations);
+    observed = null;
+    bind();
+    bindTimer = setInterval(bind, 1000);
+    unsubscribers = [
+      useConversationMessagesStore.subscribe(schedule),
+      useModelStreamStore.subscribe(schedule),
+    ];
+  };
+
+  const stop = () => {
+    if (bindTimer) clearInterval(bindTimer);
+    bindTimer = null;
+    observer?.disconnect();
+    observer = null;
+    observed = null;
+    for (const unsubscribe of unsubscribers) unsubscribe();
+    unsubscribers = [];
+    schedule.cancel();
+    conversationId = undefined;
+    markdownCache = new WeakMap();
+    lastRaw = [];
+    useDomTurnsStore.setState({ turns: EMPTY_TURNS });
+  };
+
+  return {
+    /** Ref-counted: the first reader starts the observer, the last one stops it. */
+    acquire(): () => void {
+      if (refs++ === 0) start();
+      return () => {
+        if (--refs === 0) stop();
+      };
+    },
+
+    /** Navigating between conversations must force a clean re-parse and re-bind. */
+    setConversation(id: string | null) {
+      if (id === conversationId) return;
+      const isFirstReport = conversationId === undefined;
+      conversationId = id;
+      if (isFirstReport) return;
+
+      // Starting from a clean slate matters: message ids are index-based, so leftovers
+      // from the previous conversation would be reused by React.
+      useDomTurnsStore.setState({ turns: EMPTY_TURNS });
+      // Exchange ids are per-conversation, so a stale entry could only ever mislead.
+      clearVerbatimCache();
+      markdownCache = new WeakMap();
+      lastRaw = [];
+      schedule.cancel();
+      if (observer) {
+        observed = null;
+        bind();
+      }
+    },
+  };
+})();
+
+function useDomConversationTurns(enabled: boolean): DisplayMessageTurn[] {
+  const conversationId = useCurrentConversationId();
+  const turns = useDomTurnsStore((s) => s.turns);
 
   useEffect(() => {
     if (!enabled) return;
+    return domReader.acquire();
+  }, [enabled]);
 
-    // Starting from a clean slate matters: message ids are index-based, so leftovers from
-    // the previous conversation would be reused by React.
-    setTurns([]);
-    // Exchange ids are per-conversation, so a stale entry could only ever mislead.
-    clearVerbatimCache();
+  useEffect(() => {
+    if (enabled) domReader.setConversation(conversationId);
+  }, [enabled, conversationId]);
 
-    let observed: HTMLElement | null = null;
-    const observer = new MutationObserver(() => parseConversationDOM());
-
-    /**
-     * (Re)bind to the current scroll container.
-     *
-     * Gemini swaps this element out on SPA navigation. The observer used to be bound once
-     * on mount, so after switching conversations it was watching a detached node — no more
-     * mutations arrived and the overlay kept showing the previous conversation forever.
-     */
-    const bind = () => {
-      const next = findConversationScroller();
-      if (next === observed) return;
-
-      observed = next;
-      observer.disconnect();
-      if (next) {
-        observer.observe(next, { childList: true, subtree: true, characterData: true });
-      }
-      parseConversationDOM();
-    };
-
-    bind();
-    const interval = setInterval(bind, 1000);
-
-    /**
-     * Re-parse when the verbatim sources move, not only when the DOM does.
-     *
-     * `verbatimModelText` reads both stores, and neither one mutates the document — the
-     * save landing is a store merge, and stream progress is a store write. Without these
-     * the turn would keep whatever text it had at the last DOM mutation, so a card would
-     * sit on the renderer-damaged copy until Gemini happened to touch the subtree again.
-     *
-     * Throttled because a full re-parse is not cheap and the stream is not slow: it ticks
-     * up to ten times a second, and each pass walks every turn in the conversation and
-     * converts it to markdown. The DOM observer is left unthrottled — it fires on real
-     * structural change, which is the signal we least want to delay.
-     */
-    const reparse = throttle(parseConversationDOM, 250, { leading: true, trailing: true });
-    const unsubscribeSaved = useConversationMessagesStore.subscribe(reparse);
-    const unsubscribeStream = useModelStreamStore.subscribe(reparse);
-
-    return () => {
-      clearInterval(interval);
-      observer.disconnect();
-      unsubscribeSaved();
-      unsubscribeStream();
-      reparse.cancel();
-    };
-  }, [enabled, conversationId, parseConversationDOM]);
-
-  return turns;
+  return enabled ? turns : EMPTY_TURNS;
 }

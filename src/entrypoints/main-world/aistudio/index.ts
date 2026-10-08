@@ -10,7 +10,7 @@ import { handleDeletePromptResponse } from './interceptors/delete';
 import { observeGenerateContentStream } from './interceptors/generate-content';
 import { aiStudioRequestBuilder } from './lib/request-builder';
 import { initAiStudioBackfillFetcher } from './lib/backfill-fetcher';
-import i18n from '@/locale/i18n';
+import i18n from '@/locale/i18n-bundled';
 
 /**
  * Patch Element.prototype.animate to skip Angular slideInOut animations
