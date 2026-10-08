@@ -1,7 +1,7 @@
 import { tagRepo, conversationTagRepo } from '@/shared/db/operations';
 import type { ExtensionMessage, ExtensionResponse } from '@/shared/types/messages';
 import type { MessageSender } from '../types';
-import { notifyDataUpdated } from '../notify';
+import { notifyDataChanged } from '../notify';
 import { triggerAutoSync } from './gdrive-sync';
 
 export async function handleTags(
@@ -16,34 +16,34 @@ export async function handleTags(
     case 'CREATE_TAG': {
       const { name, color } = message.payload;
       const id = await tagRepo.create(name, color);
-      await notifyDataUpdated();
+      await notifyDataChanged('tags', 'conversationTags');
       triggerAutoSync();
       return { success: true, data: { id } };
     }
     case 'UPDATE_TAG': {
       const { id, updates } = message.payload;
       await tagRepo.update(id, updates);
-      await notifyDataUpdated();
+      await notifyDataChanged('tags', 'conversationTags');
       triggerAutoSync();
       return { success: true };
     }
     case 'DELETE_TAG': {
       await tagRepo.delete(message.payload.id);
-      await notifyDataUpdated();
+      await notifyDataChanged('tags', 'conversationTags');
       triggerAutoSync();
       return { success: true };
     }
     case 'ADD_TAG_TO_CONVERSATION': {
       const { conversationId, tagId } = message.payload;
       await conversationTagRepo.addTag(conversationId, tagId);
-      await notifyDataUpdated();
+      await notifyDataChanged('conversationTags');
       triggerAutoSync();
       return { success: true };
     }
     case 'REMOVE_TAG_FROM_CONVERSATION': {
       const { conversationId, tagId } = message.payload;
       await conversationTagRepo.removeTag(conversationId, tagId);
-      await notifyDataUpdated();
+      await notifyDataChanged('conversationTags');
       triggerAutoSync();
       return { success: true };
     }

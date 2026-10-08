@@ -10,6 +10,7 @@ import {
   SnippetFolder,
 } from '../../types/db';
 import type { Platform } from '../../types/platform';
+import type { DataScope } from '../../types/data-scope';
 
 export interface Folder {
   id: string;
@@ -177,7 +178,12 @@ export interface AppState {
   setConversations: (conversations: Conversation[]) => void;
   setPromptFolders: (folders: PromptFolder[]) => void;
   setPrompts: (prompts: Prompt[]) => void;
-  fetchData: (silent?: boolean) => Promise<void>;
+  /**
+   * Refresh datasets from the background. `scopes` limits it to the tables a
+   * write touched; omitted means all of them. Calls within a short window are
+   * merged into one batch.
+   */
+  fetchData: (silent?: boolean, scopes?: readonly DataScope[]) => Promise<void>;
   moveItems: (itemIds: string[], newParentId: string | null) => Promise<void>;
   moveItem: (
     itemId: string,

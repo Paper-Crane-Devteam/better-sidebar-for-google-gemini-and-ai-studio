@@ -4,7 +4,7 @@ import type {
   ExtensionResponse,
 } from '@/shared/types/messages';
 import type { MessageSender } from '../types';
-import { notifyDataUpdated } from '../notify';
+import { notifyDataChanged } from '../notify';
 import { triggerAutoSync } from './gdrive-sync';
 import i18n from '@/locale/i18n';
 import { PROMPT_INBOX_ID } from '@/shared/constants/inbox';
@@ -74,19 +74,19 @@ export async function handlePrompts(
         folder_id: folderId,
         order_index: orderIndex,
       });
-      await notifyDataUpdated();
+      await notifyDataChanged('prompts', 'promptFolders');
       triggerAutoSync();
       return { success: true };
     }
     case 'UPDATE_PROMPT': {
       await promptRepo.update(message.payload.id, message.payload.updates);
-      await notifyDataUpdated();
+      await notifyDataChanged('prompts', 'promptFolders');
       triggerAutoSync();
       return { success: true };
     }
     case 'DELETE_PROMPT': {
       await promptRepo.delete(message.payload.id);
-      await notifyDataUpdated();
+      await notifyDataChanged('prompts', 'promptFolders');
       triggerAutoSync();
       return { success: true };
     }
@@ -94,7 +94,7 @@ export async function handlePrompts(
       const { promptIds, folderIds } = message.payload;
       if (promptIds?.length) await promptRepo.deleteMultiple(promptIds);
       if (folderIds?.length) await promptFolderRepo.deleteMultiple(folderIds);
-      await notifyDataUpdated();
+      await notifyDataChanged('prompts', 'promptFolders');
       triggerAutoSync();
       return { success: true };
     }

@@ -155,7 +155,8 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
         // Only process in the active tab — background DB may belong to another profile
         if (document.visibilityState !== 'visible') return;
 
-        fetchData(true);
+        // Only the datasets the write touched; none listed means all of them.
+        fetchData(true, message.scopes);
 
         // Handle specific update types with payload
         if (message.updateType === 'SCAN_COMPLETE' && message.payload) {

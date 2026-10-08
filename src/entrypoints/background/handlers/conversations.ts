@@ -8,7 +8,8 @@ import type {
   ExtensionResponse,
 } from '@/shared/types/messages';
 import type { MessageSender } from '../types';
-import { notifyDataUpdated } from '../notify';
+import { notifyDataChanged } from '../notify';
+import { CONVERSATION_DELETE_SCOPES } from '@/shared/types/data-scope';
 import { resolveGemNotebookFolderId, resolveSyncFolderId } from './resolve-sync-folder';
 import { isInboxFolder } from '@/shared/constants/inbox';
 import { triggerAutoSync, triggerPageLoadSync } from './gdrive-sync';
@@ -98,7 +99,7 @@ export async function handleConversations(
         // way a conversation appears without the user navigating, so without this the
         // row exists but the tree keeps looking stale until a reload.
         if (isNewBranch) {
-          await notifyDataUpdated();
+          await notifyDataChanged('conversations', 'folders');
           triggerAutoSync();
         }
       });
@@ -107,7 +108,7 @@ export async function handleConversations(
     }
     case 'DELETE_CONVERSATION': {
       await conversationRepo.delete(message.payload.id);
-      await notifyDataUpdated();
+      await notifyDataChanged(...CONVERSATION_DELETE_SCOPES);
       triggerAutoSync();
       return { success: true };
     }
@@ -116,7 +117,7 @@ export async function handleConversations(
       if (conversationIds?.length)
         await conversationRepo.deleteMultiple(conversationIds);
       if (folderIds?.length) await folderRepo.deleteMultiple(folderIds);
-      await notifyDataUpdated();
+      await notifyDataChanged('folders', ...CONVERSATION_DELETE_SCOPES);
       triggerAutoSync();
       return { success: true };
     }
@@ -128,7 +129,7 @@ export async function handleConversations(
       if (title) updates.title = title;
       if (description !== undefined) updates.description = description;
       await conversationRepo.update(id, updates);
-      await notifyDataUpdated();
+      await notifyDataChanged('conversations');
       triggerAutoSync();
       return { success: true };
     }
@@ -173,7 +174,8 @@ export async function handleConversations(
         platform,
         gem_id: gem_id || null,
       });
-      await notifyDataUpdated();
+      // 'folders' too: resolving the target folder can create the Inbox.
+      await notifyDataChanged('conversations', 'folders');
       triggerAutoSync();
       return { success: true };
     }
@@ -243,7 +245,7 @@ export async function handleConversations(
           }),
         );
         await conversationRepo.bulkSave(conversationsToSave);
-        await notifyDataUpdated();
+        await notifyDataChanged('conversations', 'folders');
       }
       triggerAutoSync();
       triggerPageLoadSync();
