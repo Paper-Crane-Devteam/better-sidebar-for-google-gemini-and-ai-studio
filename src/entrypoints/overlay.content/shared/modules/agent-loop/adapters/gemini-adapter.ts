@@ -4,7 +4,7 @@
  */
 
 import type { AgentPlatformAdapter, ComposerState, ResultSection } from './types';
-import { waitForResponseToSettle } from './response-settle';
+import { waitForResponseToSettle, type ResponseBaseline } from './response-settle';
 import { extractLiteralResponseText } from './response-text';
 import {
   getEditor as quillGetEditor,
@@ -54,7 +54,7 @@ export class GeminiAgentAdapter implements AgentPlatformAdapter {
     return getSendButtonState();
   }
 
-  observeAIResponseComplete(idleTimeoutMs: number): Promise<HTMLElement> {
+  observeAIResponseComplete(idleTimeoutMs: number, baseline?: ResponseBaseline): Promise<HTMLElement> {
     return waitForResponseToSettle(
       {
         getComposerState: () => this.getComposerState(),
@@ -62,6 +62,7 @@ export class GeminiAgentAdapter implements AgentPlatformAdapter {
         extractText: (el) => this.extractResponseText(el),
       },
       idleTimeoutMs,
+      baseline,
     );
   }
 

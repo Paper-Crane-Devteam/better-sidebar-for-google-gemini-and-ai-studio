@@ -87,6 +87,7 @@ export class AgentLoopEngine {
     // Round 1 follows a prompt that has *already* been sent, so its generation is
     // in flight before the engine exists — no boundary to draw, and none wanted.
     this.ctx.streamBoundary = null;
+    this.ctx.responseBaseline = null;
     // Undo covers one task: the previous session's snapshot is no longer something
     // the user could meaningfully revert to once a new task starts changing things.
     resetSnapshots();
@@ -131,6 +132,7 @@ export class AgentLoopEngine {
      * trade against a lossless read of the wrong one.
      */
     this.ctx.streamBoundary = null;
+    this.ctx.responseBaseline = null;
     resetSnapshots();
     this.ctx.store.start(maxRounds, session);
     toolCallRecorder.startSession({

@@ -13,6 +13,7 @@
  */
 
 import type { AgentPlatformAdapter } from '../adapters/types';
+import type { ResponseBaseline } from '../adapters/response-settle';
 import type { AgentEndReason, AgentLoopStatus } from '../types';
 import { currentStreamId } from '@/shared/lib/model-stream-store';
 import { useAgentLoopStore } from '../agent-loop-store';
@@ -46,6 +47,17 @@ export class LoopContext {
    */
   streamBoundary: string | null = null;
 
+  /**
+   * The turn that was on the page when stage ① first started waiting this round.
+   *
+   * Kept across a timed-out wait so Retry compares against the same turn. Retaken on
+   * Retry, it would be the answer we were waiting for — which finished while the
+   * loop sat paused — so the page looked idle with nothing new, and the loop reported
+   * the message as never delivered. Cleared on every send (`markSendBoundary`) and
+   * once a wait resolves, since either one means the next wait is for a new turn.
+   */
+  responseBaseline: ResponseBaseline | null = null;
+
   constructor(readonly adapter: AgentPlatformAdapter) {}
 
   /**
@@ -57,6 +69,8 @@ export class LoopContext {
    */
   markSendBoundary(): void {
     this.streamBoundary = currentStreamId();
+    // A new message means a new turn to wait for, measured from what is on screen now.
+    this.responseBaseline = null;
   }
 
   // ── Store access ───────────────────────────────────────────────────────────

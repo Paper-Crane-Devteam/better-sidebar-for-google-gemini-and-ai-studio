@@ -15,7 +15,7 @@
  */
 
 import type { AgentPlatformAdapter, ComposerState } from './types';
-import { waitForResponseToSettle } from './response-settle';
+import { waitForResponseToSettle, type ResponseBaseline } from './response-settle';
 import { extractLiteralResponseText } from './response-text';
 import {
   getTextarea,
@@ -65,7 +65,7 @@ export class AIStudioAgentAdapter implements AgentPlatformAdapter {
     return getRunState();
   }
 
-  observeAIResponseComplete(idleTimeoutMs: number): Promise<HTMLElement> {
+  observeAIResponseComplete(idleTimeoutMs: number, baseline?: ResponseBaseline): Promise<HTMLElement> {
     return waitForResponseToSettle(
       {
         getComposerState: () => this.getComposerState(),
@@ -73,6 +73,7 @@ export class AIStudioAgentAdapter implements AgentPlatformAdapter {
         extractText: (el) => this.extractResponseText(el),
       },
       idleTimeoutMs,
+      baseline,
     );
   }
 

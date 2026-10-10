@@ -6,6 +6,7 @@
  */
 
 import { responseWaitFailureOf } from '../../adapters/response-wait';
+import { captureResponseBaseline } from '../../adapters/response-settle';
 import type { LoopContext } from '../context';
 
 /**
@@ -46,8 +47,21 @@ export async function awaitAIResponse(ctx: LoopContext): Promise<AwaitOutcome> {
   ctx.events.emit('loop:round-started', { round: ctx.round });
   console.log(`[AgentLoop] Round ${ctx.round}: Waiting for AI response...`);
 
+  // Taken once per round and reused by a retry after a timeout — see
+  // `LoopContext.responseBaseline`. A retry that re-snapshotted would treat the answer
+  // that finished during the pause as the old turn.
+  const adapter = ctx.adapter;
+  ctx.responseBaseline ??= captureResponseBaseline({
+    getLastResponse: () => adapter.getLastAIResponseElement(),
+    extractText: (el) => adapter.extractResponseText(el),
+  });
+
   try {
-    const element = await ctx.adapter.observeAIResponseComplete(RESPONSE_IDLE_TIMEOUT_MS);
+    const element = await adapter.observeAIResponseComplete(
+      RESPONSE_IDLE_TIMEOUT_MS,
+      ctx.responseBaseline,
+    );
+    ctx.responseBaseline = null;
     return { kind: 'response', element };
   } catch (e) {
     // An idle page with no turn in it is a different failure from a slow one, and
@@ -55,6 +69,7 @@ export async function awaitAIResponse(ctx: LoopContext): Promise<AwaitOutcome> {
     // looking for a problem at Gemini's end.
     if (responseWaitFailureOf(e) === 'not_delivered') {
       console.warn('[AgentLoop] Nothing to wait for — the message never reached the AI');
+      ctx.responseBaseline = null;
       return { kind: 'undelivered' };
     }
 

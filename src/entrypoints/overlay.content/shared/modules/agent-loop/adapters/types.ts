@@ -7,6 +7,7 @@
  * links at runtime.
  */
 import type { ResultSection } from '../engine/stages/handoff/formatter';
+import type { ResponseBaseline } from './response-settle';
 
 /**
  * What the composer's send control is currently saying.
@@ -75,7 +76,11 @@ export interface AgentPlatformAdapter {
    * message never got there" — the second one must not wait out the whole budget,
    * and must not be reported as the AI being slow.
    */
-  observeAIResponseComplete(idleTimeoutMs: number): Promise<HTMLElement>;
+  observeAIResponseComplete(
+    idleTimeoutMs: number,
+    /** The round's baseline turn; taken at call time when omitted. See `ResponseBaseline`. */
+    baseline?: ResponseBaseline,
+  ): Promise<HTMLElement>;
 
   /**
    * How many user turns the conversation currently holds.

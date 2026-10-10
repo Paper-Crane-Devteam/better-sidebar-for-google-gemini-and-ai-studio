@@ -76,6 +76,31 @@ const BLIND_SETTLE_TICKS = 5;
  */
 const IDLE_DELIVERY_GRACE_MS = 5000;
 
+/**
+ * The turn that was already on the page when a round started waiting.
+ *
+ * Owned by the caller rather than snapshotted on every call, because a round can be
+ * waited on more than once: a wait that timed out is retried, and by then the answer
+ * we were waiting for may already be finished. Snapshotting again at that point makes
+ * the very answer we want the baseline, so the retry sees "no new turn" on an idle
+ * page and reports the message as undelivered.
+ */
+export interface ResponseBaseline {
+  element: HTMLElement | null;
+  text: string;
+}
+
+/** Snapshot the newest turn, for use as a round's baseline */
+export function captureResponseBaseline(probe: Pick<ResponseSettleProbe, 'getLastResponse' | 'extractText'>): ResponseBaseline {
+  const element = probe.getLastResponse();
+  return { element, text: element ? probe.extractText(element).trim() : '' };
+}
+
+/** Whether the tab is in the background, where the page stops rendering */
+function isPageHidden(): boolean {
+  return typeof document !== 'undefined' && document.visibilityState === 'hidden';
+}
+
 export interface ResponseSettleProbe {
   /** Read the composer's send control */
   getComposerState(): ComposerState;
@@ -92,12 +117,14 @@ export interface ResponseSettleProbe {
 export function waitForResponseToSettle(
   probe: ResponseSettleProbe,
   idleTimeoutMs: number,
+  baseline?: ResponseBaseline,
 ): Promise<HTMLElement> {
   return new Promise((resolve, reject) => {
-    // Snapshot the response that already exists when we start waiting, so the
-    // previous turn's answer is never mistaken for the new one.
-    const baselineElement = probe.getLastResponse();
-    const baselineText = baselineElement ? probe.extractText(baselineElement).trim() : '';
+    // The response that already existed when the round started waiting, so the
+    // previous turn's answer is never mistaken for the new one. Taken now only when
+    // the caller has none — see `ResponseBaseline` for why a retry must not retake it.
+    const { element: baselineElement, text: baselineText } =
+      baseline ?? captureResponseBaseline(probe);
 
     const isStaleResponse = (el: HTMLElement, text: string): boolean =>
       el === baselineElement && text === baselineText;
@@ -107,7 +134,8 @@ export function waitForResponseToSettle(
     let lastText = '';
     let stableTicks = 0;
     let deadline = Date.now() + idleTimeoutMs;
-    const startedAt = Date.now();
+    /** Start of the delivery grace window; restarts while the tab is hidden */
+    let graceFrom = Date.now();
 
     const cleanup = () => clearInterval(interval);
 
@@ -117,6 +145,23 @@ export function waitForResponseToSettle(
     };
 
     const tick = () => {
+      /**
+       * A background tab is not evidence of silence.
+       *
+       * Chrome stops rendering a hidden tab, and the platforms render the stream
+       * lazily — AI Studio only fills a turn's `.turn-content` once it has been laid
+       * out. So a turn that arrives while the user is on another tab can sit there
+       * with empty content: the control reads idle, the text never appears, and the
+       * old idle clock ran out and reported "the AI went silent" for an answer that
+       * was simply not painted yet. Both verdicts are suspended until the tab is
+       * visible again; resolving still works, so a page that does render in the
+       * background keeps the loop moving.
+       */
+      if (isPageHidden()) {
+        keepAlive();
+        graceFrom = Date.now();
+      }
+
       // Checked once, up front: every branch below either calls `keepAlive` or is by
       // definition a sample where nothing happened. Settling takes ~1s from the last
       // change, so this can't cut off a turn that was about to resolve.
@@ -152,7 +197,7 @@ export function waitForResponseToSettle(
         !hasNewTurn &&
         !sawGenerating &&
         composerState === 'absent' &&
-        Date.now() - startedAt > IDLE_DELIVERY_GRACE_MS
+        Date.now() - graceFrom > IDLE_DELIVERY_GRACE_MS
       ) {
         cleanup();
         reject(
