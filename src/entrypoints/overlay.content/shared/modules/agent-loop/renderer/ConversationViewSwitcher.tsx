@@ -189,7 +189,10 @@ export const ConversationViewSwitcher: React.FC = () => {
       <div
         role="group"
         aria-label={t('agent.view.label', { defaultValue: 'Conversation view' })}
-        className="flex items-center gap-1 rounded-full border border-border/60 bg-background/85 p-1 shadow-md backdrop-blur-md"
+        // No drop shadow: the sidebar beside it sits flat on the page, and a lifted pill
+        // read as a layer above it. A hairline border alone separates it from the
+        // conversation scrolling underneath, keeping both on the same plane.
+        className="flex items-center gap-1 rounded-full border border-border bg-background/90 p-1 backdrop-blur-md"
       >
         {options.map((option) => {
           const isActive = option.mode === active;
