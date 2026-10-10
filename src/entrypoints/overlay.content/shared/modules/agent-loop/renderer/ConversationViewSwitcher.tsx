@@ -189,13 +189,11 @@ export const ConversationViewSwitcher: React.FC = () => {
       <div
         role="group"
         aria-label={t('agent.view.label', { defaultValue: 'Conversation view' })}
-        // A sunken track, not a raised card. The sidebar sits flat on the page, but a
-        // white bordered pill on the grey conversation area still read as floating above
-        // it — a lighter surface with a rim is how elevation is drawn even without a
-        // shadow. A muted fill with no border sits *in* the page instead, the same
-        // treatment as the AgentSwitcher track in the sidebar. The blur keeps the
-        // conversation scrolling underneath from showing through the labels.
-        className="flex items-center gap-1 rounded-full bg-muted/80 p-1 backdrop-blur-md"
+        // Same elevation as the sidebar. The sidebar is a white surface raised one step
+        // above the grey conversation area, so the pill is too: the same white fill plus a
+        // soft, short shadow. `shadow-md` lifted it a step *above* the sidebar; no shadow
+        // or a muted fill sank it below.
+        className="flex items-center gap-1 rounded-full border border-border/60 bg-background/90 p-1 shadow-[0_1px_3px_rgb(0_0_0/0.08),0_1px_2px_rgb(0_0_0/0.04)] backdrop-blur-md"
       >
         {options.map((option) => {
           const isActive = option.mode === active;
