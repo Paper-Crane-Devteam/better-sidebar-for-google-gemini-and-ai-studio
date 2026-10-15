@@ -87,7 +87,7 @@ export const GemsHeader = ({
         </div>
       </div>
 
-      <div className="px-3 pb-2 pt-1 flex items-center justify-between">
+      <div className="tab-header px-3 pb-2 pt-1 flex items-center justify-between">
         <div className="flex-1 mr-2">
           <FilterActions filter={filter} visibleFilters={['search', 'tags', 'favorites']} />
         </div>
