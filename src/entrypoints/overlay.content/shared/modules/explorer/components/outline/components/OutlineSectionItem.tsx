@@ -74,15 +74,6 @@ export function OutlineSectionItem({
           </div>
         )}
 
-        <span
-          className={cn(
-            'text-[10px] font-bold shrink-0 h-4 w-4 flex items-center justify-center',
-            isActive ? 'text-primary-foreground bg-primary/80 rounded-full' : 'text-highlight bg-highlight/10 rounded-full',
-          )}
-        >
-          {section.turnIndex}
-        </span>
-
         <div className="flex-1 min-w-0 flex items-center overflow-hidden node-text-content">
           <OverflowTooltip
             content={section.userQueryFull || section.userQuery}
