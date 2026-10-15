@@ -151,6 +151,16 @@ export const useGeminiUI = () => {
         #chat-history .conversation-container user-query {
           max-width: none !important;
         }
+        /*
+         * Immersive mode (Deep Research / Canvas panel open) squeezes the chat
+         * column to roughly half width (~592px at 2560px). The 724px floor above
+         * then overflows the scroller and clips each turn, so let Gemini's own
+         * narrow layout take over there.
+         */
+        chat-window.immersives-mode #chat-history .conversation-container {
+          min-width: 0 !important;
+          max-width: 100% !important;
+        }
         `;
       }
       if (storeInputWidth > 0 && !isGemsCreatePage) {
