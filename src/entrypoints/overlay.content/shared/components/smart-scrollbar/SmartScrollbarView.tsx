@@ -28,7 +28,7 @@ export interface SmartScrollbarItem {
 /**
  * Platform look. The colour tokens already follow the host page through the
  * shadow root's theme class; the variant only covers shape — Gemini's floating
- * card versus AI Studio's flatter surface and pill-shaped dots.
+ * card versus AI Studio's flatter, opaque surface.
  */
 export type SmartScrollbarVariant = 'gemini' | 'aistudio';
 
@@ -46,9 +46,9 @@ const VARIANT_STYLES: Record<
   aistudio: {
     panel: 'rounded-2xl border-border bg-background shadow-sm',
     dot: 'rounded-full',
-    dotActive: 'h-[14px] w-[6px] bg-primary',
-    dotIdle: 'h-[10px] w-[6px] bg-muted-foreground/50 group-hover:bg-muted-foreground',
-    dotOff: 'h-[10px] w-[6px] bg-muted-foreground/20',
+    dotActive: 'h-[10px] w-[10px] bg-primary',
+    dotIdle: 'h-2 w-2 bg-muted-foreground/50 group-hover:bg-muted-foreground',
+    dotOff: 'h-2 w-2 bg-muted-foreground/20',
   },
 };
 
