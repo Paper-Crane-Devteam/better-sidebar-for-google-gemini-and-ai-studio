@@ -7,8 +7,9 @@ import { useCurrentConversationId } from '@/entrypoints/overlay.content/shared/h
  *
  * Strategy:
  * - `input-container` stays in normal flow as the hover trigger zone
- * - Its child `fieldset` gets `position: absolute` to visually slide down
- * - On `input-container:hover` or `input-container:focus-within`, fieldset slides back up
+ * - Its child `.input-area-container` (wraps input-area-v2 > fieldset) gets
+ *   `position: absolute` to visually slide down
+ * - On `input-container:hover` or `input-container:focus-within`, it slides back up
  * - When `.cdk-overlay-container` has children (popups/dropdowns open), keep fieldset visible
  * - On conversation switch (detected via useCurrentConversationId), temporarily reveal fieldset
  *
@@ -145,21 +146,35 @@ export const AutoHideInputFeature = () => {
         document.head.appendChild(styleEl);
       }
 
+      // DOM (2026-10): input-container > div.input-area-container > input-area-v2
+      //   > div.input-area > fieldset. Older builds had fieldset as a direct child.
+      const target = `input-container > .input-area-container, input-container > fieldset`;
+      const scoped = (prefix: string) =>
+        `${prefix} input-container > .input-area-container, ${prefix} input-container > fieldset`;
+
       styleEl.textContent = `
         /* input-container is the hover trigger, stays in flow */
         input-container {
           position: relative;
         }
 
-        /* fieldset is the visual element that hides/shows */
-        input-container > fieldset {
+        /* Input wrapper is taken out of flow and slid below the viewport */
+        ${target} {
           position: absolute !important;
-          transform: translateY(101px);
+          /* inset by input-container's horizontal padding so max-width % matches in-flow width */
+          left: 16px;
+          right: 16px;
+          bottom: 0;
+          margin-inline: auto !important;
+          z-index: 1;
+          transform: translateY(calc(100% - 12px));
           transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease;
           opacity: 0.3;
         }
 
         /* Reveal on hover or when user is typing */
+        input-container:hover > .input-area-container,
+        input-container:focus-within > .input-area-container,
         input-container:hover > fieldset,
         input-container:focus-within > fieldset {
           transform: translateY(-12px) !important;
@@ -167,13 +182,13 @@ export const AutoHideInputFeature = () => {
         }
 
         /* Keep visible when overlay popups are open */
-        body.bs-overlay-open input-container > fieldset {
+        ${scoped('body.bs-overlay-open')} {
           transform: translateY(-12px) !important;
           opacity: 1 !important;
         }
 
         /* Temporarily reveal on conversation switch */
-        body.bs-input-reveal input-container > fieldset {
+        ${scoped('body.bs-input-reveal')} {
           transform: translateY(-12px) !important;
           opacity: 1 !important;
           transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease !important;
