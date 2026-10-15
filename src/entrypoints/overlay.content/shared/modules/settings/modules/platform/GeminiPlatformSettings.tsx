@@ -165,22 +165,6 @@ export const GeminiPlatformSettings = () => {
               className="ui-slider w-full"
             />
           </div>
-
-          {/* Table Auto Width */}
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label className="text-sm font-medium">
-                {t('geminiUI.tableAutoWidth')}
-              </Label>
-              <p className="text-xs text-muted-foreground">
-                {t('geminiUI.tableAutoWidthDesc')}
-              </p>
-            </div>
-            <Switch
-              checked={geminiSettings?.tableAutoWidth ?? false}
-              onCheckedChange={(c) => setGeminiFeature('tableAutoWidth', c)}
-            />
-          </div>
         </div>
       </div>
 

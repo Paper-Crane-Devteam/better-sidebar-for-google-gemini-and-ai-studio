@@ -861,8 +861,6 @@
     "sidebarWidth": "Sidebar Width",
     "chatContentWidth": "Chat Content Width",
     "inputBoxWidth": "Input Box Width",
-    "tableAutoWidth": "Table Auto Width",
-    "tableAutoWidthDesc": "Remove table max-width limit so tables render at full available width",
     "elementVisibility": "Element Visibility",
     "geminiLogo": "Gemini Logo",
     "geminiLogoDesc": "Toggle Top Left Gemini logo visibility",

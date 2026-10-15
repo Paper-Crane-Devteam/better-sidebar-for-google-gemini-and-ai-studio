@@ -24,7 +24,6 @@ export const useGeminiUI = () => {
     hideUpgrade = false,
     zenMode = false,
     showSmartScrollbar = true,
-    tableAutoWidth = false,
   } = geminiSettings ?? {};
 
   const { path } = useUrl();
@@ -165,6 +164,15 @@ export const useGeminiUI = () => {
           max-width: none !important;
         }
         /*
+         * Tables: Gemini already lets .table-block span the full column, but
+         * pads .table-content with \`max(0px, 50% - 354px)\` (450px for 4+ cols)
+         * to re-center the table in a fixed 708/900px track. Drop that padding
+         * so tables follow the chat width like the rest of the response.
+         */
+        #chat-history .conversation-container .table-block .table-content {
+          padding-inline: 0 !important;
+        }
+        /*
          * Immersive mode (Deep Research / Canvas panel open) squeezes the chat
          * column to roughly half width (~592px at 2560px). The 724px floor above
          * then overflows the scroller and clips each turn, so let Gemini's own
@@ -199,11 +207,6 @@ export const useGeminiUI = () => {
       `;
     }
 
-    if (tableAutoWidth) {
-      css += `
-        .table-block.new-table-style { max-width: none !important; }
-      `;
-    }
 
     // [DEPRECATED] showTopBarTag - removed due to Gemini UI redesign
     // if (geminiSettings.showTopBarTag) {
@@ -225,7 +228,6 @@ export const useGeminiUI = () => {
     storeInputWidth,
     // [DEPRECATED] geminiSettings.showTopBarTag,
     zenMode,
-    tableAutoWidth,
     isGemsCreatePage,
   ]);
 

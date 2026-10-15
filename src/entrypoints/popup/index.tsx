@@ -290,13 +290,6 @@ const Options = ({ initialEnabledState, detectedPlatform }: OptionsProps) => {
                       </div>
                       <DebouncedSlider value={geminiSettings.inputWidth} min={40} max={100} onChange={(v) => setGeminiFeature('inputWidth', v)} />
                     </div>
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1">
-                        <Label className="text-sm font-semibold">{t('geminiUI.tableAutoWidth')}</Label>
-                        <p className="text-xs text-muted-foreground">{t('geminiUI.tableAutoWidthDesc')}</p>
-                      </div>
-                      <Switch checked={geminiSettings.tableAutoWidth ?? false} onCheckedChange={(c) => setGeminiFeature('tableAutoWidth', c)} className="data-[state=checked]:bg-primary data-[state=checked]:border-primary" />
-                    </div>
                   </div>
                 </div>
 

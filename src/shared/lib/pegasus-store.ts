@@ -89,7 +89,6 @@ export interface GeminiEnhancedFeatures {
   /** `>` in the composer opens the agent launcher popup */
   agentTrigger: boolean;
   removeWatermark: boolean;
-  tableAutoWidth: boolean;
   selectionToolbar: SelectionToolbarConfig;
 }
 
@@ -174,7 +173,6 @@ export const usePegasusStore = create<PegasusState>()((set) => ({
       slashCommand: true,
       agentTrigger: true,
       removeWatermark: true,
-      tableAutoWidth: false,
       selectionToolbar: {
         enabled: true,
         reference: true,
@@ -250,7 +248,6 @@ const DEFAULT_ENHANCED_FEATURES: PegasusState['enhancedFeatures'] = {
     slashCommand: true,
     agentTrigger: true,
     removeWatermark: true,
-    tableAutoWidth: false,
     selectionToolbar: {
       enabled: true,
       reference: true,
