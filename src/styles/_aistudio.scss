@@ -114,6 +114,13 @@
     --sidebar-padding-y: 8px;
     --sidebar-icon-stroke: 1.75;
     // --sidebar-icon-color: 68 71 70;
+    /* Rail icons sit back at rest; see the .sidebar-nav rules below */
+    --sidebar-icon-idle-opacity: 0.68;
+  }
+
+  .theme-aistudio.dark,
+  :host(.theme-aistudio.dark) {
+    --sidebar-icon-idle-opacity: 0.6;
   }
 }
 
@@ -169,6 +176,21 @@
   .theme-aistudio .sidebar-edge,
   :host(.theme-aistudio) .sidebar-edge {
     border-right: 1px solid rgb(var(--sidebar-edge-border, var(--border)));
+  }
+
+  /* Idle rail icons recede; hover / active bring them back. Opacity rather
+     than a second colour so custom themes keep working. */
+  .theme-aistudio .sidebar-nav .sidebar-icon,
+  :host(.theme-aistudio) .sidebar-nav .sidebar-icon {
+    opacity: var(--sidebar-icon-idle-opacity, 1);
+    transition: opacity 0.15s ease;
+  }
+
+  .theme-aistudio .sidebar-nav .sidebar-btn:hover .sidebar-icon,
+  .theme-aistudio .sidebar-nav .sidebar-btn.bg-secondary .sidebar-icon,
+  :host(.theme-aistudio) .sidebar-nav .sidebar-btn:hover .sidebar-icon,
+  :host(.theme-aistudio) .sidebar-nav .sidebar-btn.bg-secondary .sidebar-icon {
+    opacity: 1;
   }
 
   /* Custom Slider Styles */

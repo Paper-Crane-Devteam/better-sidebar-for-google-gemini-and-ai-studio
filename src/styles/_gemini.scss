@@ -10,10 +10,11 @@
     --sidebar-gap: 8px;
     --sidebar-padding-y: 8px;
     --sidebar-icon-stroke: 1.75;
-    /* Rail icons sit back at rest (outline grey) and only come up to full
-       on-surface-variant when hovered — the rail is rarely the focus. */
-    --sidebar-icon-color: 116 119 117; /* #747775 */
-    --sidebar-icon-color-hover: 68 71 70; /* #444746 */
+    --sidebar-icon-color: 68 71 70;
+    /* Rail icons sit back at rest and come up to full strength on hover or
+       when active — the rail is rarely the focus. Opacity rather than a second
+       colour so custom themes that only set --sidebar-icon-color still work. */
+    --sidebar-icon-idle-opacity: 0.68;
 
     --background: 253 253 253; /* #fdfdfd - lighter surface */
     --foreground: 31 31 31; /* #1f1f1f */
@@ -97,10 +98,8 @@
     --destructive: 236 146 142; /* #ec928e */
     --destructive-foreground: 96 20 16; /* #601410 */
 
-    --sidebar-icon-color: 142 145 143; /* #8e918f */
-    --sidebar-icon-color-hover: 196 199 197; /* #c4c7c5 */
-    /* Rail surface: closer to the content card so the strip stops glowing. */
-    --sidebar-nav-background: 40 42 44; /* #282a2c */
+    --sidebar-icon-color: 196 199 197; /* #c4c7c5 */
+    --sidebar-icon-idle-opacity: 0.6;
 
     --border: 55 57 59; /* #37393b - neutral-90 */
     --input: 122 122 122; /* #7a7a7a - icon-separator */
@@ -165,13 +164,29 @@
   /* Sidebar - Gemini Specific (flat, no gradient, no border — color separation handles distinction) */
   .theme-gemini .sidebar-nav,
   :host(.theme-gemini) .sidebar-nav {
-    background: rgb(var(--sidebar-nav-background, var(--secondary)));
+    background: rgb(var(--secondary));
   }
 
-  /* Bring the hovered icon back to full strength */
+  /* Dark: in Gemini's palette --secondary sits well above the content card, so
+     the rail glows. Pull it halfway toward the card; derived from the theme's
+     own tokens so custom dark themes are toned down the same way. */
+  .theme-gemini.dark .sidebar-nav,
+  :host(.theme-gemini.dark) .sidebar-nav {
+    background: color-mix(in srgb, rgb(var(--secondary)) 50%, rgb(var(--card)));
+  }
+
+  /* Idle rail icons recede; hover / active bring them back */
+  .theme-gemini .sidebar-nav .sidebar-icon,
+  :host(.theme-gemini) .sidebar-nav .sidebar-icon {
+    opacity: var(--sidebar-icon-idle-opacity, 1);
+    transition: opacity 0.15s ease;
+  }
+
   .theme-gemini .sidebar-nav .sidebar-btn:hover .sidebar-icon,
-  :host(.theme-gemini) .sidebar-nav .sidebar-btn:hover .sidebar-icon {
-    color: rgb(var(--sidebar-icon-color-hover));
+  .theme-gemini .sidebar-nav .sidebar-btn.bg-secondary .sidebar-icon,
+  :host(.theme-gemini) .sidebar-nav .sidebar-btn:hover .sidebar-icon,
+  :host(.theme-gemini) .sidebar-nav .sidebar-btn.bg-secondary .sidebar-icon {
+    opacity: 1;
   }
 
   /* Content area (file tree, outline, etc.) - white background */
