@@ -8,13 +8,7 @@
  * the client on every render. Nothing stored can be matched to an element, so the
  * DOM is the only reliable source for *which* turns exist and *where* they are.
  *
- * DOM facts this relies on (checked against the live page):
- * - Every turn of the prompt is an `ms-chat-turn#turn-<UUID>`, all present at
- *   once (no history paging). The role sits on an inner `[data-turn-role]`.
- * - Turn bodies are virtualised: off-screen turns keep their outer box but their
- *   text is replaced by a height placeholder, so text cannot be read from them.
- * - AI Studio's own scrollbar (`ms-items-scrollbar`) has one button per user turn,
- *   `#scrollbar-item-<UUID>`, whose `aria-label` is the question cut to ~40 chars.
+ * DOM facts this relies on are documented in `lib/aistudio-turns.ts`.
  *
  * Text comes in two tiers: the native button's label is always there; the full
  * question is taken from the store by position among user messages, but only when
@@ -27,26 +21,23 @@ import throttle from 'lodash/throttle';
 import { useUrl } from '@/shared/hooks/useUrl';
 import { useConversationMessagesStore } from '@/shared/lib/conversation-messages-store';
 import type { SmartScrollbarItem } from '@/entrypoints/overlay.content/shared/components/smart-scrollbar/SmartScrollbarView';
+import {
+  labelPrefix,
+  readRenderedText,
+  readTurnLabel,
+  readUserTurns,
+  scrollTurnIntoView,
+  textsAgree,
+} from '../../lib/aistudio-turns';
 
 export const AISTUDIO_SCROLLER_SELECTOR = 'ms-autoscroll-container';
 /** The chat column; the bar is pinned to its right edge, clear of the run settings panel */
 export const AISTUDIO_CHAT_COLUMN_SELECTOR = '.chat-container';
 
-const TURN_SELECTOR = 'ms-chat-turn';
-const USER_ROLE_SELECTOR = '[data-turn-role="User"]';
-
 const SCROLL_DEBOUNCE_MS = 80;
 const REFRESH_THROTTLE_MS = 250;
 /** Keep auto-detection from overriding a click while the jump settles */
 const CLICK_LOCK_MS = 1500;
-/** Interval between alignment checks after a jump */
-const SETTLE_INTERVAL_MS = 120;
-/** Give up correcting after this many checks (~1.2s) */
-const SETTLE_MAX_CHECKS = 10;
-/** Consecutive aligned checks needed before the jump counts as landed */
-const SETTLE_STABLE_CHECKS = 2;
-/** Offset (px) still considered aligned */
-const ALIGN_TOLERANCE = 4;
 /** Retry interval while the chat view has not been rendered yet */
 const RESOLVE_RETRY_MS = 500;
 
@@ -56,36 +47,12 @@ interface DomTurn {
   renderedText: string;
 }
 
-const normalize = (s: string) => s.replace(/\s+/g, ' ').trim();
-
-function readUserTurns(): HTMLElement[] {
-  return Array.from(document.querySelectorAll<HTMLElement>(TURN_SELECTOR)).filter(
-    (turn) => !!turn.id && !!turn.querySelector(USER_ROLE_SELECTOR),
-  );
-}
-
 function readDomTurns(): DomTurn[] {
-  return readUserTurns().map((turn) => {
-    const uuid = turn.id.replace(/^turn-/, '');
-    const label =
-      document.getElementById(`scrollbar-item-${uuid}`)?.getAttribute('aria-label') ?? '';
-    // Only present while the turn is rendered; the leading role caption is dropped
-    const renderedText = normalize(
-      (turn.querySelector('.turn-content') as HTMLElement | null)?.innerText ?? '',
-    ).replace(/^User\s*/, '');
-    return { id: turn.id, label, renderedText };
-  });
-}
-
-/** The label is the question cut short with a trailing ellipsis. */
-function labelPrefix(label: string): string {
-  return normalize(label).replace(/(\.{3}|…)$/, '').trim();
-}
-
-function textsAgree(full: string, prefix: string): boolean {
-  if (!prefix) return false;
-  const a = normalize(full);
-  return a.startsWith(prefix) || prefix.startsWith(a);
+  return readUserTurns().map((turn) => ({
+    id: turn.id,
+    label: readTurnLabel(turn),
+    renderedText: readRenderedText(turn),
+  }));
 }
 
 const sameTurns = (a: DomTurn[], b: DomTurn[]) =>
@@ -193,43 +160,22 @@ export function useAIStudioTurnNodes() {
   }, [scroller, detectActive]);
 
   // ── Jump ─────────────────────────────────────────────────────────────
-  /** Cancels the correction loop of a previous click */
-  const jumpTokenRef = useRef(0);
+  /** Stops the correction loop of a previous click */
+  const cancelJumpRef = useRef<(() => void) | null>(null);
+  useEffect(() => () => cancelJumpRef.current?.(), []);
 
   const scrollToNode = useCallback(
     (id: string) => {
       const turn = document.getElementById(id);
       if (!turn || !scroller) return;
 
-      const token = ++jumpTokenRef.current;
+      cancelJumpRef.current?.();
       setActiveId(id);
       lockUntilRef.current = Date.now() + CLICK_LOCK_MS;
 
-      // Instant, not smooth: a smooth scroll over a long distance renders every
-      // virtualised turn on the way, each one changing height mid-flight, and it
-      // lands short of the target. Jump, then keep re-aligning until the turns
-      // around the target have rendered and the offset stays put.
-      const align = () =>
-        turn.scrollIntoView({ block: 'start', behavior: 'auto' });
-      align();
-
-      let checks = 0;
-      let stable = 0;
-      const settle = () => {
-        if (token !== jumpTokenRef.current || !turn.isConnected) return;
-        const offset = turn.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
-        if (Math.abs(offset) > ALIGN_TOLERANCE) {
-          stable = 0;
-          align();
-        } else if (++stable >= SETTLE_STABLE_CHECKS) {
-          return;
-        }
-        if (++checks < SETTLE_MAX_CHECKS) {
-          lockUntilRef.current = Date.now() + CLICK_LOCK_MS;
-          setTimeout(settle, SETTLE_INTERVAL_MS);
-        }
-      };
-      setTimeout(settle, SETTLE_INTERVAL_MS);
+      cancelJumpRef.current = scrollTurnIntoView(turn, scroller, () => {
+        lockUntilRef.current = Date.now() + CLICK_LOCK_MS;
+      });
     },
     [scroller],
   );
