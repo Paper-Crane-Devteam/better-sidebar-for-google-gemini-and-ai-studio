@@ -1,6 +1,6 @@
 import { runQuery, runCommand, runBatch } from '../index';
 import { trace } from '@/shared/lib/trace';
-import { buildSearchSource, getSearchRegexError } from '@/shared/lib/search-pattern';
+import { buildSearchRegex, getSearchRegexError } from '@/shared/lib/search-pattern';
 import type { Message } from '../../types/db';
 
 export const messageRepo = {
@@ -358,14 +358,15 @@ export const messageRepo = {
     const useFts = !options.useRegex && query.length >= 3;
 
     if (options.useRegex) {
-      // Full scan through the worker's regexp_test() UDF — no index can answer an
-      // arbitrary regex. Case and whole-word are folded into the pattern itself.
+      // Full scan, regex applied in JS after the query (see below). No index can
+      // answer an arbitrary regex, and a SQL UDF is not an option: the OPFS build
+      // of wa-sqlite in use here never invokes JS function callbacks (verified —
+      // even `SELECT f()` with a constant result returns NULL).
       const regexError = getSearchRegexError(query, options);
       if (regexError) {
         throw new Error(`Invalid regular expression: ${regexError}`);
       }
-      const { source, flags } = buildSearchSource(query, options);
-      trace('[DB] Regex Search:', source, flags);
+      trace('[DB] Regex Search:', query);
 
       sql += `
         SELECT m.*, c.title as conversation_title, c.folder_id, f.name as folder_name, c.external_url, c.platform
@@ -375,9 +376,7 @@ export const messageRepo = {
         WHERE m.message_type != 'thought'
         AND c.deleted_at IS NULL
         AND c.is_temporary = 0
-        AND regexp_test(?, ?, m.content)
       `;
-      params.push(source, flags);
     } else if (useFts) {
       // Use FTS5 table
       // Prepare match query
@@ -449,10 +448,27 @@ export const messageRepo = {
     const needsPostFilter =
       !options.useRegex && (options.wholeWord || options.caseSensitive);
     const limit = needsPostFilter ? 1000 : 500;
-    sql += ` ORDER BY m.timestamp DESC LIMIT ${limit}`;
+    // Regex mode can't limit in SQL: the filter runs afterwards, so a LIMIT here
+    // would silently drop matches older than the newest N messages.
+    sql += options.useRegex
+      ? ` ORDER BY m.timestamp DESC`
+      : ` ORDER BY m.timestamp DESC LIMIT ${limit}`;
 
     try {
       let results = await runQuery(sql, params);
+
+      if (options.useRegex) {
+        const regex = buildSearchRegex(query, options);
+        if (!regex) return [];
+        const matched: any[] = [];
+        for (const row of results) {
+          if (typeof row.content === 'string' && regex.test(row.content)) {
+            matched.push(row);
+            if (matched.length >= 500) break;
+          }
+        }
+        return matched;
+      }
 
       // Post-filter in memory for wholeWord and/or caseSensitive
       if (needsPostFilter && query.trim().length > 0) {
