@@ -7,7 +7,7 @@ import { MarkdownRenderer } from '@/shared/components/MarkdownRenderer';
 import { toast } from '@/shared/lib/toast';
 import { NodeActionBar } from '@/entrypoints/overlay.content/shared/components/node-action-bar';
 import type { OutlineNode } from '../types';
-import { getNodeIcon } from './getNodeIcon';
+import { getNodeIcon, getNodeTextClass } from './getNodeIcon';
 
 /** Collect child content for tooltip preview (full content, no truncation) */
 function collectChildrenContent(children: OutlineNode[]): string {
@@ -191,12 +191,7 @@ export function OutlineNodeItem({
               // KaTeX formulas inherit color from parent
               '[&_.tooltip-markdown_.katex]:text-background',
             )}
-            className={cn(
-              'text-sm leading-snug truncate flex-1',
-              node.type === 'heading'
-                ? 'text-foreground font-medium'
-                : 'text-foreground',
-            )}
+            className={cn('leading-snug truncate flex-1', getNodeTextClass(node))}
           >
             {node.label}
           </OverflowTooltip>
