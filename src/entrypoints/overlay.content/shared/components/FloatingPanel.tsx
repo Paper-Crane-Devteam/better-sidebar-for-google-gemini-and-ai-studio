@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@/shared/lib/utils/utils';
 import { getPopupLayerContainer } from '@/shared/lib/popup-layer';
@@ -52,6 +52,44 @@ const HANDLES: { dir: ResizeDir; className: string }[] = [
   { dir: 'sw', className: 'bottom-[-4px] left-[-4px] h-3 w-3 cursor-nesw-resize' },
 ];
 
+/**
+ * A private portal node inside the popup layer (topmost shadow DOM, where
+ * menus/tooltips also go, so they stack above the panel).
+ *
+ * We can't portal straight into the popup layer's `.shadow-body`: it is also
+ * the container of another React root, and that root's first commit clears its
+ * container — on Gemini it commits after the sidebar has already portaled the
+ * panel in, silently deleting it while React still thinks it is mounted. So we
+ * own a node and put it back whenever it gets removed.
+ */
+function usePanelLayer(): HTMLElement | null {
+  const shadowRoot = useShadowRoot();
+  const [node] = useState(() => {
+    const el = document.createElement('div');
+    el.dataset.floatingPanelLayer = '';
+    return el;
+  });
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const parent = getPopupLayerContainer() ?? shadowRoot;
+    if (!parent) return;
+    const attach = () => {
+      if (node.parentNode !== parent) parent.appendChild(node);
+    };
+    attach();
+    setReady(true);
+    const mo = new MutationObserver(attach);
+    mo.observe(parent, { childList: true });
+    return () => {
+      mo.disconnect();
+      node.remove();
+    };
+  }, [node, shadowRoot]);
+
+  return ready ? node : null;
+}
+
 /** Keep size within the viewport and enough of the header on screen to grab it. */
 function clampRect(r: FloatingPanelRect, minW: number, minH: number): FloatingPanelRect {
   const vw = window.innerWidth;
@@ -88,10 +126,7 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
   ariaLabel,
   className,
 }) => {
-  const shadowRoot = useShadowRoot();
-  // Popup layer = topmost shadow DOM; menus/tooltips also portal there, so they
-  // stack above this panel instead of under it.
-  const container = useMemo(() => getPopupLayerContainer() ?? shadowRoot, [shadowRoot]);
+  const container = usePanelLayer();
 
   const rootRef = useRef<HTMLDivElement>(null);
   const surfaceRef = useRef<HTMLDivElement>(null);
