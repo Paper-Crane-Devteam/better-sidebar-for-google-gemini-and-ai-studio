@@ -294,6 +294,8 @@ export const MarkdownRenderer = memo(({ children, className, highlight, highligh
         "[--tw-prose-bold:currentColor]",
         "[--tw-prose-links:rgb(var(--primary))]",
         "[--tw-prose-code:currentColor]",
+        // typography 插件默认给行内 code 前后加反引号，我们已有背景样式，去掉
+        "prose-code:before:content-none prose-code:after:content-none",
         className,
       )}>
         <ReactMarkdown
