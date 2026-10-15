@@ -88,7 +88,7 @@ export const useGeminiUI = () => {
         if (isGemsCreatePage) return;
 
         const inputField = document.querySelector(
-          'input-container > fieldset',
+          'input-container > .input-area-container, input-container > fieldset',
         );
         if (inputField) {
           const percent = Math.round(
@@ -152,6 +152,19 @@ export const useGeminiUI = () => {
           max-width: none !important;
         }
         /*
+         * Gemini's extended/xl grid layout caps every markdown block and the
+         * response chrome at 708px (\`.enable-extended-and-xl-grid & > :not(#_)\`),
+         * so widening the container alone no longer widens the text.
+         */
+        #chat-history .conversation-container .markdown > *,
+        #chat-history .conversation-container .response-container-header,
+        #chat-history .conversation-container .response-container-footer,
+        #chat-history .conversation-container .response-footer,
+        #chat-history .conversation-container thinking-overlay,
+        #chat-history .conversation-container model-response-disclaimers {
+          max-width: none !important;
+        }
+        /*
          * Immersive mode (Deep Research / Canvas panel open) squeezes the chat
          * column to roughly half width (~592px at 2560px). The 724px floor above
          * then overflows the scroller and clips each turn, so let Gemini's own
@@ -165,8 +178,10 @@ export const useGeminiUI = () => {
       }
       if (storeInputWidth > 0 && !isGemsCreatePage) {
         css += `
-        /* Input Box Control */
-        input-container > fieldset {
+        /* Input Box Control (legacy fieldset + lm-input-redesign container) */
+        input-container > fieldset,
+        input-container > .input-area-container,
+        input-container > prompt-flow-bar {
           max-width: ${storeInputWidth}% !important;
           min-width: 660px !important;
           width: 100% !important;
