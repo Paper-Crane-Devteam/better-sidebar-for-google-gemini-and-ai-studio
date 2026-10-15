@@ -32,6 +32,13 @@ interface FloatingPanelProps {
 
 /** How much of the panel must stay on screen so it can always be grabbed again. */
 const KEEP_VISIBLE = 48;
+
+const SURFACE_STYLE: React.CSSProperties = {
+  backgroundColor: 'var(--panel-bg, rgb(var(--popover)))',
+  boxShadow: 'var(--shadow-panel)',
+  backdropFilter: 'var(--panel-blur)',
+  WebkitBackdropFilter: 'var(--panel-blur)',
+};
 const HEADER_HEIGHT = 32;
 
 const HANDLES: { dir: ResizeDir; className: string }[] = [
@@ -138,10 +145,12 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
   const setInteracting = (on: boolean) => {
     const s = surfaceRef.current;
     if (!s) return;
-    // Opaque bg + no blur while moving; restored from the inline defaults after.
-    s.style.backdropFilter = on ? 'none' : '';
-    s.style.setProperty('-webkit-backdrop-filter', on ? 'none' : '');
-    s.style.backgroundColor = on ? 'rgb(var(--popover))' : '';
+    // Opaque bg + no blur while moving. Restore the exact values from
+    // SURFACE_STYLE: assigning '' would delete React's inline style, and React
+    // never re-applies it because its props did not change.
+    s.style.backdropFilter = on ? 'none' : SURFACE_STYLE.backdropFilter!;
+    s.style.setProperty('-webkit-backdrop-filter', on ? 'none' : SURFACE_STYLE.backdropFilter!);
+    s.style.backgroundColor = on ? 'rgb(var(--popover))' : SURFACE_STYLE.backgroundColor!;
   };
 
   const begin = (mode: Mode, e: React.PointerEvent<HTMLElement>) => {
@@ -234,12 +243,7 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
       <div
         ref={surfaceRef}
         className="absolute inset-0 flex flex-col rounded-lg overflow-hidden border border-border/60"
-        style={{
-          backgroundColor: 'var(--panel-bg, rgb(var(--popover)))',
-          boxShadow: 'var(--shadow-panel)',
-          backdropFilter: 'var(--panel-blur)',
-          WebkitBackdropFilter: 'var(--panel-blur)',
-        }}
+        style={SURFACE_STYLE}
       >
         <div
           className="shrink-0 flex items-center h-8 pl-3 pr-1 gap-1 select-none cursor-grab active:cursor-grabbing border-b border-border/40"
