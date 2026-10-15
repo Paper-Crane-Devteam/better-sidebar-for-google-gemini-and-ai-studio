@@ -340,13 +340,6 @@ const Options = ({ initialEnabledState, detectedPlatform }: OptionsProps) => {
                     </div>
                     <div className="flex items-center justify-between p-4">
                       <div className="space-y-1">
-                        <Label className="text-sm font-semibold">{t('geminiUI.removeAutoWatermark')}</Label>
-                        <p className="text-xs text-muted-foreground">{t('geminiUI.removeAutoWatermarkDesc')}</p>
-                      </div>
-                      <Switch checked={geminiSettings.removeWatermark} onCheckedChange={(c) => setGeminiFeature('removeWatermark', c)} className="data-[state=checked]:bg-primary data-[state=checked]:border-primary" />
-                    </div>
-                    <div className="flex items-center justify-between p-4">
-                      <div className="space-y-1">
                         <Label className="text-sm font-semibold">{t('geminiUI.smartScrollbar')}</Label>
                         <p className="text-xs text-muted-foreground">{t('geminiUI.smartScrollbarDesc')}</p>
                       </div>

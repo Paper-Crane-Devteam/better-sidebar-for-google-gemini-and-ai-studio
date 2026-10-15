@@ -278,24 +278,6 @@ export const GeminiPlatformSettings = () => {
             />
           </div>
 
-          {/* Remove Auto Watermark */}
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label className="text-sm font-medium">
-                {t('geminiUI.removeAutoWatermark')}
-              </Label>
-              <p className="text-xs text-muted-foreground">
-                {t('geminiUI.removeAutoWatermarkDesc')}
-              </p>
-            </div>
-            <Switch
-              checked={geminiSettings?.removeWatermark ?? true}
-              onCheckedChange={(c) =>
-                setGeminiFeature('removeWatermark', c)
-              }
-            />
-          </div>
-
           {/* Smart Scrollbar */}
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">

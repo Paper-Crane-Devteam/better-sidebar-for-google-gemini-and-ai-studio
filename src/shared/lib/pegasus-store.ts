@@ -173,7 +173,7 @@ export const usePegasusStore = create<PegasusState>()((set) => ({
       showHotkeyHelper: true,
       slashCommand: true,
       agentTrigger: true,
-      removeWatermark: true,
+      removeWatermark: false,
       selectionToolbar: {
         enabled: true,
         reference: true,
@@ -249,7 +249,7 @@ const DEFAULT_ENHANCED_FEATURES: PegasusState['enhancedFeatures'] = {
     showHotkeyHelper: true,
     slashCommand: true,
     agentTrigger: true,
-    removeWatermark: true,
+    removeWatermark: false,
     selectionToolbar: {
       enabled: true,
       reference: true,
@@ -309,6 +309,14 @@ function ensureEnhancedFeaturesDefaults() {
       updated[k] = merged;
       patched = true;
     }
+  }
+
+  // Gemini now ships its own watermark toggle; running our reverse-blend on an
+  // un-watermarked image leaves an inverted mark. The setting is hidden, so
+  // force it off for users who still have the old `true` persisted.
+  if (updated.gemini?.removeWatermark) {
+    updated.gemini = { ...updated.gemini, removeWatermark: false };
+    patched = true;
   }
 
   if (patched) {
