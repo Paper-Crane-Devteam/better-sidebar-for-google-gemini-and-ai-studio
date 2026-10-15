@@ -1053,7 +1053,9 @@
     "copyResponse": "Copy response",
     "expandAll": "Expand all",
     "collapseAll": "Collapse all",
-    "navigate": "Go to message"
+    "navigate": "Go to message",
+    "popOut": "Pop out",
+    "dockBack": "Dock back to sidebar"
   },
   "firstInstall": {
     "title": "Import Conversation List?",

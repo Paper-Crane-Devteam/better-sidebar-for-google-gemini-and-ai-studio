@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { UIcon } from '@/shared/components/ui/icon';
 import { SqlExecutor } from '../shared/components/menu/SqlExecutor';
+import { FloatingOutline } from '../shared/modules/explorer/components/outline/FloatingOutline';
 import { ExplorerTab } from '../shared/modules/explorer/ExplorerTab';
 import { PromptsTab } from '../shared/modules/prompts/PromptsTab';
 import { SearchTab } from '../shared/modules/search/SearchTab';
@@ -520,6 +521,7 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
       </div>
 
       {showSqlInterface && <SqlExecutor onClose={() => setShowSqlInterface(false)} />}
+      <FloatingOutline />
     </div>
   );
 };

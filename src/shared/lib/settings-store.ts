@@ -72,6 +72,11 @@ interface SettingsState {
   };
   /** Persisted height of the outline panel in pixels */
   outlineHeight: number;
+  /** Outline detached into a floating panel; `rect` is null until first placed */
+  outlinePopout: {
+    open: boolean;
+    rect: { x: number; y: number; width: number; height: number } | null;
+  };
   /** Cached page index for the theme grid pagination (session-only, not persisted) */
   themeGridPage: number;
 
@@ -95,6 +100,8 @@ interface SettingsState {
     config: Partial<SettingsState['integrations']['notion']>,
   ) => void;
   setOutlineHeight: (height: number) => void;
+  setOutlinePopoutOpen: (open: boolean) => void;
+  setOutlinePopoutRect: (rect: SettingsState['outlinePopout']['rect']) => void;
   setThemeGridPage: (page: number) => void;
 }
 
@@ -202,6 +209,7 @@ export const useSettingsStore = create<SettingsState>()(
         },
       },
       outlineHeight: 200,
+      outlinePopout: { open: false, rect: null },
       themeGridPage: 0,
 
       setCompactMode: (compactMode) => set({ compactMode }),
@@ -251,6 +259,10 @@ export const useSettingsStore = create<SettingsState>()(
           },
         })),
       setOutlineHeight: (height) => set({ outlineHeight: height }),
+      setOutlinePopoutOpen: (open) =>
+        set((state) => ({ outlinePopout: { ...state.outlinePopout, open } })),
+      setOutlinePopoutRect: (rect) =>
+        set((state) => ({ outlinePopout: { ...state.outlinePopout, rect } })),
       setThemeGridPage: (page) => set({ themeGridPage: page }),
     }),
     {
