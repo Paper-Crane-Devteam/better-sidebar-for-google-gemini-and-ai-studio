@@ -639,6 +639,8 @@
     "placeholder": "Full-text Search",
     "wholeWord": "Match Whole Word",
     "matchCase": "Match Case",
+    "useRegex": "Use Regular Expression",
+    "invalidRegex": "Invalid regular expression: {{error}}",
     "copyAsText": "Copy as text",
     "copyAsMarkdown": "Copy as markdown",
     "foldersToInclude": "folders to include",

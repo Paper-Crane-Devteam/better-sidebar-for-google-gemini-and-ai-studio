@@ -81,6 +81,61 @@ const reopenDB = async () => {
   await initDB();
 };
 
+// ─── regexp_test(pattern, flags, text) ───────────────────────────────────────
+//
+// SQL function backing regex search: `WHERE regexp_test(?, ?, m.content)`.
+// It lives only in this connection's memory. Nothing is written to the database
+// file, so the schema, stored data and other readers of the file are unaffected.
+
+const SQLITE_UTF8 = 1;
+const SQLITE_DETERMINISTIC = 0x800;
+const SQLITE_NULL = 5;
+
+/** One search runs the same pattern over every row; compile it once. */
+const regexCache = new Map<string, RegExp | null>();
+
+const getCachedRegex = (pattern: string, flags: string): RegExp | null => {
+  const key = `${flags}\u0000${pattern}`;
+  if (regexCache.has(key)) return regexCache.get(key)!;
+  if (regexCache.size >= 16) regexCache.clear();
+  let re: RegExp | null = null;
+  try {
+    re = new RegExp(pattern, flags.replace(/[gy]/g, ''));
+  } catch {
+    // Invalid patterns are rejected before the query is sent; this is a backstop.
+  }
+  regexCache.set(key, re);
+  return re;
+};
+
+const registerRegexpFunction = (database: any) => {
+  const sqlite = database.sqlite;
+  sqlite.create_function(
+    database.pointer,
+    'regexp_test',
+    3,
+    SQLITE_UTF8 | SQLITE_DETERMINISTIC,
+    0,
+    (ctx: number, values: Uint32Array) => {
+      // Never throw out of here: an exception inside a UDF would abort the query
+      // with an opaque wasm error instead of simply not matching.
+      try {
+        if (sqlite.value_type(values[2]) === SQLITE_NULL) {
+          sqlite.result_int(ctx, 0);
+          return;
+        }
+        const re = getCachedRegex(
+          sqlite.value_text(values[0]),
+          sqlite.value_text(values[1]),
+        );
+        sqlite.result_int(ctx, re && re.test(sqlite.value_text(values[2])) ? 1 : 0);
+      } catch {
+        sqlite.result_int(ctx, 0);
+      }
+    },
+  );
+};
+
 const initDB = async (newDbName?: string) => {
   // If a new name is provided and differs from the current, force re-init
   if (newDbName && newDbName !== dbName) {
@@ -147,6 +202,9 @@ const initDB = async (newDbName?: string) => {
       });
 
       db = await openPromise;
+
+      // Per-connection, so it runs on every open (including reopen and import).
+      registerRegexpFunction(db);
 
       // Initialize Schema
       await db.run('PRAGMA foreign_keys = ON;');

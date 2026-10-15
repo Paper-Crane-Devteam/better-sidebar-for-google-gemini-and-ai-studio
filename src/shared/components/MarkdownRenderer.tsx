@@ -4,6 +4,11 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import katex from 'katex';
 import { cn } from '@/shared/lib/utils/utils';
+import {
+  buildSearchRegex,
+  splitByMatches,
+  type SearchMatchOptions,
+} from '@/shared/lib/search-pattern';
 // Aliased: this file's own `highlight` is the search term to mark, which is a different
 // job and, below, a competing one.
 import {
@@ -94,10 +99,7 @@ interface MarkdownRendererProps {
   children: string;
   className?: string;
   highlight?: string;
-  highlightOptions?: {
-    caseSensitive?: boolean;
-    wholeWord?: boolean;
-  };
+  highlightOptions?: SearchMatchOptions;
 }
 
 export const MarkdownRenderer = memo(({ children, className, highlight, highlightOptions }: MarkdownRendererProps) => {
@@ -105,35 +107,19 @@ export const MarkdownRenderer = memo(({ children, className, highlight, highligh
   const highlightText = (text: string) => {
     if (!highlight || !highlight.trim()) return text;
 
-    const escapeRegExp = (string: string) => {
-      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    };
-    
-    const escapedHighlight = escapeRegExp(highlight);
-    let pattern = escapedHighlight;
-    let flags = 'g';
-    
-    if (!highlightOptions?.caseSensitive) {
-      flags += 'i';
-    }
-    
-    if (highlightOptions?.wholeWord) {
-      pattern = `\\b${pattern}\\b`;
-    }
-    
-    const regex = new RegExp(`(${pattern})`, flags);
-    const parts = text.split(regex);
-    
-    return parts.map((part, i) =>
-      i % 2 === 1 ? (
+    const regex = buildSearchRegex(highlight, highlightOptions ?? {}, 'g');
+    if (!regex) return text;
+
+    return splitByMatches(text, regex).map((part, i) =>
+      part.isMatch ? (
         <span
           key={i}
           className="bg-highlight/65 text-foreground rounded-[2px]"
         >
-          {part}
+          {part.text}
         </span>
       ) : (
-        part
+        <React.Fragment key={i}>{part.text}</React.Fragment>
       ),
     );
   };

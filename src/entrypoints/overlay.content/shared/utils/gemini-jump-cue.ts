@@ -8,10 +8,10 @@
  * nodes instead of wrapping them in spans that Angular would fight with.
  */
 
-export interface HighlightQuery {
+import { buildSearchRegex, type SearchMatchOptions } from '@/shared/lib/search-pattern';
+
+export interface HighlightQuery extends SearchMatchOptions {
   query: string;
-  caseSensitive?: boolean;
-  wholeWord?: boolean;
 }
 
 const HIGHLIGHT_NAME = 'bs-jump-match';
@@ -32,11 +32,10 @@ function ensureStyle() {
   document.head.appendChild(style);
 }
 
-function buildRegex({ query, caseSensitive, wholeWord }: HighlightQuery): RegExp | null {
-  const trimmed = query.trim();
-  if (!trimmed) return null;
-  const escaped = trimmed.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return new RegExp(wholeWord ? `\\b${escaped}\\b` : escaped, caseSensitive ? 'g' : 'gi');
+function buildRegex({ query, ...options }: HighlightQuery): RegExp | null {
+  // Literal mode trims as it always has; a regex is taken as typed, since
+  // leading / trailing whitespace can be part of the pattern.
+  return buildSearchRegex(options.useRegex ? query : query.trim(), options, 'g');
 }
 
 /**
@@ -53,7 +52,11 @@ function findMatchRanges(root: HTMLElement, regex: RegExp): Range[] {
     regex.lastIndex = 0;
     let m: RegExpExecArray | null;
     while ((m = regex.exec(text))) {
-      if (m[0].length === 0) break;
+      // Empty match (possible in regex mode, e.g. `a*`): step past it, keep scanning.
+      if (m[0].length === 0) {
+        regex.lastIndex++;
+        continue;
+      }
       const range = document.createRange();
       range.setStart(node, m.index);
       range.setEnd(node, m.index + m[0].length);

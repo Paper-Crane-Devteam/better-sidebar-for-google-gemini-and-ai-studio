@@ -96,6 +96,7 @@ export interface UIState {
     options: {
       caseSensitive: boolean;
       wholeWord: boolean;
+      useRegex: boolean;
       include: string;
       exclude: string;
       roleFilter: 'all' | 'user' | 'model';
@@ -106,6 +107,7 @@ export interface UIState {
     activeOptions: {
       caseSensitive: boolean;
       wholeWord: boolean;
+      useRegex: boolean;
       include: string;
       exclude: string;
       roleFilter: 'all' | 'user' | 'model';

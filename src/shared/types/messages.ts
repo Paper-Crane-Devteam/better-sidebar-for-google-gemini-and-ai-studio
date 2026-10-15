@@ -254,6 +254,7 @@ export type ExtensionMessage = (
         options: {
           caseSensitive?: boolean;
           wholeWord?: boolean;
+          useRegex?: boolean;
           includeFolderNames?: string[];
           excludeFolderNames?: string[];
           roleFilter?: 'all' | 'user' | 'model';

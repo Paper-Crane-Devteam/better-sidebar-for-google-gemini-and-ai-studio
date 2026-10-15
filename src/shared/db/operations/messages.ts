@@ -1,5 +1,6 @@
 import { runQuery, runCommand, runBatch } from '../index';
 import { trace } from '@/shared/lib/trace';
+import { buildSearchSource, getSearchRegexError } from '@/shared/lib/search-pattern';
 import type { Message } from '../../types/db';
 
 export const messageRepo = {
@@ -301,6 +302,7 @@ export const messageRepo = {
     options: {
       caseSensitive?: boolean;
       wholeWord?: boolean;
+      useRegex?: boolean;
       includeFolderNames?: string[];
       excludeFolderNames?: string[];
       roleFilter?: 'all' | 'user' | 'model';
@@ -353,9 +355,30 @@ export const messageRepo = {
 
     // Check query length. Trigram tokenizer requires at least 3 characters.
     // If query is shorter, fall back to standard LIKE.
-    const useFts = query.length >= 3;
+    const useFts = !options.useRegex && query.length >= 3;
 
-    if (useFts) {
+    if (options.useRegex) {
+      // Full scan through the worker's regexp_test() UDF — no index can answer an
+      // arbitrary regex. Case and whole-word are folded into the pattern itself.
+      const regexError = getSearchRegexError(query, options);
+      if (regexError) {
+        throw new Error(`Invalid regular expression: ${regexError}`);
+      }
+      const { source, flags } = buildSearchSource(query, options);
+      trace('[DB] Regex Search:', source, flags);
+
+      sql += `
+        SELECT m.*, c.title as conversation_title, c.folder_id, f.name as folder_name, c.external_url, c.platform
+        FROM messages m
+        JOIN conversations c ON m.conversation_id = c.id
+        LEFT JOIN folders f ON c.folder_id = f.id
+        WHERE m.message_type != 'thought'
+        AND c.deleted_at IS NULL
+        AND c.is_temporary = 0
+        AND regexp_test(?, ?, m.content)
+      `;
+      params.push(source, flags);
+    } else if (useFts) {
       // Use FTS5 table
       // Prepare match query
       let matchQuery = query;
@@ -421,8 +444,10 @@ export const messageRepo = {
       params.push(options.conversationId);
     }
 
-    // Fetch more results when post-filtering will reduce the set
-    const needsPostFilter = options.wholeWord || options.caseSensitive;
+    // Fetch more results when post-filtering will reduce the set.
+    // Regex mode already applied case / whole-word inside SQL.
+    const needsPostFilter =
+      !options.useRegex && (options.wholeWord || options.caseSensitive);
     const limit = needsPostFilter ? 1000 : 500;
     sql += ` ORDER BY m.timestamp DESC LIMIT ${limit}`;
 

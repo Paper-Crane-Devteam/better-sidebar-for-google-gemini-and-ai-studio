@@ -22,6 +22,12 @@ import type { Message } from '@/shared/types/db';
 import AIStudioIcon from '@/assets/icons/aistudio.png';
 import GeminiIcon from '@/assets/icons/gemini.svg';
 import { PLATFORM_CONFIG, Platform } from '@/shared/types/platform';
+import {
+  buildSearchRegex,
+  findFirstMatch,
+  splitByMatches,
+  type SearchMatchOptions,
+} from '@/shared/lib/search-pattern';
 
 export interface SearchResultItem {
   id: string;
@@ -36,14 +42,14 @@ export interface SearchResultItem {
   platform?: string;
   scroll_index?: number;
   /** Set on navigation so the target page can highlight the matched terms */
-  highlight?: { query: string; caseSensitive?: boolean; wholeWord?: boolean };
+  highlight?: { query: string } & SearchMatchOptions;
 }
 
 // Component for the message preview modal content with context
 interface MessagePreviewContentProps {
   match: SearchResultItem;
   activeQuery: string;
-  activeOptions: { caseSensitive?: boolean; wholeWord?: boolean };
+  activeOptions: SearchMatchOptions;
 }
 
 const MessagePreviewContent = ({
@@ -257,34 +263,18 @@ const MatchItem = ({
       );
     }
 
-    const escapeRegExp = (string: string) => {
-      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    };
+    const regex = buildSearchRegex(highlight, activeOptions, 'g');
+    // First non-empty match, so the snippet is centred on an actual hit.
+    const firstHit = regex ? findFirstMatch(text, regex) : null;
 
-    const escapedHighlight = escapeRegExp(highlight);
-    let pattern = escapedHighlight;
-    let flags = 'g';
-
-    if (!activeOptions.caseSensitive) {
-      flags += 'i';
-    }
-
-    if (activeOptions.wholeWord) {
-      pattern = `\\b${pattern}\\b`;
-    }
-
-    const regex = new RegExp(`(${pattern})`, flags);
-    const searchRegex = new RegExp(pattern, flags.replace('g', ''));
-    const matchResult = searchRegex.exec(text);
-
-    if (!matchResult) {
+    if (!regex || !firstHit) {
       return renderWrapper(
         text.substring(0, 100) + (text.length > 100 ? '...' : ''),
       );
     }
 
-    const index = matchResult.index;
-    const matchLength = matchResult[0].length;
+    const index = firstHit.index;
+    const matchLength = firstHit.length;
     let start = Math.max(0, index - 40);
     let end = Math.min(text.length, index + matchLength + 60);
 
@@ -309,17 +299,16 @@ const MatchItem = ({
       text.substring(start, end) +
       (end < text.length ? '...' : '');
 
-    const parts = snippet.split(regex);
-    const highlightedContent = parts.map((part, i) =>
-      i % 2 === 1 ? (
+    const highlightedContent = splitByMatches(snippet, regex).map((part, i) =>
+      part.isMatch ? (
         <span
           key={i}
           className="bg-highlight/65 text-foreground rounded-[2px]"
         >
-          {part}
+          {part.text}
         </span>
       ) : (
-        part
+        <React.Fragment key={i}>{part.text}</React.Fragment>
       ),
     );
 
@@ -335,6 +324,7 @@ const MatchItem = ({
         query: activeQuery,
         caseSensitive: activeOptions.caseSensitive,
         wholeWord: activeOptions.wholeWord,
+        useRegex: activeOptions.useRegex,
       },
     });
   };
