@@ -161,9 +161,17 @@ async function scrollToTurn(turn: HTMLElement, preferModel: boolean, highlight?:
     anchor.scrollIntoView({ block: 'start', behavior: 'smooth' });
   }
 
+  // The user-query element spans the full column; ring the bubble itself instead
+  const ringTarget =
+    (!preferModel
+      ? (turn.querySelector('.user-query-bubble-with-background') as HTMLElement | null)
+      : null) ??
+    side ??
+    turn;
+
   // Pulse once the smooth scroll has mostly arrived, otherwise it plays off-screen
   await wait(350);
-  pulseTurn(side ?? turn);
+  pulseTurn(ringTarget, findConversationScroller());
 }
 
 export async function jumpToGeminiMessage(target: JumpTarget): Promise<void> {

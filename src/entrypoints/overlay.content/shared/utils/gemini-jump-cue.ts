@@ -94,13 +94,65 @@ export function highlightMatches(scope: HTMLElement, query?: HighlightQuery): Ra
   return ranges[0];
 }
 
-export function pulseTurn(el: HTMLElement) {
-  el.animate(
-    [
-      { outline: `2px solid ${ACCENT}`, outlineOffset: '6px', borderRadius: '16px' },
-      { outline: `2px solid ${ACCENT}`, outlineOffset: '6px', borderRadius: '16px', offset: 0.6 },
-      { outline: '2px solid transparent', outlineOffset: '6px', borderRadius: '16px' },
-    ],
+/** Gap between the message and the ring, and between the ring and the viewport edge. */
+const RING_GAP = 6;
+const EDGE_INSET = 4;
+
+/**
+ * Pulse a ring around `el`.
+ *
+ * Drawn as a fixed overlay on <body> rather than an `outline` on the element:
+ * Gemini's containers clipped the outline on three sides, and a model answer is
+ * often taller than the viewport, so its own bottom edge is off-screen anyway.
+ * The ring is clamped to the visible part of `clipTo` (the chat scroller) so all
+ * four sides are always on screen, and it tracks the element every frame in case
+ * the smooth scroll is still settling.
+ */
+export function pulseTurn(el: HTMLElement, clipTo?: HTMLElement | null) {
+  const ring = document.createElement('div');
+  Object.assign(ring.style, {
+    position: 'fixed',
+    pointerEvents: 'none',
+    zIndex: '1000',
+    boxSizing: 'border-box',
+    border: `2px solid ${ACCENT}`,
+    borderRadius: '16px',
+    boxShadow: `0 0 0 4px color-mix(in srgb, ${ACCENT} 25%, transparent)`,
+    left: '0',
+    top: '0',
+    width: '0',
+    height: '0',
+  } satisfies Partial<CSSStyleDeclaration>);
+  document.body.appendChild(ring);
+
+  let frame = 0;
+  const place = () => {
+    const r = el.getBoundingClientRect();
+    const bounds = clipTo?.getBoundingClientRect() ?? new DOMRect(0, 0, innerWidth, innerHeight);
+    const left = Math.max(r.left - RING_GAP, bounds.left + EDGE_INSET);
+    const top = Math.max(r.top - RING_GAP, bounds.top + EDGE_INSET);
+    const right = Math.min(r.right + RING_GAP, bounds.right - EDGE_INSET);
+    const bottom = Math.min(r.bottom + RING_GAP, bounds.bottom - EDGE_INSET);
+    const visible = right > left && bottom > top;
+    ring.style.display = visible ? 'block' : 'none';
+    if (visible) {
+      ring.style.left = `${left}px`;
+      ring.style.top = `${top}px`;
+      ring.style.width = `${right - left}px`;
+      ring.style.height = `${bottom - top}px`;
+    }
+    frame = requestAnimationFrame(place);
+  };
+  place();
+
+  const anim = ring.animate(
+    [{ opacity: 0 }, { opacity: 1, offset: 0.12 }, { opacity: 1, offset: 0.6 }, { opacity: 0 }],
     { duration: PULSE_DURATION, easing: 'ease-out' },
   );
+  const cleanup = () => {
+    cancelAnimationFrame(frame);
+    ring.remove();
+  };
+  anim.onfinish = cleanup;
+  anim.oncancel = cleanup;
 }
