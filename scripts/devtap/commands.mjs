@@ -219,7 +219,17 @@ export async function cmdEval(flags) {
   const { roots } = await discover(flags.port);
   const opened = await openAll(roots);
   try {
-    const node = filterContexts(opened.nodes, ctxName)[0];
+    let candidates = filterContexts(opened.nodes, ctxName);
+    // Two Gemini tabs share the `gem` label; --page picks one by url / target id.
+    if (flags.page) {
+      const want = String(flags.page).toLowerCase();
+      candidates = candidates.filter(
+        (n) =>
+          String(n.url ?? n.target?.url ?? '').toLowerCase().includes(want) ||
+          String(n.target?.targetId ?? n.target?.id ?? '').toLowerCase().startsWith(want),
+      );
+    }
+    const node = candidates[0];
     if (!node) {
       throw new Error(
         `No context "${ctxName}". Available: ${opened.nodes.map((n) => n.label).join(', ')}`,
