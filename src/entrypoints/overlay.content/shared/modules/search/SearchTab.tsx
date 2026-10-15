@@ -71,7 +71,7 @@ export const SearchTab = ({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="px-3 py-2 flex items-center justify-between h-12 shrink-0">
+      <div className="tab-header px-3 py-2 flex items-center justify-between h-12 shrink-0">
         <h1 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground/70">
           {t('search.title')}
         </h1>

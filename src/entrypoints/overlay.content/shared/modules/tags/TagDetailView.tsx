@@ -121,7 +121,7 @@ export const TagDetailView = ({ tag, counts }: TagDetailViewProps) => {
   return (
     <div className="flex flex-col h-full w-full" onKeyDown={handleKeyDown}>
       {/* Header: back · tag switcher · show in explorer */}
-      <div className="px-2 flex items-center gap-1 h-12 shrink-0">
+      <div className="tab-header px-2 flex items-center gap-1 h-12 shrink-0">
         <SimpleTooltip content={t('tags.backToTags')}>
           <Button
             variant="ghost"

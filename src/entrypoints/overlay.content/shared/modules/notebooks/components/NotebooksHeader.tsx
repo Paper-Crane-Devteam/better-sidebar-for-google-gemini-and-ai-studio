@@ -61,7 +61,7 @@ export const NotebooksHeader = ({
 
   return (
     <div className="flex flex-col">
-      <div className="px-3 pt-2 pb-1 flex items-center justify-between">
+      <div className="tab-header px-3 pt-2 pb-1 flex items-center justify-between">
         <h1 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground/70">
           {t('notebooks.title')}
         </h1>
