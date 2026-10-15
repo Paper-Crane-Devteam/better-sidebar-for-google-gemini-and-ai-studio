@@ -25,15 +25,18 @@ export interface ThemeVariable {
  * `!important` opacity would out-rank the keyframes and break the grow-in.
  */
 export interface LmGlowOptions {
-  /** Blur radius. Gemini uses `125px`. */
+  /**
+   * Blur radius. Currently ignored: Gemini's glow is now shaped by an SVG mask
+   * with no blur filter (it used to be a 125px-blurred gradient).
+   */
   blur?: string;
-  /** Strength of the outer stop, 0–1. Gemini is effectively 1. */
+  /** Strength of the glow body colour, 0–1. Gemini is effectively 1. */
   intensity?: number;
-  /** Outer stop colour. Defaults to the derived `surface-accent`. */
+  /** Glow body colour. Defaults to the derived `--bard-color-lm-glow-chat`. */
   accent?: string;
-  /** Widest the halo grows. Gemini uses `792px`. */
+  /** Widest the halo grows. Gemini uses `1601.27px`. */
   maxWidth?: string;
-  /** Tallest the halo grows. Gemini uses `300px`. */
+  /** Tallest the halo grows. Gemini sizes it by aspect ratio, no cap. */
   maxHeight?: string;
 }
 
@@ -56,12 +59,12 @@ export interface ThemePresetMeta {
   /** Google Fonts to load (if any) */
   fonts?: string[];
   /**
-   * The blurred halo behind the composer — Gemini's `.show-lm-background`
-   * pseudo-element, a 125px-blurred radial gradient running from
-   * `--lumi-sys-color--surface` at the centre to `--lumi-sys-color--surface-accent`
-   * at 50%.
+   * The halo behind the composer — Gemini's `.show-lm-background .lm-glow`
+   * pseudo-elements: a masked radial gradient in `--bard-color-lm-glow-chat`
+   * (`::before`) plus a half-opacity `--bard-color-lm-glow-bloom` patch
+   * (`::after`).
    *
-   * The colour is themed for every preset by deriving `surface-accent` (see
+   * The colour is themed for every preset by deriving those tokens (see
    * gemini-derived.ts), so this only exists for themes whose character calls for
    * a different *shape* of glow — a soft wash suits a glass theme and fights a
    * high-contrast one.

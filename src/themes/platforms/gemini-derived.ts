@@ -321,11 +321,26 @@ function deriveLumiTokens(f: ReturnType<typeof createFiller>): void {
   const { declared, fill } = f;
   const get = (p: string) => declared.get(p);
 
+  const primary = get('--gem-sys-color--primary');
   const primaryContainer = get('--gem-sys-color--primary-container');
+  const secondaryContainer = get('--gem-sys-color--secondary-container');
+  const surface = get('--gem-sys-color--surface');
   const onSurface = get('--gem-sys-color--on-surface');
   const error = get('--gem-sys-color--error');
 
   fill('--lumi-sys-color--surface-accent', primaryContainer);
+
+  // The current glow (`.lm-glow::before/::after`) no longer reads the Lumi
+  // tokens. Its body is `lm-glow-chat` (#9dd2ff / #1f3b9b), and the `::after`
+  // bloom is a rotated, half-opacity patch of `lm-glow-bloom` (#fff / #000) that
+  // is meant to melt into the page. Left at #000 on a non-black themed surface
+  // it shows up as a dark bulge on the glow's upper left, so it has to follow
+  // the page surface rather than any accent.
+  fill('--bard-color-lm-glow-chat', primaryContainer);
+  fill('--bard-color-lm-glow-bloom', surface);
+  // Task ("remy") mode tints the glow deeper; keep it distinct from chat.
+  fill('--bard-color-lm-glow-task-base', secondaryContainer ?? primaryContainer);
+  fill('--bard-color-lm-glow-task-mid', primary);
 
   // Overlay tints over on-surface. Gemini writes them as rgba() at fixed
   // alphas; color-mix renders the same and takes the preset's hex directly.
@@ -344,27 +359,29 @@ function cssSafe(value: string): string {
 /**
  * Reshape the composer glow.
  *
- * Targets `.show-lm-background::before` *without* the `_nghost-ng-cNNNN`
- * attribute from Gemini's own rule — that hash is regenerated on every Angular
- * build, so matching it would make this break silently at some point. Dropping
- * it still wins the cascade: Gemini's selector is (0,2,1) and this one is
- * (0,2,2), one type selector ahead.
+ * Gemini's glow is `.show-lm-background .lm-glow::before` (the masked body)
+ * plus `::after` (a half-opacity bloom). Selectors here drop the
+ * `_nghost/_ngcontent-ng-cNNNN` attributes from Gemini's own rules — that hash
+ * is regenerated on every Angular build, so matching it would break silently.
+ * Without them ours is lower specificity, hence `!important` throughout.
  *
  * `opacity` and `transform` are deliberately left alone. The element animates in
- * via `lm-background-grow`, and animations lose to `!important` declarations —
+ * via `lm-glow-grow`, and animations lose to `!important` declarations —
  * overriding either would freeze the entry animation. Intensity is applied by
- * fading the outer gradient stop instead.
+ * fading the body colour instead, through the `--lm-glow-body-*` properties the
+ * gradient already reads, so Gemini's colour transitions keep working.
  */
 function buildLmGlowCss(preset: ThemePreset): string | null {
   const glow = preset.lmGlow;
   if (!glow) return null;
 
-  const scope = `body.${'bs-theme--'}${preset.id} .show-lm-background::before`;
+  const host = `body.${'bs-theme--'}${preset.id} .show-lm-background .lm-glow`;
+  const scope = `${host}::before`;
 
   if (glow === 'off') {
     return [
       '/* Composer glow removed: a blurred haze works against this theme. */',
-      `${scope} {`,
+      `${scope}, ${host}::after {`,
       '  display: none !important;',
       '}',
     ].join('\n');
@@ -374,20 +391,21 @@ function buildLmGlowCss(preset: ThemePreset): string | null {
   const decls: string[] = [];
 
   // Fading is only worth a rule when it actually fades: at full strength the
-  // derived surface-accent already is the outer stop.
+  // derived lm-glow-chat already is the body colour.
   const fade = o.intensity !== undefined && o.intensity < 1;
   if (o.accent !== undefined || fade) {
-    const accent = cssSafe(o.accent ?? 'var(--lumi-sys-color--surface-accent)');
-    const outer = fade
+    const accent = cssSafe(o.accent ?? 'var(--bard-color-lm-glow-chat)');
+    const body = fade
       ? `color-mix(in srgb, ${accent} ${Math.round(
           Math.max(0, o.intensity as number) * 100,
         )}%, transparent)`
       : accent;
-    decls.push(
-      `  background: radial-gradient(ellipse 100% 100% at center 8%, var(--lumi-sys-color--surface) 0, ${outer} 50%) !important;`,
-    );
+    decls.push(`  --lm-glow-body-base: ${body} !important;`);
+    decls.push(`  --lm-glow-body-mid: ${body} !important;`);
   }
-  if (o.blur) decls.push(`  filter: blur(${cssSafe(o.blur)}) !important;`);
+  // `blur` is intentionally not emitted: the current glow is shaped by an SVG
+  // mask and carries no filter, so any preset blur value (tuned against the
+  // old 125px baseline) would only smear it into a much fainter blob.
   if (o.maxWidth) decls.push(`  max-width: ${cssSafe(o.maxWidth)} !important;`);
   if (o.maxHeight) decls.push(`  max-height: ${cssSafe(o.maxHeight)} !important;`);
 
