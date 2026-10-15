@@ -426,6 +426,13 @@ const Options = ({ initialEnabledState, detectedPlatform }: OptionsProps) => {
                     </div>
                     <div className="flex items-center justify-between p-4">
                       <div className="space-y-1">
+                        <Label className="text-sm font-semibold">{t('aistudioUI.smartScrollbar')}</Label>
+                        <p className="text-xs text-muted-foreground">{t('aistudioUI.smartScrollbarDesc')}</p>
+                      </div>
+                      <Switch checked={aistudioSettings.showSmartScrollbar ?? true} onCheckedChange={(c) => setAIStudioFeature('showSmartScrollbar', c)} className="data-[state=checked]:bg-primary data-[state=checked]:border-primary" />
+                    </div>
+                    <div className="flex items-center justify-between p-4">
+                      <div className="space-y-1">
                         <Label className="text-sm font-semibold">{t('aistudioUI.slashCommand')}</Label>
                         <p className="text-xs text-muted-foreground">{t('aistudioUI.slashCommandDesc')}</p>
                       </div>

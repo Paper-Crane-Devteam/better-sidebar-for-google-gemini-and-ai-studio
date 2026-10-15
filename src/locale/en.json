@@ -916,6 +916,8 @@
     "autoHideInputDesc": "Hide input box until you hover the bottom area",
     "autoHideRunSettings": "Collapse Run Settings by Default",
     "autoHideRunSettingsDesc": "Run settings panel stays collapsed when opening a chat, expand manually when needed",
+    "smartScrollbar": "Smart Scrollbar",
+    "smartScrollbarDesc": "Show conversation navigation on the right side",
     "slashCommand": "Slash Commands",
     "slashCommandDesc": "Type / in input to quickly insert prompts from library",
     "agentTrigger": "Agent Trigger",

@@ -96,6 +96,7 @@ export interface AIStudioEnhancedFeatures {
   sidebarWidth: number;
   autoHideInput: boolean;
   autoHideRunSettings: boolean;
+  showSmartScrollbar: boolean;
   showHotkeyHelper: boolean;
   slashCommand: boolean;
   /** `>` in the composer opens the agent launcher popup */
@@ -187,6 +188,7 @@ export const usePegasusStore = create<PegasusState>()((set) => ({
       sidebarWidth: 320,
       autoHideInput: false,
       autoHideRunSettings: false,
+      showSmartScrollbar: true,
       showHotkeyHelper: true,
       slashCommand: true,
       agentTrigger: true,
@@ -262,6 +264,7 @@ const DEFAULT_ENHANCED_FEATURES: PegasusState['enhancedFeatures'] = {
     sidebarWidth: 320,
     autoHideInput: false,
     autoHideRunSettings: false,
+    showSmartScrollbar: true,
     showHotkeyHelper: true,
     slashCommand: true,
     agentTrigger: true,
