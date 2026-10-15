@@ -37,10 +37,16 @@ const USER_ROLE_SELECTOR = '[data-turn-role="User"]';
 
 const SCROLL_DEBOUNCE_MS = 80;
 const REFRESH_THROTTLE_MS = 250;
-/** Keep auto-detection from overriding a click while the smooth scroll runs */
+/** Keep auto-detection from overriding a click while the jump settles */
 const CLICK_LOCK_MS = 1500;
-/** Time for the smooth scroll to land before checking whether layout moved it */
-const SETTLE_DELAY_MS = 450;
+/** Interval between alignment checks after a jump */
+const SETTLE_INTERVAL_MS = 120;
+/** Give up correcting after this many checks (~1.2s) */
+const SETTLE_MAX_CHECKS = 10;
+/** Consecutive aligned checks needed before the jump counts as landed */
+const SETTLE_STABLE_CHECKS = 2;
+/** Offset (px) still considered aligned */
+const ALIGN_TOLERANCE = 4;
 /** Retry interval while the chat view has not been rendered yet */
 const RESOLVE_RETRY_MS = 500;
 
@@ -187,22 +193,43 @@ export function useAIStudioTurnNodes() {
   }, [scroller, detectActive]);
 
   // ── Jump ─────────────────────────────────────────────────────────────
+  /** Cancels the correction loop of a previous click */
+  const jumpTokenRef = useRef(0);
+
   const scrollToNode = useCallback(
     (id: string) => {
       const turn = document.getElementById(id);
       if (!turn || !scroller) return;
 
+      const token = ++jumpTokenRef.current;
       setActiveId(id);
       lockUntilRef.current = Date.now() + CLICK_LOCK_MS;
-      turn.scrollIntoView({ block: 'start', behavior: 'smooth' });
 
-      // Turns above the target swap placeholders for real content as they come
-      // into view, which shifts the landing spot. Correct once it has settled.
-      setTimeout(() => {
-        if (!turn.isConnected) return;
+      // Instant, not smooth: a smooth scroll over a long distance renders every
+      // virtualised turn on the way, each one changing height mid-flight, and it
+      // lands short of the target. Jump, then keep re-aligning until the turns
+      // around the target have rendered and the offset stays put.
+      const align = () =>
+        turn.scrollIntoView({ block: 'start', behavior: 'auto' });
+      align();
+
+      let checks = 0;
+      let stable = 0;
+      const settle = () => {
+        if (token !== jumpTokenRef.current || !turn.isConnected) return;
         const offset = turn.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
-        if (Math.abs(offset) > 8) turn.scrollIntoView({ block: 'start', behavior: 'auto' });
-      }, SETTLE_DELAY_MS);
+        if (Math.abs(offset) > ALIGN_TOLERANCE) {
+          stable = 0;
+          align();
+        } else if (++stable >= SETTLE_STABLE_CHECKS) {
+          return;
+        }
+        if (++checks < SETTLE_MAX_CHECKS) {
+          lockUntilRef.current = Date.now() + CLICK_LOCK_MS;
+          setTimeout(settle, SETTLE_INTERVAL_MS);
+        }
+      };
+      setTimeout(settle, SETTLE_INTERVAL_MS);
     },
     [scroller],
   );

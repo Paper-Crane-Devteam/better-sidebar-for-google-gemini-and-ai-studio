@@ -258,7 +258,9 @@ const DotItem: React.FC<DotItemProps> = ({
         ref={activeRef}
         onClick={() => item.available && onSelect(item.id)}
         className={cn(
-          'group flex items-center justify-center',
+          // shrink-0: the column is height-capped, and without it a long list
+          // squeezes the rows until the dots touch instead of scrolling
+          'group flex items-center justify-center shrink-0',
           'h-4 w-6 rounded-full',
           'transition-all duration-150',
           item.available ? 'cursor-pointer' : 'cursor-default',
