@@ -20,7 +20,7 @@ import {
   getRegistry,
 } from '@/shared/lib/profile-registry';
 import { notifyDataUpdated } from '../notify';
-import { setTabDb, setCurrentDbName } from '../tab-profile-map';
+import { setTabDb, UNBOUND } from '../tab-profile-map';
 
 export async function handleProfile(
   message: ExtensionMessage,
@@ -32,6 +32,7 @@ export async function handleProfile(
         const { platform, username } = message.payload;
         const platformEnum = platform as Platform;
         const tabId = sender.tab?.id;
+        const tabUrl = sender.tab?.url;
 
         // Check if this account is already bound in the active profile
         const activeProfile = await getActiveProfile();
@@ -39,7 +40,7 @@ export async function handleProfile(
 
         if (activeAccount === username) {
           // Account matches active profile — register tab→db mapping
-          if (tabId != null) setTabDb(tabId, activeProfile.dbName);
+          if (tabId != null) setTabDb(tabId, activeProfile.dbName, tabUrl);
           return {
             success: true,
             data: { action: 'ok', profileId: activeProfile.id },
@@ -55,8 +56,7 @@ export async function handleProfile(
           // Auto-switch to the profile that has this account
           await setActiveProfile(existingProfile.id);
           await switchDB(existingProfile.dbName);
-          setCurrentDbName(existingProfile.dbName);
-          if (tabId != null) setTabDb(tabId, existingProfile.dbName);
+          if (tabId != null) setTabDb(tabId, existingProfile.dbName, tabUrl);
           await notifyDataUpdated('PROFILE_SWITCHED', {
             profileId: existingProfile.id,
             profileName: existingProfile.name,
@@ -75,7 +75,7 @@ export async function handleProfile(
         // auto-bind it (first-time setup convenience)
         if (!activeAccount) {
           await bindAccount(activeProfile.id, platformEnum, username);
-          if (tabId != null) setTabDb(tabId, activeProfile.dbName);
+          if (tabId != null) setTabDb(tabId, activeProfile.dbName, tabUrl);
           return {
             success: true,
             data: { action: 'bound', profileId: activeProfile.id },
@@ -83,7 +83,10 @@ export async function handleProfile(
         }
 
         // Active profile has a DIFFERENT account for this platform,
-        // and no other profile has this account — user needs to choose
+        // and no other profile has this account — user needs to choose.
+        // Until they do, this tab must not read or write any profile: the open
+        // database belongs to another account.
+        if (tabId != null) setTabDb(tabId, UNBOUND, tabUrl);
         const profiles = await getAllProfiles();
         return {
           success: true,
@@ -142,8 +145,7 @@ export async function handleProfile(
         const profile = registry.profiles[profileId];
         await setActiveProfile(profileId);
         await switchDB(profile.dbName);
-        setCurrentDbName(profile.dbName);
-        if (sender.tab?.id != null) setTabDb(sender.tab.id, profile.dbName);
+        if (sender.tab?.id != null) setTabDb(sender.tab.id, profile.dbName, sender.tab.url);
         await notifyDataUpdated('PROFILE_SWITCHED', {
           profileId,
           profileName: profile.name,
@@ -164,8 +166,7 @@ export async function handleProfile(
         }
         await setActiveProfile(profileId);
         await switchDB(profile.dbName);
-        setCurrentDbName(profile.dbName);
-        if (sender.tab?.id != null) setTabDb(sender.tab.id, profile.dbName);
+        if (sender.tab?.id != null) setTabDb(sender.tab.id, profile.dbName, sender.tab.url);
         await notifyDataUpdated('PROFILE_SWITCHED', {
           profileId,
           profileName: profile.name,

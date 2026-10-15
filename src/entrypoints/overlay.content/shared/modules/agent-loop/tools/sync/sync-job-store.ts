@@ -48,6 +48,15 @@ export interface SyncJobEntry {
 
 export interface SyncJob {
   platform: string;
+  /**
+   * The signed-in account the run was started under, or null if it couldn't be
+   * detected.
+   *
+   * The job lives in `chrome.storage.local`, which every tab of every account
+   * shares. Without this a tab signed into another account would pick the run up
+   * at start-up and walk itself through conversation ids that don't exist there.
+   */
+  account: string | null;
   entries: SyncJobEntry[];
   /** Index of the entry being worked on */
   cursor: number;
@@ -96,9 +105,14 @@ export async function clearSyncJob(): Promise<void> {
   await chrome.storage.local.remove(JOB_KEY);
 }
 
-export function createSyncJob(externalIds: string[], platform: string): SyncJob {
+export function createSyncJob(
+  externalIds: string[],
+  platform: string,
+  account: string | null,
+): SyncJob {
   return {
     platform,
+    account,
     entries: externalIds.map((externalId) => ({
       externalId,
       status: 'pending' as const,

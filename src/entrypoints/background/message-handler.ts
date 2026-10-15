@@ -5,7 +5,8 @@ import type {
 import type { MessageSender } from './types';
 import { ensureDbReady } from './db';
 import { detectPlatform, Platform } from '@/shared/types/platform';
-import { ensureDbForTab, removeTab } from './tab-profile-map';
+import { removeTab, resolveTabDb, UNBOUND } from './tab-profile-map';
+import { withDb } from '@/shared/db';
 import { handleBrowserAgent } from './handlers/browser-agent';
 import {
   handleFolders,
@@ -31,8 +32,8 @@ import {
   handleDocument,
 } from './handlers';
 
+// `handleProfile` is deliberately absent: it runs ahead of the tab lease.
 const handlers = [
-  handleProfile,
   handleFolders,
   handleConversations,
   handleScan,
@@ -50,6 +51,14 @@ const handlers = [
   handleBackfill,
   handleAgentLedger,
 ];
+
+/** Messages whose handlers pin an explicitly named database themselves */
+const SELF_PINNED = new Set([
+  'BACKUP_LIST',
+  'BACKUP_CREATE',
+  'BACKUP_DELETE',
+  'BACKUP_RESTORE',
+]);
 
 // Clean up tab→db mapping when tabs are closed
 browser.tabs.onRemoved.addListener((tabId) => {
@@ -115,18 +124,40 @@ export async function handleMessage(
       }
     }
 
-    // Auto-switch DB if sender tab expects a different database
-    // (handles multi-tab with different accounts)
-    if (sender.tab?.id != null) {
-      await ensureDbForTab(sender.tab.id);
+    // Profile messages decide which database a tab belongs to and switch it
+    // themselves, so they run before — and outside — any tab lease. Inside one,
+    // their `switchDB` would wait for the lease it is running in.
+    const profileResult = await handleProfile(message, sender);
+    if (profileResult !== null) return profileResult;
+
+    const runHandlers = async (): Promise<ExtensionResponse> => {
+      for (const handler of handlers) {
+        const result = await handler(message, sender);
+        if (result !== null) return result;
+      }
+      return { success: false, error: 'Unknown message type' };
+    };
+
+    // Backups name their database explicitly and pin it themselves; it need not
+    // be the sender tab's, and pinning another one inside the tab's lease would
+    // wait on itself.
+    if (sender.tab?.id == null || SELF_PINNED.has(type)) {
+      return await runHandlers();
     }
 
-    for (const handler of handlers) {
-      const result = await handler(message, sender);
-      if (result !== null) return result;
+    // Run the whole handler against the sender tab's database. A lease rather
+    // than a one-off switch: a handler awaits several queries, and another tab's
+    // message used to switch the database between them, landing the rest of the
+    // writes in the other account's profile.
+    const tabDb = await resolveTabDb(sender.tab.id, sender.tab.url);
+    if (tabDb === UNBOUND) {
+      return {
+        success: false,
+        error: 'This account is not linked to a profile yet. Choose a profile first.',
+      };
     }
-
-    return { success: false, error: 'Unknown message type' };
+    if (tabDb === null) return await runHandlers();
+    return await withDb(tabDb, runHandlers);
   } catch (err: unknown) {
     console.error('Error handling message:', message, err);
     return { success: false, error: (err as Error).message };
