@@ -10,7 +10,10 @@
     --sidebar-gap: 8px;
     --sidebar-padding-y: 8px;
     --sidebar-icon-stroke: 1.75;
-    --sidebar-icon-color: 68 71 70;
+    /* Rail icons sit back at rest (outline grey) and only come up to full
+       on-surface-variant when hovered — the rail is rarely the focus. */
+    --sidebar-icon-color: 116 119 117; /* #747775 */
+    --sidebar-icon-color-hover: 68 71 70; /* #444746 */
 
     --background: 253 253 253; /* #fdfdfd - lighter surface */
     --foreground: 31 31 31; /* #1f1f1f */
@@ -94,7 +97,10 @@
     --destructive: 236 146 142; /* #ec928e */
     --destructive-foreground: 96 20 16; /* #601410 */
 
-    --sidebar-icon-color: 196 199 197; /* #c4c7c5 */
+    --sidebar-icon-color: 142 145 143; /* #8e918f */
+    --sidebar-icon-color-hover: 196 199 197; /* #c4c7c5 */
+    /* Rail surface: closer to the content card so the strip stops glowing. */
+    --sidebar-nav-background: 40 42 44; /* #282a2c */
 
     --border: 55 57 59; /* #37393b - neutral-90 */
     --input: 122 122 122; /* #7a7a7a - icon-separator */
@@ -159,7 +165,13 @@
   /* Sidebar - Gemini Specific (flat, no gradient, no border — color separation handles distinction) */
   .theme-gemini .sidebar-nav,
   :host(.theme-gemini) .sidebar-nav {
-    background: rgb(var(--secondary));
+    background: rgb(var(--sidebar-nav-background, var(--secondary)));
+  }
+
+  /* Bring the hovered icon back to full strength */
+  .theme-gemini .sidebar-nav .sidebar-btn:hover .sidebar-icon,
+  :host(.theme-gemini) .sidebar-nav .sidebar-btn:hover .sidebar-icon {
+    color: rgb(var(--sidebar-icon-color-hover));
   }
 
   /* Content area (file tree, outline, etc.) - white background */
