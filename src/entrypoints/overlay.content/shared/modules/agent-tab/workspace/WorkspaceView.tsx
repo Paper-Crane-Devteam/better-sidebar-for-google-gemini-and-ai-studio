@@ -25,7 +25,7 @@
  */
 
 import React, { useCallback, useRef, useState } from 'react';
-import { FilePlus, Loader2, Upload } from 'lucide-react';
+import { FilePlus, FolderUp, Loader2, Upload } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { cn } from '@/shared/lib/utils/utils';
 import { useI18n } from '@/shared/hooks/useI18n';
@@ -356,7 +356,7 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({ onBack }) => {
           Empty state, over the mounted-but-empty tree.
 
           `pointer-events-none` on the wrapper so the drop target underneath still
-          receives the drag this text is inviting; the two buttons opt back in with
+          receives the drag this text is inviting; the buttons opt back in with
           `pointer-events-auto`, since a button that cannot be clicked is worse than
           no button.
 
@@ -368,8 +368,8 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({ onBack }) => {
           to add a file.
         */}
         {!loading && !error && data.length === 0 && (
-          <div className="pointer-events-none absolute inset-x-0 top-0 flex flex-col items-start gap-3 px-3 py-4">
-            <p className="text-xs text-muted-foreground">
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 py-4">
+            <p className="max-w-[260px] text-center text-xs text-muted-foreground">
               {isFiltered
                 ? t('agent.workspace.noMatches', {
                     defaultValue: 'No files match that search.',
@@ -381,11 +381,11 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({ onBack }) => {
             </p>
 
             {!isFiltered && (
-              <div className="pointer-events-auto flex items-center gap-2">
+              <div className="pointer-events-auto flex w-full max-w-[200px] flex-col items-stretch gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-7 gap-1.5 px-2.5 text-xs"
+                  className="h-8 justify-start gap-2 px-3 text-xs"
                   onClick={() => transfer.pickFiles('')}
                 >
                   <Upload className="h-3.5 w-3.5" />
@@ -396,7 +396,18 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({ onBack }) => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-7 gap-1.5 px-2.5 text-xs"
+                  className="h-8 justify-start gap-2 px-3 text-xs"
+                  onClick={() => transfer.pickFolder('')}
+                >
+                  <FolderUp className="h-3.5 w-3.5" />
+                  {t('agent.workspace.importFolder', {
+                    defaultValue: 'Import folder…',
+                  })}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 justify-start gap-2 px-3 text-xs"
                   onClick={() => void createFile('')}
                 >
                   <FilePlus className="h-3.5 w-3.5" />
