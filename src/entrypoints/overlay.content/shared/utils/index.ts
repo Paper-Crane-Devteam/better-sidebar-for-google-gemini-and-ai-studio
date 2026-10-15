@@ -2,6 +2,7 @@ import { PLATFORM_CONFIG, detectPlatform, Platform } from '@/shared/types/platfo
 import { navigate, navigateToConversation } from '@/shared/lib/navigation';
 import { browser } from 'wxt/browser';
 import { jumpToGeminiMessage } from './gemini-jump-to-message';
+import type { HighlightQuery } from './gemini-jump-cue';
 
 interface SearchMatch {
   id: string;
@@ -9,6 +10,8 @@ interface SearchMatch {
   external_url?: string;
   platform?: string;
   scroll_index?: number;
+  /** Terms to highlight after scrolling to the message (Gemini only for now) */
+  highlight?: HighlightQuery;
 }
 
 export function getExternalUrl(id: string) {

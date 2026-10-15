@@ -19,10 +19,13 @@ import { browser } from 'wxt/browser';
 import { toast } from '@/shared/lib/toast';
 import { navigateToConversation } from '@/shared/lib/navigation';
 import { findConversationScroller } from '../modules/agent-loop/tools/sync/conversation-scroller';
+import { highlightMatches, pulseTurn, type HighlightQuery } from './gemini-jump-cue';
 
 interface JumpTarget {
   id: string;
   conversation_id: string;
+  /** Search terms to highlight once the message is on screen */
+  highlight?: HighlightQuery;
 }
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -138,14 +141,29 @@ async function loadUntilFound(
 /**
  * Turns use `content-visibility: auto`, so heights above the target are estimates
  * until rendered and the first scroll can land a little off. Jump, let layout
- * settle, then correct.
+ * settle, then correct, landing on the first search hit when there is one.
  */
-async function scrollToTurn(turn: HTMLElement, preferModel: boolean) {
-  const anchor =
-    (preferModel ? (turn.querySelector('model-response') as HTMLElement | null) : null) ?? turn;
+async function scrollToTurn(turn: HTMLElement, preferModel: boolean, highlight?: HighlightQuery) {
+  const side = turn.querySelector(preferModel ? 'model-response' : 'user-query') as HTMLElement | null;
+  const anchor = (preferModel ? side : null) ?? turn;
   anchor.scrollIntoView({ block: 'start', behavior: 'auto' });
   await wait(300);
-  anchor.scrollIntoView({ block: 'start', behavior: 'smooth' });
+
+  // Now rendered, so the text nodes are real. Prefer the side of the turn that
+  // matched; fall back to the whole turn (e.g. the query hit a code block's chrome).
+  const firstHit =
+    (side && highlightMatches(side, highlight)) || highlightMatches(turn, highlight);
+  const hitEl = firstHit?.startContainer.parentElement;
+
+  if (hitEl) {
+    hitEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  } else {
+    anchor.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }
+
+  // Pulse once the smooth scroll has mostly arrived, otherwise it plays off-screen
+  await wait(350);
+  pulseTurn(side ?? turn);
 }
 
 export async function jumpToGeminiMessage(target: JumpTarget): Promise<void> {
@@ -163,7 +181,7 @@ export async function jumpToGeminiMessage(target: JumpTarget): Promise<void> {
 
   const visible = findTurn(turnId);
   if (visible) {
-    await scrollToTurn(visible, preferModel);
+    await scrollToTurn(visible, preferModel, target.highlight);
     return;
   }
 
@@ -184,7 +202,7 @@ export async function jumpToGeminiMessage(target: JumpTarget): Promise<void> {
   }
 
   if (outcome instanceof HTMLElement) {
-    await scrollToTurn(outcome, preferModel);
+    await scrollToTurn(outcome, preferModel, target.highlight);
     return;
   }
   if (outcome !== 'cancelled') {

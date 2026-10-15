@@ -35,6 +35,8 @@ export interface SearchResultItem {
   external_url?: string;
   platform?: string;
   scroll_index?: number;
+  /** Set on navigation so the target page can highlight the matched terms */
+  highlight?: { query: string; caseSensitive?: boolean; wholeWord?: boolean };
 }
 
 // Component for the message preview modal content with context
@@ -327,7 +329,14 @@ const MatchItem = ({
   const handleNavigation = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    onNavigate?.(match);
+    onNavigate?.({
+      ...match,
+      highlight: {
+        query: activeQuery,
+        caseSensitive: activeOptions.caseSensitive,
+        wholeWord: activeOptions.wholeWord,
+      },
+    });
   };
 
   const handlePreview = (e: React.MouseEvent) => {
