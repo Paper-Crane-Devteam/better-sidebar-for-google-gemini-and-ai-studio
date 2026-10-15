@@ -14,6 +14,7 @@ import { navigate } from '@/shared/lib/navigation';
 import { MoreVertical, Settings, Database, History, Layout, RefreshCw, FolderPlus, CopyMinus, ArrowDownAZ, Clock, Calendar, Folder, Upload, Eye, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { BadgeLabel, FeatureBadge } from '@/shared/components/ui/badge-dot';
 import { toggleCompactMode } from '@/shared/lib/compact-mode';
+import { useShallow } from 'zustand/react/shallow';
 
 interface SidePanelMenuProps {
   onNewFolder?: () => void;
@@ -43,13 +44,21 @@ export const SidePanelMenu = ({
   menuActions,
 }: SidePanelMenuProps) => {
   const { t } = useI18n();
-  const { 
-    ui, 
-    setIsScanning, 
+  const {
+    ui,
+    setIsScanning,
     setShowSqlInterface,
     setSettingsOpen,
     setOverlayOpen,
-  } = useAppStore();
+  } = useAppStore(
+    useShallow((s) => ({
+      ui: s.ui,
+      setIsScanning: s.setIsScanning,
+      setShowSqlInterface: s.setShowSqlInterface,
+      setSettingsOpen: s.setSettingsOpen,
+      setOverlayOpen: s.setOverlayOpen,
+    })),
+  );
   const { isScanning } = ui.overlay;
   const compactMode = useSettingsStore((s) => s.compactMode);
 

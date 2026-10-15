@@ -4,6 +4,7 @@ import { GlobalToast } from '@/shared/components/GlobalToast';
 import { PowerPackPaywall } from '@/shared/components/PowerPackPaywall';
 import { ProfilePickerDialog } from '@/entrypoints/overlay.content/shared/components/ProfilePickerDialog';
 import { RatingPromptDialog } from '@/entrypoints/overlay.content/shared/modules/feedback/RatingPromptDialog';
+import { UpdateAvailableToast } from '@/entrypoints/overlay.content/shared/modules/extension-update/UpdateAvailableToast';
 
 /**
  * Container for all ChatGPT overlay/modal/dialog/toast components.
@@ -14,6 +15,7 @@ export const ChatGPTEnhancedFeatures = () => {
     <>
       <ProfilePickerDialog />
       <RatingPromptDialog />
+      <UpdateAvailableToast />
       <PowerPackPaywall />
       <GlobalPopoverPicker />
       <GlobalToast />

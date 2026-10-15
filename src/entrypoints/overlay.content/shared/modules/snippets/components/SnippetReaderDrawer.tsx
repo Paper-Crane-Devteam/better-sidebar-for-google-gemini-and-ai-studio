@@ -13,6 +13,7 @@ import { openExportDialog } from '../../../features/export/ExportFormatDialog';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
 import type { Snippet } from '@/shared/types/db';
 import type { ExportFormat } from '../../../features/export/types';
+import { useShallow } from 'zustand/react/shallow';
 
 interface SnippetCardProps {
   snippet: Snippet;
@@ -107,7 +108,16 @@ export const SnippetReaderDrawer = () => {
     ui,
     closeSnippetReaderDrawer,
     updateSnippet,
-  } = useAppStore();
+  } = useAppStore(
+    useShallow((s) => ({
+      snippets: s.snippets,
+      snippetFolders: s.snippetFolders,
+      favorites: s.favorites,
+      ui: s.ui,
+      closeSnippetReaderDrawer: s.closeSnippetReaderDrawer,
+      updateSnippet: s.updateSnippet,
+    })),
+  );
 
   const { isOpen, folderId, activeSnippetId } = ui.snippets.readerDrawer;
   const { sortOrder } = ui.snippets;

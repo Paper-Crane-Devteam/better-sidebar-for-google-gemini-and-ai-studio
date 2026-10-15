@@ -131,6 +131,12 @@ export class Session {
   /** Only the root session owns the socket. */
   close() {
     if (!this.sessionId) this.connection.close();
+    // Browser mode: the socket is shared, so just let go of this target.
+    else if (this.connection === browserMode.connection) {
+      this.connection
+        .send(null, 'Target.detachFromTarget', { sessionId: this.sessionId })
+        .catch(() => {});
+    }
   }
 
   /**
@@ -166,7 +172,87 @@ export class Session {
   }
 }
 
+/**
+ * Browser-socket mode, for a Chrome you did not launch.
+ *
+ * Chrome 136+ refuses `--remote-debugging-port` on the default user-data-dir, so
+ * a day-to-day Chrome can only be reached through the toggle at
+ * `chrome://inspect/#remote-debugging`. That mode writes `DevToolsActivePort` into
+ * the user-data-dir and serves exactly one thing: the browser-level WebSocket.
+ * No `/json/list`, and per-target sockets are refused — every target has to be
+ * reached with `Target.attachToTarget({ flatten: true })` over the one socket.
+ *
+ * Several profiles share that one browser process, each a separate
+ * `browserContextId`, so the same extension shows up once per profile.
+ * `browserContextFilter` narrows discovery to one of them.
+ */
+const browserMode = {
+  userDataDir: null,
+  browserContextFilter: null,
+  connection: null,
+};
+
+export function configureBrowserMode({ userDataDir, browserContext } = {}) {
+  browserMode.userDataDir = userDataDir || null;
+  browserMode.browserContextFilter = browserContext ? String(browserContext).toLowerCase() : null;
+}
+
+export function inBrowserMode() {
+  return !!browserMode.userDataDir;
+}
+
+async function browserConnection() {
+  if (browserMode.connection) return browserMode.connection;
+  const { readFileSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  let port, path;
+  try {
+    [port, path] = readFileSync(join(browserMode.userDataDir, 'DevToolsActivePort'), 'utf8')
+      .trim()
+      .split('\n');
+  } catch {
+    throw new Error(
+      `No DevToolsActivePort in ${browserMode.userDataDir}. Enable remote debugging at ` +
+        'chrome://inspect/#remote-debugging in that Chrome first.',
+    );
+  }
+  const ws = new WebSocket(`ws://127.0.0.1:${port}${path}`);
+  await new Promise((resolve, reject) => {
+    // Generous: Chrome may show an "allow remote debugging?" prompt first.
+    const timer = setTimeout(() => reject(new Error('browser socket timeout')), 60000);
+    ws.addEventListener('open', () => {
+      clearTimeout(timer);
+      resolve();
+    });
+    ws.addEventListener('error', () => {
+      clearTimeout(timer);
+      reject(new Error(`browser socket failed on port ${port}`));
+    });
+  });
+  browserMode.connection = new Connection(ws);
+  return browserMode.connection;
+}
+
+async function listTargetsViaBrowser() {
+  const conn = await browserConnection();
+  const { targetInfos } = await conn.send(null, 'Target.getTargets', {});
+  const filter = browserMode.browserContextFilter;
+  return targetInfos
+    .filter((t) => !filter || (t.browserContextId || '').toLowerCase().startsWith(filter))
+    .map((t) => ({ ...t, id: t.targetId }));
+}
+
 export async function attach(target, timeoutMs = 5000) {
+  if (inBrowserMode()) {
+    const conn = await browserConnection();
+    const { sessionId } = await conn.send(
+      null,
+      'Target.attachToTarget',
+      { targetId: target.targetId ?? target.id, flatten: true },
+      timeoutMs,
+    );
+    return new Session(conn, sessionId, target);
+  }
   const ws = new WebSocket(target.webSocketDebuggerUrl);
   await new Promise((resolve, reject) => {
     const timer = setTimeout(
@@ -186,6 +272,7 @@ export async function attach(target, timeoutMs = 5000) {
 }
 
 export async function listTargets(port) {
+  if (inBrowserMode()) return listTargetsViaBrowser();
   const res = await fetch(`http://127.0.0.1:${port}/json/list`).catch(() => null);
   if (!res) {
     throw new Error(

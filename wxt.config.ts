@@ -68,6 +68,9 @@ export default defineConfig({
           // content-scripts/overlay.js (see ImportHistoryDialog.tsx).
           'images/*',
           'pdf/*',
+          // Locale bundles fetched at runtime by @/locale/i18n, so they are not
+          // inlined into overlay.js (same 5 MB limit as above).
+          'locales/*',
         ],
         matches: [
           'https://aistudio.google.com/*',
@@ -117,6 +120,12 @@ export default defineConfig({
           { src: 'node_modules/pdfjs-dist/cmaps', dest: 'pdf' },
           { src: 'node_modules/pdfjs-dist/standard_fonts', dest: 'pdf' },
           { src: 'node_modules/pdfjs-dist/wasm', dest: 'pdf' },
+          // Locale bundles for @/locale/i18n (fetched at runtime, minified here).
+          {
+            src: 'src/locale/*.json',
+            dest: 'locales',
+            transform: (content: string) => JSON.stringify(JSON.parse(content)),
+          },
           // Copy all SQLite WASM assets to assets/ (for Worker default relative path resolution)
           {
             src: 'src/assets/wa-sqlite-fts5/*',

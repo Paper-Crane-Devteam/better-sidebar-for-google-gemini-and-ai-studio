@@ -46,6 +46,11 @@ export function parseArgs(argv) {
       key = key.slice(0, eq);
     }
     key = FLAG_ALIASES[key] || key;
+    // `--chrome` alone or `--chrome=<user-data-dir>`; never eats the next arg.
+    if (key === 'chrome') {
+      out.chrome = value ?? true;
+      continue;
+    }
     if (BOOLEAN_FLAGS.has(key)) {
       out[key] = value == null ? true : value !== 'false';
       continue;

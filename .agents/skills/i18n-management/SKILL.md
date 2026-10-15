@@ -16,12 +16,18 @@ description: >-
 ## 1. 目录结构与语言文件
 
 - **源语言基准（Source of Truth）**：`src/locale/en.json`（所有 key 和层级结构以它为基准）
-- **多语言翻译文件**：
+- **多语言翻译文件**（共 13 种支持语言）：
   - `src/locale/zh-CN.json`（简体中文）
   - `src/locale/zh-TW.json`（繁体中文）
   - `src/locale/ja.json`（日语）
+  - `src/locale/ko.json`（韩语）
+  - `src/locale/de.json`（德语）
+  - `src/locale/fr.json`（法语）
   - `src/locale/es.json`（西班牙语）
   - `src/locale/pt.json`（葡萄牙语）
+  - `src/locale/it.json`（意大利语）
+  - `src/locale/pl.json`（波兰语）
+  - `src/locale/tr.json`（土耳其语）
   - `src/locale/ru.json`（俄语）
 - **配置文件**：
   - `src/locale/i18n.ts`（主配置与初始化）

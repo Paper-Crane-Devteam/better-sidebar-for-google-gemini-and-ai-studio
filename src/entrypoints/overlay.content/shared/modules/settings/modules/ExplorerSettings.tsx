@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Separator } from '../../../components/ui/separator';
 import { Button } from '@/shared/components/ui/button';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
-import { FolderTree, List, ArrowDownAZ, Calendar } from 'lucide-react';
+import { FolderTree, List, ArrowDownAZ, Calendar, GripVertical } from 'lucide-react';
 import { Switch } from '@/shared/components/ui/switch';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { useI18n } from '@/shared/hooks/useI18n';
@@ -109,6 +109,15 @@ export const ExplorerSettings = () => {
               >
                 <ArrowDownAZ className="h-3.5 w-3.5" />
                 <span className="text-xs">{t('explorerSettings.name')}</span>
+              </Button>
+              <Button
+                variant={sortOrder === 'custom' ? 'secondary' : 'ghost'}
+                size="sm"
+                className="h-7 px-2 gap-2"
+                onClick={() => setExplorerSortOrder('custom')}
+              >
+                <GripVertical className="h-3.5 w-3.5" />
+                <span className="text-xs">{t('explorerSettings.custom')}</span>
               </Button>
             </div>
           </div>

@@ -11,6 +11,7 @@ import { useSettingsStore } from '@/shared/lib/settings-store';
 import { Button } from '@/shared/components/ui/button';
 import { toast } from '@/shared/lib/toast';
 import type { Notebook } from '@/shared/types/db';
+import { useShallow } from 'zustand/react/shallow';
 
 const ITEM_HEIGHT = 36;
 const VISIBLE_COUNT = 10;
@@ -44,7 +45,17 @@ export const NotebookPickerContent = ({
   showDefaultFolderHint,
 }: NotebookPickerContentProps) => {
   const { t } = useI18n();
-  const { notebooks, folders, fetchData } = useAppStore();
+  const {
+    notebooks,
+    folders,
+    fetchData,
+  } = useAppStore(
+    useShallow((s) => ({
+      notebooks: s.notebooks,
+      folders: s.folders,
+      fetchData: s.fetchData,
+    })),
+  );
   const close = useModalStore((s) => s.close);
   const closePopover = usePopoverPickerStore((s) => s.close);
   const [search, setSearch] = useState('');

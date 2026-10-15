@@ -55,6 +55,11 @@
  *                                 warnings, which are dropped by default
  *   --write                       Allow a mutating SQL statement
  *   --port <n>                    CDP port (default 9222)
+ *   --chrome[=<userDataDir>]      Attach to an everyday Chrome (remote debugging
+ *                                 enabled at chrome://inspect/#remote-debugging)
+ *                                 via scripts/devtap/relay.mjs if it is running
+ *   --bctx <prefix>               With --chrome: only this browserContextId (profile)
+ *   --page <substr>               sql/msg: send from tabs whose url / target id matches
  *   --quiet                       Suppress the "→ path" confirmation
  *
  * Examples:
@@ -69,6 +74,7 @@
  */
 
 import { parseArgs, die } from './devtap/args.mjs';
+import { configureBrowserMode } from './devtap/cdp.mjs';
 import {
   cmdEval,
   cmdLogs,
@@ -126,6 +132,28 @@ async function main() {
   }
 
   flags.port = Number(flags.port ?? 9222);
+
+  // `--chrome` attaches to an everyday Chrome through its browser socket (see
+  // configureBrowserMode). Bare `--chrome` means the default macOS user-data-dir.
+  if (flags.chrome) {
+    // Prefer the relay: it holds one approved connection, so no prompt per command.
+    const relayed = await fetch('http://127.0.0.1:9339/run', {
+      method: 'POST',
+      body: JSON.stringify(process.argv.slice(2).filter((a) => !a.startsWith('--chrome'))),
+    })
+      .then((r) => r.json())
+      .catch(() => null);
+    if (relayed) {
+      process.stdout.write(relayed.out);
+      process.exit(relayed.ok ? 0 : 1);
+    }
+    const userDataDir =
+      flags.chrome === true || flags.chrome === 'true'
+        ? `${process.env.HOME}/Library/Application Support/Google/Chrome`
+        : flags.chrome;
+    configureBrowserMode({ userDataDir, browserContext: flags.bctx });
+  }
+
   await run(flags);
 
   // `watch` never gets here. For everything else, exit rather than waiting for

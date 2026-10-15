@@ -4,7 +4,8 @@ import type {
   ExtensionResponse,
 } from '@/shared/types/messages';
 import type { MessageSender } from '../types';
-import { notifyDataUpdated } from '../notify';
+import { notifyDataChanged } from '../notify';
+import { CONVERSATION_DELETE_SCOPES } from '@/shared/types/data-scope';
 
 export async function handleGems(
   message: ExtensionMessage,
@@ -18,7 +19,7 @@ export async function handleGems(
     case 'SAVE_GEM': {
       const platform = message.payload.platform ?? message.platform ?? 'gemini';
       await gemRepo.save({ ...message.payload, platform });
-      await notifyDataUpdated();
+      await notifyDataChanged('gems');
       return { success: true };
     }
     case 'SAVE_GEMS': {
@@ -28,22 +29,22 @@ export async function handleGems(
         platform: g.platform ?? platform,
       }));
       await gemRepo.bulkSave(gems);
-      await notifyDataUpdated();
+      await notifyDataChanged('gems');
       return { success: true };
     }
     case 'DELETE_GEM': {
       await gemRepo.delete(message.payload.id);
-      await notifyDataUpdated();
+      await notifyDataChanged('gems', ...CONVERSATION_DELETE_SCOPES);
       return { success: true };
     }
     case 'HIDE_GEM': {
       await gemRepo.softDelete(message.payload.id);
-      await notifyDataUpdated();
+      await notifyDataChanged('gems');
       return { success: true };
     }
     case 'UPDATE_GEM': {
       await gemRepo.update(message.payload.id, message.payload.updates);
-      await notifyDataUpdated();
+      await notifyDataChanged('gems');
       return { success: true };
     }
     case 'GET_GEM_CONVERSATIONS': {

@@ -23,6 +23,12 @@ import {
   LICENSE_RENEWAL_ALARM,
 } from '@/shared/lib/license-renewal';
 import { trace } from '@/shared/lib/trace';
+import {
+  registerUpdateAvailableListener,
+  registerUpdateCheckAlarm,
+  handleUpdateCheckAlarm,
+  UPDATE_CHECK_ALARM,
+} from './handlers/extension-update';
 
 console.log(
   'Better Sidebar for Gemini & AI Studio: Background Service Worker Starting...',
@@ -36,6 +42,10 @@ export default defineBackground(() => {
   // DB-ready chain below because license renewal doesn't touch the database and
   // must not be skipped when the DB fails to open.
   registerLicenseRenewalAlarm();
+
+  // Remembers a downloaded store update so the About page can offer "Update now".
+  registerUpdateAvailableListener();
+  registerUpdateCheckAlarm();
 
   const setupUninstallUrl = async () => {
     try {
@@ -115,6 +125,14 @@ export default defineBackground(() => {
     if (alarm.name === LICENSE_RENEWAL_ALARM) {
       handleLicenseRenewalAlarm(alarm).catch((err) =>
         console.error('[Background] License renewal skipped:', err),
+      );
+      return;
+    }
+
+    // Same reason: no DB involved, and the auto-sync gate below must not swallow it.
+    if (alarm.name === UPDATE_CHECK_ALARM) {
+      handleUpdateCheckAlarm().catch((err) =>
+        console.error('[Background] Update check skipped:', err),
       );
       return;
     }

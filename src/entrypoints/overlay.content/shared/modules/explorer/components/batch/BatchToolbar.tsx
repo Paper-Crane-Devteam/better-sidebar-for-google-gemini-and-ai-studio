@@ -13,6 +13,7 @@ import {
   buildExportMarkdown,
 } from '../../lib/exportConversation';
 import type { ExportFormat, ExportItem } from '../../../../features/export/types';
+import { useShallow } from 'zustand/react/shallow';
 
 interface BatchToolbarProps {
   onSelectAll: () => void;
@@ -20,7 +21,19 @@ interface BatchToolbarProps {
 
 export const BatchToolbar = ({ onSelectAll }: BatchToolbarProps) => {
   const { t } = useI18n();
-  const { ui, setExplorerBatchMode, setExplorerBatchSelection, deleteItems } = useAppStore();
+  const {
+    ui,
+    setExplorerBatchMode,
+    setExplorerBatchSelection,
+    deleteItems,
+  } = useAppStore(
+    useShallow((s) => ({
+      ui: s.ui,
+      setExplorerBatchMode: s.setExplorerBatchMode,
+      setExplorerBatchSelection: s.setExplorerBatchSelection,
+      deleteItems: s.deleteItems,
+    })),
+  );
   const { selectedIds } = ui.explorer.batch;
   const { exportItems } = useExport({
     multiFileZip: true,

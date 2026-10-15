@@ -1,144 +1,90 @@
+/**
+ * i18n for extension contexts (overlay / content scripts / background).
+ *
+ * Only `en` (the fallback) is bundled. Every other locale is fetched at runtime
+ * from `/locales/<lng>.json`, copied there by viteStaticCopy (see
+ * wxt.config.ts). Inlining all 13 locales pushed content-scripts/overlay.js
+ * past the 5 MB per-file limit that addons-linter enforces on AMO uploads.
+ *
+ * Until the active locale arrives, `t()` falls back to English. Entry points
+ * that render UI should `await i18nReady()` before mounting.
+ *
+ * The main-world script cannot fetch extension URLs; it uses
+ * `@/locale/i18n-bundled` instead.
+ */
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import dayjs from 'dayjs';
-import localizedFormat from 'dayjs/plugin/localizedFormat';
-import 'dayjs/locale/zh-cn';
-import 'dayjs/locale/zh-tw';
-import 'dayjs/locale/ja';
-import 'dayjs/locale/pt';
-import 'dayjs/locale/es';
-import 'dayjs/locale/ru';
-import zhCN from './zh-CN.json';
-import zhTW from './zh-TW.json';
 import en from './en.json';
-import ja from './ja.json';
-import pt from './pt.json';
-import es from './es.json';
-import ru from './ru.json';
-import { useSettingsStore } from '@/shared/lib/settings-store';
-import { usePegasusStore } from '@/shared/lib/pegasus-store';
+import {
+  applyDayjsLocale,
+  getInitialLanguage,
+  subscribeLanguageChanges,
+  type SupportedLanguage,
+} from './language';
 
-// Get language from settings store or browser language
-const getInitialLanguage = (): string => {
-  // Try to get from settings store synchronously
-  try {
-    const state = usePegasusStore.getState();
-    if (state.language) {
-      return state.language;
+const loaded = new Set<string>(['en']);
+const inflight = new Map<string, Promise<void>>();
+
+/** Fetch a locale bundle into i18next once. Failures leave English in place. */
+const loadBundle = (lng: SupportedLanguage): Promise<void> => {
+  if (loaded.has(lng)) return Promise.resolve();
+  const existing = inflight.get(lng);
+  if (existing) return existing;
+
+  const task = (async () => {
+    try {
+      const res = await fetch(browser.runtime.getURL(`/locales/${lng}.json`));
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const translation = (await res.json()) as Record<string, unknown>;
+      i18n.addResourceBundle(lng, 'translation', translation, true, true);
+      loaded.add(lng);
+    } catch (err) {
+      console.warn(`[i18n] failed to load locale "${lng}":`, err);
+    } finally {
+      inflight.delete(lng);
     }
-  } catch {
-    // Settings store might not be initialized yet, ignore
-  }
-
-  // Fallback to browser language
-  const browserLang = navigator.language || navigator.languages?.[0] || 'en';
-  if (browserLang.startsWith('zh-TW') || browserLang.startsWith('zh-Hant')) {
-    return 'zh-TW';
-  }
-  if (browserLang.startsWith('zh')) {
-    return 'zh-CN';
-  }
-  if (browserLang.startsWith('ja')) {
-    return 'ja';
-  }
-  if (browserLang.startsWith('pt')) {
-    return 'pt';
-  }
-  if (browserLang.startsWith('es')) {
-    return 'es';
-  }
-  if (browserLang.startsWith('ru')) {
-    return 'ru';
-  }
-  return 'en';
+  })();
+  inflight.set(lng, task);
+  return task;
 };
 
-// Map i18next language codes to dayjs locale codes
-const mapLanguageToDayjs = (lang: string): string => {
-  switch (lang) {
-    case 'zh-CN':
-      return 'zh-cn';
-    case 'zh-TW':
-      return 'zh-tw';
-    case 'ja':
-      return 'ja';
-    case 'pt':
-      return 'pt';
-    case 'es':
-      return 'es';
-    case 'ru':
-      return 'ru';
-    default:
-      return 'en';
-  }
-};
+let pending: Promise<void> = Promise.resolve();
 
-// Initialize i18n
-const initI18n = () => {
-  const lng = getInitialLanguage();
-
-  // Initialize dayjs
-  dayjs.extend(localizedFormat);
-  dayjs.locale(mapLanguageToDayjs(lng));
-
-  i18n.use(initReactI18next).init({
-    resources: {
-      'zh-CN': {
-        translation: zhCN,
-      },
-      'zh-TW': {
-        translation: zhTW,
-      },
-      en: {
-        translation: en,
-      },
-      ja: {
-        translation: ja,
-      },
-      pt: {
-        translation: pt,
-      },
-      es: {
-        translation: es,
-      },
-      ru: {
-        translation: ru,
-      },
-    },
-    lng,
-    fallbackLng: 'en',
-    interpolation: {
-      escapeValue: false, // React already escapes values
-    },
+/** Switch to `lng`, loading its bundle first. Last call wins. */
+const switchLanguage = (lng: SupportedLanguage) => {
+  const task = loadBundle(lng).then(async () => {
+    if (pending !== task) return; // superseded by a newer switch
+    applyDayjsLocale(lng);
+    await i18n.changeLanguage(lng);
   });
-
-  // Subscribe to language changes from settings store
-  if (globalThis.window !== undefined) {
-    let previousLanguage = usePegasusStore.getState().language;
-    usePegasusStore.subscribe((state) => {
-      const currentLanguage = state.language;
-      const supportedLanguages = [
-        'zh-CN',
-        'zh-TW',
-        'en',
-        'ja',
-        'pt',
-        'es',
-        'ru',
-      ];
-      if (
-        currentLanguage !== previousLanguage &&
-        supportedLanguages.includes(currentLanguage)
-      ) {
-        i18n.changeLanguage(currentLanguage);
-        dayjs.locale(mapLanguageToDayjs(currentLanguage));
-        previousLanguage = currentLanguage;
-      }
-    });
-  }
+  pending = task;
+  return task;
 };
 
-// Initialize immediately
-initI18n();
+/** Resolves once the most recently requested language is loaded and active. */
+export const i18nReady = (): Promise<void> => pending;
+
+const lng = getInitialLanguage();
+
+// `lng` is set right away so `i18n.language` is correct from the start; until
+// its bundle lands, lookups fall through to `en`.
+i18n.use(initReactI18next).init({
+  resources: { en: { translation: en } },
+  lng,
+  fallbackLng: 'en',
+  interpolation: {
+    escapeValue: false, // React already escapes values
+  },
+  react: {
+    // Re-render translated components when a fetched bundle is added.
+    bindI18nStore: 'added',
+  },
+});
+applyDayjsLocale(lng); // dayjs locales are bundled, no need to wait
+if (lng !== 'en') switchLanguage(lng);
+
+subscribeLanguageChanges((next) => {
+  switchLanguage(next);
+});
 
 export default i18n;

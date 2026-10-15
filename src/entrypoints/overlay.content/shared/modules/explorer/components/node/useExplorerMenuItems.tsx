@@ -44,6 +44,7 @@ import type { ExportFormat } from '@/entrypoints/overlay.content/shared/features
 import type { MenuEntryDef } from '@/entrypoints/overlay.content/shared/components/node-action-bar';
 import type { NodeRendererProps } from 'react-arborist';
 import type { FolderTreeNodeData } from '../../../../components/folder-tree/types';
+import { useShallow } from 'zustand/react/shallow';
 
 interface UseExplorerMenuItemsParams {
   node: NodeRendererProps<FolderTreeNodeData>['node'];
@@ -75,7 +76,15 @@ export function useExplorerMenuItems({
   onFolderSettings,
 }: UseExplorerMenuItemsParams): MenuEntryDef[] {
   const { t } = useI18n();
-  const { tags, conversationTags } = useAppStore();
+  const {
+    tags,
+    conversationTags,
+  } = useAppStore(
+    useShallow((s) => ({
+      tags: s.tags,
+      conversationTags: s.conversationTags,
+    })),
+  );
   const { exportItem } = useExport({ obsidianFolder: 'Conversations' });
   const { createPendingAndFocus } = useExplorerContext();
   const lastSelectedGemId = useSettingsStore((s) => s.lastSelectedGemId);

@@ -11,6 +11,7 @@ import { SplitNewChatButton } from '@/shared/components/ui/split-new-chat-button
 import { useExplorerContext } from '../../shared/modules/explorer/ExplorerContext';
 import { INBOX_FOLDER_ID } from '@/shared/constants/inbox';
 import type { Gem, Notebook } from '@/shared/types/db';
+import { useShallow } from 'zustand/react/shallow';
 
 interface NewChatButtonProps {
   onTemporaryChat?: () => void;
@@ -26,7 +27,15 @@ export const NewChatButton = ({ onTemporaryChat }: NewChatButtonProps) => {
 
   const lastSelectedGemId = useSettingsStore((s) => s.lastSelectedGemId);
   const lastSelectedNotebookId = useSettingsStore((s) => s.lastSelectedNotebookId);
-  const { gems, notebooks } = useAppStore();
+  const {
+    gems,
+    notebooks,
+  } = useAppStore(
+    useShallow((s) => ({
+      gems: s.gems,
+      notebooks: s.notebooks,
+    })),
+  );
 
   const lastGem = useMemo(
     () => (lastSelectedGemId ? gems.find((g) => g.id === lastSelectedGemId) : null),

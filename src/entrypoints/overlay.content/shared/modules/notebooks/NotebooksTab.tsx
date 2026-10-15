@@ -13,6 +13,7 @@ import { Button } from '@/shared/components/ui/button';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { navigate } from '@/shared/lib/navigation';
 import { toast } from '@/shared/lib/toast';
+import { useShallow } from 'zustand/react/shallow';
 
 interface NotebooksTabProps {
   menuActions?: {
@@ -23,7 +24,17 @@ interface NotebooksTabProps {
 
 export const NotebooksTab = ({ menuActions }: NotebooksTabProps) => {
   const { t } = useI18n();
-  const { notebooks, tags: allTags, fetchData } = useAppStore();
+  const {
+    notebooks,
+    tags: allTags,
+    fetchData,
+  } = useAppStore(
+    useShallow((s) => ({
+      notebooks: s.notebooks,
+      tags: s.tags,
+      fetchData: s.fetchData,
+    })),
+  );
   const filter = useStoreFilter('notebooks');
   const treeRef = useRef<NotebooksTreeHandle>(null);
   const [isScanning, setIsScanning] = useState(false);

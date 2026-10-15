@@ -3,6 +3,7 @@ import { useAppStore } from '@/shared/lib/store';
 import { ArboristTreeHandle } from '../types';
 import { TreeView } from './TreeView';
 import { TimelineView } from './TimelineView';
+import { useShallow } from 'zustand/react/shallow';
 
 export type { ArboristTreeHandle } from '../types';
 
@@ -13,7 +14,13 @@ interface ArboristTreeProps {
 }
 
 export const ArboristTree = forwardRef<ArboristTreeHandle, ArboristTreeProps>(({ onSelect }, ref) => {
-  const { ui } = useAppStore();
+  const {
+    ui,
+  } = useAppStore(
+    useShallow((s) => ({
+      ui: s.ui,
+    })),
+  );
   const { viewMode } = ui.explorer;
 
   if (viewMode === 'timeline') {

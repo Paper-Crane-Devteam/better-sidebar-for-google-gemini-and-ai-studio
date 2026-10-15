@@ -1,4 +1,4 @@
-import { runQuery, runCommand } from '../index';
+import { runQuery, runCommand, runBatch } from '../index';
 import { updateWithTimestamp } from './helpers';
 import type { Folder } from '../../types/db';
 
@@ -100,12 +100,13 @@ export const folderRepo = {
     }
   },
 
-  reorder: async (parentId: string | null, orderedIds: string[]): Promise<void> => {
-    for (let i = 0; i < orderedIds.length; i++) {
-      await runCommand(
-        'UPDATE folders SET order_index = ?, updated_at = unixepoch() WHERE id = ?',
-        [i, orderedIds[i]],
-      );
-    }
+  reorder: async (_parentId: string | null, orderedIds: string[]): Promise<void> => {
+    if (orderedIds.length === 0) return;
+    await runBatch(
+      orderedIds.map((id, i) => ({
+        sql: 'UPDATE folders SET order_index = ?, updated_at = unixepoch() WHERE id = ?',
+        bind: [i, id],
+      })),
+    );
   },
 };

@@ -10,6 +10,7 @@ import { Button } from '@/shared/components/ui/button';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { navigate } from '@/shared/lib/navigation';
 import { toast } from '@/shared/lib/toast';
+import { useShallow } from 'zustand/react/shallow';
 
 interface GemsTabProps {
   menuActions?: {
@@ -20,7 +21,17 @@ interface GemsTabProps {
 
 export const GemsTab = ({ menuActions }: GemsTabProps) => {
   const { t } = useI18n();
-  const { gems, tags: allTags, fetchData } = useAppStore();
+  const {
+    gems,
+    tags: allTags,
+    fetchData,
+  } = useAppStore(
+    useShallow((s) => ({
+      gems: s.gems,
+      tags: s.tags,
+      fetchData: s.fetchData,
+    })),
+  );
   const filter = useStoreFilter('gems');
   const treeRef = useRef<GemsTreeHandle>(null);
   const [isScanningGems, setIsScanningGems] = useState(false);

@@ -20,6 +20,7 @@ import { PromptPreviewContent } from './components/PromptPreviewContent';
 import { PromptIconDisplay } from './lib/prompt-icons';
 import { modal } from '@/shared/lib/modal';
 import { SlashTip } from './components/SlashTip';
+import { useShallow } from 'zustand/react/shallow';
 
 interface PromptsTabProps {
   menuActions?: {
@@ -39,7 +40,17 @@ export const PromptsTab = ({ menuActions }: PromptsTabProps) => {
     createPrompt,
     updatePrompt,
     ui,
-  } = useAppStore();
+  } = useAppStore(
+    useShallow((s) => ({
+      promptFolders: s.promptFolders,
+      prompts: s.prompts,
+      isLoading: s.isLoading,
+      createPromptFolder: s.createPromptFolder,
+      createPrompt: s.createPrompt,
+      updatePrompt: s.updatePrompt,
+      ui: s.ui,
+    })),
+  );
 
   const filter = useStoreFilter('prompts');
 

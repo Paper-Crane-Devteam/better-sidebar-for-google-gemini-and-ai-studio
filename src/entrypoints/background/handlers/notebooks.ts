@@ -5,7 +5,8 @@ import type {
   ExtensionResponse,
 } from '@/shared/types/messages';
 import type { MessageSender } from '../types';
-import { notifyDataUpdated } from '../notify';
+import { notifyDataChanged } from '../notify';
+import { CONVERSATION_DELETE_SCOPES } from '@/shared/types/data-scope';
 
 export async function handleNotebooks(
   message: ExtensionMessage,
@@ -19,7 +20,7 @@ export async function handleNotebooks(
     case 'SAVE_NOTEBOOK': {
       const platform = message.payload.platform ?? message.platform ?? 'gemini';
       await notebookRepo.save({ ...message.payload, platform });
-      await notifyDataUpdated();
+      await notifyDataChanged('notebooks');
       return { success: true };
     }
     case 'SAVE_NOTEBOOKS': {
@@ -29,7 +30,7 @@ export async function handleNotebooks(
         platform: n.platform ?? platform,
       }));
       await notebookRepo.bulkSave(notebooks);
-      await notifyDataUpdated();
+      await notifyDataChanged('notebooks');
       return { success: true };
     }
     case 'DELETE_NOTEBOOK': {
@@ -39,12 +40,12 @@ export async function handleNotebooks(
         [message.payload.id],
       );
       await notebookRepo.delete(message.payload.id);
-      await notifyDataUpdated();
+      await notifyDataChanged('notebooks', ...CONVERSATION_DELETE_SCOPES);
       return { success: true };
     }
     case 'UPDATE_NOTEBOOK': {
       await notebookRepo.update(message.payload.id, message.payload.updates);
-      await notifyDataUpdated();
+      await notifyDataChanged('notebooks');
       return { success: true };
     }
     case 'GET_NOTEBOOK_CONVERSATIONS': {

@@ -35,7 +35,7 @@ interface SettingsState {
   lastSelectedNotebookId: string | null;
   explorer: {
     viewMode: 'tree' | 'timeline';
-    sortOrder: 'alpha' | 'date';
+    sortOrder: 'alpha' | 'date' | 'custom';
     ignoredFolders: string[];
     enableRightClickRename: boolean;
   };
@@ -83,7 +83,7 @@ interface SettingsState {
   setSkipDeleteConfirm: (enabled: boolean) => void;
   setOverlayPosition: (position: { x: number; y: number }) => void;
   setExplorerViewMode: (mode: 'tree' | 'timeline') => void;
-  setExplorerSortOrder: (order: 'alpha' | 'date') => void;
+  setExplorerSortOrder: (order: 'alpha' | 'date' | 'custom') => void;
   setExplorerIgnoredFolders: (folders: string[]) => void;
   setExplorerEnableRightClickRename: (enabled: boolean) => void;
   setIconVisible: (id: string, visible: boolean) => void;

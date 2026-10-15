@@ -4,6 +4,7 @@ import { useAppStore } from '@/shared/lib/store';
 import { useI18n } from '@/shared/hooks/useI18n';
 import type { FolderTreeNodeData } from '../components/folder-tree/types';
 import type { NodeApi } from 'react-arborist';
+import { useShallow } from 'zustand/react/shallow';
 
 /**
  * Shared hook to build enriched tooltip content for tree node items (conversations).
@@ -12,7 +13,15 @@ import type { NodeApi } from 'react-arborist';
  */
 export function useNodeTooltip(node: NodeApi<FolderTreeNodeData>) {
   const { t } = useI18n();
-  const { tags, conversationTags } = useAppStore();
+  const {
+    tags,
+    conversationTags,
+  } = useAppStore(
+    useShallow((s) => ({
+      tags: s.tags,
+      conversationTags: s.conversationTags,
+    })),
+  );
   const isFile = node.data.type === 'file';
   const description = isFile ? (node.data.data?.description || '') : '';
   const hasDescription = description.length > 0;

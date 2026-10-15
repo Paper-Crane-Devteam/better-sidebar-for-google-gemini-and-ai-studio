@@ -12,7 +12,7 @@ export function createTagActions(get: GetState): Pick<
           type: 'CREATE_TAG',
           payload: { name, color },
         });
-        await get().fetchData(true);
+        await get().fetchData(true, ['tags', 'conversationTags']);
       } catch (error) {
         console.error('Failed to create tag:', error);
       }
@@ -23,7 +23,7 @@ export function createTagActions(get: GetState): Pick<
           type: 'UPDATE_TAG',
           payload: { id, updates },
         });
-        await get().fetchData(true);
+        await get().fetchData(true, ['tags', 'conversationTags']);
       } catch (error) {
         console.error('Failed to update tag:', error);
       }
@@ -34,7 +34,7 @@ export function createTagActions(get: GetState): Pick<
           type: 'DELETE_TAG',
           payload: { id },
         });
-        await get().fetchData(true);
+        await get().fetchData(true, ['tags', 'conversationTags']);
       } catch (error) {
         console.error('Failed to delete tag:', error);
       }
@@ -45,7 +45,7 @@ export function createTagActions(get: GetState): Pick<
           type: 'ADD_TAG_TO_CONVERSATION',
           payload: { conversationId, tagId },
         });
-        await get().fetchData(true);
+        await get().fetchData(true, ['conversationTags']);
       } catch (error) {
         console.error('Failed to add tag to conversation:', error);
       }
@@ -56,7 +56,7 @@ export function createTagActions(get: GetState): Pick<
           type: 'REMOVE_TAG_FROM_CONVERSATION',
           payload: { conversationId, tagId },
         });
-        await get().fetchData(true);
+        await get().fetchData(true, ['conversationTags']);
       } catch (error) {
         console.error('Failed to remove tag from conversation:', error);
       }

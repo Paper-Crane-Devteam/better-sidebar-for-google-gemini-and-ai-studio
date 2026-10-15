@@ -36,6 +36,7 @@ import type { MenuEntryDef } from '@/entrypoints/overlay.content/shared/componen
 import { FolderTreeNodeContent } from '../../../components/folder-tree';
 import { useNodeTooltip } from '../../../hooks/useNodeTooltip';
 import { MoveItemsDialog } from '../../explorer/components/batch/MoveItemsDialog';
+import { useShallow } from 'zustand/react/shallow';
 
 export const GemNode = ({
   node,
@@ -52,7 +53,16 @@ export const GemNode = ({
     conversationTags,
     addTagToConversation,
     removeTagFromConversation,
-  } = useAppStore();
+  } = useAppStore(
+    useShallow((s) => ({
+      favorites: s.favorites,
+      toggleFavorite: s.toggleFavorite,
+      fetchData: s.fetchData,
+      conversationTags: s.conversationTags,
+      addTagToConversation: s.addTagToConversation,
+      removeTagFromConversation: s.removeTagFromConversation,
+    })),
+  );
   const currentConversationId = useCurrentConversationId();
   const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -289,7 +299,6 @@ export const GemNode = ({
     !isActive && !isCurrentConversation && 'hover:bg-accent/50',
     isActive && 'node-item-selected',
     !isActive && isCurrentConversation && 'node-item-current',
-    isGem && node.data.data?.is_pinned && 'node-item-pinned',
     node.willReceiveDrop && 'bg-accent/50 border border-primary/40',
     isMenuActive && 'bg-accent/50',
     isMenuActive && 'node-menu-active',
@@ -341,15 +350,28 @@ export const GemNode = ({
               <NodeActionBar
                 actions={
                   isGem
-                    ? [{
-                        icon: <MessageSquarePlus className="h-3.5 w-3.5" />,
-                        tooltip: t('gems.newGemChat'),
-                        onClick: (e: React.MouseEvent) => {
-                          e.stopPropagation();
-                          e.preventDefault();
-                          navigateToGem(node.data.id);
+                    ? [
+                        // Unpin button for pinned gems — always shown, leftmost
+                        ...(node.data.data?.is_pinned ? [{
+                          icon: <Pin className="h-3.5 w-3.5 rotate-45 fill-current" />,
+                          tooltip: t('node.unpinFromTop'),
+                          onClick: (e: React.MouseEvent) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            useAppStore.getState().togglePin(node.data.id, 'gems', true);
+                          },
+                          persistent: true,
+                        }] : []),
+                        {
+                          icon: <MessageSquarePlus className="h-3.5 w-3.5" />,
+                          tooltip: t('gems.newGemChat'),
+                          onClick: (e: React.MouseEvent) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            navigateToGem(node.data.id);
+                          },
                         },
-                      }]
+                      ]
                     : isFile && isFavorite
                       ? [{
                           icon: <Star className="h-3.5 w-3.5 fill-highlight text-highlight" />,
@@ -360,6 +382,7 @@ export const GemNode = ({
                             toggleFavorite(node.data.id, 'conversation', isFavorite);
                           },
                           className: 'text-highlight hover:text-highlight/80',
+                          persistent: true,
                         }]
                       : []
                 }

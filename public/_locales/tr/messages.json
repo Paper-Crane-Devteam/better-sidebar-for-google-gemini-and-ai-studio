@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "Better Sidebar: Gemini Klasörler ve Arama",
+    "description": "Uzantının adı"
+  },
+  "extensionDescription": {
+    "message": "Gemini ve AI Studio sohbetlerini klasörler, etiketler, tam metin arama, istemler, dışa aktarma, Drive senkronizasyonu ve yapay zeka araçlarıyla düzenleyin.",
+    "description": "Uzantının açıklaması"
+  }
+}

@@ -35,7 +35,7 @@ export function createSnippetsActions(
           type: 'CREATE_SNIPPET_FOLDER',
           payload: { id: newId, name, parentId: parentId || null },
         });
-        await get().fetchData(true);
+        await get().fetchData(true, ['snippets', 'snippetFolders']);
         return newId;
       } catch (error) {
         console.error('Failed to create snippet folder:', error);
@@ -57,7 +57,7 @@ export function createSnippetsActions(
             folderId: folderId || null,
           },
         });
-        await get().fetchData(true);
+        await get().fetchData(true, ['snippets', 'snippetFolders']);
       } catch (error) {
         console.error('Failed to create snippet:', error);
       }
@@ -69,7 +69,7 @@ export function createSnippetsActions(
           type: 'UPDATE_SNIPPET',
           payload: { id, updates },
         });
-        await get().fetchData(true);
+        await get().fetchData(true, ['snippets', 'snippetFolders']);
       } catch (error) {
         console.error('Failed to update snippet:', error);
       }
@@ -88,7 +88,7 @@ export function createSnippetsActions(
             payload: { id: itemId },
           });
         }
-        await get().fetchData(true);
+        await get().fetchData(true, ['snippets', 'snippetFolders']);
       } catch (error) {
         console.error('Failed to delete snippet item:', error);
       }
@@ -108,7 +108,7 @@ export function createSnippetsActions(
           type: 'DELETE_SNIPPET_ITEMS',
           payload: { snippetIds, folderIds },
         });
-        await get().fetchData(true);
+        await get().fetchData(true, ['snippets', 'snippetFolders']);
       } catch (error) {
         console.error('Failed to delete snippet items:', error);
       }
@@ -120,7 +120,7 @@ export function createSnippetsActions(
           type: 'MOVE_SNIPPETS',
           payload: { ids: itemIds, folderId: newParentId },
         });
-        await get().fetchData(true);
+        await get().fetchData(true, ['snippets', 'snippetFolders']);
       } catch (error) {
         console.error('Failed to move snippet items:', error);
       }
@@ -139,7 +139,7 @@ export function createSnippetsActions(
             payload: { id: itemId, folderId: newParentId },
           });
         }
-        await get().fetchData(true);
+        await get().fetchData(true, ['snippets', 'snippetFolders']);
       } catch (error) {
         console.error('Failed to move snippet item:', error);
       }
@@ -158,7 +158,7 @@ export function createSnippetsActions(
             payload: { id: itemId, updates: { title: newName } },
           });
         }
-        await get().fetchData(true);
+        await get().fetchData(true, ['snippets', 'snippetFolders']);
       } catch (error) {
         console.error('Failed to rename snippet item:', error);
       }

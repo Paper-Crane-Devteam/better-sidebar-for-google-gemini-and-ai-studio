@@ -37,7 +37,8 @@ interface StatusRow {
   message_count: number;
 }
 
-type RowState = 'idle' | 'syncing' | 'synced' | 'empty' | 'failed';
+/** `missing` — the platform says the chat does not exist; a retry would only fail again. */
+type RowState = 'idle' | 'syncing' | 'synced' | 'empty' | 'missing' | 'failed';
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -96,11 +97,15 @@ const MessageSyncModalContent = () => {
     }
   };
 
-  const syncOne = async (id: string): Promise<'synced' | 'empty' | 'failed'> => {
+  const syncOne = async (id: string): Promise<'synced' | 'empty' | 'missing' | 'failed'> => {
     setRowStates((prev) => ({ ...prev, [id]: 'syncing' }));
     announceManualActivity();
 
     const result = await syncConversationMessages(platform, id);
+    if (!result.ok && result.reason === 'not-found') {
+      applyResult(id, 0, 'missing');
+      return 'missing';
+    }
     if (!result.ok) {
       applyResult(id, 0, 'failed');
       return 'failed';
@@ -288,6 +293,16 @@ const MessageSyncAction = ({
   if (state === 'empty') {
     return (
       <span className="text-[11px] text-muted-foreground">{t('backfillStatus.reallyEmpty')}</span>
+    );
+  }
+  if (state === 'missing') {
+    return (
+      <span
+        className="text-[11px] text-muted-foreground cursor-help"
+        title={t('backfillStatus.notFoundHint')}
+      >
+        {t('backfillStatus.notFound')}
+      </span>
     );
   }
   if (state === 'failed') {

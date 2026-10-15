@@ -7,6 +7,7 @@ import { FolderTintRow } from './node/FolderTintRow';
 import { getTreeDndManager } from '../../../components/folder-tree/dnd-manager';
 import { NodeData, ArboristTreeHandle } from '../types';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { useShallow } from 'zustand/react/shallow';
 
 interface TimelineViewProps {
   onSelect: (item: any) => void;
@@ -27,8 +28,19 @@ export const TimelineView = forwardRef<ArboristTreeHandle, TimelineViewProps>(
     } = useArboristTree();
 
     const { t, currentLanguage } = useI18n();
-    const { conversationTags, ui, favorites, setExplorerBatchSelection } =
-      useAppStore();
+    const {
+      conversationTags,
+      ui,
+      favorites,
+      setExplorerBatchSelection,
+    } = useAppStore(
+      useShallow((s) => ({
+        conversationTags: s.conversationTags,
+        ui: s.ui,
+        favorites: s.favorites,
+        setExplorerBatchSelection: s.setExplorerBatchSelection,
+      })),
+    );
     const { tags: tagFilter, typeFilter, onlyFavorites } = ui.explorer;
 
     const rowHeight = 32;

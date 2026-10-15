@@ -23,6 +23,8 @@ import {
 } from '@/shared/lib/conversation-messages-store';
 import { getPlatformDomAdapter } from '@/shared/lib/platform-dom-adapter';
 import { dedupModelMessages } from '@/shared/lib/dedup-messages';
+import { useShallow } from 'zustand/react/shallow';
+import throttle from 'lodash/throttle';
 
 // ── The Hook ─────────────────────────────────────────────────────────
 
@@ -42,8 +44,22 @@ export function useInitConversationMessages() {
     setIsOnConversation,
     setConversationDbId,
     fetchedForUrl,
-    messages,
-  } = useConversationMessagesStore();
+    messageCount,
+  } = useConversationMessagesStore(
+    useShallow((s) => ({
+      mergeMessages: s.mergeMessages,
+      reset: s.reset,
+      refreshDomPresence: s.refreshDomPresence,
+      setIsLoading: s.setIsLoading,
+      setFetchedForUrl: s.setFetchedForUrl,
+      setIsOnConversation: s.setIsOnConversation,
+      setConversationDbId: s.setConversationDbId,
+      fetchedForUrl: s.fetchedForUrl,
+      // Only the count: this hook sits at the root of the enhanced-features tree,
+      // and subscribing to the array re-rendered all of it on every merge.
+      messageCount: s.messages.length,
+    })),
+  );
 
   useEffect(() => { pathRef.current = path; }, [path]);
 
@@ -191,10 +207,16 @@ export function useInitConversationMessages() {
     const scrollContainer = adapter.getChatScrollContainer();
     if (!scrollContainer) return;
 
-    const observer = new MutationObserver(refreshDomPresence);
+    // Throttled: `refreshDomPresence` looks up every message in the DOM, and while a
+    // reply streams the container mutates on every token.
+    const refresh = throttle(refreshDomPresence, 250, { leading: true, trailing: true });
+    const observer = new MutationObserver(refresh);
     observer.observe(scrollContainer, { childList: true, subtree: true });
     refreshDomPresence();
 
-    return () => observer.disconnect();
-  }, [messages.length, refreshDomPresence]);
+    return () => {
+      observer.disconnect();
+      refresh.cancel();
+    };
+  }, [messageCount, refreshDomPresence]);
 }

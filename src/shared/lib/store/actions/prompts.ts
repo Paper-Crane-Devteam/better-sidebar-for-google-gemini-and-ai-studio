@@ -29,7 +29,7 @@ export function createPromptsActions(
           type: 'CREATE_PROMPT_FOLDER',
           payload: { id: newId, name, parentId: parentId || null },
         });
-        await get().fetchData(true);
+        await get().fetchData(true, ['prompts', 'promptFolders']);
         return newId;
       } catch (error) {
         console.error('Failed to create prompt folder:', error);
@@ -51,7 +51,7 @@ export function createPromptsActions(
             folderId: folderId || null,
           },
         });
-        await get().fetchData(true);
+        await get().fetchData(true, ['prompts', 'promptFolders']);
       } catch (error) {
         console.error('Failed to create prompt:', error);
       }
@@ -63,7 +63,7 @@ export function createPromptsActions(
           type: 'UPDATE_PROMPT',
           payload: { id, updates },
         });
-        await get().fetchData(true);
+        await get().fetchData(true, ['prompts', 'promptFolders']);
       } catch (error) {
         console.error('Failed to update prompt:', error);
       }
@@ -82,7 +82,7 @@ export function createPromptsActions(
             payload: { id: itemId },
           });
         }
-        await get().fetchData(true);
+        await get().fetchData(true, ['prompts', 'promptFolders']);
       } catch (error) {
         console.error('Failed to delete prompt item:', error);
       }
@@ -102,7 +102,7 @@ export function createPromptsActions(
           type: 'DELETE_PROMPT_ITEMS',
           payload: { promptIds, folderIds },
         });
-        await get().fetchData(true);
+        await get().fetchData(true, ['prompts', 'promptFolders']);
       } catch (error) {
         console.error('Failed to delete prompt items:', error);
       }
@@ -114,7 +114,7 @@ export function createPromptsActions(
           type: 'MOVE_PROMPTS',
           payload: { ids: itemIds, folderId: newParentId },
         });
-        await get().fetchData(true);
+        await get().fetchData(true, ['prompts', 'promptFolders']);
       } catch (error) {
         console.error('Failed to move prompt items:', error);
       }
@@ -133,7 +133,7 @@ export function createPromptsActions(
             payload: { id: itemId, folderId: newParentId },
           });
         }
-        await get().fetchData(true);
+        await get().fetchData(true, ['prompts', 'promptFolders']);
       } catch (error) {
         console.error('Failed to move prompt item:', error);
       }
@@ -152,7 +152,7 @@ export function createPromptsActions(
             payload: { id: itemId, updates: { title: newName } },
           });
         }
-        await get().fetchData(true);
+        await get().fetchData(true, ['prompts', 'promptFolders']);
       } catch (error) {
         console.error('Failed to rename prompt item:', error);
       }

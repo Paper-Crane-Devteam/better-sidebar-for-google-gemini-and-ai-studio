@@ -25,6 +25,13 @@ async function fetchTranscript(promptId: string): Promise<BackfillFetchResult> {
     body: [promptId],
   });
 
+  // 404 is Drive saying the prompt file is gone or not visible to this account —
+  // a fact about this prompt, not about the session. Reporting it as a plain HTTP
+  // failure made the scheduler abort the whole cycle on it and pick the same
+  // prompt first again next cycle, so one deleted prompt blocked every other one.
+  if (res.status === 404) {
+    return { ok: false, reason: 'not-found', detail: '404', pages: 1 };
+  }
   if (!res.ok) {
     return { ok: false, reason: 'http', detail: String(res.status), pages: 1 };
   }

@@ -4,7 +4,7 @@ import type {
   ExtensionResponse,
 } from '@/shared/types/messages';
 import type { MessageSender } from '../types';
-import { notifyDataUpdated } from '../notify';
+import { notifyDataChanged } from '../notify';
 import { triggerAutoSync } from './gdrive-sync';
 import i18n from '@/locale/i18n';
 import { SNIPPET_INBOX_ID } from '@/shared/constants/inbox';
@@ -38,7 +38,7 @@ export async function handleSnippets(
     }
     case 'CREATE_SNIPPET_FOLDER': {
       await snippetFolderRepo.create(message.payload);
-      await notifyDataUpdated();
+      await notifyDataChanged('snippets', 'snippetFolders');
       triggerAutoSync();
       return { success: true };
     }
@@ -47,13 +47,13 @@ export async function handleSnippets(
         message.payload.id,
         message.payload.updates,
       );
-      await notifyDataUpdated();
+      await notifyDataChanged('snippets', 'snippetFolders');
       triggerAutoSync();
       return { success: true };
     }
     case 'DELETE_SNIPPET_FOLDER': {
       await snippetFolderRepo.delete(message.payload.id);
-      await notifyDataUpdated();
+      await notifyDataChanged('snippets', 'snippetFolders');
       triggerAutoSync();
       return { success: true };
     }
@@ -78,19 +78,19 @@ export async function handleSnippets(
         folder_id: folderId,
         order_index: orderIndex,
       });
-      await notifyDataUpdated();
+      await notifyDataChanged('snippets', 'snippetFolders');
       triggerAutoSync();
       return { success: true };
     }
     case 'UPDATE_SNIPPET': {
       await snippetRepo.update(message.payload.id, message.payload.updates);
-      await notifyDataUpdated();
+      await notifyDataChanged('snippets', 'snippetFolders');
       triggerAutoSync();
       return { success: true };
     }
     case 'DELETE_SNIPPET': {
       await snippetRepo.delete(message.payload.id);
-      await notifyDataUpdated();
+      await notifyDataChanged('snippets', 'snippetFolders');
       triggerAutoSync();
       return { success: true };
     }
@@ -98,7 +98,7 @@ export async function handleSnippets(
       const { snippetIds, folderIds } = message.payload;
       if (snippetIds?.length) await snippetRepo.deleteMultiple(snippetIds);
       if (folderIds?.length) await snippetFolderRepo.deleteMultiple(folderIds);
-      await notifyDataUpdated();
+      await notifyDataChanged('snippets', 'snippetFolders');
       triggerAutoSync();
       return { success: true };
     }

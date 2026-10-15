@@ -41,6 +41,7 @@ import {
   IconBarGroup,
   useIconBar,
 } from '../shared/modules/icon-bar';
+import { useShallow } from 'zustand/react/shallow';
 
 export const OverlayPanel = ({ className }: { className?: string }) => {
   const moduleConfig = useModuleConfig();
@@ -61,7 +62,19 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
     setSettingsOpen: setIsSettingsOpen,
     setOverlayOpen,
     setShowSqlInterface,
-  } = useAppStore();
+  } = useAppStore(
+    useShallow((s) => ({
+      fetchData: s.fetchData,
+      ui: s.ui,
+      setActiveTab: s.setActiveTab,
+      setIsScanning: s.setIsScanning,
+      setExplorerViewMode: s.setExplorerViewMode,
+      setExplorerSortOrder: s.setExplorerSortOrder,
+      setSettingsOpen: s.setSettingsOpen,
+      setOverlayOpen: s.setOverlayOpen,
+      setShowSqlInterface: s.setShowSqlInterface,
+    })),
+  );
 
   const {
     isOpen: isUIVisible,
@@ -89,7 +102,8 @@ export const OverlayPanel = ({ className }: { className?: string }) => {
         // Only process in the active tab — background DB may belong to another profile
         if (document.visibilityState !== 'visible') return;
 
-        fetchData(true);
+        // Only the datasets the write touched; none listed means all of them.
+        fetchData(true, message.scopes);
 
         // Handle specific update types with payload
         if (message.updateType === 'SCAN_COMPLETE' && message.payload) {

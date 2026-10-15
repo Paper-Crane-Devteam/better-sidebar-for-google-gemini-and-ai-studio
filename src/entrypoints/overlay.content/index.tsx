@@ -7,7 +7,7 @@ import { isPlatformEnabled } from '@/shared/lib/platform-enabled-store';
 import { warnIfNoAccount } from './shared/lib/account-guard';
 import { initPegasusTransport } from '@webext-pegasus/transport/content-script';
 import { getPegasusStoreReady } from '@/shared/lib/pegasus-store';
-import '@/locale/i18n';
+import { i18nReady } from '@/locale/i18n';
 
 export default defineContentScript({
   matches: [
@@ -34,6 +34,10 @@ export default defineContentScript({
       );
       return;
     }
+
+    // Non-English locales are fetched at runtime (see @/locale/i18n). The store
+    // is ready by now, so this covers its saved language, not just the browser's.
+    await i18nReady();
 
     // Non-blocking: toast a sign-in hint if no account can be detected.
     warnIfNoAccount(platform);

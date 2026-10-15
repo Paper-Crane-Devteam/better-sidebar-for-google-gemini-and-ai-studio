@@ -14,6 +14,7 @@ import { FilterActions } from '../../../components/FilterActions';
 import type { FilterState, ExplorerTypeFilter } from '../../../types/filter';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { navigate } from '@/shared/lib/navigation';
+import { useShallow } from 'zustand/react/shallow';
 
 interface GemsHeaderProps {
   onCollapseAll: () => void;
@@ -37,7 +38,15 @@ export const GemsHeader = ({
   onScanGems,
 }: GemsHeaderProps) => {
   const { t } = useI18n();
-  const { ui, setGemsSortOrder } = useAppStore();
+  const {
+    ui,
+    setGemsSortOrder,
+  } = useAppStore(
+    useShallow((s) => ({
+      ui: s.ui,
+      setGemsSortOrder: s.setGemsSortOrder,
+    })),
+  );
   const { sortOrder } = ui.gems;
 
   const handleSort = () => {

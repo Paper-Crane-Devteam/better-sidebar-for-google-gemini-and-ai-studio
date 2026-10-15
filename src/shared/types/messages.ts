@@ -79,6 +79,11 @@ export type ExtensionMessage = (
       payload: { ids: string[]; folderId: string | null };
     }
   | {
+      /** Manual (custom-sort) order of the conversations inside one folder. */
+      type: 'REORDER_CONVERSATIONS';
+      payload: { folderId: string | null; orderedIds: string[] };
+    }
+  | {
       type: 'UPDATE_CONVERSATION';
       payload: { id: string; title?: string; description?: string; updated_at?: number };
     }
@@ -176,6 +181,12 @@ export type ExtensionMessage = (
   | { type: 'OPEN_NEW_CHAT_TAB'; payload: { url: string; prompt?: string } }
   /** Sent by every page load: "is there text waiting for my composer?" Consumes it. */
   | { type: 'CLAIM_COMPOSER_PREFILL' }
+  /** Ask the store for a newer version now — see `background/handlers/extension-update.ts`. */
+  | { type: 'CHECK_EXTENSION_UPDATE' }
+  /** Version already downloaded and waiting for a reload, or null. Never hits the store. */
+  | { type: 'GET_PENDING_EXTENSION_UPDATE' }
+  /** Reload into the downloaded update. Waits briefly if the download is still running. */
+  | { type: 'APPLY_EXTENSION_UPDATE' }
   | {
       type: 'ADD_FAVORITE';
       payload: {

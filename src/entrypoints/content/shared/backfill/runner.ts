@@ -176,6 +176,7 @@ export class BackfillRunner {
       const outcome = await this.processOne(candidates[i]);
       if (outcome === 'abort') return;
 
+      if (outcome === 'skipped') continue;
       unproductiveInARow = outcome === 'saved' ? 0 : unproductiveInARow + 1;
       if (unproductiveInARow >= UNPRODUCTIVE_STREAK_LIMIT) {
         console.warn(
@@ -187,6 +188,9 @@ export class BackfillRunner {
   }
 
   /**
+   * `skipped` means the platform has no such conversation: cooled down, and it
+   * neither resets nor extends the unproductive streak.
+   *
    * `abort` means the problem is not with this conversation.
    *
    * A request builder that has not learned its parameters yet, an HTTP failure, a
@@ -197,7 +201,7 @@ export class BackfillRunner {
    */
   private async processOne(
     candidate: BackfillCandidate,
-  ): Promise<'saved' | 'unproductive' | 'abort'> {
+  ): Promise<'saved' | 'unproductive' | 'skipped' | 'abort'> {
     const result = await syncConversationMessages(this.platform, candidate.id);
 
     if (!result.ok) {
@@ -208,6 +212,14 @@ export class BackfillRunner {
       console.warn(
         `[Backfill] ${candidate.id} failed (${result.reason}${result.detail ? `: ${result.detail}` : ''})`,
       );
+      if (result.reason === 'not-found') {
+        // The platform has no such conversation for this account. Cool it down and
+        // keep going: aborting here would stall every other candidate behind it,
+        // since this one would come back first again next cycle. Not counted
+        // toward the streak — it is a definite answer, not a sign the format moved.
+        await this.ledger.recordAttempt(candidate.id);
+        return 'skipped';
+      }
       if (result.reason === 'parse') {
         // The response arrived and we could not make sense of it. Recorded against
         // the conversation, but the streak limit above is what stops this from

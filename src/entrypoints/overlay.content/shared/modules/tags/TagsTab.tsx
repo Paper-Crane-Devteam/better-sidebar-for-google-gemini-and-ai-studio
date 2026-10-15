@@ -11,6 +11,7 @@ import { modal } from '@/shared/lib/modal';
 import { toast } from '@/shared/lib/toast';
 import { TagColorDialog } from './TagColorDialog';
 import { useTagsViewStore } from './tags-view-store';
+import { useShallow } from 'zustand/react/shallow';
 
 interface TagsTabProps {
   menuActions?: {
@@ -23,7 +24,19 @@ interface TagsTabProps {
 
 export const TagsTab = ({ menuActions }: TagsTabProps) => {
   const { t } = useI18n();
-  const { tags, conversations, conversationTags, createTag } = useAppStore();
+  const {
+    tags,
+    conversations,
+    conversationTags,
+    createTag,
+  } = useAppStore(
+    useShallow((s) => ({
+      tags: s.tags,
+      conversations: s.conversations,
+      conversationTags: s.conversationTags,
+      createTag: s.createTag,
+    })),
+  );
   const activeTagId = useTagsViewStore((s) => s.activeTagId);
   const openTag = useTagsViewStore((s) => s.openTag);
   const backToList = useTagsViewStore((s) => s.backToList);

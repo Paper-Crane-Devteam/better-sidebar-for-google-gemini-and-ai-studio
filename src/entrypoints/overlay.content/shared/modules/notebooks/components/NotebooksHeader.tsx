@@ -17,6 +17,7 @@ import type {
 } from '../../../types/filter';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { navigate } from '@/shared/lib/navigation';
+import { useShallow } from 'zustand/react/shallow';
 
 interface NotebooksHeaderProps {
   onCollapseAll: () => void;
@@ -39,7 +40,15 @@ export const NotebooksHeader = ({
   onScan,
 }: NotebooksHeaderProps) => {
   const { t } = useI18n();
-  const { ui, setNotebooksSortOrder } = useAppStore();
+  const {
+    ui,
+    setNotebooksSortOrder,
+  } = useAppStore(
+    useShallow((s) => ({
+      ui: s.ui,
+      setNotebooksSortOrder: s.setNotebooksSortOrder,
+    })),
+  );
   const { sortOrder } = ui.notebooks;
 
   const handleSort = () => {

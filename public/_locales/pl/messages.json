@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "Better Sidebar: foldery i wyszukiwanie dla Gemini",
+    "description": "Nazwa rozszerzenia"
+  },
+  "extensionDescription": {
+    "message": "Organizuj czaty Gemini i AI Studio za pomocą folderów, tagów, wyszukiwania pełnotekstowego, promptów, eksportu, synchronizacji z Drive i narzędzi AI.",
+    "description": "Opis rozszerzenia"
+  }
+}

@@ -10,6 +10,7 @@ import {
   SnippetFolder,
 } from '../../types/db';
 import type { Platform } from '../../types/platform';
+import type { DataScope } from '../../types/data-scope';
 
 export interface Folder {
   id: string;
@@ -35,7 +36,18 @@ export interface Conversation {
   platform?: string;
   gem_id?: string | null;
   notebook_id?: string | null;
+  /**
+   * Manual position inside its folder, used by the explorer's `custom` sort.
+   * 0 = never ranked (sorted by date above the ranked ones); ranks start at 1.
+   */
+  order_index?: number;
 }
+
+/**
+ * Explorer sort mode. Only conversations follow it — folders are always in their
+ * manual (`order_index`) order, whatever the mode.
+ */
+export type ExplorerSortOrder = 'alpha' | 'date' | 'custom';
 
 /** Sections available in the settings modal sidebar. */
 export type SettingsSection =
@@ -113,7 +125,7 @@ export interface UIState {
     tags: { isOpen: boolean; selected: string[] };
     typeFilter: 'all' | 'conversation' | 'text-to-image' | 'gem' | 'notebook';
     onlyFavorites: boolean;
-    sortOrder: 'alpha' | 'date';
+    sortOrder: ExplorerSortOrder;
     viewMode: 'tree' | 'timeline';
     batch: { isBatchMode: boolean; selectedIds: string[] };
   };
@@ -166,7 +178,12 @@ export interface AppState {
   setConversations: (conversations: Conversation[]) => void;
   setPromptFolders: (folders: PromptFolder[]) => void;
   setPrompts: (prompts: Prompt[]) => void;
-  fetchData: (silent?: boolean) => Promise<void>;
+  /**
+   * Refresh datasets from the background. `scopes` limits it to the tables a
+   * write touched; omitted means all of them. Calls within a short window are
+   * merged into one batch.
+   */
+  fetchData: (silent?: boolean, scopes?: readonly DataScope[]) => Promise<void>;
   moveItems: (itemIds: string[], newParentId: string | null) => Promise<void>;
   moveItem: (
     itemId: string,
@@ -239,7 +256,7 @@ export interface AppState {
     filter: 'all' | 'conversation' | 'text-to-image' | 'gem' | 'notebook',
   ) => void;
   setExplorerOnlyFavorites: (onlyFavorites: boolean) => void;
-  setExplorerSortOrder: (order: 'alpha' | 'date') => void;
+  setExplorerSortOrder: (order: ExplorerSortOrder) => void;
   setExplorerViewMode: (mode: 'tree' | 'timeline') => void;
   setExplorerBatchMode: (isBatchMode: boolean) => void;
   setExplorerBatchSelection: (selectedIds: string[]) => void;
@@ -311,6 +328,11 @@ export interface AppState {
   // Pin
   reorderFolders: (
     parentId: string | null,
+    orderedIds: string[],
+  ) => Promise<void>;
+  /** Write manual ranks 1..n for the conversations of one folder, in this order. */
+  reorderConversations: (
+    folderId: string | null,
     orderedIds: string[],
   ) => Promise<void>;
 

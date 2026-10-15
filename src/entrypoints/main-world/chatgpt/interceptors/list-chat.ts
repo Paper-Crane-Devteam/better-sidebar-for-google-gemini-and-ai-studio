@@ -1,4 +1,4 @@
-import i18n from '@/locale/i18n';
+import i18n from '@/locale/i18n-bundled';
 import { trace } from '@/shared/lib/trace';
 
 

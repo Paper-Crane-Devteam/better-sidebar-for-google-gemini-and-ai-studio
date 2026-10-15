@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "Better Sidebar: cartelle e ricerca per Gemini",
+    "description": "Nome dell'estensione"
+  },
+  "extensionDescription": {
+    "message": "Organizza le chat di Gemini e AI Studio con cartelle, tag, ricerca full-text, prompt, esportazione, sincronizzazione Drive, strumenti AI e altro.",
+    "description": "Descrizione dell'estensione"
+  }
+}

@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useAppStore } from '@/shared/lib/store';
 import { Z_INDEX } from '@/shared/lib/z-index';
+import { useShallow } from 'zustand/react/shallow';
 
 export const RatingPromptDialog = () => {
   const { t } = useI18n();
@@ -28,7 +29,13 @@ export const RatingPromptDialog = () => {
   );
   const setInstalledAt = useRatingStore((state) => state.setInstalledAt);
 
-  const { setActiveTab } = useAppStore();
+  const {
+    setActiveTab,
+  } = useAppStore(
+    useShallow((s) => ({
+      setActiveTab: s.setActiveTab,
+    })),
+  );
 
   useEffect(() => {
     // Initialize installedAt if not set

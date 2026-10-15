@@ -15,6 +15,7 @@ import {
 } from '../../components/ui/context-menu';
 import { ExclusiveContextMenu } from '../../components/ui/exclusive-context-menu';
 import { CreateSnippetForm } from './components/CreateSnippetForm';
+import { useShallow } from 'zustand/react/shallow';
 
 interface SnippetsTabProps {
   menuActions?: {
@@ -33,7 +34,17 @@ export const SnippetsTab = ({ menuActions }: SnippetsTabProps) => {
     createSnippet,
     updateSnippet,
     openSnippetReaderDrawer,
-  } = useAppStore();
+  } = useAppStore(
+    useShallow((s) => ({
+      snippetFolders: s.snippetFolders,
+      snippets: s.snippets,
+      isLoading: s.isLoading,
+      createSnippetFolder: s.createSnippetFolder,
+      createSnippet: s.createSnippet,
+      updateSnippet: s.updateSnippet,
+      openSnippetReaderDrawer: s.openSnippetReaderDrawer,
+    })),
+  );
 
   const filter = useStoreFilter('snippets');
 

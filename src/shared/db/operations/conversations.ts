@@ -137,11 +137,17 @@ export const conversationRepo = {
     await runCommand('UPDATE conversations SET deleted_at = unixepoch() WHERE id = ?', [id]);
   },
 
+  // A manual rank only means something inside the folder it was given in, so a
+  // conversation that changes folder drops back to unranked (0). SET expressions
+  // read the pre-update row, so `folder_id IS ?` compares against the old folder.
   move: async (id: string, folderId: string | null): Promise<void> => {
-    await runCommand('UPDATE conversations SET folder_id = ?, updated_at = unixepoch() WHERE id = ?', [
-      folderId,
-      id,
-    ]);
+    await runCommand(
+      `UPDATE conversations SET folder_id = ?,
+         order_index = CASE WHEN folder_id IS ? THEN order_index ELSE 0 END,
+         updated_at = unixepoch()
+       WHERE id = ?`,
+      [folderId, folderId, id],
+    );
   },
 
   moveMultiple: async (
@@ -151,8 +157,26 @@ export const conversationRepo = {
     if (ids.length === 0) return;
     const placeholders = ids.map(() => '?').join(',');
     await runCommand(
-      `UPDATE conversations SET folder_id = ?, updated_at = unixepoch() WHERE id IN (${placeholders})`,
-      [folderId, ...ids]
+      `UPDATE conversations SET folder_id = ?,
+         order_index = CASE WHEN folder_id IS ? THEN order_index ELSE 0 END,
+         updated_at = unixepoch()
+       WHERE id IN (${placeholders})`,
+      [folderId, folderId, ...ids]
+    );
+  },
+
+  /**
+   * Manual order for the explorer's `custom` sort: ranks 1..n in the given order.
+   * 0 stays reserved for "never ranked". Deliberately leaves `updated_at` alone —
+   * the date sort falls back to it, and a reorder is not activity on the chat.
+   */
+  reorder: async (orderedIds: string[]): Promise<void> => {
+    if (orderedIds.length === 0) return;
+    await runBatch(
+      orderedIds.map((id, i) => ({
+        sql: 'UPDATE conversations SET order_index = ? WHERE id = ?',
+        bind: [i + 1, id],
+      })),
     );
   },
 

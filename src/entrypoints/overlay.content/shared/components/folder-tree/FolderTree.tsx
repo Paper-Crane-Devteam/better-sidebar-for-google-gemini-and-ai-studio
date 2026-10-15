@@ -1,8 +1,9 @@
-import React, { forwardRef, useImperativeHandle } from 'react';
+import React, { forwardRef, useImperativeHandle, useMemo } from 'react';
 import { Tree, NodeRendererProps, RowRendererProps } from 'react-arborist';
 import { FolderTreeNodeData, FolderTreeHandle } from './types';
 import { useFolderTree, UseFolderTreeOptions } from './useFolderTree';
 import { getTreeDndManager } from './dnd-manager';
+import { createTreeDragPreview } from './TreeDragPreview';
 
 export interface FolderTreeProps extends UseFolderTreeOptions {
   /** Tree data (already transformed into hierarchy) */
@@ -33,6 +34,10 @@ export const FolderTree = forwardRef<FolderTreeHandle, FolderTreeProps>(
     } = useFolderTree(hookOptions);
 
     const rowHeight = rowHeightProp ?? 32;
+
+    // Stable component identity: react-arborist renders `renderDragPreview` as a
+    // component, so a new function each render would remount it mid-drag.
+    const renderDragPreview = useMemo(() => createTreeDragPreview(treeRef), [treeRef]);
 
     useImperativeHandle(ref, () => ({
       collapseAll: () => {
@@ -80,6 +85,7 @@ export const FolderTree = forwardRef<FolderTreeHandle, FolderTreeProps>(
           dndManager={getTreeDndManager()}
 
           renderRow={renderRow}
+          renderDragPreview={renderDragPreview}
         >
           {renderNode}
         </Tree>

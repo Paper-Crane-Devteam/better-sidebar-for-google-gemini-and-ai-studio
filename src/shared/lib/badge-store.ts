@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { create } from 'zustand';
+import packageJson from '../../../package.json';
 
 /**
  * Generic "red dot" badge system for feature-discovery hints.
@@ -12,6 +13,9 @@ import { create } from 'zustand';
  * - Re-pointing an existing key at a newer version *does* bring its dot back,
  *   which is what you want when a section gets a visible revamp.
  * - Deleting a key retires that badge for good.
+ * - A badge only shows while the running version equals its registered
+ *   version. Any version change (patch/minor/major) hides it automatically,
+ *   so to keep a dot alive in a new release, re-point it at that release.
  *
  * ── Adding a badge ──────────────────────────────────────────────────────────
  * 1. Register the key below with the release it ships in.
@@ -41,6 +45,15 @@ const recordFor = (key: string): string | null => {
   const version = BADGE_REGISTRY[key];
   return version ? `${key}@${version}` : null;
 };
+
+const CURRENT_VERSION = packageJson.version;
+
+/**
+ * A badge only lives within the exact release that introduced it. Once the
+ * user is on any other version (patch, minor or major), the hint is stale and
+ * stays hidden even if it was never dismissed.
+ */
+const isCurrentRelease = (version: string): boolean => version === CURRENT_VERSION;
 
 // ─── Storage ─────────────────────────────────────────────────────────────────
 const STORAGE_KEY = 'badge_dismissed';
@@ -111,8 +124,9 @@ export const useBadgeStore = create<BadgeState>((set, get) => ({
   isVisible: (key: string) => {
     const { dismissed, ready } = get();
     if (!ready) return false;
-    const record = recordFor(key);
-    return !!record && !dismissed.has(record);
+    const version = BADGE_REGISTRY[key];
+    if (!version || !isCurrentRelease(version)) return false;
+    return !dismissed.has(`${key}@${version}`);
   },
 
   isGroupVisible: (prefix: string | string[]) => {
@@ -121,6 +135,7 @@ export const useBadgeStore = create<BadgeState>((set, get) => ({
     const prefixes = Array.isArray(prefix) ? prefix : [prefix];
     return Object.entries(BADGE_REGISTRY).some(
       ([key, version]) =>
+        isCurrentRelease(version) &&
         prefixes.some((p) => key.startsWith(p)) &&
         !dismissed.has(`${key}@${version}`),
     );

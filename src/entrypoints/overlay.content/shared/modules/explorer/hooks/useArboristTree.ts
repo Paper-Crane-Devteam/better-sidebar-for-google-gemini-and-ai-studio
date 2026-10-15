@@ -1,6 +1,7 @@
 import { useAppStore } from '@/shared/lib/store';
 import { useFolderTree } from '../../../components/folder-tree';
 import { useDeleteHandler } from './useDeleteHandler';
+import { useShallow } from 'zustand/react/shallow';
 
 export const STORAGE_KEY = 'AI_STUDIO_EXPANDED_FOLDERS';
 
@@ -14,7 +15,18 @@ export const useArboristTree = () => {
     toggleFavorite,
     createFolder,
     ui,
-  } = useAppStore();
+  } = useAppStore(
+    useShallow((s) => ({
+      folders: s.folders,
+      conversations: s.conversations,
+      moveItem: s.moveItem,
+      renameItem: s.renameItem,
+      favorites: s.favorites,
+      toggleFavorite: s.toggleFavorite,
+      createFolder: s.createFolder,
+      ui: s.ui,
+    })),
+  );
   const { handleDelete } = useDeleteHandler();
   const { query: searchTerm } = ui.explorer.search;
 

@@ -20,8 +20,14 @@ export const AISTUDIO_BACKFILL_FETCH = 'BETTER_SIDEBAR_BACKFILL_FETCH_AISTUDIO';
  * `not-ready` is the one the scheduler treats as "come back later" rather than a
  * failure of this conversation: it means the request builder has not seen a real
  * request yet, which is a property of the page, not of the conversation.
+ *
+ * `not-found` is the platform saying this conversation does not exist for this
+ * account — deleted on the platform, or a row that came in from a backup or
+ * another account. It is a fact about the conversation, so the scheduler cools it
+ * down and moves on, and the dialog says so instead of offering a retry that can
+ * only fail the same way.
  */
-export type BackfillFailureReason = 'not-ready' | 'http' | 'parse' | 'error';
+export type BackfillFailureReason = 'not-ready' | 'not-found' | 'http' | 'parse' | 'error';
 
 export interface BackfillFetchResult {
   ok: boolean;

@@ -20,7 +20,7 @@ import {
   type BackfillFetchResult,
 } from '@/shared/constants/backfill';
 import { geminiRequestBuilder } from './request-builder';
-import { parseResponsePayloads } from './response-parser';
+import { getWrbFrErrorCode, parseResponsePayloads } from './response-parser';
 import {
   getChatContentEntries,
   getNextPageToken,
@@ -30,6 +30,9 @@ import {
 } from './chat-content-parser';
 
 const CHAT_CONTENT_RPC = 'hNvQHb';
+
+/** google.rpc.Code NOT_FOUND, as batchexecute reports it in a failed `wrb.fr` chunk. */
+const RPC_NOT_FOUND = 5;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -76,9 +79,22 @@ async function fetchTranscript(conversationId: string): Promise<BackfillFetchRes
       return { ok: false, reason: 'http', detail: String(res.status), pages };
     }
 
-    const payloads = parseResponsePayloads(await res.text());
+    const body = await res.text();
+    const payloads = parseResponsePayloads(body);
     if (payloads.length === 0) {
-      return { ok: false, reason: 'parse', pages };
+      // An RPC-level error rides inside an HTTP 200. NOT_FOUND (5) is Gemini
+      // saying the conversation is gone for this account; anything else stays a
+      // parse failure, because we cannot tell it apart from a format change.
+      const code = getWrbFrErrorCode(body);
+      if (code === RPC_NOT_FOUND) {
+        return { ok: false, reason: 'not-found', pages };
+      }
+      return {
+        ok: false,
+        reason: 'parse',
+        detail: code != null ? `rpc status ${code}` : undefined,
+        pages,
+      };
     }
 
     collected.push(

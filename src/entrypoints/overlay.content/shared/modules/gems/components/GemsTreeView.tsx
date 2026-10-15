@@ -9,6 +9,7 @@ import {
   NodeRendererProps,
 } from '../../../components/folder-tree';
 import { GemNode } from './GemNode';
+import { useShallow } from 'zustand/react/shallow';
 
 
 const STORAGE_KEY = 'gems-tree-open-state';
@@ -35,7 +36,15 @@ export const GemsTreeView = forwardRef<GemsTreeHandle, GemsTreeViewProps>(
       conversationTags,
       favorites,
       ui,
-    } = useAppStore();
+    } = useAppStore(
+      useShallow((s) => ({
+        gems: s.gems,
+        conversations: s.conversations,
+        conversationTags: s.conversationTags,
+        favorites: s.favorites,
+        ui: s.ui,
+      })),
+    );
 
     const { sortOrder, tags: tagFilter, onlyFavorites } = ui.gems;
     const { query: searchTerm } = ui.gems.search;

@@ -20,7 +20,13 @@ export type SupportedLanguage =
   | 'ja'
   | 'pt'
   | 'es'
-  | 'ru';
+  | 'ru'
+  | 'ko'
+  | 'de'
+  | 'fr'
+  | 'it'
+  | 'pl'
+  | 'tr';
 
 const LOCALE_LOADERS: Record<
   SupportedLanguage,
@@ -33,6 +39,12 @@ const LOCALE_LOADERS: Record<
   pt: () => import('./pt.json'),
   es: () => import('./es.json'),
   ru: () => import('./ru.json'),
+  ko: () => import('./ko.json'),
+  de: () => import('./de.json'),
+  fr: () => import('./fr.json'),
+  it: () => import('./it.json'),
+  pl: () => import('./pl.json'),
+  tr: () => import('./tr.json'),
 };
 
 const isSupported = (lng: string): lng is SupportedLanguage =>
