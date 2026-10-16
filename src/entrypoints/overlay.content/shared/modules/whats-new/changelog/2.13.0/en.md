@@ -6,6 +6,17 @@ Gemini rolled out a new layout recently, and a fair part of this round went into
 
 ---
 
+## 🎁 A Small Gift for Gemini Argon
+
+To celebrate Gemini's new Argon model, I've prepared a redeem code that unlocks **all Power Pack features free for 10 days**.
+
+- **Where to get it**: The code is in the promotions channel on our **[Discord](https://discord.gg/FRzesxaGAx)**.
+- **Until when**: You can redeem it any time until **October 21**.
+
+If you run into any trouble using it, or have ideas you'd like to share, you're always welcome to find me on Discord too.
+
+---
+
 ## ⚡ TL;DR
 
 1. **🎯 Jump straight to the matching message**: Opening a search result now scrolls to the exact message, not just the chat.
@@ -70,14 +81,6 @@ Clicking an item in the outline on AI Studio now jumps to that message. The dot 
 - **Menus close instantly**: Dropdown and right-click menus no longer play a closing animation.
 - **Workspace**: The empty state now has an "Import folder" option.
 - **A small thank-you badge**: If you have a Support Pack or Power Pack, the popup now shows a small badge next to the title. It's my quiet way of saying thank you. Everyone's sidebar avatar also got a soft new ring.
-
----
-
-## 💌 A Small Gift for Gemini Argon
-
-To celebrate Gemini's new Argon model, I've prepared a redeem code that unlocks all Power Pack features free for 10 days. You can redeem it any time until **October 21**, and the code is waiting in the promotions channel on **[Discord](https://discord.gg/FRzesxaGAx)**.
-
-If you run into any trouble using it, or have ideas you'd like to share, you're always welcome to find me on Discord too.
 
 ---
 
