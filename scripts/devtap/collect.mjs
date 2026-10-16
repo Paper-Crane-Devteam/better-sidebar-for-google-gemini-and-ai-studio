@@ -109,7 +109,8 @@ function worldOf(execContext) {
  * excluded outright — those are the SQLite worker's own console lines, which the
  * worker's session already reports, so keeping them would print each one twice.
  */
-const NOISY_LOG_SOURCES = new Set(['worker', 'javascript', 'rendering', 'deprecation', 'other']);
+// `security` is Gemini's own CSP violations: dozens per page load, never ours.
+const NOISY_LOG_SOURCES = new Set(['worker', 'javascript', 'rendering', 'deprecation', 'other', 'security']);
 
 function keepBrowserLog(entry, includeNoise) {
   if (entry.source === 'worker') return false;
