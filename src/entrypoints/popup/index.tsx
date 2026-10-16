@@ -19,7 +19,7 @@ import {
   PlatformEnabledState,
 } from '@/shared/lib/platform-enabled-store';
 import { cn } from '@/shared/lib/utils/utils';
-import { SlidersHorizontal, Settings2, Globe2, Gem, Sparkle } from 'lucide-react';
+import { SlidersHorizontal, Settings2, Globe2, Crown } from 'lucide-react';
 import {
   isLicenseValid,
   useLicenseStore,
@@ -98,42 +98,84 @@ function selectMemberTier(state: LicenseState): MemberTier {
 }
 
 /**
- * Small pill beside the popup title for pack owners.
- *
- * Tinted with the theme's --highlight accent so it follows every preset. Power
- * gets a 1px border swept from --highlight into --ring (two-layer background:
- * an opaque padding-box fill over a gradient border-box), Support a plain
- * hairline — same family, the higher tier a shade richer.
+ * Title-text fill for members: starts as plain foreground and only turns toward
+ * the theme accent over the last stretch of the word, so the title stays as
+ * legible as the plain one on every preset. Power runs on into --ring, which
+ * gives the higher tier a second hue without making it any louder.
  */
-function MemberBadge({ tier }: { tier: Exclude<MemberTier, null> }) {
+const MEMBER_TITLE_GRADIENT: Record<Exclude<MemberTier, null>, string> = {
+  support:
+    'linear-gradient(90deg, rgb(var(--foreground)) 40%, rgb(var(--highlight)) 100%)',
+  power:
+    'linear-gradient(90deg, rgb(var(--foreground)) 30%, rgb(var(--highlight)) 72%, rgb(var(--ring)) 100%)',
+};
+
+/**
+ * Popup header lockup: logo tile + title.
+ *
+ * Pack owners get the same lockup, dressed rather than annotated — a small
+ * crown tipped onto the logo tile's corner, an accent hairline around the tile,
+ * the title fading into the accent, and the tier set in small caps beneath it.
+ * Every colour is a theme token (--highlight, --ring, --background), so it
+ * follows whichever preset is active.
+ */
+function HeaderLockup({ tier }: { tier: MemberTier }) {
   const { t } = useI18n();
-  const isPower = tier === 'power';
-  const Icon = isPower ? Gem : Sparkle;
 
   return (
-    <span
-      title={t('popup.badgeThanks')}
-      className={cn(
-        'inline-flex items-center gap-1 h-[18px] pl-1.5 pr-2 rounded-full select-none',
-        'text-[10px] font-semibold uppercase tracking-[0.08em] leading-none text-highlight',
-        !isPower && 'bg-highlight/[0.08] ring-1 ring-inset ring-highlight/25',
-      )}
-      style={
-        isPower
-          ? {
-              border: '1px solid transparent',
-              background: [
-                'linear-gradient(rgb(var(--highlight) / 0.1), rgb(var(--highlight) / 0.1)) padding-box',
-                'linear-gradient(rgb(var(--background)), rgb(var(--background))) padding-box',
-                'linear-gradient(120deg, rgb(var(--highlight) / 0.6), rgb(var(--ring) / 0.6)) border-box',
-              ].join(', '),
-            }
-          : undefined
-      }
+    <div
+      className="flex items-center gap-3"
+      title={tier ? t('popup.badgeThanks') : undefined}
     >
-      <Icon className="w-2.5 h-2.5" strokeWidth={2.25} aria-hidden />
-      {t(isPower ? 'popup.badgePower' : 'popup.badgeSupporter')}
-    </span>
+      <div className="relative shrink-0">
+        <div
+          className={cn(
+            'w-10 h-10 rounded-xl bg-gradient-to-br from-primary/80 to-primary shadow-md flex items-center justify-center',
+            tier && 'ring-1 ring-highlight/40 ring-offset-2 ring-offset-background',
+          )}
+        >
+          <img src="/icons/icon128.png" className="w-6 h-6 object-contain drop-shadow-sm" alt="Logo" />
+        </div>
+        {tier && (
+          // Background-filled disc so the crown reads cleanly over the tile's
+          // gradient, whatever --primary happens to be.
+          <span
+            aria-hidden
+            className="absolute -top-2 -right-2 w-[18px] h-[18px] rounded-full bg-background shadow-sm ring-1 ring-highlight/30 flex items-center justify-center rotate-[18deg]"
+          >
+            <Crown
+              className="w-[11px] h-[11px] text-highlight"
+              strokeWidth={2.25}
+              fill="currentColor"
+              fillOpacity={tier === 'power' ? 0.45 : 0.2}
+            />
+          </span>
+        )}
+      </div>
+
+      <div className="flex flex-col">
+        <h1
+          className="text-base font-bold tracking-tight text-foreground leading-tight"
+          style={
+            tier
+              ? {
+                  backgroundImage: MEMBER_TITLE_GRADIENT[tier],
+                  WebkitBackgroundClip: 'text',
+                  backgroundClip: 'text',
+                  color: 'transparent',
+                }
+              : undefined
+          }
+        >
+          {t('popup.title')}
+        </h1>
+        {tier && (
+          <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] leading-none text-highlight/90">
+            {t(tier === 'power' ? 'popup.badgePower' : 'popup.badgeSupporter')}
+          </span>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -195,20 +237,14 @@ const Options = ({ initialEnabledState, detectedPlatform }: OptionsProps) => {
     <div className="w-[420px] h-[600px] flex flex-col bg-background text-foreground overflow-hidden font-sans selection:bg-primary/30">
       <div className="absolute top-0 left-0 w-full h-[400px] pointer-events-none overflow-hidden z-0 select-none">
         <div className="absolute -top-[100px] -left-[80px] w-[300px] h-[300px] rounded-full bg-primary/5 blur-[80px]" />
-        <div className="absolute top-[20px] -right-[100px] w-[350px] h-[350px] rounded-full bg-primary/5 blur-[90px]" />
+        {/* Members get one of the two ambient glows warmed by the accent, so the
+            lockup's tint carries into the page instead of sitting on top of it. */}
+        <div className={cn('absolute top-[20px] -right-[100px] w-[350px] h-[350px] rounded-full blur-[90px]', memberTier ? 'bg-highlight/[0.07]' : 'bg-primary/5')} />
       </div>
 
       {/* Header */}
       <div className="relative z-10 w-full flex-shrink-0 flex flex-col items-center pt-6 pb-4 space-y-4 bg-background/50 backdrop-blur-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/80 to-primary shadow-md flex items-center justify-center shrink-0">
-            <img src="/icons/icon128.png" className="w-6 h-6 object-contain drop-shadow-sm" alt="Logo" />
-          </div>
-          <h1 className="text-base font-bold tracking-tight text-foreground leading-tight">
-            {t('popup.title')}
-          </h1>
-          {memberTier && <MemberBadge tier={memberTier} />}
-        </div>
+        <HeaderLockup tier={memberTier} />
 
         <div className="flex bg-muted/50 p-1 rounded-lg w-[85%]">
           <button

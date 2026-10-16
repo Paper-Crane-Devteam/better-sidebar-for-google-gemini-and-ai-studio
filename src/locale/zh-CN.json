@@ -617,7 +617,7 @@
     "platforms": "支持的平台",
     "enablePlatform": "在 {{platform}} 上启用",
     "badgeSupporter": "支持者",
-    "badgePower": "Power",
+    "badgePower": "Power 会员",
     "badgeThanks": "感谢你对 Better Sidebar 的支持"
   },
   "feedback": {
