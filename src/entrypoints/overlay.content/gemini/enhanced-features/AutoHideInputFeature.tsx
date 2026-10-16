@@ -39,6 +39,14 @@ const targets = (prefix: string) =>
   `${prefix} input-container > .input-area-container, ${prefix} input-container > fieldset`;
 
 const STYLE_TEXT = `
+  /* The slid-down input overflows its overflow:hidden ancestor. overflow:hidden
+     is still programmatically scrollable, so focus / caret-into-view scrolls it
+     up and the whole column (including the input) shifts, leaving the input
+     half visible. overflow:clip is not a scroll container and can't scroll. */
+  body[${STATE_ATTR}] :has(> input-container) {
+    overflow: clip !important;
+  }
+
   body[${STATE_ATTR}] input-container {
     position: relative;
   }
@@ -180,6 +188,8 @@ export const AutoHideInputFeature = () => {
     // ---- state machine ----
     const setState = (next: State) => {
       state = next;
+      // ResizeObserver misses pure position shifts; re-measure on every flip.
+      measureGap();
       if (active) document.body.setAttribute(STATE_ATTR, next);
     };
 
@@ -220,6 +230,10 @@ export const AutoHideInputFeature = () => {
     // ---- measurement ----
     const measureGap = () => {
       if (!container) return;
+      // Safety net: if the parent got scrolled anyway (before clip applied,
+      // or by a future layout change), undo it so measurements are sane.
+      const parent = container.parentElement;
+      if (parent && parent.scrollTop !== 0) parent.scrollTop = 0;
       const gap = Math.max(
         0,
         Math.round(window.innerHeight - container.getBoundingClientRect().bottom),
@@ -269,6 +283,7 @@ export const AutoHideInputFeature = () => {
       }
       attachContainer();
       attachOverlay();
+      measureGap();
       evaluate();
     };
 
