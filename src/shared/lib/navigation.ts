@@ -17,14 +17,21 @@ const clickGeminiNewChat = (): boolean => {
 };
 
 /**
- * Navigate to a Gem chat via pushState + popstate.
- * Accepts either a gem ID or a full gem URL.
+ * Navigate to a Gem chat. Accepts either a gem ID or a full gem URL.
+ *
+ * Going straight from an open conversation to `/gem/<id>` only changes the URL:
+ * Gemini reuses the chat view and keeps the old conversation on screen. Routing
+ * through `/app` first (which does clear it) fixes that. Both hops run
+ * synchronously and the second one replaces the first, so the user sees no
+ * intermediate page and history gets a single new entry.
  */
 export const navigateToGem = (gemIdOrUrl: string) => {
   const gemUrl = gemIdOrUrl.startsWith('http')
     ? gemIdOrUrl
     : `https://gemini.google.com${geminiAccountPrefix()}/gem/${gemIdOrUrl}`;
-  navigate(gemUrl);
+  navigate(`${geminiAccountPrefix()}/app`);
+  window.history.replaceState({}, '', gemUrl);
+  window.dispatchEvent(new PopStateEvent('popstate'));
 };
 
 /**
