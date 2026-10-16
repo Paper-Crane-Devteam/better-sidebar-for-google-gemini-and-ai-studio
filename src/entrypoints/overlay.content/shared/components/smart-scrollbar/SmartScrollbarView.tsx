@@ -27,28 +27,56 @@ export interface SmartScrollbarItem {
 
 /**
  * Platform look. The colour tokens already follow the host page through the
- * shadow root's theme class; the variant only covers shape — Gemini's floating
- * card versus AI Studio's flatter, opaque surface.
+ * shadow root's theme class; the variant covers shape and density — Gemini's
+ * soft, roomy floating card versus AI Studio's compact Material surface
+ * (8px container radius, 4px item radius, tighter rows).
  */
 export type SmartScrollbarVariant = 'gemini' | 'aistudio';
 
-const VARIANT_STYLES: Record<
-  SmartScrollbarVariant,
-  { panel: string; dot: string; dotActive: string; dotIdle: string; dotOff: string }
-> = {
+interface VariantStyle {
+  panel: string;
+  /** Collapsed bar width */
+  collapsedWidth: string;
+  /** Toggle button padding, collapsed / expanded */
+  toggleCollapsed: string;
+  toggleExpanded: string;
+  /** Outline row: outer pitch + inner highlight block */
+  row: string;
+  rowInner: string;
+  /** Dot row hit area */
+  dotRow: string;
+  dot: string;
+  dotActive: string;
+  dotIdle: string;
+  dotOff: string;
+}
+
+const VARIANT_STYLES: Record<SmartScrollbarVariant, VariantStyle> = {
   gemini: {
     panel: 'rounded-xl border-border/40 bg-background/80 backdrop-blur-xl shadow-lg shadow-black/5',
+    collapsedWidth: 'w-8',
+    toggleCollapsed: 'p-2',
+    toggleExpanded: 'px-3 py-2',
+    row: 'h-8 mx-1',
+    rowInner: 'h-7 px-3 gap-2 rounded-md',
+    dotRow: 'h-4 w-6 rounded-full',
     dot: 'rounded-full',
     dotActive: 'h-[10px] w-[10px] bg-primary',
     dotIdle: 'h-2 w-2 bg-muted-foreground/40 group-hover:bg-muted-foreground/80',
     dotOff: 'h-2 w-2 bg-muted-foreground/20',
   },
   aistudio: {
-    panel: 'rounded-2xl border-border bg-background shadow-sm',
+    panel: 'rounded-lg border-border bg-background shadow-sm',
+    collapsedWidth: 'w-7',
+    toggleCollapsed: 'p-1.5',
+    toggleExpanded: 'px-2.5 py-1.5',
+    row: 'h-7 mx-0.5',
+    rowInner: 'h-6 px-2 gap-1.5 rounded',
+    dotRow: 'h-3.5 w-5 rounded-sm',
     dot: 'rounded-full',
-    dotActive: 'h-[10px] w-[10px] bg-primary',
-    dotIdle: 'h-2 w-2 bg-muted-foreground/50 group-hover:bg-muted-foreground',
-    dotOff: 'h-2 w-2 bg-muted-foreground/20',
+    dotActive: 'h-2 w-2 bg-primary',
+    dotIdle: 'h-1.5 w-1.5 bg-muted-foreground/50 group-hover:bg-muted-foreground',
+    dotOff: 'h-1.5 w-1.5 bg-muted-foreground/20',
   },
 };
 
@@ -132,7 +160,7 @@ export const SmartScrollbarView: React.FC<Props> = ({
           // Only the width animates; height snaps instantly
           'transition-[width] duration-300 ease-out origin-right',
           'overflow-hidden',
-          expanded ? 'w-[240px]' : 'w-8',
+          expanded ? 'w-[240px]' : styles.collapsedWidth,
           loading && 'opacity-40 pointer-events-none',
         )}
         style={{
@@ -157,7 +185,7 @@ export const SmartScrollbarView: React.FC<Props> = ({
               'flex items-center gap-2 min-w-0 flex-1',
               'transition-colors duration-150',
               'hover:bg-accent/60',
-              expanded ? 'px-3 py-2' : 'p-2 self-center',
+              expanded ? styles.toggleExpanded : cn(styles.toggleCollapsed, 'self-center'),
             )}
           >
             <List className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -194,6 +222,7 @@ export const SmartScrollbarView: React.FC<Props> = ({
                     index={index}
                     isActive={isActive}
                     onSelect={onSelect}
+                    styles={styles}
                     activeRef={isActive ? activeRef : undefined}
                   />
                 );
@@ -241,7 +270,7 @@ interface DotItemProps {
   item: SmartScrollbarItem;
   isActive: boolean;
   onSelect: (id: string) => void;
-  styles: (typeof VARIANT_STYLES)[SmartScrollbarVariant];
+  styles: VariantStyle;
   activeRef?: React.Ref<HTMLDivElement>;
 }
 
@@ -261,7 +290,7 @@ const DotItem: React.FC<DotItemProps> = ({
           // shrink-0: the column is height-capped, and without it a long list
           // squeezes the rows until the dots touch instead of scrolling
           'group flex items-center justify-center shrink-0',
-          'h-4 w-6 rounded-full',
+          styles.dotRow,
           'transition-all duration-150',
           item.available ? 'cursor-pointer' : 'cursor-default',
         )}
@@ -288,6 +317,7 @@ interface OutlineItemProps {
   index: number;
   isActive: boolean;
   onSelect: (id: string) => void;
+  styles: VariantStyle;
   activeRef?: React.Ref<HTMLDivElement>;
 }
 
@@ -296,6 +326,7 @@ const OutlineItem: React.FC<OutlineItemProps> = ({
   index,
   isActive,
   onSelect,
+  styles,
   activeRef,
 }) => {
   // Clean up whitespace for display (CSS handles truncation)
@@ -308,16 +339,18 @@ const OutlineItem: React.FC<OutlineItemProps> = ({
       className={cn(
         // Fixed row pitch: keeps the panel height independent of the
         // animating width, so expanding doesn't reflow (no height flicker)
-        'group flex items-center h-8 shrink-0 mx-1',
+        'group flex items-center shrink-0',
+        styles.row,
         item.available ? 'cursor-pointer' : 'cursor-default opacity-50',
       )}
     >
-      {/* Inner block is 28px tall, leaving 4px of breathing room inside
-          the 32px row without changing the overall list height */}
+      {/* Inner block is 4px shorter than the row, leaving breathing room
+          without changing the overall list height */}
       <div
         className={cn(
-          'flex items-center gap-2 px-3 h-7 w-full min-w-0',
-          'rounded-md transition-colors duration-150',
+          'flex items-center w-full min-w-0',
+          styles.rowInner,
+          'transition-colors duration-150',
           isActive
             ? 'bg-primary/10 text-foreground'
             : 'group-hover:bg-accent/60 text-muted-foreground group-hover:text-foreground',
