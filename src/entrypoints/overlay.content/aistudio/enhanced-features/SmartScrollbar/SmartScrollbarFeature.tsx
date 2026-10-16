@@ -9,8 +9,12 @@ import {
 
 /** Same threshold as Gemini: a two-question chat does not need a navigator. */
 const MIN_USER_TURNS = 3;
-/** Gap between the bar and the chat column's right edge */
-const EDGE_GAP = 16;
+/**
+ * Gap between the bar and the chat column's right edge. The native scrollbar
+ * occupies the column's last 32px (the gutter right of the text), which is
+ * exactly the collapsed bar's width, so sit flush in that slot.
+ */
+const EDGE_GAP = 0;
 
 const NATIVE_SCROLLBAR_STYLE_ID = 'better-sidebar-aistudio-hide-native-scrollbar';
 
