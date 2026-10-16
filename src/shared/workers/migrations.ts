@@ -671,6 +671,37 @@ export const runMigrations = async (db: any) => {
       console.log('Worker: Conversation created_at fix completed.');
     });
 
+    // ── One-time data fix: AI Studio message timestamps stamped with the write time ──
+    // AI Studio transcripts carry no per-message time, and the insert used to fall
+    // back to unixepoch(). A backfill or a re-open of an old chat therefore dated
+    // every message "today", and full-text search (sorted by message time) put old
+    // chats ahead of newer ones. New writes fall back to the conversation's
+    // last_active_at (see NO_TIMESTAMP_FALLBACK in messages.ts); this brings the
+    // rows written before that into line. The 900s slack matches
+    // BACKFILL_STALE_SLACK_SEC so ordinary live turns are left alone.
+    await step('fix AI Studio message timestamps from last_active_at', async () => {
+      const KEY = 'fix_aistudio_message_timestamps_v1';
+      await ensureMigrationsTable();
+      if (await hasMigrationRun(KEY)) return;
+
+      await db.run(`
+        UPDATE messages
+        SET timestamp = (
+          SELECT c.last_active_at FROM conversations c WHERE c.id = messages.conversation_id
+        )
+        WHERE conversation_id IN (
+          SELECT c.id FROM conversations c
+          WHERE c.platform = 'aistudio' AND c.last_active_at IS NOT NULL
+        )
+        AND timestamp > (
+          SELECT c.last_active_at FROM conversations c WHERE c.id = messages.conversation_id
+        ) + 900
+      `);
+
+      await markMigrationDone(KEY);
+      console.log('Worker: AI Studio message timestamp fix completed.');
+    });
+
     /**
      * Migration: `messages` primary key becomes (conversation_id, id).
      *

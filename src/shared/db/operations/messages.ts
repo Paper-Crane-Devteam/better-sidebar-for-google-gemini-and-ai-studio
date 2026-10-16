@@ -3,6 +3,18 @@ import { trace } from '@/shared/lib/trace';
 import { buildSearchRegex, getSearchRegexError } from '@/shared/lib/search-pattern';
 import type { Message } from '../../types/db';
 
+/**
+ * Timestamp for a message the platform gave no time for (AI Studio never does).
+ * Binds one parameter: the conversation id.
+ *
+ * Falls back to the conversation's own last activity, not the write time. The write
+ * time is when *we* stored it — a backfill or a re-open of a months-old chat — and
+ * full-text search sorts and dates hits by this column, so "now" made old chats
+ * show up as today's, ahead of chats that are genuinely newer.
+ */
+const NO_TIMESTAMP_FALLBACK =
+  'COALESCE((SELECT last_active_at FROM conversations WHERE id = ?), unixepoch())';
+
 export const messageRepo = {
   create: async (
     message: Omit<Message, 'id' | 'timestamp' | 'order_index'>,
@@ -46,14 +58,14 @@ export const messageRepo = {
       const hasTs = msg.created_at != null;
       return {
         sql: `INSERT INTO messages (id, conversation_id, role, content, message_type, timestamp, order_index)
-              VALUES (${hasId ? '?' : 'hex(randomblob(16))'}, ?, ?, ?, ?, ${hasTs ? '?' : 'unixepoch()'}, ?)`,
+              VALUES (${hasId ? '?' : 'hex(randomblob(16))'}, ?, ?, ?, ?, ${hasTs ? '?' : NO_TIMESTAMP_FALLBACK}, ?)`,
         bind: [
           ...(hasId ? [msg.id] : []),
           conversationId,
           msg.role,
           msg.content,
           msg.message_type || 'text',
-          ...(hasTs ? [msg.created_at] : []),
+          hasTs ? msg.created_at : conversationId,
           currentOrder++,
         ],
       };
@@ -161,12 +173,13 @@ export const messageRepo = {
       let currentOrder = 0;
       messages.forEach((msg) => {
         operations.push({
-          sql: 'INSERT INTO messages (id, conversation_id, role, content, message_type, timestamp, order_index) VALUES (hex(randomblob(16)), ?, ?, ?, ?, unixepoch(), ?)',
+          sql: `INSERT INTO messages (id, conversation_id, role, content, message_type, timestamp, order_index) VALUES (hex(randomblob(16)), ?, ?, ?, ?, ${NO_TIMESTAMP_FALLBACK}, ?)`,
           bind: [
             conversationId,
             msg.role,
             msg.content,
             msg.message_type || 'text',
+            conversationId,
             currentOrder++,
           ],
         });
