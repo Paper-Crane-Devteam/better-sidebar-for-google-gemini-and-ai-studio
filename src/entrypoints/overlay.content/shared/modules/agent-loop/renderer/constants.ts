@@ -138,10 +138,29 @@ const SCROLLER_SELECTORS = [
  *
  * `ms-chat-session` stays as the fallback: if this class is ever renamed we lose the extra
  * 20px of coverage rather than the overlay itself.
+ *
+ * ## Gemini: never become a direct child of `infinite-scroller.chat-history`
+ *
+ * Gemini's scroller runs a `MutationObserver` on its own direct children and decides how
+ * to scroll from which end of that list changed:
+ *
+ *   - last child changed  → a new turn arrived → `scrollIntoView` the newest turn
+ *   - only first changed  → older history was prepended → preserve the current offset
+ *
+ * Appending our host to the scroller made it the permanent last child. After switching
+ * conversations the turns are replaced but the last child is still our div, so Gemini
+ * took the "history prepended" branch and left the chat parked at `scrollTop = 0` instead
+ * of landing on the latest turn. It only bit when our div was already in place when the
+ * turns rendered (the setup runs on a 1s interval), which is why it looked intermittent.
+ *
+ * `.chat-history-scroll-container` is the scroller's parent and has the same box
+ * (`position: relative; overflow: hidden`, not scrolling), so the overlay is
+ * viewport-stable there and the native scroller is left entirely to Gemini.
  */
 const OVERLAY_HOST_SELECTORS = [
   '.chat-view-container', // AI Studio — the full chat column
   'ms-chat-session', // AI Studio — the scroller's non-scrolling twin
+  '.chat-history-scroll-container', // Gemini — the scroller's non-scrolling parent
 ] as const;
 
 /**
@@ -159,8 +178,8 @@ export const AI_STUDIO_OVERLAY_PADDING_X = 36;
 /**
  * Find the element to attach the overlay's portal host to.
  *
- * Falls back to the scroller, which is what Gemini uses and what the pinning logic in
- * `ConversationOverlay` is written for.
+ * Falls back to the scroller only if none of the non-scrolling hosts exist; the pinning
+ * logic in `ConversationOverlay` covers that case.
  */
 export function findOverlayHost(): HTMLElement | null {
   for (const selector of OVERLAY_HOST_SELECTORS) {
