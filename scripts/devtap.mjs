@@ -32,6 +32,9 @@
  *   snapshot                      All of the above into one file
  *   reload [--no-tabs]            Rebuild all entrypoints via the dev server,
  *                                 reload the extension and Gemini / AI Studio tabs
+ *   net start|stop|clear [ctx]    Capture the host page's XHR + fetch with bodies
+ *   net list|dump [ctx]           List / decode captured traffic (net.mjs)
+ *   gsend "<text>" [--new]        Type and send a Gemini message (gemini-ui.mjs)
  *
  * Context labels:
  *   bg     background service worker
@@ -88,8 +91,12 @@ import {
   cmdTargets,
   cmdWatch,
 } from './devtap/commands.mjs';
+import { cmdNet } from './devtap/net.mjs';
+import { cmdGsend } from './devtap/gemini-ui.mjs';
 
 const COMMANDS = {
+  net: cmdNet,
+  gsend: cmdGsend,
   targets: cmdTargets,
   logs: cmdLogs,
   watch: cmdWatch,
@@ -112,6 +119,10 @@ const HELP = `devtap — read the running extension from the command line
   state                       background storage / contexts / alarms
   snapshot                    everything, into one file
   reload [--no-tabs]          rebuild + reload extension + host tabs
+  net start|stop|clear [ctx]  capture the page's own XHR + fetch, bodies included
+  net list|dump [ctx]         list / decode (batchexecute rpc, WebChannel protobuf)
+                              → .kiro/devlog/net.txt   --grep <url re> --id 3,4
+  gsend "<text>" [--new]      type + send a Gemini message, wait for the reply
 
 contexts: bg  off  dbw  docw  gem  ais   (page logs are tagged gem/main, gem/ext)
 

@@ -4,9 +4,9 @@
  * A chat on gemini.google.com can live inside one of three contexts:
  *   - plain conversation (/app/<id> or /app)
  *   - gem chat         (/gem/<gemId> or /gem/<gemId>/<convId>)
- *   - notebook chat    (URL is /app/<convId> same as plain, but the
- *                       StreamGenerate request payload contains
- *                       "notebooks/<uuid>" at innerJson[21])
+ *   - notebook chat    (URL is /app/<convId> same as plain; the old StreamGenerate
+ *                       request named "notebooks/<uuid>", the processSession
+ *                       uplink has not been mapped for it yet)
  *
  * Previously gem detection was scattered across multiple files and notebook
  * support was missing (causing notebook chats to be misclassified as gems).

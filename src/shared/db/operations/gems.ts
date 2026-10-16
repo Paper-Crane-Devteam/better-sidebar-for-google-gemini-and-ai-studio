@@ -74,7 +74,14 @@ export const gemRepo = {
               external_url = COALESCE(excluded.external_url, gems.external_url),
               icon_url = COALESCE(excluded.icon_url, gems.icon_url),
               description = COALESCE(excluded.description, gems.description),
-              updated_at = excluded.updated_at`,
+              updated_at = excluded.updated_at
+            -- Callers resend the whole list on every page load; leave unchanged rows
+            -- alone so updated_at (and with it sync) only moves on a real change.
+            WHERE gems.name IS NOT excluded.name
+               OR (excluded.external_id IS NOT NULL AND gems.external_id IS NOT excluded.external_id)
+               OR (excluded.external_url IS NOT NULL AND gems.external_url IS NOT excluded.external_url)
+               OR (excluded.icon_url IS NOT NULL AND gems.icon_url IS NOT excluded.icon_url)
+               OR (excluded.description IS NOT NULL AND gems.description IS NOT excluded.description)`,
       bind: [
         gem.id,
         gem.name,

@@ -164,6 +164,15 @@ export const useGeminiUI = () => {
           max-width: none !important;
         }
         /*
+         * Response action bar (👍👎↻⧉⋯) is also capped at 708px and centered via
+         * a computed margin-inline, so once the column widens it drifts to the
+         * middle instead of hugging the text's left edge.
+         */
+        #chat-history .conversation-container message-actions {
+          max-width: none !important;
+          margin-inline: 0 !important;
+        }
+        /*
          * Tables: Gemini already lets .table-block span the full column, but
          * pads .table-content with \`max(0px, 50% - 354px)\` (450px for 4+ cols)
          * to re-center the table in a fixed 708/900px track. Drop that padding

@@ -19,6 +19,8 @@
  *   });
  */
 
+import { nativeFetch } from './native-fetch';
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -61,6 +63,34 @@ let reqidSuffix = '';   // e.g. "46304"
 let reqidPrefix = 0;    // e.g. 60
 
 let lastLearnedFingerprint = '';
+
+/**
+ * `/u/N` of the signed-in account this tab is using, or '' for the default account.
+ *
+ * Google picks the account from the path, not the cookies: `/_/BardChatUi/…` is
+ * account 0, `/u/2/_/BardChatUi/…` is account 2. A request built without it reads
+ * the *default* account's data with this tab's tokens, which Gemini answers with
+ * HTTP 400 — or, for an id that happens to exist there, with someone else's chat.
+ */
+let accountPrefix: string | null = null;
+
+const ACCOUNT_PREFIX_RE = /^\/u\/\d+(?=\/)/;
+
+function prefixFromPath(pathname: string): string | null {
+  const m = ACCOUNT_PREFIX_RE.exec(pathname);
+  return m ? m[0] : null;
+}
+
+/** The prefix learned from page traffic, else the tab's own URL, else none. */
+function currentAccountPrefix(): string {
+  return accountPrefix ?? prefixFromPath(location.pathname) ?? '';
+}
+
+/** Prefix a page path (`/app/<id>`) with the account, unless it already has one. */
+function withAccountPrefix(path: string, prefix: string): string {
+  if (!prefix || ACCOUNT_PREFIX_RE.test(path)) return path;
+  return `${prefix}${path.startsWith('/') ? '' : '/'}${path}`;
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -112,6 +142,11 @@ export const geminiRequestBuilder = {
     try {
       const u = new URL(url, location.origin);
       const params = u.searchParams;
+
+      // The page's own requests carry the account in their path; '' is account 0.
+      if (u.pathname.includes('/_/BardChatUi/')) {
+        accountPrefix = prefixFromPath(u.pathname) ?? '';
+      }
 
       // Extract reqid for counter sync
       const reqidRaw = params.get('_reqid');
@@ -212,7 +247,9 @@ export const geminiRequestBuilder = {
     const { at, fsid, bl, hl, headers: capturedHeaders } = captured;
 
     const reqid = nextReqid();
-    const sp = sourcePath || location.pathname;
+    const prefix = currentAccountPrefix();
+    // Callers pass account-less paths like `/app/<id>`; the page sends `/u/2/app/<id>`.
+    const sp = withAccountPrefix(sourcePath || location.pathname, prefix);
 
     // Build URL
     const qp = new URLSearchParams({
@@ -224,7 +261,7 @@ export const geminiRequestBuilder = {
       _reqid: reqid,
       rt: 'c',
     });
-    const url = `https://gemini.google.com/_/BardChatUi/data/batchexecute?${qp.toString()}`;
+    const url = `https://gemini.google.com${prefix}/_/BardChatUi/data/batchexecute?${qp.toString()}`;
 
     // Build body
     const bodyParams = new URLSearchParams({
@@ -239,10 +276,12 @@ export const geminiRequestBuilder = {
     };
 
     console.log(
-      `Better Sidebar (Gemini): Executing ${rpcid} (reqid=${reqid})`,
+      `Better Sidebar (Gemini): Executing ${rpcid} (reqid=${reqid}${prefix ? `, account ${prefix}` : ''})`,
     );
 
-    return fetch(url, {
+    // Not the global `fetch`: that one is the interceptor, which would route this
+    // response back into the page-traffic handlers.
+    return nativeFetch(url, {
       method: 'POST',
       headers: finalHeaders,
       body: bodyParams.toString(),

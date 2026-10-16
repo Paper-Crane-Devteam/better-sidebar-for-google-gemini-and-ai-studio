@@ -7,9 +7,9 @@
  * because a single conversation is a handful of requests at most; the expensive
  * pacing (between conversations) is the scheduler's job.
  *
- * Uses `fetch`, which ajax-hook does not proxy — so unlike the page's own
- * requests these responses never reach the interceptors, and cannot make the
- * sidebar think the user opened a conversation they did not.
+ * Goes through the request builder's unwrapped `fetch` (`native-fetch.ts`), so
+ * unlike the page's own requests these responses never reach the interceptors,
+ * and cannot make the sidebar think the user opened a conversation they did not.
  */
 
 import {
@@ -20,7 +20,7 @@ import {
   type BackfillFetchResult,
 } from '@/shared/constants/backfill';
 import { geminiRequestBuilder } from './request-builder';
-import { getWrbFrErrorCode, parseResponsePayloads } from './response-parser';
+import { decodeBatchResponse } from './batchexecute';
 import {
   getChatContentEntries,
   getNextPageToken,
@@ -79,13 +79,12 @@ async function fetchTranscript(conversationId: string): Promise<BackfillFetchRes
       return { ok: false, reason: 'http', detail: String(res.status), pages };
     }
 
-    const body = await res.text();
-    const payloads = parseResponsePayloads(body);
-    if (payloads.length === 0) {
+    const row = decodeBatchResponse(await res.text()).find((r) => r.rpcid === CHAT_CONTENT_RPC);
+    if (!row?.payload) {
       // An RPC-level error rides inside an HTTP 200. NOT_FOUND (5) is Gemini
       // saying the conversation is gone for this account; anything else stays a
       // parse failure, because we cannot tell it apart from a format change.
-      const code = getWrbFrErrorCode(body);
+      const code = row?.errorCode ?? null;
       if (code === RPC_NOT_FOUND) {
         return { ok: false, reason: 'not-found', pages };
       }
@@ -97,11 +96,9 @@ async function fetchTranscript(conversationId: string): Promise<BackfillFetchRes
       };
     }
 
-    collected.push(
-      ...parseChatContentEntries(getChatContentEntries(payloads[0])),
-    );
+    collected.push(...parseChatContentEntries(getChatContentEntries(row.payload)));
 
-    pageToken = getNextPageToken(payloads[0]);
+    pageToken = getNextPageToken(row.payload);
     if (!pageToken) break;
   }
 

@@ -974,7 +974,6 @@
     "hideGemConfirm": "確定要隱藏 \"{{name}}\" 嗎？你可以重新掃描來恢復此 Gem。",
     "deleteGem": "刪除 Gem",
     "deleteGemConfirm": "確定要刪除 \"{{name}}\" 嗎？此操作將從 Gemini 永久刪除該 Gem。",
-    "renameGem": "重新命名 Gem",
     "createGem": "建立 Gem",
     "selectGem": "選擇一個 Gem",
     "searchGems": "搜尋 Gems...",

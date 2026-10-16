@@ -3,7 +3,8 @@ name: devtap-debug
 description: >
   用 scripts/devtap.mjs 排查这个扩展的运行时问题：读取全部 6 个 context 的 console
   历史（含浏览器 MCP 看不到的 background / offscreen / SQLite worker）、查 SQLite 库、
-  在任意 context 里执行 JS、发扩展消息、抓一份完整现场快照。
+  在任意 context 里执行 JS、发扩展消息、抓一份完整现场快照；抓宿主页面的 XHR/fetch
+  请求和响应并解码（batchexecute rpc、WebChannel protobuf），自动往 Gemini 发消息复现。
   任何「为什么没生效 / 报什么错 / 数据对不对 / 流程走到哪了」的问题都先用它，
   不要靠读代码猜，也不要一上手就开浏览器 MCP（MCP 只能看页面且对象参数全丢）。
   Keywords: 调试, debug, 排查, troubleshoot, 定位, 日志, log, logs, console, 控制台,
@@ -13,7 +14,10 @@ description: >
   agent loop, 同步, sync, gdrive, 快照, snapshot, 现场, devtap, cdp, 9222,
   详细日志, verbose, trace, __bsTrace, 日志开关, 噪声, noise, 看不到日志, 日志太多,
   生产, 正式环境, production, prod, 商店版, 用户的浏览器, 日常 Chrome, 其他 profile,
-  --chrome, relay, 中继, remote-debugging, DevToolsActivePort, Extension context invalidated.
+  --chrome, relay, 中继, remote-debugging, DevToolsActivePort, Extension context invalidated,
+  接口, 接口变了, API 变动, 抓包, 网络请求, network, request, response, xhr, fetch,
+  batchexecute, rpcid, rpcids, processSession, WebChannel, protobuf, 逆向, 协议,
+  捕捉不到, 没捕获, 抓不到对话, 新对话, 自动发消息, gsend, net dump.
 ---
 
 # devtap：读取运行中的扩展
@@ -60,6 +64,63 @@ node scripts/devtap.mjs reload            # 全量重建 + 重载扩展 + 刷新
 
 过滤：`--ctx bg,dbw` `--grep 'AgentLoop|DB Command'` `--level warn` `--since 2m`
 `-n 80` `--stack` `--maxval 800` `--noise`。完整说明 `head -80 scripts/devtap.mjs`。
+
+## 抓宿主页面的网络流量 `net`，自动发消息 `gsend`
+
+「Gemini 是不是改接口了 / 拦截器为什么没触发」先用这两个，**不要再手写探针塞进 `eval`**：
+
+```bash
+node scripts/devtap.mjs net start --all          # 所有 gem 标签页装探针（--page <url片段> 选一个）
+node scripts/devtap.mjs gsend "测试" --page 6c3f # 往输入框打字并发送，等回复结束（--new 先开新对话）
+node scripts/devtap.mjs net list --page 6c3f     # 一行一个请求：xhr/fetch、状态、请求/响应字节数、rpcids / RID
+node scripts/devtap.mjs net dump --grep 'MaZiqc|processSession'   # 解码后的内容 → .kiro/devlog/net.txt
+node scripts/devtap.mjs net dump --id 15,16 --maxstr 120          # 只看指定条目
+node scripts/devtap.mjs net reload --page u/2     # 带着探针重载标签页，抓页面加载期的请求（列表、gem、notebook）
+node scripts/devtap.mjs net clear / net stop
+```
+
+`net dump` 会自动解码：`batchexecute` 解成 `→ rpcid <请求 inner JSON>` / `← rpcid <响应 inner JSON>`；
+`processSession`（WebChannel）把 base64 protobuf 解成点分字段路径 `.2.7.1.4.4.5.2.1 "正文"`，
+这和 `lib/process-session.ts` 里取值用的路径是同一套写法，直接对照着改就行。离线解 protobuf
+可以 `import { dumpProto, b64ToBuffer } from './scripts/devtap/proto.mjs'`。
+
+探针已经处理好的坑（自己写探针时最容易踩）：
+
+- **ajax-hook 底下**：扩展把 `window.XMLHttpRequest` 换成了代理，探针 patch 的是代理背后的原生原型
+  （`new XMLHttpRequest().__origin_xhr`），扩展有没有转发都能看到。
+- **流结束会被 abort**：WebChannel 回复结束后 `abort()` 回传通道，`responseText` 会被清成 ''。
+  探针在 `progress` 时就保留最长的文本。拦截器也一样，只能边收边读。
+- **fetch 的 body 在 Request 上**：Gemini 调 `fetch(Request)`，`init.body` 是空的，要在发出**之前** clone。
+- **Response 要同步 clone**：`resPromise.then(r => r.clone())` 必须在把 promise 还给页面之前注册，
+  晚一步页面就把 body 读掉了（`Response body is already used`）。
+
+`gsend` 的坑：输入框是 `<rich-textarea>` 里的 Quill，只认 `execCommand('insertText')`；
+发送按钮要在输入区域内找（`aria-label="Send message"`），全页面里还有别的 "Send…" 按钮。
+Gemini 在输入框获得焦点时就会**预开**一个 processSession，没发送的话一分钟后自己关掉，
+所以只开 session 不代表发了消息，以带 `.2.9.1`（prompt）的上行为准。
+
+**Windows / PowerShell 下长 JS 用 `eval --file`**：PowerShell 会把参数里的双引号吃掉
+（`SyntaxError: Unexpected identifier`），把表达式写进 `.kiro/devlog/xxx.js` 再
+`node scripts/devtap.mjs eval gem --file .kiro/devlog/xxx.js --page u/2`。
+点 Gemini UI（重命名 / 删除对话）就这样写：`button[aria-label="More options for <标题>"]` →
+`[role=menuitem]` → `[role=dialog] button`。只对自己建的测试对话做有副作用的操作。
+
+**Gemini 当前接口一览（2026-10 版本 `boq_gemini-web-uiserver_20261015`）**：生成走
+`geminiweb-pa.clients6.google.com/v1/processSession`（WebChannel + protobuf，
+`interceptors/process-session.ts`）；其余 `batchexecute` rpcid（`MaZiqc` 列表、`hNvQHb` 内容、
+`MUAZcd` 改名、`GzXR5e` 删除、`CNgdBe` gem/notebook 列表 …）**没变**，只是从 XHR 改成了 fetch。
+两种传输都汇到 `interceptors/rpc-handlers.ts` 的 rpcid → handler 表，handler 拿到的是
+`lib/batchexecute.ts` 解好的 `{ request, response }`，新增/修改 rpc 只动这张表和对应 handler。
+`CNgdBe` 按**请求**区分：`[2,[lang],0]` 自己的 gem、`[1,…]` 最近用过的（含官方预置，忽略）、
+`[2,[lang],0,null,[2]]` notebook。扩展自己发的请求走 `lib/native-fetch.ts`，不会被自己的拦截器再处理一遍。
+
+**多账号**：数据库是按标签页路由的（background 的 `[TabProfileMap] Tab … → <db>`），
+`GET_ACTIVE_PROFILE` 返回的是全局"当前" profile，不代表某个标签页写进哪个库。查某个账号的数据用
+`sql --page <那个账号的标签页>`。
+
+**别连续狂发**：短时间内 reload + 自动发消息太频繁，Google 会把标签页重定向到
+`google.com/sorry`（人机验证）。`targets` 里 gem 标签页突然消失就是这个，需要用户手动过验证，
+不要尝试自动解验证码。
 
 ## 详细日志开关 `__bsTrace`
 

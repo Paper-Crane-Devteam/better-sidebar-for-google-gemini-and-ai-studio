@@ -214,8 +214,10 @@ export async function cmdWatch(flags) {
 
 export async function cmdEval(flags) {
   const [, ctxName, ...exprParts] = flags._;
-  const expression = exprParts.join(' ');
-  if (!ctxName || !expression) throw new Error('Usage: devtap eval <ctx> <expression>');
+  // `--file x.js` sidesteps shell quoting, which PowerShell mangles for any expression
+  // containing double quotes.
+  const expression = flags.file ? readFileSync(resolve(flags.file), 'utf8') : exprParts.join(' ');
+  if (!ctxName || !expression) throw new Error('Usage: devtap eval <ctx> <expression> | --file <path.js>');
 
   const { roots } = await discover(flags.port);
   const opened = await openAll(roots);

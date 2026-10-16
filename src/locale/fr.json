@@ -974,7 +974,6 @@
     "hideGemConfirm": "Êtes-vous sûr de vouloir masquer \"{{name}}\" ? Vous pourrez réanalyser pour récupérer ce Gem.",
     "deleteGem": "Supprimer le Gem",
     "deleteGemConfirm": "Êtes-vous sûr de vouloir supprimer \"{{name}}\" ? Cela supprimera définitivement le Gem de Gemini.",
-    "renameGem": "Renommer le Gem",
     "createGem": "Créer un Gem",
     "selectGem": "Sélectionner un Gem",
     "searchGems": "Rechercher des Gems...",

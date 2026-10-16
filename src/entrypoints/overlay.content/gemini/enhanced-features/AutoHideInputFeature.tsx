@@ -5,221 +5,423 @@ import { useCurrentConversationId } from '@/entrypoints/overlay.content/shared/h
 /**
  * Auto-hide input feature for Gemini conversation pages.
  *
- * Strategy:
- * - `input-container` stays in normal flow as the hover trigger zone
- * - Its child `.input-area-container` (wraps input-area-v2 > fieldset) gets
- *   `position: absolute` to visually slide down
- * - On `input-container:hover` or `input-container:focus-within`, it slides back up
- * - When `.cdk-overlay-container` has children (popups/dropdowns open), keep fieldset visible
- * - On conversation switch (detected via useCurrentConversationId), temporarily reveal fieldset
+ * CSS only animates; visibility is decided by a small JS state machine that
+ * writes `body[data-bs-aih="shown|hidden"]`.
  *
- * Uses a MutationObserver on .cdk-overlay-container to toggle a body class
- * that forces fieldset to stay visible via CSS.
+ * - The input wrapper is taken out of flow (`position: absolute`) and slid
+ *   down. The slide distance is measured (`--bs-aih-gap` = space between
+ *   input-container's bottom and the viewport bottom), so extra rows Gemini
+ *   adds below the input (disclaimers, banners) don't leave it half visible.
+ * - Shown when any of: pointer in the bottom hot zone (or over the shown
+ *   input), focused with non-empty text, a cdk popup opened while shown,
+ *   files being dragged, or a temporary reveal after switching conversations.
+ * - Show/hide are debounced to avoid flicker when the pointer skims the edge.
  */
+
+const STYLE_ID = 'better-sidebar-auto-hide-input';
+const STATE_ATTR = 'data-bs-aih';
+const GAP_VAR = '--bs-aih-gap';
+
+const PEEK_PX = 12; // visible strip when hidden
+const LIFT_PX = 12; // lift above input-container bottom when shown
+const HOT_ZONE_PX = 40; // bottom zone that triggers reveal while hidden
+const SIDE_SLOP_PX = 24;
+const TOP_SLOP_PX = 16;
+const SHOW_DELAY_MS = 80;
+const HIDE_DELAY_MS = 400;
+const REVEAL_MS = 1500;
+
+type State = 'shown' | 'hidden';
+
+// DOM (2026-10): input-container > div.input-area-container > input-area-v2
+//   > div.input-area > fieldset. Older builds had fieldset as a direct child.
+const targets = (prefix: string) =>
+  `${prefix} input-container > .input-area-container, ${prefix} input-container > fieldset`;
+
+const STYLE_TEXT = `
+  /* The slid-down input overflows its overflow:hidden ancestor. overflow:hidden
+     is still programmatically scrollable, so focus / caret-into-view scrolls it
+     up and the whole column (including the input) shifts, leaving the input
+     half visible. overflow:clip is not a scroll container and can't scroll. */
+  body[${STATE_ATTR}] :has(> input-container) {
+    overflow: clip !important;
+  }
+
+  body[${STATE_ATTR}] input-container {
+    position: relative;
+  }
+
+  ${targets(`body[${STATE_ATTR}]`)} {
+    position: absolute !important;
+    /* inset by input-container's horizontal padding so max-width % matches in-flow width */
+    left: 16px;
+    right: 16px;
+    bottom: 0;
+    margin-inline: auto !important;
+    z-index: 1;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease !important;
+  }
+
+  ${targets(`body[${STATE_ATTR}="hidden"]`)} {
+    transform: translateY(calc(100% + var(${GAP_VAR}, 0px) - ${PEEK_PX}px)) !important;
+    opacity: 0.3 !important;
+  }
+
+  ${targets(`body[${STATE_ATTR}="shown"]`)} {
+    transform: translateY(-${LIFT_PX}px) !important;
+    opacity: 1 !important;
+  }
+
+  /* The disclaimer sits where the peek strip lands; fade it out while hidden */
+  body[${STATE_ATTR}] input-container > hallucination-disclaimer {
+    transition: opacity 0.2s ease;
+  }
+  body[${STATE_ATTR}="hidden"] input-container > hallucination-disclaimer {
+    opacity: 0;
+    pointer-events: none;
+  }
+`;
+
+const isConversationPage = () => {
+  const path = window.location.pathname;
+  return (
+    /\/app\/[a-zA-Z0-9_-]+/.test(path) ||
+    /\/gem\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+/.test(path)
+  );
+};
+
 export const AutoHideInputFeature = () => {
   const autoHideInput = usePegasusStore(
     (s) => s.enhancedFeatures.gemini.autoHideInput,
   );
   const conversationId = useCurrentConversationId();
   const prevConversationIdRef = useRef<string | null | undefined>(undefined);
+  const revealRef = useRef<(() => void) | null>(null);
 
-  // Temporarily reveal input when conversation switches
+  // Temporarily reveal + focus input when switching between conversations
   useEffect(() => {
-    // Skip the initial mount (undefined → first value)
-    if (prevConversationIdRef.current === undefined) {
-      prevConversationIdRef.current = conversationId;
-      return;
-    }
-
-    // Only reveal when switching between conversations (both old and new are non-null)
-    if (
-      autoHideInput &&
-      conversationId &&
-      prevConversationIdRef.current &&
-      conversationId !== prevConversationIdRef.current
-    ) {
-      document.body.classList.add('bs-input-reveal');
-
-      // Focus the contenteditable input so user can start typing immediately.
-      // Once focused, :focus-within keeps the fieldset visible — no timeout needed.
-      const focusTimer = setTimeout(() => {
-        const editableDiv = document.querySelector(
-          'rich-textarea > div[contenteditable]',
-        ) as HTMLElement | null;
-        if (editableDiv) {
-          editableDiv.focus();
-          // :focus-within now keeps it visible, remove the reveal class
-          document.body.classList.remove('bs-input-reveal');
-        }
-      }, 300);
-
-      prevConversationIdRef.current = conversationId;
-      return () => {
-        clearTimeout(focusTimer);
-        document.body.classList.remove('bs-input-reveal');
-      };
-    }
-
+    const prev = prevConversationIdRef.current;
     prevConversationIdRef.current = conversationId;
+    if (prev === undefined) return; // initial mount
+    if (autoHideInput && conversationId && prev && conversationId !== prev) {
+      revealRef.current?.();
+    }
   }, [conversationId, autoHideInput]);
 
   useEffect(() => {
-    const styleId = 'better-sidebar-auto-hide-input';
-    let styleEl = document.getElementById(styleId) as HTMLStyleElement | null;
-    let overlayObserver: MutationObserver | null = null;
-
     if (!autoHideInput) {
-      if (styleEl) styleEl.remove();
-      document.body.classList.remove('bs-overlay-open');
-      document.body.classList.remove('bs-input-reveal');
+      document.getElementById(STYLE_ID)?.remove();
+      document.body.removeAttribute(STATE_ATTR);
+      document.body.style.removeProperty(GAP_VAR);
       return;
     }
 
-    const isConversationPage = () => {
-      const path = window.location.pathname;
-      return (
-        /\/app\/[a-zA-Z0-9_-]+/.test(path) ||
-        /\/gem\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+/.test(path)
+    let styleEl: HTMLStyleElement | null = null;
+    let active = false;
+    let state: State = 'hidden';
+
+    let container: Element | null = null;
+    let resizeObs: ResizeObserver | null = null;
+    let overlayEl: Element | null = null;
+    let overlayObs: MutationObserver | null = null;
+
+    let pointerInZone = false;
+    let dragging = false;
+    let overlayHold = false;
+    let revealUntil = 0;
+    let lastX = -1;
+    let lastY = -1;
+
+    let pendingTimer = 0;
+    let pendingTarget: State | null = null;
+    let rafId = 0;
+    const timers = new Set<number>();
+    const later = (fn: () => void, ms: number) => {
+      const id = window.setTimeout(() => {
+        timers.delete(id);
+        fn();
+      }, ms);
+      timers.add(id);
+    };
+
+    // ---- DOM queries ----
+    const getInput = () =>
+      container?.querySelector(
+        ':scope > .input-area-container, :scope > fieldset',
+      ) ?? null;
+
+    const getEditor = () =>
+      container?.querySelector<HTMLElement>(
+        'rich-textarea [contenteditable]',
+      ) ?? null;
+
+    const hasText = () => {
+      const editor = getEditor();
+      if (!editor) return false;
+      if (editor.classList.contains('ql-blank')) return false;
+      return (editor.textContent ?? '').trim().length > 0;
+    };
+
+    const isFocused = () =>
+      !!container && container.contains(document.activeElement);
+
+    const isOverlayOpen = () =>
+      !!overlayEl &&
+      Array.from(overlayEl.querySelectorAll('.cdk-overlay-pane')).some(
+        (p) => p.childElementCount > 0,
       );
+
+    const pointerHitsZone = () => {
+      if (lastX < 0) return false;
+      const input = getInput();
+      if (!input) return false;
+      const r = input.getBoundingClientRect();
+      if (lastX < r.left - SIDE_SLOP_PX || lastX > r.right + SIDE_SLOP_PX)
+        return false;
+      const top =
+        state === 'shown'
+          ? r.top - TOP_SLOP_PX
+          : window.innerHeight - HOT_ZONE_PX;
+      return lastY >= top;
     };
 
-    // Watch .cdk-overlay-container for children (popups/dropdowns)
-    const setupOverlayObserver = () => {
-      const tryAttach = () => {
-        const overlayContainer = document.querySelector('.cdk-overlay-container');
-        if (!overlayContainer) return false;
-
-        const checkOverlay = () => {
-          const inputContainer = document.querySelector('input-container');
-          const isInputExpanded =
-            inputContainer?.matches(':hover') ||
-            inputContainer?.matches(':focus-within');
-
-          if (overlayContainer.children.length > 0 && isInputExpanded) {
-            document.body.classList.add('bs-overlay-open');
-          } else {
-            document.body.classList.remove('bs-overlay-open');
-          }
-        };
-
-        checkOverlay();
-        overlayObserver = new MutationObserver(checkOverlay);
-        overlayObserver.observe(overlayContainer, { childList: true });
-        return true;
-      };
-
-      // Try immediately
-      if (tryAttach()) return;
-
-      // If not found, watch body for the container to appear
-      const bodyObserver = new MutationObserver(() => {
-        if (tryAttach()) {
-          bodyObserver.disconnect();
-        }
-      });
-      bodyObserver.observe(document.body, { childList: true, subtree: false });
-
-      // Store for cleanup
-      const origDisconnect = overlayObserver?.disconnect.bind(overlayObserver);
-      overlayObserver = {
-        disconnect: () => {
-          bodyObserver.disconnect();
-          origDisconnect?.();
-        },
-      } as MutationObserver;
+    // ---- state machine ----
+    const setState = (next: State) => {
+      state = next;
+      // ResizeObserver misses pure position shifts; re-measure on every flip.
+      measureGap();
+      if (active) document.body.setAttribute(STATE_ATTR, next);
     };
 
-    const applyStyle = () => {
-      if (!isConversationPage()) {
-        if (styleEl) styleEl.textContent = '';
-        // When navigating back to new chat, our absolute positioning CSS is removed.
-        // Gemini's layout may have stale calculations — fire resize to fix it.
-        requestAnimationFrame(() => {
-          window.dispatchEvent(new Event('resize'));
-        });
+    const cancelPending = () => {
+      if (pendingTimer) clearTimeout(pendingTimer);
+      pendingTimer = 0;
+      pendingTarget = null;
+    };
+
+    const evaluate = () => {
+      if (!active) return;
+      const typing = isFocused() && hasText();
+      const forced =
+        dragging || overlayHold || typing || Date.now() < revealUntil;
+      const want: State = forced || pointerInZone ? 'shown' : 'hidden';
+
+      if (want === state) {
+        cancelPending();
         return;
       }
+      if (pendingTimer && pendingTarget === want) return;
 
-      if (!styleEl) {
-        styleEl = document.createElement('style');
-        styleEl.id = styleId;
-        document.head.appendChild(styleEl);
+      cancelPending();
+      const delay =
+        want === 'hidden' ? HIDE_DELAY_MS : forced ? 0 : SHOW_DELAY_MS;
+      if (delay === 0) {
+        setState(want);
+        return;
       }
-
-      // DOM (2026-10): input-container > div.input-area-container > input-area-v2
-      //   > div.input-area > fieldset. Older builds had fieldset as a direct child.
-      const target = `input-container > .input-area-container, input-container > fieldset`;
-      const scoped = (prefix: string) =>
-        `${prefix} input-container > .input-area-container, ${prefix} input-container > fieldset`;
-
-      styleEl.textContent = `
-        /* input-container is the hover trigger, stays in flow */
-        input-container {
-          position: relative;
-        }
-
-        /* Input wrapper is taken out of flow and slid below the viewport */
-        ${target} {
-          position: absolute !important;
-          /* inset by input-container's horizontal padding so max-width % matches in-flow width */
-          left: 16px;
-          right: 16px;
-          bottom: 0;
-          margin-inline: auto !important;
-          z-index: 1;
-          transform: translateY(calc(100% - 12px));
-          transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease;
-          opacity: 0.3;
-        }
-
-        /* Reveal on hover or when user is typing */
-        input-container:hover > .input-area-container,
-        input-container:focus-within > .input-area-container,
-        input-container:hover > fieldset,
-        input-container:focus-within > fieldset {
-          transform: translateY(-12px) !important;
-          opacity: 1 !important;
-        }
-
-        /* Keep visible when overlay popups are open */
-        ${scoped('body.bs-overlay-open')} {
-          transform: translateY(-12px) !important;
-          opacity: 1 !important;
-        }
-
-        /* Temporarily reveal on conversation switch */
-        ${scoped('body.bs-input-reveal')} {
-          transform: translateY(-12px) !important;
-          opacity: 1 !important;
-          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease !important;
-        }
-      `;
-
-      setupOverlayObserver();
+      pendingTarget = want;
+      pendingTimer = window.setTimeout(() => {
+        pendingTimer = 0;
+        pendingTarget = null;
+        setState(want);
+      }, delay);
     };
 
-    applyStyle();
+    // ---- measurement ----
+    const measureGap = () => {
+      if (!container) return;
+      // Safety net: if the parent got scrolled anyway (before clip applied,
+      // or by a future layout change), undo it so measurements are sane.
+      const parent = container.parentElement;
+      if (parent && parent.scrollTop !== 0) parent.scrollTop = 0;
+      const gap = Math.max(
+        0,
+        Math.round(window.innerHeight - container.getBoundingClientRect().bottom),
+      );
+      document.body.style.setProperty(GAP_VAR, `${gap}px`);
+    };
 
-    // Re-apply on SPA navigation (title changes)
-    const navObserver = new MutationObserver(() => {
-      requestAnimationFrame(applyStyle);
-    });
+    // ---- attachment (re-run on navigation / DOM swaps) ----
+    const attachContainer = () => {
+      const c = document.querySelector('input-container');
+      if (c === container) return;
+      resizeObs?.disconnect();
+      container = c;
+      if (!c) return;
+      resizeObs = new ResizeObserver(measureGap);
+      resizeObs.observe(c);
+      measureGap();
+    };
 
+    const onOverlayMutation = () => {
+      const open = isOverlayOpen();
+      if (open && state === 'shown') overlayHold = true;
+      else if (!open) overlayHold = false;
+      evaluate();
+    };
+
+    const attachOverlay = () => {
+      if (overlayEl?.isConnected) return;
+      overlayObs?.disconnect();
+      overlayEl = document.querySelector('.cdk-overlay-container');
+      if (!overlayEl) return;
+      overlayObs = new MutationObserver(onOverlayMutation);
+      overlayObs.observe(overlayEl, { childList: true, subtree: true });
+    };
+
+    const activate = () => {
+      if (!styleEl) {
+        styleEl = document.createElement('style');
+        styleEl.id = STYLE_ID;
+        document.head.appendChild(styleEl);
+      }
+      if (styleEl.textContent !== STYLE_TEXT) styleEl.textContent = STYLE_TEXT;
+      if (!active) {
+        active = true;
+        state = 'hidden';
+        document.body.setAttribute(STATE_ATTR, state);
+      }
+      attachContainer();
+      attachOverlay();
+      measureGap();
+      evaluate();
+    };
+
+    const deactivate = () => {
+      if (!active) return;
+      active = false;
+      cancelPending();
+      document.body.removeAttribute(STATE_ATTR);
+      if (styleEl) styleEl.textContent = '';
+      // Gemini's layout may keep stale calculations once our absolute
+      // positioning goes away (e.g. back to new chat) — nudge it.
+      requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
+    };
+
+    const sync = () => {
+      if (isConversationPage()) activate();
+      else deactivate();
+    };
+
+    // ---- event handlers ----
+    const onPointerMove = (e: MouseEvent) => {
+      lastX = e.clientX;
+      lastY = e.clientY;
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = 0;
+        pointerInZone = pointerHitsZone();
+        evaluate();
+      });
+    };
+
+    const onPointerGone = () => {
+      lastX = lastY = -1;
+      pointerInZone = false;
+      evaluate();
+    };
+
+    const hasFiles = (e: DragEvent) =>
+      !!e.dataTransfer && Array.from(e.dataTransfer.types).includes('Files');
+
+    const onDragEnter = (e: DragEvent) => {
+      if (!hasFiles(e)) return;
+      dragging = true;
+      evaluate();
+    };
+
+    const onDragLeave = (e: DragEvent) => {
+      const outside =
+        e.relatedTarget === null &&
+        (e.clientX <= 0 ||
+          e.clientY <= 0 ||
+          e.clientX >= window.innerWidth ||
+          e.clientY >= window.innerHeight);
+      if (!outside) return;
+      dragging = false;
+      evaluate();
+    };
+
+    const onDragEnd = () => {
+      if (!dragging) return;
+      dragging = false;
+      evaluate();
+    };
+
+    // Typing, sending (editor cleared) and focus moves all change the
+    // "focused with text" condition.
+    const onEditorActivity = () => requestAnimationFrame(evaluate);
+
+    const onResize = () => {
+      measureGap();
+      pointerInZone = pointerHitsZone();
+      evaluate();
+    };
+
+    revealRef.current = () => {
+      if (!active) return;
+      revealUntil = Date.now() + REVEAL_MS;
+      cancelPending();
+      setState('shown');
+      later(evaluate, REVEAL_MS + 20);
+      later(() => getEditor()?.focus(), 300);
+    };
+
+    sync();
+
+    // SPA navigation: title changes + popstate, plus a cheap poll to catch
+    // input-container / overlay container being re-rendered.
+    const navObserver = new MutationObserver(() => requestAnimationFrame(sync));
     navObserver.observe(document.querySelector('title') || document.head, {
       childList: true,
       subtree: true,
       characterData: true,
     });
+    const pollId = window.setInterval(sync, 1000);
 
-    window.addEventListener('popstate', applyStyle);
+    const root = document.documentElement;
+    window.addEventListener('popstate', sync);
+    window.addEventListener('resize', onResize);
+    window.addEventListener('blur', onPointerGone);
+    document.addEventListener('mousemove', onPointerMove, { passive: true });
+    root.addEventListener('mouseleave', onPointerGone);
+    window.addEventListener('dragenter', onDragEnter, true);
+    window.addEventListener('dragleave', onDragLeave, true);
+    window.addEventListener('drop', onDragEnd, true);
+    window.addEventListener('dragend', onDragEnd, true);
+    document.addEventListener('focusin', onEditorActivity);
+    document.addEventListener('focusout', onEditorActivity);
+    document.addEventListener('input', onEditorActivity, true);
+    document.addEventListener('keyup', onEditorActivity, true);
 
     return () => {
+      revealRef.current = null;
       navObserver.disconnect();
-      if (overlayObserver) overlayObserver.disconnect();
-      window.removeEventListener('popstate', applyStyle);
-      document.body.classList.remove('bs-overlay-open');
-      document.body.classList.remove('bs-input-reveal');
-      if (styleEl) styleEl.remove();
+      clearInterval(pollId);
+      resizeObs?.disconnect();
+      overlayObs?.disconnect();
+      cancelPending();
+      if (rafId) cancelAnimationFrame(rafId);
+      timers.forEach((id) => clearTimeout(id));
+      timers.clear();
+
+      window.removeEventListener('popstate', sync);
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('blur', onPointerGone);
+      document.removeEventListener('mousemove', onPointerMove);
+      root.removeEventListener('mouseleave', onPointerGone);
+      window.removeEventListener('dragenter', onDragEnter, true);
+      window.removeEventListener('dragleave', onDragLeave, true);
+      window.removeEventListener('drop', onDragEnd, true);
+      window.removeEventListener('dragend', onDragEnd, true);
+      document.removeEventListener('focusin', onEditorActivity);
+      document.removeEventListener('focusout', onEditorActivity);
+      document.removeEventListener('input', onEditorActivity, true);
+      document.removeEventListener('keyup', onEditorActivity, true);
+
+      document.body.removeAttribute(STATE_ATTR);
+      document.body.style.removeProperty(GAP_VAR);
+      styleEl?.remove();
     };
   }, [autoHideInput]);
 

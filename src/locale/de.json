@@ -974,7 +974,6 @@
     "hideGemConfirm": "Sind Sie sicher, dass Sie „{{name}}“ ausblenden möchten? Sie können einen erneuten Scan durchführen, um dieses Gem abzurufen.",
     "deleteGem": "Gem löschen",
     "deleteGemConfirm": "Sind Sie sicher, dass Sie „{{name}}“ löschen möchten? Dadurch wird das Gem dauerhaft aus Gemini gelöscht.",
-    "renameGem": "Gem umbenennen",
     "createGem": "Gem erstellen",
     "selectGem": "Gem auswählen",
     "searchGems": "Gems suchen...",

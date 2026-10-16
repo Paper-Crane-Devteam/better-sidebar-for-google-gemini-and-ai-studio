@@ -1,38 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import { Check, Loader2 } from 'lucide-react';
+import { Check, Loader2, RefreshCw } from 'lucide-react';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { toast } from '@/shared/lib/toast';
-import { cn } from '@/shared/lib/utils/utils';
+import { Button } from '@/shared/components/ui/button';
 import type { UpdateCheckStatus } from '@/entrypoints/background/handlers/extension-update';
 import { applyExtensionUpdate } from '../../extension-update/apply-update';
 
-type State =
+export type UpdateCheckState =
   | { kind: 'idle' }
   | { kind: 'checking' }
   | { kind: 'upToDate' }
   | { kind: 'available'; version?: string }
   | { kind: 'applying'; version?: string };
 
-/** How long "Up to date" stays before the link comes back. */
+/** How long "Up to date" stays before the status clears. */
 const UP_TO_DATE_MS = 4000;
 
-/** Shared look for the small text buttons in the About page's version row. */
-export const textButtonClass = cn(
-  'inline-flex items-center gap-1 rounded-sm text-muted-foreground transition-colors',
-  'hover:text-foreground hover:underline underline-offset-4',
-  'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
-  'disabled:pointer-events-none disabled:opacity-60',
-);
-
-export const Dot = () => <span aria-hidden="true">·</span>;
-
 /**
- * Inline "Check for updates" / "Update now" for the About page's version row.
- * Renders a leading dot so it can sit right after the version number.
+ * Update-check state machine for the About page. Split from the UI so the
+ * status text (next to the version) and the action button (right side of the
+ * card) can live in different places.
  */
-export const UpdateCheck = () => {
+export const useUpdateCheck = () => {
   const { t } = useI18n();
-  const [state, setState] = useState<State>({ kind: 'idle' });
+  const [state, setState] = useState<UpdateCheckState>({ kind: 'idle' });
 
   useEffect(() => {
     if (state.kind !== 'upToDate') return;
@@ -56,7 +47,6 @@ export const UpdateCheck = () => {
           setState({ kind: 'upToDate' });
           break;
         case 'throttled':
-          // Too long for the inline row; a toast reads better.
           toast.info(t('about.update.throttled'));
           setState({ kind: 'idle' });
           break;
@@ -74,23 +64,27 @@ export const UpdateCheck = () => {
     }
   };
 
-  const apply = async (version?: string) => {
+  const apply = async () => {
+    if (state.kind !== 'available') return;
     const previous = state;
-    const outcome = await applyExtensionUpdate(version, () =>
-      setState({ kind: 'applying', version }),
+    const outcome = await applyExtensionUpdate(state.version, () =>
+      setState({ kind: 'applying', version: previous.version }),
     );
     if (outcome !== 'reloading') setState(previous);
   };
 
-  let content: React.ReactNode;
+  return { state, check, apply };
+};
+
+/** Short status shown after the version number. Renders nothing when idle. */
+export const UpdateStatus = ({ state }: { state: UpdateCheckState }) => {
+  const { t } = useI18n();
+
+  let content: React.ReactNode = null;
   switch (state.kind) {
     case 'checking':
-      content = (
-        <span className="inline-flex items-center gap-1">
-          <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-          {t('about.update.checking')}
-        </span>
-      );
+      // The button already spins; plain text here avoids a second spinner.
+      content = <span>{t('about.update.checking')}</span>;
       break;
     case 'upToDate':
       content = (
@@ -103,37 +97,61 @@ export const UpdateCheck = () => {
     case 'available':
     case 'applying':
       content = (
-        <>
-          <span>{t('about.update.availableShort', { version: state.version ?? '' })}</span>
-          <Dot />
-          <button
-            type="button"
-            className={cn(textButtonClass, 'font-medium text-primary hover:text-primary')}
-            onClick={() => apply(state.version)}
-            disabled={state.kind === 'applying'}
-          >
-            {state.kind === 'applying' && (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-            )}
-            {state.kind === 'applying' ? t('about.update.applying') : t('about.update.updateNow')}
-          </button>
-        </>
+        <span className="font-medium text-primary">
+          {t('about.update.availableShort', { version: state.version ?? '' })}
+        </span>
       );
       break;
-    default:
-      content = (
-        <button type="button" className={textButtonClass} onClick={check}>
-          {t('about.update.check')}
-        </button>
-      );
   }
 
   return (
-    <>
-      <Dot />
-      <span className="contents" role="status" aria-live="polite">
-        {content}
-      </span>
-    </>
+    <span className="inline-flex items-center gap-1.5" role="status" aria-live="polite">
+      {content && (
+        <>
+          <span aria-hidden="true">·</span>
+          {content}
+        </>
+      )}
+    </span>
+  );
+};
+
+/** Right-side action: "Check for updates", or "Update now" once one is found. */
+export const UpdateAction = ({
+  state,
+  onCheck,
+  onApply,
+}: {
+  state: UpdateCheckState;
+  onCheck: () => void;
+  onApply: () => void;
+}) => {
+  const { t } = useI18n();
+
+  if (state.kind === 'available' || state.kind === 'applying') {
+    const applying = state.kind === 'applying';
+    return (
+      <Button size="sm" className="-mr-1 shrink-0 gap-1.5" onClick={onApply} disabled={applying}>
+        {applying && <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />}
+        {applying ? t('about.update.applying') : t('about.update.updateNow')}
+      </Button>
+    );
+  }
+
+  const checking = state.kind === 'checking';
+  return (
+    <Button
+      size="sm"
+      variant="ghost"
+      className="-mr-2 shrink-0 gap-1.5 text-muted-foreground hover:text-foreground"
+      onClick={onCheck}
+      disabled={checking}
+    >
+      <RefreshCw
+        className={checking ? 'h-3.5 w-3.5 animate-spin' : 'h-3.5 w-3.5'}
+        aria-hidden="true"
+      />
+      {t('about.update.check')}
+    </Button>
   );
 };

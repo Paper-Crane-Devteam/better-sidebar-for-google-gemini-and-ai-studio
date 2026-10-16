@@ -5,12 +5,12 @@
  *
  * Dispatched by:
  * - `main-world/aistudio/interceptors/generate-content.ts` (AI Studio `GenerateContent`)
- * - `main-world/gemini/interceptors/generate.ts` (Gemini `StreamGenerate`)
+ * - `main-world/gemini/interceptors/process-session.ts` (Gemini `processSession`)
  *
  * ## Why one contract for two platforms
  *
  * The two wire formats have nothing in common — AI Studio streams a nested JSON array
- * of **deltas**, Gemini streams length-prefixed `wrb.fr` frames each carrying a **full
+ * of **deltas**, Gemini streams WebChannel protobuf frames each carrying a **full
  * snapshot**. Both differences are absorbed by the platform reader, so what crosses
  * the world boundary is the same three strings either way.
  *

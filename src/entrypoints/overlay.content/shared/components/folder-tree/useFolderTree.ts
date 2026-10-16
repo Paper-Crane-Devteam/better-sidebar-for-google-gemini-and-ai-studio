@@ -13,8 +13,8 @@ export interface UseFolderTreeOptions {
   searchTerm: string;
   /** Move an item to a new parent */
   onMoveItem: (id: string, parentId: string | null, type: 'folder' | 'file') => Promise<void>;
-  /** Rename an item */
-  onRenameItem: (id: string, name: string, type: 'folder' | 'file') => Promise<void>;
+  /** Rename an item. Omit for trees whose items cannot be renamed; editing is then disabled. */
+  onRenameItem?: (id: string, name: string, type: 'folder' | 'file') => Promise<void>;
   /** Delete items by ids */
   onDeleteItems: (ids: string[]) => Promise<void>;
   /** Create a new folder, returns the new folder id or null */
@@ -231,7 +231,7 @@ export const useFolderTree = (options: UseFolderTreeOptions) => {
     node: NodeApi<FolderTreeNodeData>;
   }) => {
     const type = node.data.type;
-    await onRenameItem(id, name, type);
+    await onRenameItem?.(id, name, type);
   };
 
   const onDelete = async ({ ids }: { ids: string[] }) => {
