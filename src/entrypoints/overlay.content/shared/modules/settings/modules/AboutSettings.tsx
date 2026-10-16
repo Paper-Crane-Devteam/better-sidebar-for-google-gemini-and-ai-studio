@@ -1,10 +1,9 @@
 import React from 'react';
 import { Separator } from '../../../components/ui/separator';
 import { useI18n } from '@/shared/hooks/useI18n';
-import { ExternalLink, Sparkles } from 'lucide-react';
-import { Button } from '@/shared/components/ui/button';
+import { ExternalLink } from 'lucide-react';
 import { useWhatsNewStore } from '../../whats-new/whats-new-store';
-import { UpdateCheck } from './UpdateCheck';
+import { Dot, UpdateCheck, textButtonClass } from './UpdateCheck';
 
 // Served from public/images (web-accessible), same as the other overlay images.
 const betterPlaylistsIcon = browser.runtime.getURL('/images/better-playlists.png');
@@ -43,31 +42,24 @@ export const AboutSettings = () => {
           <div className="space-y-4 py-4">
             <div className="grid gap-1">
               <h3 className="font-medium">{t('about.appName')}</h3>
+              {/* Version row: version-related actions live inline as text buttons. */}
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+                <span>
+                  {t('about.version')} {browser.runtime.getManifest().version}
+                </span>
+                <UpdateCheck />
+                <Dot />
+                <button
+                  type="button"
+                  className={textButtonClass}
+                  onClick={() => openWhatsNew()}
+                >
+                  {t('about.changelog')}
+                </button>
+              </div>
               <p className="text-sm text-muted-foreground">
-                {t('about.version')} {browser.runtime.getManifest().version}
+                {t('about.developer')} {t('about.developerName')}
               </p>
-            </div>
-            <UpdateCheck />
-            <div className="grid gap-1">
-              <h3 className="font-medium">{t('about.developer')}</h3>
-              <p className="text-sm text-muted-foreground">
-                {t('about.developerName')}
-              </p>
-            </div>
-
-            <Separator className="my-2" />
-
-            {/* View Changelog button */}
-            <div className="grid gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-fit flex items-center gap-2"
-                onClick={() => openWhatsNew()}
-              >
-                <Sparkles className="h-4 w-4 text-yellow-500" />
-                {t('about.viewChangelog')}
-              </Button>
             </div>
 
             <Separator className="my-2" />
