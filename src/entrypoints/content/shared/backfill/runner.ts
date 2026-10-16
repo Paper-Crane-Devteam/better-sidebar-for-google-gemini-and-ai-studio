@@ -49,6 +49,14 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 /** Consecutive empty answers that make us suspect the platform rather than the chats. */
 const UNPRODUCTIVE_STREAK_LIMIT = 3;
 
+/**
+ * Statuses that are an answer about this request, not about the session or network.
+ * 401/403/429 stay out: those mean "stop for now" and keep the abort path.
+ */
+function isClientError(status: string | undefined): boolean {
+  return status === '400' || status === '404';
+}
+
 export class BackfillRunner {
   private readonly ledger: BackfillLedger;
   private readonly lock: BackfillLock;
@@ -219,6 +227,18 @@ export class BackfillRunner {
         // toward the streak — it is a definite answer, not a sign the format moved.
         await this.ledger.recordAttempt(candidate.id);
         return 'skipped';
+      }
+      if (result.reason === 'http' && isClientError(result.detail)) {
+        // 400 / 404: Gemini refused *this* request — typically a conversation that
+        // belongs to another signed-in account. Retrying unchanged returns the same
+        // answer, and aborting would put it first in line again next cycle, so one
+        // such chat would stall the whole queue every 30s indefinitely.
+        //
+        // Cooled down and counted toward the streak rather than skipped: if the cause
+        // is the session (every request now 400s), three in a row still stops the
+        // cycle, and the cost is a cooldown on three chats, not on the library.
+        await this.ledger.recordAttempt(candidate.id);
+        return 'unproductive';
       }
       if (result.reason === 'parse') {
         // The response arrived and we could not make sense of it. Recorded against
