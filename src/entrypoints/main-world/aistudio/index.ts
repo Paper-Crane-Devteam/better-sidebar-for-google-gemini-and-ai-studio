@@ -262,7 +262,8 @@ export function initAiStudioInterceptors() {
       const url = response.config.url;
       try {
         if (url.includes('ResolveDriveResource')) {
-          handleChatResponse(response, url);
+          // Opening a prompt, not activity on it
+          handleChatResponse(response, url, false);
         } else if (url.endsWith('ListPrompts')) {
           handleLibraryResponse(response);
         } else if (url.includes('UpdatePrompt')) {

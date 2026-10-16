@@ -1,7 +1,13 @@
 import { parseConversation } from '../lib/response-parser';
 import { trace } from '@/shared/lib/trace';
 
-export function handleChatResponse(response: any, url: string) {
+/**
+ * @param isActivity Whether this response reflects new activity on the prompt
+ *   (a save or a create). `ResolveDriveResource` is just the user opening a chat,
+ *   and must not bump `last_active_at` — otherwise every opened chat jumps to the
+ *   top of the list.
+ */
+export function handleChatResponse(response: any, url: string, isActivity = true) {
   if (response.status === 200 || response.response) {
     let responseBody = response.response;
     if (typeof responseBody !== 'string') {
@@ -29,6 +35,7 @@ export function handleChatResponse(response: any, url: string) {
         new CustomEvent('AI_STUDIO_RESPONSE', {
           detail: {
             ...parsedData,
+            is_activity: isActivity,
             originalUrl: url,
           },
         })

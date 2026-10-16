@@ -93,7 +93,9 @@ export async function initAiStudio() {
           external_id: data.id,
           external_url: `https://aistudio.google.com/prompts/${data.id}`,
           model_name: data.model_name,
-          last_active_at: data.updated_at,
+          // Only real activity (save/create) moves the chat in the list; merely
+          // opening it leaves last_active_at to the background handler to keep.
+          last_active_at: data.is_activity ? data.updated_at : undefined,
           messages: data.messages,
           platform: Platform.AI_STUDIO,
         },

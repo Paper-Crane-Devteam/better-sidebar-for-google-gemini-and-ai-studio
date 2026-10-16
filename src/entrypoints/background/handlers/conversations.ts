@@ -81,6 +81,12 @@ export async function handleConversations(
           );
         }
 
+        // No last_active_at means "no opinion" (e.g. the user just opened the chat).
+        // `save` would otherwise default it to now and move the row to the top.
+        if (convoData.last_active_at == null && existing) {
+          convoData.last_active_at = existing.last_active_at;
+        }
+
         await conversationRepo.save({ ...convoData, platform });
         if (messages?.length) {
           if (replaceAfterMessageId) {
