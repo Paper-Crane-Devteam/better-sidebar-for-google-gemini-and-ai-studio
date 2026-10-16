@@ -17,34 +17,25 @@ const clickGeminiNewChat = (): boolean => {
 };
 
 /**
- * Navigate to a Gem chat. Creates a new chat first to work around
- * a bug where navigating directly to a gem URL can fail.
+ * Navigate to a Gem chat via pushState + popstate.
  * Accepts either a gem ID or a full gem URL.
  */
 export const navigateToGem = (gemIdOrUrl: string) => {
   const gemUrl = gemIdOrUrl.startsWith('http')
     ? gemIdOrUrl
     : `https://gemini.google.com${geminiAccountPrefix()}/gem/${gemIdOrUrl}`;
-  // Trigger new chat first, then navigate to the gem
-  clickGeminiNewChat();
-  setTimeout(() => {
-    navigate(gemUrl);
-  }, 100);
+  navigate(gemUrl);
 };
 
 /**
- * Navigate to a Notebook page. Same pattern as navigateToGem —
- * click "New chat" first, then pushState to the notebook URL.
+ * Navigate to a Notebook page via pushState + popstate.
  * Accepts either a notebook UUID or a full notebook URL.
  */
 export const navigateToNotebook = (notebookIdOrUrl: string) => {
   const nbUrl = notebookIdOrUrl.startsWith('http')
     ? notebookIdOrUrl
     : `https://gemini.google.com${geminiAccountPrefix()}/notebook/notebooks%2F${notebookIdOrUrl}`;
-  clickGeminiNewChat();
-  setTimeout(() => {
-    navigate(nbUrl);
-  }, 100);
+  navigate(nbUrl);
 };
 
 export const navigate = (url: string) => {
@@ -75,24 +66,9 @@ export const navigateToNewChat = () => {
 export const navigateToConversation = (targetId: string) => {
   const platform = detectPlatform();
   if (platform === Platform.GEMINI) {
-    const links = document.querySelectorAll('[data-test-id="conversation"] > a');
-    const targetHref = `/app/${targetId}`;
-    
-    for (const link of Array.from(links)) {
-      const href = link.getAttribute('href');
-      if (href && href.includes(targetHref)) {
-        (link as HTMLElement).click();
-        return;
-      }
-    }
-    
-    // Fallback: same approach as navigateToGem — click "New chat" first, then pushState
-    console.warn(`Conversation link not found for id: ${targetId}, falling back to new chat + pushState`);
-    clickGeminiNewChat();
-    const prefix = geminiAccountPrefix();
-    setTimeout(() => {
-      navigate(`${prefix}/app/${targetId}`);
-    }, 100);
+    // Pure pushState + popstate: Gemini's router picks it up and loads the
+    // conversation, whether or not it is in the native sidebar.
+    navigate(`${geminiAccountPrefix()}/app/${targetId}`);
   }
   if(platform === Platform.AI_STUDIO) {
     navigate(`/prompts/${targetId}`);
