@@ -75,6 +75,7 @@ node scripts/devtap.mjs gsend "测试" --page 6c3f # 往输入框打字并发送
 node scripts/devtap.mjs net list --page 6c3f     # 一行一个请求：xhr/fetch、状态、请求/响应字节数、rpcids / RID
 node scripts/devtap.mjs net dump --grep 'MaZiqc|processSession'   # 解码后的内容 → .kiro/devlog/net.txt
 node scripts/devtap.mjs net dump --id 15,16 --maxstr 120          # 只看指定条目
+node scripts/devtap.mjs net reload --page u/2     # 带着探针重载标签页，抓页面加载期的请求（列表、gem、notebook）
 node scripts/devtap.mjs net clear / net stop
 ```
 
@@ -107,9 +108,15 @@ Gemini 在输入框获得焦点时就会**预开**一个 processSession，没发
 **Gemini 当前接口一览（2026-10 版本 `boq_gemini-web-uiserver_20261015`）**：生成走
 `geminiweb-pa.clients6.google.com/v1/processSession`（WebChannel + protobuf，
 `interceptors/process-session.ts`）；其余 `batchexecute` rpcid（`MaZiqc` 列表、`hNvQHb` 内容、
-`MUAZcd` 改名、`GzXR5e` 删除、`CNgdBe` gem/notebook 列表 …）**没变**，只是从 XHR 改成了 fetch，
-在 `main-world/gemini/index.ts` 的 fetch 包装里分发。扩展自己发的请求走 `lib/native-fetch.ts`，
-不会被自己的拦截器再处理一遍。
+`MUAZcd` 改名、`GzXR5e` 删除、`CNgdBe` gem/notebook 列表 …）**没变**，只是从 XHR 改成了 fetch。
+两种传输都汇到 `interceptors/rpc-handlers.ts` 的 rpcid → handler 表，handler 拿到的是
+`lib/batchexecute.ts` 解好的 `{ request, response }`，新增/修改 rpc 只动这张表和对应 handler。
+`CNgdBe` 按**请求**区分：`[2,[lang],0]` 自己的 gem、`[1,…]` 最近用过的（含官方预置，忽略）、
+`[2,[lang],0,null,[2]]` notebook。扩展自己发的请求走 `lib/native-fetch.ts`，不会被自己的拦截器再处理一遍。
+
+**多账号**：数据库是按标签页路由的（background 的 `[TabProfileMap] Tab … → <db>`），
+`GET_ACTIVE_PROFILE` 返回的是全局"当前" profile，不代表某个标签页写进哪个库。查某个账号的数据用
+`sql --page <那个账号的标签页>`。
 
 **别连续狂发**：短时间内 reload + 自动发消息太频繁，Google 会把标签页重定向到
 `google.com/sorry`（人机验证）。`targets` 里 gem 标签页突然消失就是这个，需要用户手动过验证，

@@ -283,6 +283,8 @@ function decodeEntry(e, { maxval, maxStr }) {
 
 /**
  *   net start [ctx]          install / resume capture (default ctx gem)
+ *   net reload [ctx]         reload the tab with the probe in place from the first byte
+ *                            (page-load traffic)  --wait 10
  *   net stop  [ctx]          pause (buffer kept)
  *   net clear [ctx]          empty the buffer
  *   net list  [ctx]          one line per request  (--grep on url)
@@ -294,10 +296,27 @@ export async function cmdNet(flags) {
   const run = (expr) => withPage(flags, ctxName, (node) => evaluate(node.session, expr));
 
   if (sub === 'start') return void process.stdout.write((await run(INSTALL)).join('\n') + '\n');
+
+  // Page-load traffic happens before `start` could ever run, so register the probe for
+  // the next document, reload, and stay attached while it loads: the registration lives
+  // only as long as this CDP session. The buffer then survives for list / dump.
+  if (sub === 'reload') {
+    const waitMs = Number(flags.wait ?? 10) * 1000;
+    const out = await withPage(flags, ctxName, async (node) => {
+      await node.session.send('Page.enable');
+      const { identifier } = await node.session.send('Page.addScriptToEvaluateOnNewDocument', { source: INSTALL });
+      await node.session.send('Page.reload', {});
+      await new Promise((r) => setTimeout(r, waitMs));
+      await node.session.send('Page.removeScriptToEvaluateOnNewDocument', { identifier }).catch(() => {});
+      return evaluate(node.session, `(window.__devtapNet?.log.length ?? 0) + ' requests captured since load'`);
+    });
+    process.stdout.write(out.join('\n') + '\n');
+    return;
+  }
   if (sub === 'stop') return void process.stdout.write((await run(STOP)).join('\n') + '\n');
   if (sub === 'clear') return void process.stdout.write((await run(CLEAR)).join('\n') + '\n');
 
-  if (sub !== 'list' && sub !== 'dump') throw new Error(`Unknown "net ${sub}". Use start | stop | clear | list | dump.`);
+  if (sub !== 'list' && sub !== 'dump') throw new Error(`Unknown "net ${sub}". Use start | reload | stop | clear | list | dump.`);
 
   const raw = await run(READ(flags['since-id']));
   let entries = raw.flatMap((r) => JSON.parse(r || '[]'));
