@@ -10,18 +10,24 @@ import {
 /** Same threshold as Gemini: a two-question chat does not need a navigator. */
 const MIN_USER_TURNS = 3;
 /**
- * Gap between the bar and the chat column's right edge. The native scrollbar
- * occupies the column's last 32px (the gutter right of the text), which is
- * exactly the collapsed bar's width, so sit flush in that slot.
+ * Right padding given to `.chat-view-container` while the bar is shown (AI Studio's
+ * own is 20px). Turns keep ~13px of inner padding on top of this, so the text ends
+ * ~57px from the column edge: room for the 32px bar with ~12px either side.
  */
-const EDGE_GAP = 0;
+const GUTTER_PADDING = 44;
+/** Gap between the bar and the chat column's right edge, inside the gutter */
+const EDGE_GAP = 12;
 
-const NATIVE_SCROLLBAR_STYLE_ID = 'better-sidebar-aistudio-hide-native-scrollbar';
+const GUTTER_STYLE_ID = 'better-sidebar-aistudio-scrollbar-gutter';
 
 /**
  * AI Studio SmartScrollbar: same dot bar / outline as Gemini, fed from the DOM.
- * While it is shown, AI Studio's own turn scrollbar is hidden so the two do not
- * stack on the same edge.
+ *
+ * While it is shown, the chat column gets a wider right gutter and the bar sits in
+ * it. Pinning to the column (not the viewport) keeps it clear of the run settings
+ * panel when that is open, and the gutter keeps it off the text and off the window
+ * edge when it is closed. AI Studio's own turn scrollbar is hidden so the two do
+ * not stack.
  */
 export const SmartScrollbarFeature = () => {
   const enabled = usePegasusStore(
@@ -39,7 +45,7 @@ const AIStudioSmartScrollbar = () => {
   const visible = items.length >= MIN_USER_TURNS;
   const anchor = useChatColumnAnchor(scroller, visible);
 
-  useHideNativeScrollbar(visible);
+  useReserveGutter(visible);
 
   if (!visible || !anchor) return null;
 
@@ -94,13 +100,17 @@ function useChatColumnAnchor(scroller: HTMLElement | null, active: boolean) {
   return anchor;
 }
 
-function useHideNativeScrollbar(hide: boolean) {
+/** Widen the chat column's right gutter and hide the native scrollbar */
+function useReserveGutter(active: boolean) {
   useEffect(() => {
-    if (!hide) return;
+    if (!active) return;
     const style = document.createElement('style');
-    style.id = NATIVE_SCROLLBAR_STYLE_ID;
-    style.textContent = `ms-items-scrollbar { display: none !important; }`;
+    style.id = GUTTER_STYLE_ID;
+    style.textContent = `
+      ${AISTUDIO_CHAT_COLUMN_SELECTOR} .chat-view-container { padding-right: ${GUTTER_PADDING}px !important; }
+      ms-items-scrollbar { display: none !important; }
+    `;
     document.head.appendChild(style);
     return () => style.remove();
-  }, [hide]);
+  }, [active]);
 }
