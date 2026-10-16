@@ -69,6 +69,9 @@ export const FolderTree = forwardRef<FolderTreeHandle, FolderTreeProps>(
           data={data}
           onMove={onMove}
           onRename={onRename}
+          // No rename handler means the tree's items cannot be renamed here (gems:
+          // names live in Gemini). Without this F2 opens an input that saves nothing.
+          disableEdit={!hookOptions.onRenameItem}
           onDelete={onDelete}
           onSelect={onSelect}
           onToggle={handleToggle}

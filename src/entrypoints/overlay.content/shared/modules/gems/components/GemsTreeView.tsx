@@ -168,7 +168,6 @@ export const GemsTreeView = forwardRef<GemsTreeHandle, GemsTreeViewProps>(
         searchTerm={searchTerm}
         onSelect={onSelect}
         onMoveItem={async () => {}}
-        onRenameItem={async () => {}}
         onDeleteItems={async () => {}}
         onCreateFolder={async () => null}
         renderNode={NodeWrapper}

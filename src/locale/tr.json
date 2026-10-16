@@ -974,7 +974,6 @@
     "hideGemConfirm": "\"{{name}}\" öğesini gizlemek istediğinizden emin misiniz? Bu Gem'i geri almak için yeniden tarayabilirsiniz.",
     "deleteGem": "Gem'i Sil",
     "deleteGemConfirm": "\"{{name}}\" öğesini silmek istediğinizden emin misiniz? Bu, Gem'i Gemini'den kalıcı olarak silecektir.",
-    "renameGem": "Gem'i Yeniden Adlandır",
     "createGem": "Gem Oluştur",
     "selectGem": "Bir Gem seçin",
     "searchGems": "Gems ara...",
