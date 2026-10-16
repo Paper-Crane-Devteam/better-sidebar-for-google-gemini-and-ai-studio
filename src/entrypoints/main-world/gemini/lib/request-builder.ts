@@ -19,6 +19,8 @@
  *   });
  */
 
+import { nativeFetch } from './native-fetch';
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -242,7 +244,9 @@ export const geminiRequestBuilder = {
       `Better Sidebar (Gemini): Executing ${rpcid} (reqid=${reqid})`,
     );
 
-    return fetch(url, {
+    // Not the global `fetch`: that one is the interceptor, which would route this
+    // response back into the page-traffic handlers.
+    return nativeFetch(url, {
       method: 'POST',
       headers: finalHeaders,
       body: bodyParams.toString(),

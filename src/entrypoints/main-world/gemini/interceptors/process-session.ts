@@ -94,7 +94,9 @@ export function observeProcessSession(url: string, body: unknown, xhr: XMLHttpRe
   }
   if (up.prompt) session.prompt = up.prompt;
 
-  if (up.submits && !session.announced) {
+  // The prompt upload is the send. `.4` (half-close) is not: Gemini pre-opens a session
+  // when the input is focused and closes it unused a minute later.
+  if (up.prompt && !session.announced) {
     session.announced = true;
     globalThis.dispatchEvent(new CustomEvent('BETTER_SIDEBAR_GENERATE_START'));
     // Show the question straight away; the model takes a moment to start.

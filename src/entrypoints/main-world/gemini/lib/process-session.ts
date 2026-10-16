@@ -10,10 +10,10 @@
  * `count=N&ofs=K&req0___data__=<b64>&req1___data__=…` — one protobuf per `reqI`.
  *
  * ```
- * .1                    session open (first upload of a turn)
+ * .1                    session open — sent when the input is focused, *before* typing
  * .1.8.5.1.72.1         "c_<conversationId>"   — ABSENT for a brand-new chat
- * .2.9.1                the user's message
- * .4                    submit
+ * .2.9.1                the user's message (may share an upload with .1)
+ * .4                    half-close — after the reply, or ~60s later if nothing was sent
  * ```
  *
  * ## Downlink (`RID=rpc`, long-lived GET)
@@ -65,7 +65,7 @@ export interface UplinkInfo {
   conversationId: string;
   /** The user's message, '' when not in this upload. */
   prompt: string;
-  /** True when this upload is the submit signal. */
+  /** True when this upload half-closes the session (field 4). Not a send signal. */
   submits: boolean;
 }
 

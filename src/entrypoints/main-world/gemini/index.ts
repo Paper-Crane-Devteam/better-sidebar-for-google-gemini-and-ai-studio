@@ -14,6 +14,7 @@ import { handleRenameNotebookResponse } from './interceptors/rename-notebook';
 import { handleCreateNotebookResponse } from './interceptors/create-notebook';
 import { handleDownloadResponse } from './interceptors/download';
 import { geminiRequestBuilder } from './lib/request-builder';
+import { nativeFetch } from './lib/native-fetch';
 import { initGeminiBackfillFetcher } from './lib/backfill-fetcher';
 
 export function initGeminiInterceptors() {
@@ -45,7 +46,7 @@ export function initGeminiInterceptors() {
     }
   });
 
-  const originalFetch = window.fetch.bind(window);
+  const originalFetch = nativeFetch;
   window.fetch = function (input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
     const url =
       typeof input === 'string'
@@ -58,12 +59,19 @@ export function initGeminiInterceptors() {
       return handleDownloadResponse(url, originalFetch);
     }
 
+    // Since the 2026-10 web build, batchexecute goes through fetch rather than XHR,
+    // so ajax-hook never sees it. Same handlers, fed from here.
+    if (url.includes('/data/batchexecute')) {
+      return interceptBatchExecuteFetch(input, init, url, originalFetch);
+    }
+
     return originalFetch(input, init);
   };
 
   proxy({
     onRequest: (config, handler) => {
-      // Learn params from every batchexecute request for the request builder
+      // Learn params from batchexecute over XHR (older builds; current builds use
+      // fetch, handled in interceptBatchExecuteFetch).
       if (config.url?.includes('batchexecute')) {
         try {
           geminiRequestBuilder.learn(
@@ -120,27 +128,7 @@ export function initGeminiInterceptors() {
         if (url.includes('StreamGenerate')) {
           handleGenerateResponse(response, url);
         } else if (url.includes('batchexecute')) {
-          if (url.includes('rpcids=hNvQHb')) {
-            handleChatContentResponse(response, url);
-          } else if (url.includes('rpcids=MaZiqc')) {
-            handleListChatResponse(response, url);
-          } else if (url.includes('rpcids=GzXR5e')) {
-            handleDeleteResponse(response, url);
-          } else if (url.includes('rpcids=CNgdBe')) {
-            handleCNgdBeResponse(response, url);
-          } else if (url.includes('rpcids=MUAZcd')) {
-            handleRenameResponse(response, url);
-          } else if (url.includes('rpcids=KDNZr')) {
-            handleBranchResponse(response, url);
-          } else if (url.includes('rpcids=UXcSJb')) {
-            handleDeleteGemResponse(response, url);
-          } else if (url.includes('rpcids=Nwkn9')) {
-            handleDeleteNotebookResponse(response, url);
-          } else if (url.includes('rpcids=kHv0Vd')) {
-            handleRenameNotebookResponse(response, url);
-          } else if (url.includes('rpcids=oMH3Zd')) {
-            handleCreateNotebookResponse(response, url);
-          }
+          routeBatchExecute(response, url);
         }
       } catch (e) {
         console.error('Better Sidebar: Error in Gemini interception handler', e);
@@ -149,4 +137,105 @@ export function initGeminiInterceptors() {
       handler.next(response);
     },
   });
+}
+
+/**
+ * The shape the batchexecute handlers read. Matches ajax-hook's response object so the
+ * fetch path and the XHR path feed the same code.
+ */
+interface InterceptedResponse {
+  status: number;
+  response: string;
+  config: { url: string; body?: string; headers?: Record<string, string> };
+}
+
+function routeBatchExecute(response: InterceptedResponse | any, url: string): void {
+  if (url.includes('rpcids=hNvQHb')) {
+    handleChatContentResponse(response, url);
+  } else if (url.includes('rpcids=MaZiqc')) {
+    handleListChatResponse(response, url);
+  } else if (url.includes('rpcids=GzXR5e')) {
+    handleDeleteResponse(response, url);
+  } else if (url.includes('rpcids=CNgdBe')) {
+    handleCNgdBeResponse(response, url);
+  } else if (url.includes('rpcids=MUAZcd')) {
+    handleRenameResponse(response, url);
+  } else if (url.includes('rpcids=KDNZr')) {
+    handleBranchResponse(response, url);
+  } else if (url.includes('rpcids=UXcSJb')) {
+    handleDeleteGemResponse(response, url);
+  } else if (url.includes('rpcids=Nwkn9')) {
+    handleDeleteNotebookResponse(response, url);
+  } else if (url.includes('rpcids=kHv0Vd')) {
+    handleRenameNotebookResponse(response, url);
+  } else if (url.includes('rpcids=oMH3Zd')) {
+    handleCreateNotebookResponse(response, url);
+  }
+}
+
+async function readRequestBody(input: RequestInfo | URL, init?: RequestInit): Promise<string | undefined> {
+  const body = init?.body;
+  if (typeof body === 'string') return body;
+  if (body instanceof URLSearchParams) return body.toString();
+  if (body == null && input instanceof Request) return input.clone().text();
+  return undefined;
+}
+
+function headersToRecord(input: RequestInfo | URL, init?: RequestInit): Record<string, string> {
+  const out: Record<string, string> = {};
+  const add = (h: HeadersInit | undefined) => {
+    if (!h) return;
+    new Headers(h).forEach((v, k) => {
+      out[k] = v;
+    });
+  };
+  if (input instanceof Request) add(input.headers);
+  add(init?.headers);
+  return out;
+}
+
+function interceptBatchExecuteFetch(
+  input: RequestInfo | URL,
+  init: RequestInit | undefined,
+  url: string,
+  originalFetch: typeof fetch,
+): Promise<Response> {
+  // Read the body before the request is sent: a Request's body can only be read once,
+  // so this works on a clone, and the clone must be taken before fetch consumes it.
+  let bodyPromise: Promise<string | undefined>;
+  try {
+    bodyPromise = readRequestBody(input, init).catch(() => undefined);
+  } catch {
+    bodyPromise = Promise.resolve(undefined);
+  }
+  const headers = headersToRecord(input, init);
+
+  const resPromise = originalFetch(input, init);
+  // Registered before the page gets the promise back, so this reaction runs first and
+  // clones while the body is still unread. Cloning any later races the page's own read.
+  const clonePromise = resPromise.then((res) => res.clone());
+
+  // Observe on the side; the page gets its Response untouched and unawaited.
+  void (async () => {
+    const body = await bodyPromise;
+    try {
+      geminiRequestBuilder.learn(url, headers, body);
+    } catch {
+      // non-critical
+    }
+    let res: Response;
+    try {
+      res = await clonePromise;
+    } catch {
+      return;
+    }
+    try {
+      const text = await res.text();
+      routeBatchExecute({ status: res.status, response: text, config: { url, body, headers } }, url);
+    } catch (e) {
+      console.error('Better Sidebar: Error in Gemini fetch interception handler', e);
+    }
+  })();
+
+  return resPromise;
 }
