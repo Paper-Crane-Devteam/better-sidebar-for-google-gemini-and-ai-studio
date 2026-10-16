@@ -1,7 +1,8 @@
 import React from 'react';
 import { Separator } from '../../../components/ui/separator';
 import { useI18n } from '@/shared/hooks/useI18n';
-import { ChevronRight, ExternalLink } from 'lucide-react';
+import { ExternalLink, ScrollText } from 'lucide-react';
+import { Button } from '@/shared/components/ui/button';
 import { useWhatsNewStore } from '../../whats-new/whats-new-store';
 import { UpdateAction, UpdateStatus, useUpdateCheck } from './UpdateCheck';
 
@@ -42,43 +43,50 @@ export const AboutSettings = () => {
           <h3 className="text-lg font-medium">{t('about.title')}</h3>
           <Separator />
           <div className="space-y-4 py-4">
-            {/* Version card: status sits with the version, the action on the right. */}
-            <div className="flex items-start gap-3 rounded-lg border p-4">
-              <img
-                src={appIcon}
-                alt=""
-                aria-hidden="true"
-                className="h-12 w-12 shrink-0 rounded-lg"
-              />
-              <div className="min-w-0 flex-1 space-y-1">
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <h3 className="font-medium leading-tight">{t('about.appName')}</h3>
-                    <div className="mt-1 flex flex-wrap items-center gap-x-1.5 text-sm text-muted-foreground">
-                      <span>v{browser.runtime.getManifest().version}</span>
-                      <UpdateStatus state={update.state} />
-                    </div>
+            {/*
+              Version card. Top: identity (name / developer / version + status).
+              Footer bar: the two version actions side by side, so they read as
+              one group and the long app name never pushes the button onto its
+              own row.
+            */}
+            <div className="overflow-hidden rounded-lg border">
+              <div className="flex items-center gap-3 p-4">
+                <img
+                  src={appIcon}
+                  alt=""
+                  aria-hidden="true"
+                  className="h-12 w-12 shrink-0 rounded-lg"
+                />
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-medium leading-snug">{t('about.appName')}</h3>
+                  <p className="text-xs text-muted-foreground">
+                    {t('about.byDeveloper', { name: t('about.developerName') })}
+                  </p>
+                  <div className="mt-1 flex flex-wrap items-center gap-x-1.5 text-xs text-muted-foreground">
+                    <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-[11px] text-foreground/80">
+                      v{browser.runtime.getManifest().version}
+                    </span>
+                    <UpdateStatus state={update.state} />
                   </div>
-                  <UpdateAction
-                    state={update.state}
-                    onCheck={update.check}
-                    onApply={update.apply}
-                  />
                 </div>
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-0.5 rounded-sm pt-1 text-sm text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              </div>
+              <div className="flex items-center justify-between gap-2 border-t bg-muted/30 px-4 py-2">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="-ml-2 gap-1.5 text-muted-foreground hover:text-foreground"
                   onClick={() => openWhatsNew()}
                 >
+                  <ScrollText className="h-3.5 w-3.5" aria-hidden="true" />
                   {t('about.changelog')}
-                  <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
-                </button>
+                </Button>
+                <UpdateAction
+                  state={update.state}
+                  onCheck={update.check}
+                  onApply={update.apply}
+                />
               </div>
             </div>
-
-            <p className="text-sm text-muted-foreground">
-              {t('about.developer')} {t('about.developerName')}
-            </p>
 
             <Separator className="my-2" />
 

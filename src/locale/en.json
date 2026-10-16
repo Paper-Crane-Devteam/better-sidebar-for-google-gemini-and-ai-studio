@@ -244,6 +244,7 @@
     "versionNumber": "2.1.0",
     "developer": "Developer",
     "developerName": "Paper Crane Dev",
+    "byDeveloper": "by {{name}}",
     "license": "License",
     "sourceCode": "Source Code",
     "githubRepository": "GitHub Repository",
