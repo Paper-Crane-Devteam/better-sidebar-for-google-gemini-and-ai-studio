@@ -173,8 +173,12 @@ export function useOutline() {
     }
 
     // Default: scroll to the message container
-    const container = el.closest('.conversation-container') || el;
-    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (adapter.scrollToMessageElement) {
+      adapter.scrollToMessageElement(el);
+    } else {
+      const container = el.closest('.conversation-container') || el;
+      container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
     setActiveMessageId(messageId);
   }, []);
 

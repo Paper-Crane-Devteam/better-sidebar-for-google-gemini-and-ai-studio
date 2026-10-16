@@ -7,6 +7,8 @@ interface ChatTarget {
   external_url?: string;
   platform?: string;
   scroll_index?: number;
+  /** Terms to highlight once the message is on screen */
+  highlight?: { query: string };
 }
 
 /**

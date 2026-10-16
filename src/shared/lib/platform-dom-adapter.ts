@@ -24,6 +24,13 @@ export interface PlatformDomAdapter {
   /** Get the scrollable chat container element */
   getChatScrollContainer(): HTMLElement | null;
 
+  /**
+   * Scroll a message element (from `findMessageElement`) into view. Optional:
+   * without it callers fall back to a plain smooth `scrollIntoView`, which is
+   * fine unless the platform virtualises turns.
+   */
+  scrollToMessageElement?(el: HTMLElement): void;
+
   /** Event names to listen for live message updates from interceptors */
   interceptorEvents: string[];
 

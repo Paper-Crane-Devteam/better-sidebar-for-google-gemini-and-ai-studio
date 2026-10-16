@@ -3,7 +3,8 @@ import debounce from 'lodash/debounce';
 import { useAppStore } from '@/shared/lib/store';
 import { Input } from '@/shared/components/ui/input';
 import { Button } from '@/shared/components/ui/button';
-import { CaseSensitive, Type, MoreHorizontal, HelpCircle } from 'lucide-react';
+import { CaseSensitive, Type, Regex, MoreHorizontal, HelpCircle } from 'lucide-react';
+import { getSearchRegexError } from '@/shared/lib/search-pattern';
 import { cn } from '@/shared/lib/utils/utils';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
@@ -53,6 +54,7 @@ export const SearchInput = () => {
   };
 
   const isCurrentConvScope = !!options.conversationId;
+  const regexError = getSearchRegexError(query, options);
 
   return (
     <div className="flex flex-col gap-2 p-4">
@@ -61,7 +63,12 @@ export const SearchInput = () => {
           value={query}
           onChange={(e) => handleQueryChange(e.target.value)}
           placeholder={t('search.placeholder')}
-          className="pr-24"
+          className={cn(
+            'pr-28',
+            regexError && 'border-destructive focus-visible:ring-destructive',
+          )}
+          aria-invalid={!!regexError}
+          aria-describedby={regexError ? 'search-regex-error' : undefined}
           autoFocus
         />
         <div className="absolute right-1 flex items-center gap-0.5">
@@ -97,8 +104,36 @@ export const SearchInput = () => {
               <Type className="h-4 w-4" />
             </Button>
           </SimpleTooltip>
+          <SimpleTooltip content={t('search.useRegex')}>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={t('search.useRegex')}
+              aria-pressed={options.useRegex}
+              className={cn(
+                'h-7 w-7',
+                options.useRegex && 'bg-accent text-accent-foreground',
+              )}
+              onClick={() => {
+                setSearchOptions({ useRegex: !options.useRegex });
+                debouncedSearch();
+              }}
+            >
+              <Regex className="h-4 w-4" />
+            </Button>
+          </SimpleTooltip>
         </div>
       </div>
+
+      {regexError && (
+        <div
+          id="search-regex-error"
+          role="alert"
+          className="text-xs text-destructive break-words"
+        >
+          {t('search.invalidRegex', { error: regexError })}
+        </div>
+      )}
 
       <div className="flex items-center justify-between text-muted-foreground hover:text-foreground select-none">
         <div

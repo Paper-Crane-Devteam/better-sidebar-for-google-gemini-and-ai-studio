@@ -52,6 +52,7 @@ export function useMessageItems(
             external_url: hit.external_url,
             platform: hit.platform,
             scroll_index: hit.scroll_index,
+            highlight: { query },
           }),
       });
     }

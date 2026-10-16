@@ -131,7 +131,7 @@ export const TagsTab = ({ menuActions }: TagsTabProps) => {
   return (
     <div className="flex flex-col h-full w-full">
       {/* Header */}
-      <div className="p-3 flex items-center justify-between h-12 shrink-0">
+      <div className="tab-header p-3 flex items-center justify-between h-12 shrink-0">
         <h1 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground/70">
           {t('tabs.tags')}
         </h1>

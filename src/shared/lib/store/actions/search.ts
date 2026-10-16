@@ -1,4 +1,5 @@
 import type { AppState, SetState, GetState } from '../types';
+import { getSearchRegexError } from '../../search-pattern';
 
 export function createSearchActions(
   set: SetState,
@@ -33,6 +34,15 @@ export function createSearchActions(
         return;
       }
 
+      // A half-typed regex is invalid most of the time. The input shows the error;
+      // don't round-trip to the DB just to get it back.
+      if (getSearchRegexError(query, options)) {
+        set((s) => ({
+          ui: { ...s.ui, search: { ...s.ui.search, results: [], activeQuery: '', isSearching: false } },
+        }));
+        return;
+      }
+
       set((s) => ({
         ui: { ...s.ui, search: { ...s.ui.search, isSearching: true } },
       }));
@@ -55,6 +65,7 @@ export function createSearchActions(
             options: {
               caseSensitive: options.caseSensitive,
               wholeWord: options.wholeWord,
+              useRegex: options.useRegex,
               includeFolderNames,
               excludeFolderNames,
               roleFilter: options.roleFilter,

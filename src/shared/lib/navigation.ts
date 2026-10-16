@@ -24,7 +24,7 @@ const clickGeminiNewChat = (): boolean => {
 export const navigateToGem = (gemIdOrUrl: string) => {
   const gemUrl = gemIdOrUrl.startsWith('http')
     ? gemIdOrUrl
-    : `https://gemini.google.com/gem/${gemIdOrUrl}`;
+    : `https://gemini.google.com${geminiAccountPrefix()}/gem/${gemIdOrUrl}`;
   // Trigger new chat first, then navigate to the gem
   clickGeminiNewChat();
   setTimeout(() => {
@@ -40,7 +40,7 @@ export const navigateToGem = (gemIdOrUrl: string) => {
 export const navigateToNotebook = (notebookIdOrUrl: string) => {
   const nbUrl = notebookIdOrUrl.startsWith('http')
     ? notebookIdOrUrl
-    : `https://gemini.google.com/notebook/notebooks%2F${notebookIdOrUrl}`;
+    : `https://gemini.google.com${geminiAccountPrefix()}/notebook/notebooks%2F${notebookIdOrUrl}`;
   clickGeminiNewChat();
   setTimeout(() => {
     navigate(nbUrl);
@@ -52,11 +52,20 @@ export const navigate = (url: string) => {
   window.dispatchEvent(new PopStateEvent('popstate'));
 };
 
+/**
+ * The `/u/N` segment of the current Gemini URL, or '' for the default account.
+ *
+ * Every hand-built Gemini path has to carry it. Without it a tab signed into a
+ * secondary account navigates into the default account's session.
+ */
+export const geminiAccountPrefix = (): string =>
+  /^\/u\/\d+(?=\/|$)/.exec(location.pathname)?.[0] ?? '';
+
 export const navigateToNewChat = () => {
   const platform = detectPlatform();
   if (platform === Platform.GEMINI) {
     if (!clickGeminiNewChat()) {
-      navigate('/app');
+      navigate(`${geminiAccountPrefix()}/app`);
     }
   } else if (platform === Platform.AI_STUDIO) {
     navigate('/prompts/new_chat');
@@ -80,8 +89,9 @@ export const navigateToConversation = (targetId: string) => {
     // Fallback: same approach as navigateToGem — click "New chat" first, then pushState
     console.warn(`Conversation link not found for id: ${targetId}, falling back to new chat + pushState`);
     clickGeminiNewChat();
+    const prefix = geminiAccountPrefix();
     setTimeout(() => {
-      navigate(`/app/${targetId}`);
+      navigate(`${prefix}/app/${targetId}`);
     }, 100);
   }
   if(platform === Platform.AI_STUDIO) {

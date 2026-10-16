@@ -3,6 +3,7 @@ import { AutoHideRunSettingsFeature } from './AutoHideRunSettingsFeature';
 import { SlashCommandFeature } from './SlashCommandFeature';
 import { AgentLoopFeature } from './AgentLoopFeature';
 import { SaveSnippetFeature } from './SaveSnippetFeature';
+import { SmartScrollbarFeature } from './SmartScrollbar/SmartScrollbarFeature';
 import { SnippetDragDrawer } from '@/entrypoints/overlay.content/shared/modules/snippets/components/SnippetDragFolderView';
 import { GlobalModal } from '@/shared/components/GlobalModal';
 import { GlobalPopoverPicker } from '@/shared/components/GlobalPopoverPicker';
@@ -49,6 +50,7 @@ export const AIStudioEnhancedFeatures = () => {
     <>
       <AutoHideInputFeature />
       <AutoHideRunSettingsFeature />
+      <SmartScrollbarFeature />
       <SlashCommandFeature />
       <AgentLoopFeature />
       <SaveSnippetFeature />

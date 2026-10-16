@@ -204,17 +204,28 @@ export function useInitConversationMessages() {
     const adapter = getPlatformDomAdapter();
     if (!adapter) return;
 
-    const scrollContainer = adapter.getChatScrollContainer();
-    if (!scrollContainer) return;
-
     // Throttled: `refreshDomPresence` looks up every message in the DOM, and while a
     // reply streams the container mutates on every token.
     const refresh = throttle(refreshDomPresence, 250, { leading: true, trailing: true });
     const observer = new MutationObserver(refresh);
-    observer.observe(scrollContainer, { childList: true, subtree: true });
-    refreshDomPresence();
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
+    let retries = 0;
+
+    // The chat view can render after the messages arrive (AI Studio mounts its
+    // scroll container late), so keep looking for a while instead of giving up.
+    const attach = () => {
+      const scrollContainer = adapter.getChatScrollContainer();
+      if (!scrollContainer) {
+        if (++retries <= 20) retryTimer = setTimeout(attach, 500);
+        return;
+      }
+      observer.observe(scrollContainer, { childList: true, subtree: true });
+      refreshDomPresence();
+    };
+    attach();
 
     return () => {
+      if (retryTimer) clearTimeout(retryTimer);
       observer.disconnect();
       refresh.cancel();
     };

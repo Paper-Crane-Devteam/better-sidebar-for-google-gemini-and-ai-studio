@@ -4,7 +4,7 @@ import { OutlineContent, OutlineContentHandle } from './outline/OutlineContent';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { Button } from '@/shared/components/ui/button';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
-import { CopyMinus, Crosshair } from 'lucide-react';
+import { CopyMinus, Crosshair, PictureInPicture2 } from 'lucide-react';
 import { CollapsibleSection } from '../../../components/CollapsibleSection';
 
 interface OutlineSectionProps {
@@ -20,6 +20,8 @@ export const OutlineSection: React.FC<OutlineSectionProps> = ({ fillAvailable = 
   const { t } = useI18n();
   const [isExpanded, setIsExpanded] = useState(false);
   const { outlineHeight, setOutlineHeight } = useSettingsStore();
+  const isPoppedOut = useSettingsStore((s) => s.outlinePopout.open);
+  const setPopoutOpen = useSettingsStore((s) => s.setOutlinePopoutOpen);
   const outlineRef = useRef<OutlineContentHandle>(null);
 
   const handleLocateCurrent = useCallback(() => {
@@ -29,6 +31,9 @@ export const OutlineSection: React.FC<OutlineSectionProps> = ({ fillAvailable = 
   const handleCollapseAll = useCallback(() => {
     outlineRef.current?.collapseAll();
   }, []);
+
+  // Rendered by <FloatingOutline /> at the panel level while detached.
+  if (isPoppedOut) return null;
 
   return (
     <CollapsibleSection
@@ -41,6 +46,18 @@ export const OutlineSection: React.FC<OutlineSectionProps> = ({ fillAvailable = 
       onHeightChange={setOutlineHeight}
       actions={
         <>
+          <SimpleTooltip content={t('outline.popOut')}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-5 w-5 text-muted-foreground hover:text-foreground"
+              onClick={() => setPopoutOpen(true)}
+              aria-label={t('outline.popOut')}
+            >
+              <PictureInPicture2 className="h-3.5 w-3.5" />
+            </Button>
+          </SimpleTooltip>
+
           <SimpleTooltip content={t('menu.locateCurrent')}>
             <Button
               variant="ghost"

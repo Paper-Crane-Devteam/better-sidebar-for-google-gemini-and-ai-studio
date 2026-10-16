@@ -55,7 +55,7 @@ export const PromptsHeader = ({
 
   return (
     <div className="flex flex-col">
-      <div className="px-3 pt-2 pb-1 flex items-center justify-between">
+      <div className="tab-header px-3 pt-2 pb-1 flex items-center justify-between">
         <h1 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground/70">
           {t('tabs.prompts')}
         </h1>
@@ -108,7 +108,7 @@ export const PromptsHeader = ({
         </div>
       </div>
 
-      <div className="px-3 pb-2 pt-1 flex items-center justify-between">
+      <div className="tab-header px-3 pb-2 pt-1 flex items-center justify-between">
         <div className="flex-1 mr-2">
           <PromptsFilterActions filter={filter} />
         </div>

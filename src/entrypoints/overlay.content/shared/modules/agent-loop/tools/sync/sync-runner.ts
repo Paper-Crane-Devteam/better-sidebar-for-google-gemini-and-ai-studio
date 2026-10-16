@@ -33,7 +33,13 @@
 
 import i18n from '@/locale/i18n';
 import { toast } from '@/shared/lib/toast';
-import { navigate, navigateToConversation } from '@/shared/lib/navigation';
+import {
+  geminiAccountPrefix,
+  navigate,
+  navigateToConversation,
+} from '@/shared/lib/navigation';
+import { detectAccount } from '@/entrypoints/content/shared/detect-account';
+import { Platform } from '@/shared/types/platform';
 import { scrollConversationToTop } from './conversation-scroller';
 import { hideSyncProgress, showSyncProgress } from './sync-progress';
 import {
@@ -50,7 +56,9 @@ import {
 /** Only Gemini for now — the AI Studio adapter doesn't exist yet */
 const SYNC_PLATFORM = 'gemini';
 
-const conversationUrl = (externalId: string) => `https://gemini.google.com/app/${externalId}`;
+/** Keeps the `/u/N` account prefix: dropping it would load the default account */
+const conversationUrl = (externalId: string) =>
+  `https://gemini.google.com${geminiAccountPrefix()}/app/${externalId}`;
 
 /** `/app/{id}`, the same shape the Gemini DOM adapter reads */
 function currentConversationId(): string | null {
@@ -169,7 +177,9 @@ export async function startSyncRun(externalIds: string[]): Promise<StartSyncRunR
     };
   }
 
-  const job = createSyncJob(externalIds, SYNC_PLATFORM);
+  // Short wait: the page is long loaded by the time the agent asks for a run.
+  const account = await detectAccount(Platform.GEMINI, 3000);
+  const job = createSyncJob(externalIds, SYNC_PLATFORM, account);
   await saveSyncJob(job);
   // Raised here, not in `driveJob`: the tab is already committed to the trip, and the
   // 2.5s handoff delay is long enough for pickup to act on the very response that
@@ -200,6 +210,17 @@ export async function resumeSyncRun(): Promise<void> {
     // is what stops a crashed or expired run from silencing auto-pickup forever.
     markRunActive(false);
     return;
+  }
+
+  // Another account's run. Leave the job for the tab that owns it: driving it
+  // here would open conversations this account doesn't have.
+  if (job.account) {
+    const account = await detectAccount(Platform.GEMINI);
+    if (account && account !== job.account) {
+      markRunActive(false);
+      console.log('[AgentLoop][sync] pending run belongs to another account; not resuming here');
+      return;
+    }
   }
 
   markRunActive(true);

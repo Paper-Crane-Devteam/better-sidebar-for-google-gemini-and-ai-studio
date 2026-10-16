@@ -93,7 +93,7 @@ export const WorkspaceToolbar: React.FC<WorkspaceToolbarProps> = ({
   return (
     <div className="flex flex-col border-b border-border/60">
       {/* Row 1: back, title, view controls, overflow menu */}
-      <div className="flex items-center gap-1 px-2 pt-2">
+      <div className="tab-header flex items-center gap-1 px-2 pt-2">
         {/* Only when there is somewhere to go back to. As the Workspace agent's own panel
             there is not: the agent switcher above is the way out, and an arrow pointing at
             the other agent is not "back" in any sense the user means. */}

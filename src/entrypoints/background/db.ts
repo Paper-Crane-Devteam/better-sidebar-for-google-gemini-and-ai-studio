@@ -1,6 +1,5 @@
 import { initDB } from '@/shared/db';
 import { getDbNameForActiveProfile } from '@/shared/lib/profile-registry';
-import { setCurrentDbName } from './tab-profile-map';
 
 let opening: Promise<void> | null = null;
 
@@ -8,7 +7,6 @@ const openActiveProfileDb = async () => {
   const dbName = await getDbNameForActiveProfile();
   console.log(`Initializing database with profile DB: ${dbName}`);
   await initDB(dbName);
-  setCurrentDbName(dbName);
   console.log('Database initialized successfully');
 };
 

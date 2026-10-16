@@ -89,7 +89,6 @@ export interface GeminiEnhancedFeatures {
   /** `>` in the composer opens the agent launcher popup */
   agentTrigger: boolean;
   removeWatermark: boolean;
-  tableAutoWidth: boolean;
   selectionToolbar: SelectionToolbarConfig;
 }
 
@@ -97,6 +96,7 @@ export interface AIStudioEnhancedFeatures {
   sidebarWidth: number;
   autoHideInput: boolean;
   autoHideRunSettings: boolean;
+  showSmartScrollbar: boolean;
   showHotkeyHelper: boolean;
   slashCommand: boolean;
   /** `>` in the composer opens the agent launcher popup */
@@ -173,8 +173,7 @@ export const usePegasusStore = create<PegasusState>()((set) => ({
       showHotkeyHelper: true,
       slashCommand: true,
       agentTrigger: true,
-      removeWatermark: true,
-      tableAutoWidth: false,
+      removeWatermark: false,
       selectionToolbar: {
         enabled: true,
         reference: true,
@@ -189,6 +188,7 @@ export const usePegasusStore = create<PegasusState>()((set) => ({
       sidebarWidth: 320,
       autoHideInput: false,
       autoHideRunSettings: false,
+      showSmartScrollbar: true,
       showHotkeyHelper: true,
       slashCommand: true,
       agentTrigger: true,
@@ -249,8 +249,7 @@ const DEFAULT_ENHANCED_FEATURES: PegasusState['enhancedFeatures'] = {
     showHotkeyHelper: true,
     slashCommand: true,
     agentTrigger: true,
-    removeWatermark: true,
-    tableAutoWidth: false,
+    removeWatermark: false,
     selectionToolbar: {
       enabled: true,
       reference: true,
@@ -265,6 +264,7 @@ const DEFAULT_ENHANCED_FEATURES: PegasusState['enhancedFeatures'] = {
     sidebarWidth: 320,
     autoHideInput: false,
     autoHideRunSettings: false,
+    showSmartScrollbar: true,
     showHotkeyHelper: true,
     slashCommand: true,
     agentTrigger: true,
@@ -309,6 +309,14 @@ function ensureEnhancedFeaturesDefaults() {
       updated[k] = merged;
       patched = true;
     }
+  }
+
+  // Gemini now ships its own watermark toggle; running our reverse-blend on an
+  // un-watermarked image leaves an inverted mark. The setting is hidden, so
+  // force it off for users who still have the old `true` persisted.
+  if (updated.gemini?.removeWatermark) {
+    updated.gemini = { ...updated.gemini, removeWatermark: false };
+    patched = true;
   }
 
   if (patched) {

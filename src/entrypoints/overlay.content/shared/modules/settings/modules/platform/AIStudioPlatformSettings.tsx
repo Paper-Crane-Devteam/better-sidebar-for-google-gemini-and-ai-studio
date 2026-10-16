@@ -17,6 +17,7 @@ export const AIStudioPlatformSettings = () => {
     sidebarWidth: 320,
     autoHideInput: false,
     autoHideRunSettings: false,
+    showSmartScrollbar: true,
     showHotkeyHelper: true,
     slashCommand: true,
     agentTrigger: true,
@@ -119,6 +120,22 @@ export const AIStudioPlatformSettings = () => {
               onCheckedChange={(c) =>
                 setAIStudioFeature('autoHideRunSettings', c)
               }
+            />
+          </div>
+
+          {/* Smart Scrollbar */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label className="text-sm font-medium">
+                {t('aistudioUI.smartScrollbar')}
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                {t('aistudioUI.smartScrollbarDesc')}
+              </p>
+            </div>
+            <Switch
+              checked={aistudioSettings.showSmartScrollbar ?? true}
+              onCheckedChange={(c) => setAIStudioFeature('showSmartScrollbar', c)}
             />
           </div>
 

@@ -62,6 +62,7 @@ export const initialUIState: UIState = {
     options: {
       caseSensitive: false,
       wholeWord: false,
+      useRegex: false,
       include: '',
       exclude: '',
       roleFilter: 'all',
@@ -71,6 +72,7 @@ export const initialUIState: UIState = {
     activeOptions: {
       caseSensitive: false,
       wholeWord: false,
+      useRegex: false,
       include: '',
       exclude: '',
       roleFilter: 'all',

@@ -24,7 +24,6 @@ export const useGeminiUI = () => {
     hideUpgrade = false,
     zenMode = false,
     showSmartScrollbar = true,
-    tableAutoWidth = false,
   } = geminiSettings ?? {};
 
   const { path } = useUrl();
@@ -88,7 +87,7 @@ export const useGeminiUI = () => {
         if (isGemsCreatePage) return;
 
         const inputField = document.querySelector(
-          'input-container > fieldset',
+          'input-container > .input-area-container, input-container > fieldset',
         );
         if (inputField) {
           const percent = Math.round(
@@ -151,12 +150,46 @@ export const useGeminiUI = () => {
         #chat-history .conversation-container user-query {
           max-width: none !important;
         }
+        /*
+         * Gemini's extended/xl grid layout caps every markdown block and the
+         * response chrome at 708px (\`.enable-extended-and-xl-grid & > :not(#_)\`),
+         * so widening the container alone no longer widens the text.
+         */
+        #chat-history .conversation-container .markdown > *,
+        #chat-history .conversation-container .response-container-header,
+        #chat-history .conversation-container .response-container-footer,
+        #chat-history .conversation-container .response-footer,
+        #chat-history .conversation-container thinking-overlay,
+        #chat-history .conversation-container model-response-disclaimers {
+          max-width: none !important;
+        }
+        /*
+         * Tables: Gemini already lets .table-block span the full column, but
+         * pads .table-content with \`max(0px, 50% - 354px)\` (450px for 4+ cols)
+         * to re-center the table in a fixed 708/900px track. Drop that padding
+         * so tables follow the chat width like the rest of the response.
+         */
+        #chat-history .conversation-container .table-block .table-content {
+          padding-inline: 0 !important;
+        }
+        /*
+         * Immersive mode (Deep Research / Canvas panel open) squeezes the chat
+         * column to roughly half width (~592px at 2560px). The 724px floor above
+         * then overflows the scroller and clips each turn, so let Gemini's own
+         * narrow layout take over there.
+         */
+        chat-window.immersives-mode #chat-history .conversation-container {
+          min-width: 0 !important;
+          max-width: 100% !important;
+        }
         `;
       }
       if (storeInputWidth > 0 && !isGemsCreatePage) {
         css += `
-        /* Input Box Control */
-        input-container > fieldset {
+        /* Input Box Control (legacy fieldset + lm-input-redesign container) */
+        input-container > fieldset,
+        input-container > .input-area-container,
+        input-container > prompt-flow-bar {
           max-width: ${storeInputWidth}% !important;
           min-width: 660px !important;
           width: 100% !important;
@@ -174,11 +207,6 @@ export const useGeminiUI = () => {
       `;
     }
 
-    if (tableAutoWidth) {
-      css += `
-        .table-block.new-table-style { max-width: none !important; }
-      `;
-    }
 
     // [DEPRECATED] showTopBarTag - removed due to Gemini UI redesign
     // if (geminiSettings.showTopBarTag) {
@@ -200,7 +228,6 @@ export const useGeminiUI = () => {
     storeInputWidth,
     // [DEPRECATED] geminiSettings.showTopBarTag,
     zenMode,
-    tableAutoWidth,
     isGemsCreatePage,
   ]);
 

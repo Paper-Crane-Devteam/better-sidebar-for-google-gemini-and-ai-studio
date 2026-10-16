@@ -288,7 +288,7 @@ export const ExplorerHeader = ({
   return (
     <div className="flex flex-col">
       {/* Row 1: Library title | cloud, (divider), sort, new folder, menu */}
-      <div className="px-3 py-2 flex items-center justify-between h-12 shrink-0">
+      <div className="tab-header px-3 py-2 flex items-center justify-between h-12 shrink-0">
         <SimpleTooltip
           content={compactMode ? t('tooltip.exitCompactMode') : t('tooltip.enterCompactMode')}
         >

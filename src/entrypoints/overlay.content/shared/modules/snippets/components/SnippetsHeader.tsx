@@ -143,7 +143,7 @@ export const SnippetsHeader = ({
   return (
     <div className="flex flex-col">
       {/* Row 1: Title + actions */}
-      <div className="px-3 py-2 flex items-center justify-between">
+      <div className="tab-header px-3 py-2 flex items-center justify-between">
         <h1 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground/70">
           {t('tabs.snippets')}
         </h1>
@@ -225,7 +225,7 @@ export const SnippetsHeader = ({
       </div>
 
       {/* Row 2: FilterActions (search, favorites) + New Folder, New Snippet */}
-      <div className="px-3 pb-2 pt-1 flex items-center justify-between">
+      <div className="tab-header px-3 pb-2 pt-1 flex items-center justify-between">
         <div className="flex-1 mr-2">
           <FilterActions
             filter={filter}

@@ -1,6 +1,8 @@
 import { PLATFORM_CONFIG, detectPlatform, Platform } from '@/shared/types/platform';
 import { navigate, navigateToConversation } from '@/shared/lib/navigation';
 import { browser } from 'wxt/browser';
+import { jumpToGeminiMessage } from './gemini-jump-to-message';
+import type { HighlightQuery } from './gemini-jump-cue';
 
 interface SearchMatch {
   id: string;
@@ -8,6 +10,8 @@ interface SearchMatch {
   external_url?: string;
   platform?: string;
   scroll_index?: number;
+  /** Terms to highlight after scrolling to the message (Gemini only for now) */
+  highlight?: HighlightQuery;
 }
 
 export function getExternalUrl(id: string) {
@@ -36,6 +40,16 @@ export async function handleSearchNavigation(match: SearchMatch) {
   }
 
   // 2. Handle same-platform navigation
+  if (currentPlatform === Platform.GEMINI) {
+    // `id` is the chat id itself for conversation-level hits; only scroll for messages
+    if (match.id && match.id !== match.conversation_id) {
+      await jumpToGeminiMessage(match);
+    } else {
+      navigateToConversation(match.conversation_id);
+    }
+    return;
+  }
+
   if (currentPlatform !== Platform.AI_STUDIO) {
     navigateToConversation(match.conversation_id);
     return;

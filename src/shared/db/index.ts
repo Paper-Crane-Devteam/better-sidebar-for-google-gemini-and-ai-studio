@@ -72,17 +72,147 @@ let workerNeedsInit = false;
  * Validating the database once at the start cannot catch this; the connection
  * has to stay pinned for the whole operation.
  */
-let lockChain: Promise<unknown> = Promise.resolve();
+//
+// The gate below is a reader/writer lock where the "readers" are grouped by
+// database name:
+//
+// - A *lease* (`withDb`) pins one database. Any number of leases on the same
+//   database run concurrently — that is ordinary traffic from one tab — but a
+//   lease on a different database waits until every lease on the current one has
+//   been released, and only then switches. So a tab's handler can no longer have
+//   its second query land in another tab's profile.
+// - An *exclusive* section (`initDB`, `switchDB`) waits for all leases to drain
+//   and keeps everyone else out while it runs.
+//
+// Waiters are served FIFO, with one exception: a lease on the database that is
+// already pinned is admitted immediately, even past queued waiters. That is what
+// makes a nested `withDbSession` inside a message lease (backup, Drive sync) safe
+// instead of a deadlock. The cost is that a busy tab can delay another tab's
+// switch until its in-flight requests drain, which happens between messages.
+//
+// Not reentrant across databases: calling `switchDB`/`initDB`, or `withDb` on a
+// *different* database, from inside a lease waits on itself forever.
 
-function runExclusive<T>(fn: () => Promise<T>): Promise<T> {
-  const result = lockChain.then(fn, fn);
-  // Keep the chain alive regardless of individual failures
-  lockChain = result.then(
+type GateWaiter =
+  | { kind: 'lease'; db: string; grant: () => void }
+  | { kind: 'exclusive'; grant: () => void };
+
+const gateQueue: GateWaiter[] = [];
+let leaseCount = 0;
+let leaseDb: string | null = null;
+/** Resolves once the pinned database is actually open; shared by its leases */
+let leaseReady: Promise<void> = Promise.resolve();
+let exclusiveHeld = false;
+
+function pumpGate() {
+  while (gateQueue.length && !exclusiveHeld) {
+    const head = gateQueue[0];
+    if (head.kind === 'exclusive') {
+      if (leaseCount > 0) return;
+      gateQueue.shift();
+      exclusiveHeld = true;
+      head.grant();
+      return;
+    }
+    if (leaseCount > 0 && head.db !== leaseDb) return;
+    gateQueue.shift();
+    admitLease(head.db);
+    head.grant();
+  }
+}
+
+function admitLease(db: string) {
+  if (leaseCount === 0) {
+    // First lease of a new pin: open the database before anyone runs a query.
+    leaseDb = db;
+    leaseReady = openForLease(db);
+    // A failed open is reported to each lease holder; it must not poison the gate.
+    leaseReady.catch(() => undefined);
+  }
+  leaseCount++;
+}
+
+async function openForLease(dbName: string) {
+  await ensureWorker();
+  const current = workerNeedsInit
+    ? null
+    : await rawSendWorkerMessage('GET_DB_NAME');
+  if (current !== dbName) {
+    console.log(`[DB] Pinning "${dbName}" (was "${current}")`);
+    await rawSwitchDB(dbName);
+  } else {
+    // Already on the right database, but requests may still have to replay INIT
+    // if the worker gets replaced mid-lease. Point the replay at this database so
+    // recovery cannot open a different profile.
+    desiredDbName = dbName;
+  }
+}
+
+function releaseLease() {
+  leaseCount--;
+  if (leaseCount === 0) leaseDb = null;
+  pumpGate();
+}
+
+/**
+ * Run `fn` with the connection pinned to `dbName`.
+ *
+ * Concurrent with other leases on the same database; serialized against leases
+ * on any other database and against `switchDB`/`initDB`.
+ */
+export async function withDb<T>(dbName: string, fn: () => Promise<T>): Promise<T> {
+  if (!exclusiveHeld && leaseCount > 0 && leaseDb === dbName) {
+    admitLease(dbName);
+  } else {
+    await new Promise<void>((grant) => {
+      gateQueue.push({ kind: 'lease', db: dbName, grant });
+      pumpGate();
+    });
+  }
+  try {
+    await leaseReady;
+    return await fn();
+  } finally {
+    releaseLease();
+  }
+}
+
+async function runExclusive<T>(fn: () => Promise<T>): Promise<T> {
+  await new Promise<void>((grant) => {
+    gateQueue.push({ kind: 'exclusive', grant });
+    pumpGate();
+  });
+  try {
+    return await fn();
+  } finally {
+    exclusiveHeld = false;
+    pumpGate();
+  }
+}
+
+/**
+ * Serializes multi-step sessions against each other.
+ *
+ * Leases alone let two sessions on the same database interleave — a restore
+ * emptying tables while an export reads them. Sessions take their lease first
+ * and this second; the fixed order is what keeps the two locks deadlock-free.
+ */
+let sessionChain: Promise<unknown> = Promise.resolve();
+
+function runSessionSerialized<T>(fn: () => Promise<T>): Promise<T> {
+  const result = sessionChain.then(fn, fn);
+  sessionChain = result.then(
     () => undefined,
     () => undefined,
   );
   return result;
 }
+
+/**
+ * The database this side of the bridge has open (or is opening), or null before
+ * the first open. Inside a `withDb` lease this is the leased database.
+ */
+export const getOpenDbName = (): string | null => desiredDbName;
 
 // Helper to handle partial chunks
 const chunkedResponses = new Map<string, { chunks: string[]; received: number; total: number }>();
@@ -220,8 +350,9 @@ export const initDB = async (dbName?: string) =>
 /**
  * Switch the active database.
  *
- * Waits for any in-flight `withDbSession` to finish, so a tab that wants a
- * different profile cannot yank the connection out from under a running sync.
+ * Waits for every in-flight lease to finish, so a tab that wants a different
+ * profile cannot yank the connection out from under a running operation. Must
+ * not be called from inside a lease.
  */
 export const switchDB = async (dbName: string) =>
   runExclusive(() => rawSwitchDB(dbName));
@@ -238,34 +369,17 @@ const rawSwitchDB = async (dbName: string) => {
 /**
  * Run a multi-step database operation with the connection pinned to `dbName`.
  *
- * Switches to the database first, then holds the lock for the duration of `fn`,
- * so concurrent `switchDB` calls queue behind it instead of changing the
- * database mid-operation.
+ * A lease on `dbName` (see `withDb`) plus mutual exclusion with other sessions,
+ * so concurrent switches queue behind it and two sessions never interleave.
  *
  * Use this for anything that issues more than one dependent query — sync,
- * export, import, restore. Do not call `switchDB`/`initDB`/`withDbSession` from
- * inside `fn`; the lock is not reentrant.
+ * export, import, restore. Safe to call from inside a lease on the same
+ * database; do not call `switchDB`/`initDB`/`withDbSession` from inside `fn`.
  */
 export const withDbSession = async <T>(
   dbName: string,
   fn: () => Promise<T>,
-): Promise<T> =>
-  runExclusive(async () => {
-    await ensureWorker();
-    const current = workerNeedsInit
-      ? null
-      : await rawSendWorkerMessage('GET_DB_NAME');
-    if (current !== dbName) {
-      console.log(`[DB] Session pinning "${dbName}" (was "${current}")`);
-      await rawSwitchDB(dbName);
-    } else {
-      // Already on the right database, but requests inside `fn` may still have
-      // to replay INIT if the worker gets replaced mid-session. Point the replay
-      // at this session's database so recovery cannot open a different profile.
-      desiredDbName = dbName;
-    }
-    return fn();
-  });
+): Promise<T> => withDb(dbName, () => runSessionSerialized(fn));
 
 /**
  * Ask the worker which database it actually has open.

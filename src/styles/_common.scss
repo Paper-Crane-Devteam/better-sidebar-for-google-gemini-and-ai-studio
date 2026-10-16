@@ -87,6 +87,19 @@
     stroke-width: inherit;
   }
 
+  /* Tab header action icons (the row beside each tab's title). Like the rail,
+     they are rarely the focus, so they recede at rest and come back on hover,
+     while their menu is open, or when the button is toggled on (secondary
+     variant / primary tint). Opacity keeps every theme's own colour. */
+  .tab-header button svg {
+    opacity: var(--tab-header-icon-idle-opacity, 0.65);
+    transition: opacity 0.15s ease;
+  }
+
+  .tab-header button:is(:hover, :focus-visible, [data-state='open'], .bg-secondary, .text-primary) svg {
+    opacity: 1;
+  }
+
   /* Account avatar standing in for a sidebar icon. Sized a touch larger than
      --sidebar-icon-size because a filled circle reads smaller than a line icon
      of the same box, and given a hairline rim so a light photo does not bleed
