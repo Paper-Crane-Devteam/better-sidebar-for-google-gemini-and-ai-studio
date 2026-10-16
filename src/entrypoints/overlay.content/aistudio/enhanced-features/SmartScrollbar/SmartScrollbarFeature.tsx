@@ -12,9 +12,9 @@ const MIN_USER_TURNS = 3;
 /**
  * Right padding given to `.chat-view-container` while the bar is shown (AI Studio's
  * own is 20px). Turns keep ~13px of inner padding on top of this, so the text ends
- * ~57px from the column edge: room for the 32px bar with ~12px either side.
+ * ~49px from the column edge: room for the 24px bar with ~12px either side.
  */
-const GUTTER_PADDING = 44;
+const GUTTER_PADDING = 36;
 /** Gap between the bar and the chat column's right edge, inside the gutter */
 const EDGE_GAP = 12;
 
