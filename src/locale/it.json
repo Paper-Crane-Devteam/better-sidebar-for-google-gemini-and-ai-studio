@@ -248,7 +248,27 @@
     "sourceCode": "Codice sorgente",
     "githubRepository": "Repository GitHub",
     "viewChangelog": "Visualizza il registro delle modifiche",
-    "userGuide": "Guida introduttiva"
+    "userGuide": "Guida introduttiva",
+    "moreExtensions": "Altro da Paper Crane Dev",
+    "betterPlaylistsDesc": "Organizza le playlist di YouTube con una barra laterale: sposta, copia e rimuovi in blocco, oltre a ricerca e paginazione.",
+    "update": {
+      "check": "Controlla aggiornamenti",
+      "checking": "Controllo in corso…",
+      "upToDate": "Stai usando la versione più recente.",
+      "available": "La versione {{version}} è disponibile ed è in download.",
+      "ready": "La versione {{version}} è pronta per l'installazione.",
+      "throttled": "Controllo eseguito troppo di recente. Riprova tra qualche minuto.",
+      "unsupported": "Questo browser non supporta il controllo degli aggiornamenti da qui. L'estensione si aggiornerà automaticamente.",
+      "updateNow": "Aggiorna ora",
+      "applying": "Aggiornamento in corso…",
+      "confirmTitle": "Aggiornare a {{version}}?",
+      "confirmContent": "L'estensione verrà riavviata e questa pagina verrà ricaricata. Le altre schede di Gemini, AI Studio o ChatGPT aperte dovranno poi essere aggiornate.",
+      "notReady": "Il download non è ancora terminato. Riprova tra poco, oppure il browser lo installerà da solo.",
+      "checkFailed": "Impossibile controllare gli aggiornamenti.",
+      "applyFailed": "Impossibile applicare l'aggiornamento.",
+      "toastTitle": "Better Sidebar {{version}} è pronto",
+      "dismiss": "Ignora"
+    }
   },
   "sponsor": {
     "title": "Condividi con gli amici",
@@ -595,7 +615,10 @@
     "title": "Better Sidebar",
     "description": "Configura le piattaforme su cui è attiva Better Sidebar. La disattivazione di una piattaforma interromperà completamente l'esecuzione dell'estensione su quel sito.",
     "platforms": "Piattaforme supportate",
-    "enablePlatform": "Abilita su {{platform}}"
+    "enablePlatform": "Abilita su {{platform}}",
+    "badgeSupporter": "Sostenitore",
+    "badgePower": "Membro Power",
+    "badgeThanks": "Grazie per il tuo supporto a Better Sidebar"
   },
   "feedback": {
     "title": "Contattaci",
@@ -619,6 +642,8 @@
     "placeholder": "Ricerca testo completo",
     "wholeWord": "Corrisponde a parola intera",
     "matchCase": "Maiuscole e minuscole",
+    "useRegex": "Usa espressione regolare",
+    "invalidRegex": "Espressione regolare non valida: {{error}}",
     "copyAsText": "Copia come testo",
     "copyAsMarkdown": "Copia come markdown",
     "foldersToInclude": "cartelle da includere",
@@ -634,6 +659,9 @@
     "noResults": "Nessun risultato trovato per \"{{query}}\"",
     "messagePreview": "Anteprima messaggio",
     "jumpToConversation": "Vai alla chat",
+    "jumpLoadingEarlier": "Caricamento dei messaggi precedenti per trovare questo...",
+    "jumpNotFound": "Impossibile trovare questo messaggio nella pagina. Potrebbe essere più in alto, scorri verso l'alto per caricarne altri.",
+    "jumpStop": "Interrompi",
     "searching": "Ricerca...",
     "resultsSummary": "{{count}} risultati in {{files}} chat",
     "whyNoOlder": "Perché non riesco a trovare le chat più vecchie?",
@@ -838,8 +866,6 @@
     "sidebarWidth": "Barra laterale Larghezza",
     "chatContentWidth": "Larghezza contenuto chat",
     "inputBoxWidth": "Larghezza casella di input",
-    "tableAutoWidth": "Larghezza automatica tabella",
-    "tableAutoWidthDesc": "Rimuovi il limite di larghezza massima della tabella in modo che le tabelle vengano visualizzate alla larghezza massima disponibile",
     "elementVisibility": "Visibilità elemento",
     "geminiLogo": "Logo Gemini",
     "geminiLogoDesc": "Attiva/disattiva la visibilità del logo Gemini in alto a sinistra",
@@ -895,6 +921,8 @@
     "autoHideInputDesc": "Nascondi la casella di input finché non passi il mouse sull'area inferiore",
     "autoHideRunSettings": "Comprimi le impostazioni di esecuzione per impostazione predefinita",
     "autoHideRunSettingsDesc": "Il pannello delle impostazioni di esecuzione rimane compresso quando si apre una chat, si espande manualmente quando necessario",
+    "smartScrollbar": "Barra di scorrimento intelligente",
+    "smartScrollbarDesc": "Mostra la navigazione della conversazione sul lato destro",
     "slashCommand": "Comandi barra",
     "slashCommandDesc": "Digita / per inserire rapidamente i prompt dalla libreria",
     "agentTrigger": "Trigger dell'agente",
@@ -1028,7 +1056,9 @@
     "copyResponse": "Copia risposta",
     "expandAll": "Espandi tutto",
     "collapseAll": "Comprimi tutto",
-    "navigate": "Vai al messaggio"
+    "navigate": "Vai al messaggio",
+    "popOut": "Stacca",
+    "dockBack": "Riaggancia alla barra laterale"
   },
   "firstInstall": {
     "title": "Importare elenco conversazioni?",

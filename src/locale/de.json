@@ -248,7 +248,27 @@
     "sourceCode": "Quellcode",
     "githubRepository": "GitHub Repository",
     "viewChangelog": "Ände Text",
-    "userGuide": "Getting started guide"
+    "userGuide": "Getting started guide",
+    "moreExtensions": "Mehr von Paper Crane Dev",
+    "betterPlaylistsDesc": "Organisiere YouTube-Playlists mit einer Seitenleiste: Stapelweise verschieben, kopieren und entfernen, dazu Suche und Seitennavigation.",
+    "update": {
+      "check": "Nach Updates suchen",
+      "checking": "Wird geprüft…",
+      "upToDate": "Du verwendest die neueste Version.",
+      "available": "Version {{version}} ist verfügbar und wird heruntergeladen.",
+      "ready": "Version {{version}} ist bereit zur Installation.",
+      "throttled": "Zu kurz nach der letzten Prüfung. Bitte versuche es in ein paar Minuten erneut.",
+      "unsupported": "Dieser Browser unterstützt die Update-Prüfung von hier aus nicht. Die Erweiterung wird automatisch aktualisiert.",
+      "updateNow": "Jetzt aktualisieren",
+      "applying": "Wird aktualisiert…",
+      "confirmTitle": "Auf {{version}} aktualisieren?",
+      "confirmContent": "Die Erweiterung wird neu gestartet und diese Seite neu geladen. Andere geöffnete Gemini-, AI Studio- oder ChatGPT-Tabs müssen danach aktualisiert werden.",
+      "notReady": "Der Download ist noch nicht abgeschlossen. Versuche es gleich noch einmal, oder der Browser installiert das Update selbst.",
+      "checkFailed": "Update-Prüfung fehlgeschlagen.",
+      "applyFailed": "Update konnte nicht angewendet werden.",
+      "toastTitle": "Better Sidebar {{version}} ist bereit",
+      "dismiss": "Schließen"
+    }
   },
   "sponsor": {
     "title": "Share with Friends",
@@ -595,7 +615,10 @@
     "title": "Better Sidebar",
     "description": "Konfigurieren Sie die Plattformen, auf denen Better Sidebar aktiv ist. Durch das Deaktivieren einer Plattform wird die Ausführung der Erweiterung auf dieser Website vollständig gestoppt.",
     "platforms": "Unterstützte Plattformen",
-    "enablePlatform": "Aktivieren am {{platform}}"
+    "enablePlatform": "Aktivieren am {{platform}}",
+    "badgeSupporter": "Unterstützer",
+    "badgePower": "Power-Mitglied",
+    "badgeThanks": "Danke, dass du Better Sidebar unterstützt"
   },
   "feedback": {
     "title": "Kontaktieren Sie uns",
@@ -619,6 +642,8 @@
     "placeholder": "Volltextsuche",
     "wholeWord": "Ganzes Wort erkennen",
     "matchCase": "Groß-/Kleinschreibung berücksichtigen",
+    "useRegex": "Regulären Ausdruck verwenden",
+    "invalidRegex": "Ungültiger regulärer Ausdruck: {{error}}",
     "copyAsText": "Als Text kopieren",
     "copyAsMarkdown": "Als Markdown kopieren",
     "foldersToInclude": "Einzuschließende Ordner",
@@ -634,6 +659,9 @@
     "noResults": "Keine Ergebnisse für „{{query}}“ gefunden",
     "messagePreview": "Nachrichtenvorschau",
     "jumpToConversation": "Zum Chat springen",
+    "jumpLoadingEarlier": "Frühere Nachrichten werden geladen, um diese zu finden...",
+    "jumpNotFound": "Diese Nachricht wurde auf der Seite nicht gefunden. Sie liegt möglicherweise weiter oben. Scrolle nach oben, um mehr zu laden.",
+    "jumpStop": "Stopp",
     "searching": "Suchen...",
     "resultsSummary": "{{count}} führt zu {{files}}-Chats",
     "whyNoOlder": "Warum kann ich nicht finden? ältere Chats?",
@@ -838,8 +866,6 @@
     "sidebarWidth": "Seitenleiste Breite",
     "chatContentWidth": "Breite des Chat-Inhalts",
     "inputBoxWidth": "Breite des Eingabefelds",
-    "tableAutoWidth": "Automatische Tabellenbreite",
-    "tableAutoWidthDesc": "Entfernen Sie die maximale Tabellenbreitenbeschränkung, damit Tabellen mit der vollen verfügbaren Breite gerendert werden",
     "elementVisibility": "Elementsichtbarkeit",
     "geminiLogo": "Gemini-Logo",
     "geminiLogoDesc": "Sichtbarkeit des Gemini-Logos oben links umschalten",
@@ -895,6 +921,8 @@
     "autoHideInputDesc": "Eingabefeld ausblenden, bis Sie mit der Maus über den unteren Bereich fahren",
     "autoHideRunSettings": "Ausführungseinstellungen standardmäßig reduzieren",
     "autoHideRunSettingsDesc": "Das Bedienfeld „Ausführungseinstellungen“ bleibt beim Öffnen eines Chats ausgeblendet und kann bei Bedarf manuell erweitert werden.",
+    "smartScrollbar": "Intelligente Scrollleiste",
+    "smartScrollbarDesc": "Unterhaltungsnavigation auf der rechten Seite anzeigen",
     "slashCommand": "Schrägstrich Befehle",
     "slashCommandDesc": "Geben Sie / ein, um schnell Prompts aus der Bibliothek einzufügen",
     "agentTrigger": "Agent-Trigger",
@@ -1028,7 +1056,9 @@
     "copyResponse": "Antwort kopieren",
     "expandAll": "Alle erweitern",
     "collapseAll": "Alle reduzieren",
-    "navigate": "Zur Nachricht gehen"
+    "navigate": "Zur Nachricht gehen",
+    "popOut": "Herauslösen",
+    "dockBack": "Wieder an die Seitenleiste andocken"
   },
   "firstInstall": {
     "title": "Konversationsliste importieren?",

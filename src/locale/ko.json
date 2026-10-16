@@ -248,7 +248,27 @@
     "sourceCode": "소스 코드",
     "githubRepository": "GitHub 저장소",
     "viewChangelog": "변경 로그 보기",
-    "userGuide": "시작 가이드"
+    "userGuide": "시작 가이드",
+    "moreExtensions": "Paper Crane Dev의 다른 확장 프로그램",
+    "betterPlaylistsDesc": "사이드바로 YouTube 재생목록을 정리하세요. 일괄 이동, 복사, 삭제와 검색, 페이지 나누기를 지원합니다.",
+    "update": {
+      "check": "업데이트 확인",
+      "checking": "확인 중…",
+      "upToDate": "최신 버전을 사용 중입니다.",
+      "available": "버전 {{version}}을(를) 사용할 수 있으며 다운로드 중입니다.",
+      "ready": "버전 {{version}}을(를) 설치할 준비가 되었습니다.",
+      "throttled": "너무 최근에 확인했습니다. 몇 분 후에 다시 시도해 주세요.",
+      "unsupported": "이 브라우저에서는 여기서 업데이트를 확인할 수 없습니다. 자동으로 업데이트됩니다.",
+      "updateNow": "지금 업데이트",
+      "applying": "업데이트 중…",
+      "confirmTitle": "{{version}}(으)로 업데이트할까요?",
+      "confirmContent": "확장 프로그램이 다시 시작되고 이 페이지가 새로고침됩니다. 열려 있는 다른 Gemini, AI Studio 또는 ChatGPT 탭은 이후 새로고침해야 합니다.",
+      "notReady": "아직 다운로드가 완료되지 않았습니다. 잠시 후 다시 시도하거나 브라우저가 자동으로 설치하도록 두세요.",
+      "checkFailed": "업데이트를 확인할 수 없습니다.",
+      "applyFailed": "업데이트를 적용할 수 없습니다.",
+      "toastTitle": "Better Sidebar {{version}} 준비 완료",
+      "dismiss": "닫기"
+    }
   },
   "sponsor": {
     "title": "친구와 공유",
@@ -595,7 +615,10 @@
     "title": "Better Sidebar",
     "description": "Better Sidebar가 활성화되는 플랫폼을 구성하세요. 플랫폼을 비활성화하면 해당 사이트에서 확장 프로그램 실행이 완전히 중단됩니다.",
     "platforms": "지원되는 플랫폼",
-    "enablePlatform": "{{platform}}에서 활성화"
+    "enablePlatform": "{{platform}}에서 활성화",
+    "badgeSupporter": "후원자",
+    "badgePower": "파워 멤버",
+    "badgeThanks": "Better Sidebar를 후원해 주셔서 감사합니다"
   },
   "feedback": {
     "title": "문의하세요",
@@ -619,6 +642,8 @@
     "placeholder": "전체 텍스트 검색",
     "wholeWord": "전체 단어 일치",
     "matchCase": "대소문자 일치",
+    "useRegex": "정규 표현식 사용",
+    "invalidRegex": "잘못된 정규 표현식: {{error}}",
     "copyAsText": "텍스트로 복사",
     "copyAsMarkdown": "마크다운으로 복사",
     "foldersToInclude": "포함할 폴더",
@@ -634,6 +659,9 @@
     "noResults": "\"{{query}}\"에 대한 결과를 찾을 수 없습니다",
     "messagePreview": "메시지 미리보기",
     "jumpToConversation": "채팅으로 이동",
+    "jumpLoadingEarlier": "이 메시지를 찾기 위해 이전 메시지를 불러오는 중...",
+    "jumpNotFound": "페이지에서 이 메시지를 찾을 수 없습니다. 더 위쪽에 있을 수 있으니 위로 스크롤하여 더 불러와 보세요.",
+    "jumpStop": "중지",
     "searching": "검색 중...",
     "resultsSummary": "{{count}} 결과가 {{files}} 채팅으로 나타남",
     "whyNoOlder": "이유 이전 채팅을 찾을 수 없나요?",
@@ -838,8 +866,6 @@
     "sidebarWidth": "사이드바 너비",
     "chatContentWidth": "채팅 콘텐츠 너비",
     "inputBoxWidth": "입력 상자 너비",
-    "tableAutoWidth": "테이블 자동 너비",
-    "tableAutoWidthDesc": "테이블이 사용 가능한 전체 너비로 렌더링되도록 테이블 최대 너비 제한을 제거",
     "elementVisibility": "요소 가시성",
     "geminiLogo": "Gemini 로고",
     "geminiLogoDesc": "왼쪽 상단 Gemini 로고 표시 전환",
@@ -895,6 +921,8 @@
     "autoHideInputDesc": "하단 영역에 마우스를 가져갈 때까지 입력 상자 숨기기",
     "autoHideRunSettings": "기본적으로 실행 설정 축소",
     "autoHideRunSettingsDesc": "실행 설정 패널은 채팅을 열 때 축소된 상태로 유지되며, 필요할 때 수동으로 확장",
+    "smartScrollbar": "스마트 스크롤바",
+    "smartScrollbarDesc": "오른쪽에 대화 탐색 표시",
     "slashCommand": "슬래시 명령",
     "slashCommandDesc": "입력에 /를 입력하여 라이브러리에서 프롬프트를 빠르게 삽입하세요.",
     "agentTrigger": "에이전트 트리거",
@@ -1028,7 +1056,9 @@
     "copyResponse": "응답 복사",
     "expandAll": "모두 확장",
     "collapseAll": "모두 축소",
-    "navigate": "메시지로 이동"
+    "navigate": "메시지로 이동",
+    "popOut": "분리하기",
+    "dockBack": "사이드바에 다시 고정"
   },
   "firstInstall": {
     "title": "대화 목록을 가져오시겠습니까?",

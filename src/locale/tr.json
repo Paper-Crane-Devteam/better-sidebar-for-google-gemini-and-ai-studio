@@ -248,7 +248,27 @@
     "sourceCode": "Kaynak Kodu",
     "githubRepository": "GitHub Deposu",
     "viewChangelog": "Değişiklik Günlüğünü Görüntüle",
-    "userGuide": "Başlangıç kılavuzu"
+    "userGuide": "Başlangıç kılavuzu",
+    "moreExtensions": "Paper Crane Dev'den daha fazlası",
+    "betterPlaylistsDesc": "YouTube oynatma listelerini bir kenar çubuğuyla düzenleyin: toplu taşıma, kopyalama ve kaldırma, ayrıca arama ve sayfalama.",
+    "update": {
+      "check": "Güncellemeleri denetle",
+      "checking": "Denetleniyor…",
+      "upToDate": "En son sürümü kullanıyorsunuz.",
+      "available": "{{version}} sürümü mevcut ve indiriliyor.",
+      "ready": "{{version}} sürümü yüklenmeye hazır.",
+      "throttled": "Çok kısa süre önce denetlendi. Lütfen birkaç dakika sonra tekrar deneyin.",
+      "unsupported": "Bu tarayıcı buradan güncelleme denetlemeyi desteklemiyor. Uzantı otomatik olarak güncellenecek.",
+      "updateNow": "Şimdi güncelle",
+      "applying": "Güncelleniyor…",
+      "confirmTitle": "{{version}} sürümüne güncellensin mi?",
+      "confirmContent": "Uzantı yeniden başlatılacak ve bu sayfa yeniden yüklenecek. Açık olan diğer Gemini, AI Studio veya ChatGPT sekmelerinin ardından yenilenmesi gerekir.",
+      "notReady": "İndirme henüz tamamlanmadı. Birazdan tekrar deneyin ya da tarayıcının kendisi yüklemesine izin verin.",
+      "checkFailed": "Güncellemeler denetlenemedi.",
+      "applyFailed": "Güncelleme uygulanamadı.",
+      "toastTitle": "Better Sidebar {{version}} hazır",
+      "dismiss": "Kapat"
+    }
   },
   "sponsor": {
     "title": "Arkadaşlarınızla Paylaşın",
@@ -595,7 +615,10 @@
     "title": "Daha İyi Kenar Çubuğu",
     "description": "Daha İyi Kenar Çubuğu'nun etkin olduğu platformları yapılandırın. Bir platformun devre dışı bırakılması, uzantının söz konusu sitede çalışmasını tamamen durduracaktır.",
     "platforms": "Desteklenen Platformlar",
-    "enablePlatform": "{{platform}} tarihinde etkinleştirin"
+    "enablePlatform": "{{platform}} tarihinde etkinleştirin",
+    "badgeSupporter": "Destekçi",
+    "badgePower": "Güçlü Üye",
+    "badgeThanks": "Better Sidebar'ı desteklediğiniz için teşekkürler"
   },
   "feedback": {
     "title": "İletişime Geçin",
@@ -619,6 +642,8 @@
     "placeholder": "Tam Metin Arama",
     "wholeWord": "Tüm Kelimeyi Eşleştir",
     "matchCase": "Büyük Harf Eşleştirme",
+    "useRegex": "Normal ifade kullan",
+    "invalidRegex": "Geçersiz normal ifade: {{error}}",
     "copyAsText": "Metin olarak kopyala",
     "copyAsMarkdown": "Markdown olarak kopyala",
     "foldersToInclude": "eklenecek klasörler",
@@ -634,6 +659,9 @@
     "noResults": "\"{{query}}\" için sonuç bulunamadı",
     "messagePreview": "Mesaj Önizlemesi",
     "jumpToConversation": "Sohbete atla",
+    "jumpLoadingEarlier": "Bu mesajı bulmak için önceki mesajlar yükleniyor...",
+    "jumpNotFound": "Bu mesaj sayfada bulunamadı. Daha yukarıda olabilir, daha fazlasını yüklemek için yukarı kaydırın.",
+    "jumpStop": "Durdur",
     "searching": "Aranıyor...",
     "resultsSummary": "{{count}}, {{files}} sohbetleriyle sonuçlanır",
     "whyNoOlder": "Neden eski sohbetleri bulamıyorum?",
@@ -838,8 +866,6 @@
     "sidebarWidth": "Kenar Çubuğu Genişlik",
     "chatContentWidth": "Sohbet İçeriği Genişliği",
     "inputBoxWidth": "Giriş Kutusu Genişliği",
-    "tableAutoWidth": "Tablo Otomatik Genişliği",
-    "tableAutoWidthDesc": "Tabloların tam kullanılabilir genişlikte görüntülenmesi için tablo maksimum genişlik sınırını kaldırın",
     "elementVisibility": "Öğe Görünürlüğü",
     "geminiLogo": "Gemini Logosu",
     "geminiLogoDesc": "Sol Üst Gemini logosu görünürlüğünü aç/kapa",
@@ -895,6 +921,8 @@
     "autoHideInputDesc": "Alt alana gelene kadar giriş kutusunu gizle",
     "autoHideRunSettings": "Varsayılan Olarak Çalıştırma Ayarlarını Daralt",
     "autoHideRunSettingsDesc": "Bir sohbeti açarken çalıştırma ayarları paneli daraltılmış halde kalır, gerektiğinde manuel olarak genişletilir",
+    "smartScrollbar": "Akıllı Kaydırma Çubuğu",
+    "smartScrollbarDesc": "Sohbet gezinmesini sağ tarafta göster",
     "slashCommand": "Eğik Çizgi Komutları",
     "slashCommandDesc": "Kütüphaneden istemleri hızlı bir şekilde eklemek için / yazın",
     "agentTrigger": "Agent Tetikleyicisi",
@@ -1028,7 +1056,9 @@
     "copyResponse": "Yanıtı kopyala",
     "expandAll": "Tümünü genişlet",
     "collapseAll": "Tümünü daralt",
-    "navigate": "Mesaja git"
+    "navigate": "Mesaja git",
+    "popOut": "Ayır",
+    "dockBack": "Kenar çubuğuna geri yerleştir"
   },
   "firstInstall": {
     "title": "Konuşma Listesini İçe Aktarmak mı istiyorsunuz?",

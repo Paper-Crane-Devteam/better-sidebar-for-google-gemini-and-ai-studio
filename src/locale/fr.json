@@ -248,7 +248,27 @@
     "sourceCode": "Code source",
     "githubRepository": "Référentiel GitHub",
     "viewChangelog": "Afficher le journal des modifications",
-    "userGuide": "Guide de démarrage"
+    "userGuide": "Guide de démarrage",
+    "moreExtensions": "Plus de Paper Crane Dev",
+    "betterPlaylistsDesc": "Organisez vos playlists YouTube avec une barre latérale : déplacement, copie et suppression par lot, recherche et pagination.",
+    "update": {
+      "check": "Rechercher des mises à jour",
+      "checking": "Vérification…",
+      "upToDate": "Vous utilisez la dernière version.",
+      "available": "La version {{version}} est disponible et en cours de téléchargement.",
+      "ready": "La version {{version}} est prête à être installée.",
+      "throttled": "Vérification trop récente. Veuillez réessayer dans quelques minutes.",
+      "unsupported": "Ce navigateur ne permet pas de rechercher des mises à jour depuis cette page. La mise à jour se fera automatiquement.",
+      "updateNow": "Mettre à jour",
+      "applying": "Mise à jour…",
+      "confirmTitle": "Mettre à jour vers {{version}} ?",
+      "confirmContent": "L'extension va redémarrer et cette page sera rechargée. Les autres onglets Gemini, AI Studio ou ChatGPT ouverts devront ensuite être actualisés.",
+      "notReady": "Le téléchargement n'est pas encore terminé. Réessayez dans un instant, ou le navigateur l'installera de lui-même.",
+      "checkFailed": "Impossible de rechercher des mises à jour.",
+      "applyFailed": "Impossible d'appliquer la mise à jour.",
+      "toastTitle": "Better Sidebar {{version}} est prêt",
+      "dismiss": "Ignorer"
+    }
   },
   "sponsor": {
     "title": "Partager avec des amis",
@@ -595,7 +615,10 @@
     "title": "Better Sidebar",
     "description": "Configurez les plates-formes sur lesquelles Better Sidebar est active. La désactivation d'une plate-forme empêchera complètement l'extension de s'exécuter sur ce site.",
     "platforms": "Plateformes prises en charge",
-    "enablePlatform": "Activer sur {{platform}}"
+    "enablePlatform": "Activer sur {{platform}}",
+    "badgeSupporter": "Soutien",
+    "badgePower": "Membre Power",
+    "badgeThanks": "Merci de soutenir Better Sidebar"
   },
   "feedback": {
     "title": "Entrez en contact",
@@ -619,6 +642,8 @@
     "placeholder": "Recherche en texte intégral",
     "wholeWord": "Mots entiers",
     "matchCase": "Respecter la casse",
+    "useRegex": "Utiliser une expression régulière",
+    "invalidRegex": "Expression régulière invalide : {{error}}",
     "copyAsText": "Copier sous forme de texte",
     "copyAsMarkdown": "Copier sous forme de démarque",
     "foldersToInclude": "dossiers à inclure",
@@ -634,6 +659,9 @@
     "noResults": "Aucun résultat trouvé pour \"{{query}}\"",
     "messagePreview": "Aperçu du message",
     "jumpToConversation": "Aller au chat",
+    "jumpLoadingEarlier": "Chargement des messages précédents pour trouver celui-ci...",
+    "jumpNotFound": "Ce message est introuvable sur la page. Il se trouve peut-être plus haut, faites défiler vers le haut pour en charger davantage.",
+    "jumpStop": "Arrêter",
     "searching": "Recherche...",
     "resultsSummary": "{{count}} résultats dans les chats {{files}}",
     "whyNoOlder": "Pourquoi ne puis-je pas trouver les discussions plus anciennes ?",
@@ -838,8 +866,6 @@
     "sidebarWidth": "Barre latérale Largeur",
     "chatContentWidth": "Largeur du contenu du chat",
     "inputBoxWidth": "Largeur de la zone de saisie",
-    "tableAutoWidth": "Largeur automatique du tableau",
-    "tableAutoWidthDesc": "Supprimer la limite de largeur maximale du tableau pour que les tableaux s'affichent à toute la largeur disponible",
     "elementVisibility": "Visibilité des éléments",
     "geminiLogo": "Logo Gemini",
     "geminiLogoDesc": "Activer la visibilité du logo Gemini en haut à gauche",
@@ -895,6 +921,8 @@
     "autoHideInputDesc": "Masquer la zone de saisie jusqu'à ce que vous survoliez la zone inférieure",
     "autoHideRunSettings": "Réduire les paramètres d'exécution par défaut",
     "autoHideRunSettingsDesc": "Le panneau des paramètres d'exécution reste réduit lors de l'ouverture d'une discussion, développez-le manuellement si nécessaire",
+    "smartScrollbar": "Barre de défilement intelligente",
+    "smartScrollbarDesc": "Afficher la navigation de la conversation sur le côté droit",
     "slashCommand": "Commandes Slash",
     "slashCommandDesc": "Tapez / dans l'entrée pour insérer rapidement des invites de la bibliothèque",
     "agentTrigger": "Déclencheur d'agent",
@@ -1028,7 +1056,9 @@
     "copyResponse": "Copier la réponse",
     "expandAll": "Développer tout",
     "collapseAll": "Tout réduire",
-    "navigate": "Aller au message"
+    "navigate": "Aller au message",
+    "popOut": "Détacher",
+    "dockBack": "Rattacher à la barre latérale"
   },
   "firstInstall": {
     "title": "Importer la liste de conversations ?",

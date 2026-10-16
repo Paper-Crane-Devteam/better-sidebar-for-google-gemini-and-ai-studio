@@ -248,7 +248,27 @@
     "sourceCode": "Kod źródłowy",
     "githubRepository": "Repozytorium GitHub",
     "viewChangelog": "Wyświetl dziennik zmian",
-    "userGuide": "Przewodnik dla początkujących"
+    "userGuide": "Przewodnik dla początkujących",
+    "moreExtensions": "Więcej od Paper Crane Dev",
+    "betterPlaylistsDesc": "Porządkuj playlisty YouTube za pomocą paska bocznego: zbiorcze przenoszenie, kopiowanie i usuwanie, a także wyszukiwanie i stronicowanie.",
+    "update": {
+      "check": "Sprawdź aktualizacje",
+      "checking": "Sprawdzanie…",
+      "upToDate": "Masz najnowszą wersję.",
+      "available": "Wersja {{version}} jest dostępna i jest pobierana.",
+      "ready": "Wersja {{version}} jest gotowa do instalacji.",
+      "throttled": "Sprawdzano zbyt niedawno. Spróbuj ponownie za kilka minut.",
+      "unsupported": "Ta przeglądarka nie obsługuje sprawdzania aktualizacji z tego miejsca. Rozszerzenie zaktualizuje się automatycznie.",
+      "updateNow": "Aktualizuj teraz",
+      "applying": "Aktualizowanie…",
+      "confirmTitle": "Zaktualizować do {{version}}?",
+      "confirmContent": "Rozszerzenie uruchomi się ponownie, a ta strona zostanie przeładowana. Pozostałe otwarte karty Gemini, AI Studio lub ChatGPT trzeba będzie potem odświeżyć.",
+      "notReady": "Pobieranie jeszcze się nie zakończyło. Spróbuj ponownie za chwilę albo pozwól przeglądarce zainstalować je samodzielnie.",
+      "checkFailed": "Nie udało się sprawdzić aktualizacji.",
+      "applyFailed": "Nie udało się zastosować aktualizacji.",
+      "toastTitle": "Better Sidebar {{version}} jest gotowy",
+      "dismiss": "Zamknij"
+    }
   },
   "sponsor": {
     "title": "Udostępnij znajomym",
@@ -595,7 +615,10 @@
     "title": "Lepszy pasek boczny",
     "description": "Skonfiguruj platformy, na których aktywny jest Lepszy pasek boczny. Wyłączenie platformy spowoduje całkowite zatrzymanie działania rozszerzenia w tej witrynie.",
     "platforms": "Obsługiwane platformy",
-    "enablePlatform": "Włącz na {{platform}}"
+    "enablePlatform": "Włącz na {{platform}}",
+    "badgeSupporter": "Wspierający",
+    "badgePower": "Członek Power",
+    "badgeThanks": "Dziękujemy za wspieranie Better Sidebar"
   },
   "feedback": {
     "title": "Skontaktuj się",
@@ -619,6 +642,8 @@
     "placeholder": "Wyszukiwanie pełnotekstowe",
     "wholeWord": "Dopasuj całe słowo",
     "matchCase": "Dopasuj wielkość liter",
+    "useRegex": "Użyj wyrażenia regularnego",
+    "invalidRegex": "Nieprawidłowe wyrażenie regularne: {{error}}",
     "copyAsText": "Kopiuj jako tekst",
     "copyAsMarkdown": "Kopiuj jako przeceny",
     "foldersToInclude": "foldery do uwzględnienia",
@@ -634,6 +659,9 @@
     "noResults": "Nie znaleziono wyników dla „{{query}}”",
     "messagePreview": "Podgląd wiadomości",
     "jumpToConversation": "Przeskocz do czatu",
+    "jumpLoadingEarlier": "Wczytywanie wcześniejszych wiadomości, aby znaleźć tę...",
+    "jumpNotFound": "Nie znaleziono tej wiadomości na stronie. Może znajdować się wyżej, przewiń w górę, aby wczytać więcej.",
+    "jumpStop": "Zatrzymaj",
     "searching": "Wyszukiwanie...",
     "resultsSummary": "{{count}} wyników w {{files}} czatach",
     "whyNoOlder": "Dlaczego nie mogę znaleźć starszych czatów?",
@@ -838,8 +866,6 @@
     "sidebarWidth": "Pasek boczny Szerokość",
     "chatContentWidth": "Szerokość treści czatu",
     "inputBoxWidth": "Szerokość pola wejściowego",
-    "tableAutoWidth": "Automatyczna szerokość tabeli",
-    "tableAutoWidthDesc": "Usuń ograniczenie maksymalnej szerokości tabeli, aby tabele były renderowane z pełną dostępną szerokością",
     "elementVisibility": "Widoczność elementów",
     "geminiLogo": "Logo Gemini",
     "geminiLogoDesc": "Przełącz widoczność logo Gemini w lewym górnym rogu",
@@ -895,6 +921,8 @@
     "autoHideInputDesc": "Ukryj pole wprowadzania, dopóki nie najedziesz kursorem na dolny obszar",
     "autoHideRunSettings": "Zwiń domyślne ustawienia uruchamiania",
     "autoHideRunSettingsDesc": "Panel ustawień uruchamiania pozostaje zwinięty podczas otwierania czatu, w razie potrzeby rozwiń go ręcznie",
+    "smartScrollbar": "Inteligentny pasek przewijania",
+    "smartScrollbarDesc": "Pokaż nawigację po rozmowie po prawej stronie",
     "slashCommand": "Polecenia z ukośnikiem",
     "slashCommandDesc": "Wpisz /, aby szybko wstawić podpowiedzi z biblioteki",
     "agentTrigger": "Wyzwalacz agenta",
@@ -1028,7 +1056,9 @@
     "copyResponse": "Kopiuj odpowiedź",
     "expandAll": "Rozwiń wszystko",
     "collapseAll": "Zwiń wszystko",
-    "navigate": "Przejdź do wiadomość"
+    "navigate": "Przejdź do wiadomość",
+    "popOut": "Odłącz",
+    "dockBack": "Przypnij z powrotem do paska bocznego"
   },
   "firstInstall": {
     "title": "Importuj listę rozmów?",
