@@ -131,7 +131,7 @@ export const UpdateAction = ({
   if (state.kind === 'available' || state.kind === 'applying') {
     const applying = state.kind === 'applying';
     return (
-      <Button size="sm" className="shrink-0 gap-1.5" onClick={onApply} disabled={applying}>
+      <Button size="sm" className="-mr-1 shrink-0 gap-1.5" onClick={onApply} disabled={applying}>
         {applying && <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />}
         {applying ? t('about.update.applying') : t('about.update.updateNow')}
       </Button>
@@ -142,8 +142,8 @@ export const UpdateAction = ({
   return (
     <Button
       size="sm"
-      variant="outline"
-      className="shrink-0 gap-1.5"
+      variant="ghost"
+      className="-mr-2 shrink-0 gap-1.5 text-muted-foreground hover:text-foreground"
       onClick={onCheck}
       disabled={checking}
     >
