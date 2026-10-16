@@ -1,114 +1,49 @@
-import { parseStreamingResponse, extractWrbFrPayloads } from '../lib/response-parser';
-import { parseBatchExecuteRequest } from '../lib/request-parser';
+import type { RpcCall } from '../lib/batchexecute';
 import { classifyChatParentId } from '@/shared/lib/gemini-context';
 import { trace } from '@/shared/lib/trace';
 
-export function handleListChatResponse(response: any, url: string) {
-  if (response.status === 200) {
-    // Parse Request
-    try {
-        const requestBody = response.config?.body;
-        const requestData = requestBody || response.config?.data;
-        if (requestData && typeof requestData === 'string') {
-            const parsedBody = parseBatchExecuteRequest(requestData);
-            trace('Better Sidebar (Gemini): Parsed List Chat Request:', parsedBody);
-        }
-    } catch (e) {
-        console.error('Better Sidebar (Gemini): Error handling list chat request', e);
-    }
+/**
+ * `MaZiqc` — a page of the chat list.
+ *
+ * Response `[_, _, [item, …]]`, each item
+ * `["c_<id>", "<title>", _, _, _, [seconds, nanos], _, <parent id>, …]`:
+ *
+ * - `[5]` is the LAST ACTIVE time, not creation. The list exposes no creation
+ *   timestamp at all, so never map this into `created_at` downstream.
+ * - `[7]` is the parent when the chat belongs to a gem or a notebook; notebook ids
+ *   arrive as `notebooks/<uuid>`.
+ */
+export function handleListChat(call: RpcCall): void {
+  const list = (call.response as any)?.[2];
+  const items: Record<string, unknown>[] = [];
 
-    let responseBody = response.response;
-    
-    if (typeof responseBody !== 'string') {
-       try {
-         responseBody = JSON.stringify(responseBody);
-       } catch (e) {
-         console.warn('Better Sidebar (Gemini): Could not stringify response body', e);
-         return;
-       }
-    }
+  if (Array.isArray(list)) {
+    for (const chat of list) {
+      const id = chat?.[0];
+      if (typeof id !== 'string' || !id) continue;
 
-    try {
-      const retChunks = parseStreamingResponse(responseBody);
-      const chunks = retChunks.map(chunk => chunk[0]);
-      
-      trace('Better Sidebar (Gemini): List Chat chunks:', chunks);
-
-      if (chunks.length > 0) {
-        const items: any[] = [];
-        
-        // Use common helper to extract payloads
-        const payloads = extractWrbFrPayloads(chunks);
-        trace('Better Sidebar (Gemini): WrbFrPayloads:', payloads)
-        for (const payload of payloads) {
-            try {
-                // User says: payload[2] is the list
-                // Use try-catch/optional chaining to simplify
-                const chatList = payload?.[2];
-                
-                if (Array.isArray(chatList)) {
-                     for (const chatItem of chatList) {
-                         try {
-                             // Example item: ["id","Title",null,null,null,[1770271826,895639000],...]
-                             const id = chatItem?.[0];
-                             const title = chatItem?.[1];
-                             // chatItem[5] is a [seconds, nanos] tuple holding the
-                             // LAST ACTIVE time, not the creation time. Gemini's list
-                             // endpoint does not expose a creation timestamp at all,
-                             // so never map this into `created_at` downstream.
-                             let lastActiveAtSeconds = null;
-
-                             const timeArr = chatItem?.[5];
-                             if (Array.isArray(timeArr) && timeArr.length > 0) {
-                                 lastActiveAtSeconds = timeArr[0];
-                             }
-                             
-                             if (id) {
-                                // chatItem[7] holds the parent id when this chat
-                                // belongs to a gem OR a notebook. Notebook ids
-                                // are transmitted as `notebooks/<uuid>`.
-                                const { gemId, notebookId } = classifyChatParentId(
-                                    chatItem?.[7],
-                                );
-                                let type: string;
-                                if (notebookId) type = 'notebook';
-                                else if (gemId) type = 'gem';
-                                else type = 'conversation';
-                                items.push({
-                                    id: id.replace(/^c_/, ''),
-                                    title,
-                                    last_active_at: lastActiveAtSeconds,
-                                    type,
-                                    gem_id: gemId,
-                                    notebook_id: notebookId,
-                                });
-                             }
-                         } catch (itemErr) {
-                             // ignore individual item error
-                         }
-                     }
-                }
-            } catch (payloadErr) {
-                // ignore payload error
-            }
-        }
-        
-        if (items.length > 0) {
-            console.log(`Better Sidebar (Gemini): Parsed ${items.length} chats`);
-            trace('Better Sidebar (Gemini): Parsed chats:', items);
-        }
-
-        globalThis.dispatchEvent(
-          new CustomEvent('GEMINI_LIST_CHAT_RESPONSE', {
-            detail: {
-              items, // The parsed list of chats
-              originalUrl: url
-            }
-          })
-        );
-      }
-    } catch (e) {
-      console.error('Better Sidebar (Gemini): Error handling list chat response', e);
+      const time = chat?.[5];
+      const { gemId, notebookId } = classifyChatParentId(chat?.[7]);
+      items.push({
+        id: id.replace(/^c_/, ''),
+        title: chat?.[1],
+        last_active_at: Array.isArray(time) && time.length > 0 ? time[0] : null,
+        type: notebookId ? 'notebook' : gemId ? 'gem' : 'conversation',
+        gem_id: gemId,
+        notebook_id: notebookId,
+      });
     }
   }
+
+  if (items.length > 0) {
+    console.log(`Better Sidebar (Gemini): Parsed ${items.length} chats`);
+    trace('Better Sidebar (Gemini): Parsed chats:', items);
+  }
+
+  // Dispatched even when empty: an empty page is still an answer the scanner waits on.
+  globalThis.dispatchEvent(
+    new CustomEvent('GEMINI_LIST_CHAT_RESPONSE', {
+      detail: { items, originalUrl: call.url },
+    }),
+  );
 }

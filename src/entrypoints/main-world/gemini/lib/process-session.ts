@@ -19,7 +19,7 @@
  * ## Downlink (`RID=rpc`, long-lived GET)
  *
  * `<len>\n[[seq,["<b64>"]],…]` repeated. `len` counts bytes, so frames are found by
- * bracket depth instead (same reasoning as `stream-generate.ts`). Each b64 payload:
+ * bracket depth instead (UTF-8 byte counts vs UTF-16 strings). Each b64 payload:
  *
  * ```
  * .2.7.1.1              1 on the frame where the reply finished

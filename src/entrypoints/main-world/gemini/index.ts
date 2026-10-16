@@ -1,21 +1,54 @@
+/**
+ * Gemini main-world entry: taps the page's own traffic and hands each exchange to the
+ * code that understands it.
+ *
+ * Two endpoints matter, and transport is decided here and nowhere else:
+ *
+ *   batchexecute     every RPC except generation. Normalised to {url, status,
+ *                    request, response} and dispatched by rpcid in
+ *                    `interceptors/rpc-handlers.ts`. Sent via fetch since the
+ *                    2026-10 web build, via XHR before — both are tapped.
+ *   processSession   generation (WebChannel + protobuf, XHR). Streams, so it is
+ *                    observed from the request onward, not on completion —
+ *                    `interceptors/process-session.ts`.
+ */
+
 import { proxy } from 'ajax-hook';
-import { handleGenerateResponse } from './interceptors/generate';
-import { observeStreamGenerate } from './interceptors/stream-generate';
 import { isProcessSessionUrl, observeProcessSession } from './interceptors/process-session';
-import { handleChatContentResponse } from './interceptors/chat-content';
-import { handleListChatResponse } from './interceptors/list-chat';
-import { handleDeleteResponse } from './interceptors/delete';
-import { handleCNgdBeResponse } from './interceptors/create-gem';
-import { handleRenameResponse } from './interceptors/rename';
-import { handleBranchResponse } from './interceptors/branch';
-import { handleDeleteGemResponse } from './interceptors/delete-gem';
-import { handleDeleteNotebookResponse } from './interceptors/delete-notebook';
-import { handleRenameNotebookResponse } from './interceptors/rename-notebook';
-import { handleCreateNotebookResponse } from './interceptors/create-notebook';
+import { observeBatchExecute } from './interceptors/rpc-handlers';
 import { handleDownloadResponse } from './interceptors/download';
 import { geminiRequestBuilder } from './lib/request-builder';
 import { nativeFetch } from './lib/native-fetch';
+import { tapFetch } from './lib/fetch-tap';
 import { initGeminiBackfillFetcher } from './lib/backfill-fetcher';
+
+const isBatchExecute = (url: string | undefined) => !!url && url.includes('/data/batchexecute');
+
+/** Both transports end here. */
+function onBatchExecute(exchange: {
+  url: string;
+  status: number;
+  requestBody: unknown;
+  requestHeaders: Record<string, string>;
+  responseText: unknown;
+}): void {
+  try {
+    geminiRequestBuilder.learn(
+      exchange.url,
+      exchange.requestHeaders,
+      typeof exchange.requestBody === 'string' ? exchange.requestBody : undefined,
+    );
+  } catch {
+    // Learning is best-effort; the request builder only needs one good sample.
+  }
+  if (typeof exchange.responseText !== 'string') return;
+  observeBatchExecute({
+    url: exchange.url,
+    status: exchange.status,
+    requestBody: exchange.requestBody,
+    responseText: exchange.responseText,
+  });
+}
 
 export function initGeminiInterceptors() {
   console.log('Better Sidebar: Main World Script (Gemini) Initialized');
@@ -46,46 +79,21 @@ export function initGeminiInterceptors() {
     }
   });
 
-  const originalFetch = nativeFetch;
   window.fetch = function (input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
     const url =
-      typeof input === 'string'
-        ? input
-        : input instanceof URL
-          ? input.href
-          : (input as Request).url;
+      typeof input === 'string' ? input : input instanceof URL ? input.href : (input as Request).url;
 
     if (/lh3\.googleusercontent\.com\/rd-gg(?:-dl)?\//.test(url)) {
-      return handleDownloadResponse(url, originalFetch);
+      return handleDownloadResponse(url, nativeFetch);
     }
-
-    // Since the 2026-10 web build, batchexecute goes through fetch rather than XHR,
-    // so ajax-hook never sees it. Same handlers, fed from here.
-    if (url.includes('/data/batchexecute')) {
-      return interceptBatchExecuteFetch(input, init, url, originalFetch);
+    if (isBatchExecute(url)) {
+      return tapFetch(input, init, url, nativeFetch, onBatchExecute);
     }
-
-    return originalFetch(input, init);
+    return nativeFetch(input, init);
   };
 
   proxy({
     onRequest: (config, handler) => {
-      // Learn params from batchexecute over XHR (older builds; current builds use
-      // fetch, handled in interceptBatchExecuteFetch).
-      if (config.url?.includes('batchexecute')) {
-        try {
-          geminiRequestBuilder.learn(
-            config.url,
-            (config.headers as Record<string, string>) || {},
-            typeof config.body === 'string' ? config.body : undefined,
-          );
-        } catch {
-          // non-critical
-        }
-      }
-
-      // Current generation transport (since the 2026-10 web build): WebChannel +
-      // protobuf. Emits GENERATE_START, MODEL_STREAM and the DB events itself.
       if (isProcessSessionUrl(config.url)) {
         try {
           observeProcessSession(config.url, config.body, config.xhr);
@@ -93,149 +101,23 @@ export function initGeminiInterceptors() {
           console.warn('Better Sidebar (Gemini): could not observe processSession', e);
         }
       }
-
-      // Legacy transport, kept while Gemini may still serve it to some users.
-      if (config.url?.includes('StreamGenerate')) {
-        globalThis.dispatchEvent(
-          new CustomEvent('BETTER_SIDEBAR_GENERATE_START'),
-        );
-
-        // Read the reply as it streams, not in `onResponse`. `handleGenerateResponse`
-        // still runs there and still writes the transcript; this is the lossless copy
-        // the agent loop parses instead of the rendered DOM — see
-        // `interceptors/stream-generate.ts`.
-        if (config.xhr) {
-          try {
-            observeStreamGenerate(config.xhr, config.body);
-          } catch (e) {
-            // The live view is an improvement on the response path, not a
-            // prerequisite for it. Losing it must not cost us the transcript.
-            console.warn('Better Sidebar (Gemini): could not observe stream', e);
-          }
-        }
-      }
-
       handler.next(config);
     },
     onError: (err, handler) => {
-      console.error('Better Sidebar: Request Error', err);
       handler.next(err);
     },
     onResponse: (response, handler) => {
-      const url = response.config.url;
-
-      try {
-        if (url.includes('StreamGenerate')) {
-          handleGenerateResponse(response, url);
-        } else if (url.includes('batchexecute')) {
-          routeBatchExecute(response, url);
-        }
-      } catch (e) {
-        console.error('Better Sidebar: Error in Gemini interception handler', e);
+      const { config } = response;
+      if (isBatchExecute(config.url)) {
+        onBatchExecute({
+          url: config.url,
+          status: response.status,
+          requestBody: config.body,
+          requestHeaders: (config.headers as Record<string, string>) || {},
+          responseText: response.response,
+        });
       }
-
       handler.next(response);
     },
   });
-}
-
-/**
- * The shape the batchexecute handlers read. Matches ajax-hook's response object so the
- * fetch path and the XHR path feed the same code.
- */
-interface InterceptedResponse {
-  status: number;
-  response: string;
-  config: { url: string; body?: string; headers?: Record<string, string> };
-}
-
-function routeBatchExecute(response: InterceptedResponse | any, url: string): void {
-  if (url.includes('rpcids=hNvQHb')) {
-    handleChatContentResponse(response, url);
-  } else if (url.includes('rpcids=MaZiqc')) {
-    handleListChatResponse(response, url);
-  } else if (url.includes('rpcids=GzXR5e')) {
-    handleDeleteResponse(response, url);
-  } else if (url.includes('rpcids=CNgdBe')) {
-    handleCNgdBeResponse(response, url);
-  } else if (url.includes('rpcids=MUAZcd')) {
-    handleRenameResponse(response, url);
-  } else if (url.includes('rpcids=KDNZr')) {
-    handleBranchResponse(response, url);
-  } else if (url.includes('rpcids=UXcSJb')) {
-    handleDeleteGemResponse(response, url);
-  } else if (url.includes('rpcids=Nwkn9')) {
-    handleDeleteNotebookResponse(response, url);
-  } else if (url.includes('rpcids=kHv0Vd')) {
-    handleRenameNotebookResponse(response, url);
-  } else if (url.includes('rpcids=oMH3Zd')) {
-    handleCreateNotebookResponse(response, url);
-  }
-}
-
-async function readRequestBody(input: RequestInfo | URL, init?: RequestInit): Promise<string | undefined> {
-  const body = init?.body;
-  if (typeof body === 'string') return body;
-  if (body instanceof URLSearchParams) return body.toString();
-  if (body == null && input instanceof Request) return input.clone().text();
-  return undefined;
-}
-
-function headersToRecord(input: RequestInfo | URL, init?: RequestInit): Record<string, string> {
-  const out: Record<string, string> = {};
-  const add = (h: HeadersInit | undefined) => {
-    if (!h) return;
-    new Headers(h).forEach((v, k) => {
-      out[k] = v;
-    });
-  };
-  if (input instanceof Request) add(input.headers);
-  add(init?.headers);
-  return out;
-}
-
-function interceptBatchExecuteFetch(
-  input: RequestInfo | URL,
-  init: RequestInit | undefined,
-  url: string,
-  originalFetch: typeof fetch,
-): Promise<Response> {
-  // Read the body before the request is sent: a Request's body can only be read once,
-  // so this works on a clone, and the clone must be taken before fetch consumes it.
-  let bodyPromise: Promise<string | undefined>;
-  try {
-    bodyPromise = readRequestBody(input, init).catch(() => undefined);
-  } catch {
-    bodyPromise = Promise.resolve(undefined);
-  }
-  const headers = headersToRecord(input, init);
-
-  const resPromise = originalFetch(input, init);
-  // Registered before the page gets the promise back, so this reaction runs first and
-  // clones while the body is still unread. Cloning any later races the page's own read.
-  const clonePromise = resPromise.then((res) => res.clone());
-
-  // Observe on the side; the page gets its Response untouched and unawaited.
-  void (async () => {
-    const body = await bodyPromise;
-    try {
-      geminiRequestBuilder.learn(url, headers, body);
-    } catch {
-      // non-critical
-    }
-    let res: Response;
-    try {
-      res = await clonePromise;
-    } catch {
-      return;
-    }
-    try {
-      const text = await res.text();
-      routeBatchExecute({ status: res.status, response: text, config: { url, body, headers } }, url);
-    } catch (e) {
-      console.error('Better Sidebar: Error in Gemini fetch interception handler', e);
-    }
-  })();
-
-  return resPromise;
 }

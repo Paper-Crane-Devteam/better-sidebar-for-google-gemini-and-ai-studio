@@ -37,7 +37,7 @@ export const GEMINI_SELECTORS = {
    *
    * `temp-chat-on` marks the toggle while the chat is still empty, but Gemini
    * drops the class as soon as the first message is sent — which is *before* the
-   * StreamGenerate response we need to classify arrives. Checking only that class
+   * generation response we need to classify arrives. Checking only that class
    * would therefore report false at the one moment it matters.
    *
    * `.temporary-chat-header` is the banner Gemini renders for the duration of an

@@ -1,9 +1,9 @@
 /**
  * Captures Gemini turns sent over the WebChannel `processSession` protocol.
  *
- * Does the job `generate.ts` (DB write) and `stream-generate.ts` (live stream for the
- * agent loop) did for `StreamGenerate`, which the 2026-10 web build stopped using.
- * Wire format and field paths: `lib/process-session.ts`.
+ * Writes each turn to the DB and feeds the live stream the agent loop reads. Replaced
+ * the `StreamGenerate` interceptors when the 2026-10 web build stopped using that
+ * endpoint. Wire format and field paths: `lib/process-session.ts`.
  *
  * A WebChannel session is several XHRs sharing one `gsessionid`: forward-channel POSTs
  * carrying the prompt, and one long-lived `RID=rpc` back channel carrying the reply.
