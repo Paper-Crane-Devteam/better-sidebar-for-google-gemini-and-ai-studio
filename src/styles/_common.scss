@@ -112,6 +112,59 @@
     box-shadow: 0 0 0 1px rgb(var(--border));
   }
 
+  /* Supporter rim. A hairline ring sat 1px off the photo, drawn with a masked
+     ::after so the gap is truly transparent — frosted presets keep showing the
+     panel through it, which a box-shadow "gap" in a fixed colour would not.
+     Support Pack gets a solid ring in the theme's warm --highlight accent;
+     Power Pack gets the same ring swept into --ring, so the two read as one
+     family with the higher tier a shade richer. Kept quiet on purpose: it is a
+     thank-you, not a badge. */
+  .sidebar-avatar-frame {
+    position: relative;
+    display: inline-flex;
+    border-radius: 9999px;
+  }
+
+  .sidebar-avatar-frame[data-supporter] .sidebar-avatar {
+    // The rim already separates the photo from the panel.
+    box-shadow: none;
+  }
+
+  .sidebar-avatar-frame[data-supporter]::after {
+    content: '';
+    position: absolute;
+    inset: -2.5px;
+    padding: 1.5px;
+    border-radius: inherit;
+    pointer-events: none;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+    opacity: 0.8;
+    transition: opacity 0.15s ease;
+  }
+
+  .sidebar-avatar-frame[data-supporter='support']::after {
+    background: rgb(var(--highlight));
+  }
+
+  .sidebar-avatar-frame[data-supporter='power']::after {
+    background: conic-gradient(
+      from 200deg,
+      rgb(var(--highlight)),
+      rgb(var(--ring)),
+      rgb(var(--highlight))
+    );
+  }
+
+  button:is(:hover, :focus-visible, [data-state='open']) > .sidebar-avatar-frame[data-supporter]::after {
+    opacity: 1;
+  }
+
   * {
     @apply border-border;
   }

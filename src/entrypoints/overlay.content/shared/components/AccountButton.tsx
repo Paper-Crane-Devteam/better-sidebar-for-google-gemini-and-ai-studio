@@ -27,6 +27,24 @@ import {
 } from '@/shared/lib/dom-selectors';
 import { clickHiddenNativeElement } from '@/shared/lib/native-anchor-click';
 import { readAiStudioAccount } from '@/entrypoints/content/shared/detect-account';
+import {
+  isLicenseValid,
+  useLicenseStore,
+  type LicenseState,
+} from '@/shared/lib/license-store';
+
+/**
+ * Which supporter rim, if any, the avatar wears. `pro` folds into `power` —
+ * it is a superset, and a third visual tier would be noise at this size.
+ */
+type SupporterTier = 'support' | 'power' | null;
+
+function selectSupporterTier(state: LicenseState): SupporterTier {
+  if (!isLicenseValid(state)) return null;
+  if (state.tier === 'support_pack') return 'support';
+  if (state.tier === 'power_pack' || state.tier === 'pro') return 'power';
+  return null;
+}
 
 export interface AccountButtonConfig {
   /** Selector for the native `<img>` holding the signed-in user's avatar. */
@@ -119,6 +137,7 @@ export const AccountButton = ({ config, className }: AccountButtonProps) => {
     readNativeAccount(config),
   );
   const [imageBroken, setImageBroken] = useState(false);
+  const supporterTier = useLicenseStore(selectSupporterTier);
 
   useEffect(() => {
     const sample = () => {
@@ -143,9 +162,20 @@ export const AccountButton = ({ config, className }: AccountButtonProps) => {
   if (account.state === 'unavailable') return null;
 
   const signedOut = account.state === 'signedOut';
-  const label = signedOut
+  const baseLabel = signedOut
     ? t('tooltip.signIn')
     : account.name || t('tooltip.account');
+  // The rim is only shown on a real avatar, so the tooltip only names the pack
+  // in that same case — otherwise it would describe something not on screen.
+  const showSupporterRim =
+    !signedOut && !!account.avatarUrl && !imageBroken && !!supporterTier;
+  const label = showSupporterRim
+    ? `${baseLabel} · ${t(
+        supporterTier === 'power'
+          ? 'packs.powerPackTitle'
+          : 'packs.supportPackTitle',
+      )}`
+    : baseLabel;
 
   const handleClick = () => {
     const target = queryFirst(
@@ -172,14 +202,19 @@ export const AccountButton = ({ config, className }: AccountButtonProps) => {
         aria-label={label}
       >
         {!signedOut && account.avatarUrl && !imageBroken ? (
-          <img
-            src={account.avatarUrl}
-            alt=""
-            draggable={false}
-            referrerPolicy="no-referrer"
-            onError={() => setImageBroken(true)}
-            className="sidebar-avatar"
-          />
+          <span
+            className="sidebar-avatar-frame"
+            data-supporter={showSupporterRim ? supporterTier : undefined}
+          >
+            <img
+              src={account.avatarUrl}
+              alt=""
+              draggable={false}
+              referrerPolicy="no-referrer"
+              onError={() => setImageBroken(true)}
+              className="sidebar-avatar"
+            />
+          </span>
         ) : (
           // Two cases land here: signed out, and signed in with an avatar that
           // has not arrived yet. Both get the same person-in-a-circle glyph — it
