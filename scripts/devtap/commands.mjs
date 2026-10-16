@@ -1,6 +1,6 @@
 /** devtap subcommands. Each takes the parsed flags and prints or writes. */
 
-import { appendFileSync, mkdirSync } from 'node:fs';
+import { appendFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 
 import { attach, evaluate } from './cdp.mjs';
@@ -23,6 +23,7 @@ import {
   sendExtensionMessage,
 } from './probe.mjs';
 
+import { reloadHostTabs } from '../dev-reload.mjs';
 const DEFAULT_LOG_DIR = '.kiro/devlog';
 
 /**
@@ -449,4 +450,52 @@ export async function cmdSnapshot(flags) {
   } finally {
     opened.close();
   }
+}
+
+/**
+ * Rebuild every entrypoint, reload the extension, then reload the host tabs.
+ *
+ * Goes through the dev server's POST /__dev/reload (scripts/dev-reload.mjs), so
+ * the output on disk is guaranteed fresh. If the dev server is not reachable it
+ * falls back to `runtime.reload()` in the background plus a tab reload, which
+ * only helps when the build was already up to date.
+ */
+export async function cmdReload(flags) {
+  const tabs = !flags['no-tabs'];
+  let origin = 'http://localhost:3000';
+  let endpoint = '/__dev/reload';
+  try {
+    const info = JSON.parse(readFileSync(resolve('.wxt/dev-server.json'), 'utf8'));
+    origin = info.origin || origin;
+    endpoint = info.endpoint || endpoint;
+  } catch {
+    /* dev server never wrote it; use the WXT default */
+  }
+  const url = `${origin}${endpoint}${tabs ? '' : '?tabs=0'}`;
+  const res = await fetch(url, { method: 'POST' }).catch(() => null);
+  if (res) {
+    const body = await res.json().catch(() => ({ ok: false, error: `HTTP ${res.status}` }));
+    if (!body.ok) throw new Error(`Dev server reload failed: ${body.error}`);
+    const note = body.tabs?.note ? ` (${body.tabs.note})` : '';
+    process.stdout.write(
+      `rebuilt + reloaded extension in ${body.ms}ms, reloaded ${body.tabs?.reloaded ?? 0} tab(s)${note}\n`,
+    );
+    return;
+  }
+
+  process.stdout.write(`dev server not reachable at ${origin}; falling back to runtime.reload()\n`);
+  const { roots } = await discover(flags.port);
+  const bg = pickBackground(roots);
+  const session = await attach(bg.target);
+  try {
+    // The worker dies mid-call, so the evaluate never answers; do not wait on it.
+    session.post('Runtime.evaluate', { expression: 'chrome.runtime.reload()' });
+    await new Promise((r) => setTimeout(r, 1500));
+  } finally {
+    session.close();
+  }
+  const tabResult = tabs ? await reloadHostTabs(flags.port) : { reloaded: 0 };
+  process.stdout.write(
+    `reloaded extension (build not refreshed), reloaded ${tabResult.reloaded} tab(s)\n`,
+  );
 }

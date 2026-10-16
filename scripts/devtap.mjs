@@ -30,6 +30,8 @@
  *   msg <TYPE> [payloadJson]      Send an extension message, print the reply
  *   state                         Background storage, contexts, alarms
  *   snapshot                      All of the above into one file
+ *   reload [--no-tabs]            Rebuild all entrypoints via the dev server,
+ *                                 reload the extension and Gemini / AI Studio tabs
  *
  * Context labels:
  *   bg     background service worker
@@ -79,6 +81,7 @@ import {
   cmdEval,
   cmdLogs,
   cmdMsg,
+  cmdReload,
   cmdSnapshot,
   cmdSql,
   cmdState,
@@ -95,6 +98,7 @@ const COMMANDS = {
   msg: cmdMsg,
   state: cmdState,
   snapshot: cmdSnapshot,
+  reload: cmdReload,
 };
 
 const HELP = `devtap — read the running extension from the command line
@@ -107,6 +111,7 @@ const HELP = `devtap — read the running extension from the command line
   msg <TYPE> [json]           send an extension message
   state                       background storage / contexts / alarms
   snapshot                    everything, into one file
+  reload [--no-tabs]          rebuild + reload extension + host tabs
 
 contexts: bg  off  dbw  docw  gem  ais   (page logs are tagged gem/main, gem/ext)
 

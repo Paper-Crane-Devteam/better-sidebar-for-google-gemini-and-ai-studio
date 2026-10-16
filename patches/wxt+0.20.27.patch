@@ -1,0 +1,75 @@
+diff --git a/node_modules/wxt/dist/core/create-server.mjs b/node_modules/wxt/dist/core/create-server.mjs
+index b82dde6..db8ce70 100644
+--- a/node_modules/wxt/dist/core/create-server.mjs
++++ b/node_modules/wxt/dist/core/create-server.mjs
+@@ -69,6 +69,7 @@ async function createServerInternal() {
+ 			});
+ 			await buildAndOpenBrowser();
+ 			const reloadOnChange = createFileReloader(server);
++			server.forceReload = reloadOnChange.forceReload;
+ 			server.watcher.on("all", async (...args) => {
+ 				await reloadOnChange(args[0], args[1]);
+ 				keyboardShortcuts.start();
+diff --git a/node_modules/wxt/dist/core/utils/create-file-reloader.mjs b/node_modules/wxt/dist/core/utils/create-file-reloader.mjs
+index a6b400d..a2556e5 100644
+--- a/node_modules/wxt/dist/core/utils/create-file-reloader.mjs
++++ b/node_modules/wxt/dist/core/utils/create-file-reloader.mjs
+@@ -9,7 +9,7 @@ import "./building/index.mjs";
+ import { isBabelSyntaxError, logBabelSyntaxError } from "./syntax-errors.mjs";
+ import { relative } from "node:path";
+ import { styleText } from "node:util";
+-import { debounce } from "perfect-debounce";
++import { groupEntrypoints } from "./building/group-entrypoints.mjs";
+ import { Mutex } from "async-mutex";
+ //#region src/core/utils/create-file-reloader.ts
+ /**
+@@ -19,8 +19,11 @@ import { Mutex } from "async-mutex";
+ function createFileReloader(server) {
+ 	const fileChangedMutex = new Mutex();
+ 	const changeQueue = [];
+-	const cb = async (event, path) => {
+-		changeQueue.push([event, path]);
++	// [better-sidebar patch] Upstream wraps this in a leading-only debounce and
++	// pushes to changeQueue *inside* the debounced fn, so every change that lands
++	// within watchDebounce of the first one is dropped and never rebuilt. Queue
++	// every event, then run one trailing pass.
++	const cb = async () => {
+ 		await fileChangedMutex.runExclusive(async () => {
+ 			if (server.currentOutput == null) return;
+ 			const fileChanges = changeQueue.splice(0, changeQueue.length).map(([_, file]) => file);
+@@ -64,10 +67,32 @@ function createFileReloader(server) {
+ 			logBabelSyntaxError(error);
+ 		});
+ 	};
+-	return debounce(cb, wxt.config.dev.server.watchDebounce, {
+-		leading: true,
+-		trailing: false
++	let timer;
++	let waiting = [];
++	const onChange = (event, path) => {
++		changeQueue.push([event, path]);
++		clearTimeout(timer);
++		return new Promise((resolve) => {
++			waiting.push(resolve);
++			timer = setTimeout(() => {
++				const run = cb();
++				waiting.splice(0).forEach((r) => r(run));
++			}, wxt.config.dev.server.watchDebounce);
++		});
++	};
++	/** [better-sidebar patch] Rebuild every entrypoint and reload the extension. */
++	onChange.forceReload = () => fileChangedMutex.runExclusive(async () => {
++		if (server.currentOutput == null) throw new Error("Initial build has not finished yet");
++		changeQueue.splice(0, changeQueue.length);
++		wxt.logger.info("Manual reload: rebuilding all entrypoints...");
++		await wxt.reloadConfig();
++		const allEntrypoints = await findEntrypoints();
++		const { output } = await rebuild(allEntrypoints, groupEntrypoints(allEntrypoints), void 0);
++		server.currentOutput = output;
++		server.reloadExtension();
++		wxt.logger.success("Manual reload: rebuilt and reloaded extension");
+ 	});
++	return onChange;
+ }
+ /**
+ * From the server, tell the client to reload content scripts from the provided

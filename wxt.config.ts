@@ -1,11 +1,15 @@
 import { defineConfig } from 'wxt';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import path from 'node:path';
+import { devReload } from './scripts/dev-reload.mjs';
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   srcDir: 'src',
   modules: ['@wxt-dev/module-react'],
+  // Manual rebuild + reload: `r` + Enter in the dev terminal, or
+  // `npm run devtap reload`. See scripts/dev-reload.mjs.
+  hooks: devReload.hooks,
   manifest: ({ browser: targetBrowser }) => ({
     name: '__MSG_extensionName__',
     description: '__MSG_extensionDescription__',
@@ -110,6 +114,7 @@ export default defineConfig({
   },
   vite: (env) => ({
     plugins: [
+      devReload.vitePlugin(),
       viteStaticCopy({
         targets: [
           // Modern build only. The legacy build ships core-js polyfills that the

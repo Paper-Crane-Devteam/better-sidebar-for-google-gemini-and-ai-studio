@@ -22,6 +22,7 @@ const BOOLEAN_FLAGS = new Set([
   'quiet',
   'noise',
   'write',
+  'no-tabs',
 ]);
 
 /**

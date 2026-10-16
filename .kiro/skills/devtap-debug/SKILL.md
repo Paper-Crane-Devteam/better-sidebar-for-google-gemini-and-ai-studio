@@ -50,7 +50,13 @@ node scripts/devtap.mjs watch --ctx bg    # 实时跟，阻塞，放后台跑
 node scripts/devtap.mjs sql "SELECT ..."  # 查库
 node scripts/devtap.mjs eval bg '<expr>'  # 在任意 context 执行 JS，支持顶层 await
 node scripts/devtap.mjs msg GET_FOLDERS   # 发一条扩展消息看回复
+node scripts/devtap.mjs reload            # 全量重建 + 重载扩展 + 刷新 Gemini/AI Studio 标签页
 ```
+
+改完代码、验证之前如果怀疑 dev server 没重新加载（日志里看不到新代码的输出、行为没变），
+先 `reload` 再复现。它走 dev server 的 `POST /__dev/reload`（scripts/dev-reload.mjs），
+保证磁盘上的产物是新的；`--no-tabs` 只重载扩展不刷新标签页。用户也可以在 `npm run dev`
+的终端里输入 `r` + 回车做同样的事。
 
 过滤：`--ctx bg,dbw` `--grep 'AgentLoop|DB Command'` `--level warn` `--since 2m`
 `-n 80` `--stack` `--maxval 800` `--noise`。完整说明 `head -80 scripts/devtap.mjs`。
