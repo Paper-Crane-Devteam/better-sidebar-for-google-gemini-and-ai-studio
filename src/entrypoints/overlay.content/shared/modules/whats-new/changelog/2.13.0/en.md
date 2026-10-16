@@ -73,4 +73,12 @@ Clicking an item in the outline on AI Studio now jumps to that message. The dot 
 
 ---
 
+## 💌 A Small Gift for Gemini Argon
+
+To celebrate Gemini's new Argon model, I've prepared a redeem code that unlocks all Power Pack features free for 10 days. You can redeem it any time until **October 21**, and the code is waiting in the promotions channel on **[Discord](https://discord.gg/FRzesxaGAx)**.
+
+If you run into any trouble using it, or have ideas you'd like to share, you're always welcome to find me on Discord too.
+
+---
+
 That's it for this round. Since Gemini's layout is still changing, there may be spots I haven't caught yet. If something looks off, please let me know and I'll look into it. Thanks for being here ☕
