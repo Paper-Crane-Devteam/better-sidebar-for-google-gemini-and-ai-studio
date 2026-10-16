@@ -74,6 +74,29 @@ export const messageRepo = {
     await runBatch(operations);
   },
 
+  /**
+   * Pull message timestamps that sit well past their conversation's last activity
+   * back down to it. Only meaningful for platforms whose messages carry no time of
+   * their own (AI Studio), where the timestamp is derived from `last_active_at` and
+   * goes wrong whenever that was — opening a chat used to bump it to "now", and the
+   * messages stored at that moment inherited it. The 900s slack matches
+   * BACKFILL_STALE_SLACK_SEC so ordinary live turns are left alone.
+   */
+  clampToConversationActivity: async (conversationIds: string[]): Promise<void> => {
+    if (conversationIds.length === 0) return;
+    const placeholders = conversationIds.map(() => '?').join(', ');
+    await runCommand(
+      `UPDATE messages
+       SET timestamp = (SELECT c.last_active_at FROM conversations c WHERE c.id = messages.conversation_id)
+       WHERE conversation_id IN (${placeholders})
+         AND timestamp > (
+           SELECT c.last_active_at FROM conversations c
+           WHERE c.id = messages.conversation_id AND c.last_active_at IS NOT NULL
+         ) + 900`,
+      conversationIds,
+    );
+  },
+
   getByConversationId: async (conversationId: string): Promise<Message[]> => {
     return (await runQuery(
       'SELECT * FROM messages WHERE conversation_id = ? ORDER BY order_index ASC',

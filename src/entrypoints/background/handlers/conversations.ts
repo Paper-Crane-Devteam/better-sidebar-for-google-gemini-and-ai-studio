@@ -251,6 +251,12 @@ export async function handleConversations(
           }),
         );
         await conversationRepo.bulkSave(conversationsToSave);
+        // The list carries the authoritative last-active time, which may have just
+        // pulled a wrongly bumped last_active_at back down. AI Studio messages have
+        // no time of their own and were dated from it, so bring them along.
+        if (platform === 'aistudio') {
+          await messageRepo.clampToConversationActivity(itemsToSync.map((i) => i.id));
+        }
         await notifyDataChanged('conversations', 'folders');
       }
       triggerAutoSync();
