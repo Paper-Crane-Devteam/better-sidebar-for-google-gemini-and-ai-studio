@@ -18,7 +18,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import throttle from 'lodash/throttle';
-import { useUrl } from '@/shared/hooks/useUrl';
 import { useConversationMessagesStore } from '@/shared/lib/conversation-messages-store';
 import type { SmartScrollbarItem } from '@/entrypoints/overlay.content/shared/components/smart-scrollbar/SmartScrollbarView';
 import {
@@ -62,7 +61,6 @@ const sameTurns = (a: DomTurn[], b: DomTurn[]) =>
   );
 
 export function useAIStudioTurnNodes() {
-  const { path } = useUrl();
   const messages = useConversationMessagesStore((s) => s.messages);
 
   const [scroller, setScroller] = useState<HTMLElement | null>(null);
@@ -75,25 +73,18 @@ export function useAIStudioTurnNodes() {
   }, [activeId]);
 
   // ── Resolve the scroll container (recreated on SPA navigation) ──────
+  // Polled rather than resolved once per path change: right after the URL
+  // changes the old container is still in the DOM, so a one-shot lookup grabs
+  // the element Angular is about to replace and then observes a detached node.
   useEffect(() => {
-    setTurns([]);
-    setActiveId(null);
-
-    let timer: ReturnType<typeof setTimeout> | null = null;
-    const resolve = () => {
+    const check = () => {
       const el = document.querySelector<HTMLElement>(AISTUDIO_SCROLLER_SELECTOR);
-      if (el) {
-        setScroller(el);
-        return;
-      }
-      setScroller(null);
-      timer = setTimeout(resolve, RESOLVE_RETRY_MS);
+      setScroller((prev) => (prev === el ? prev : el));
     };
-    resolve();
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [path]);
+    check();
+    const timer = setInterval(check, RESOLVE_RETRY_MS);
+    return () => clearInterval(timer);
+  }, []);
 
   // ── Active-turn detection ────────────────────────────────────────────
   const detectActive = useCallback(() => {

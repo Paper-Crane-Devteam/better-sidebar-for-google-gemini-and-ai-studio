@@ -26,57 +26,60 @@ export interface SmartScrollbarItem {
 }
 
 /**
- * Platform look. The colour tokens already follow the host page through the
- * shadow root's theme class; the variant covers shape and density — Gemini's
- * soft, roomy floating card versus AI Studio's compact Material surface
- * (8px container radius, 4px item radius, tighter rows).
+ * Platform look. The colour tokens and `--radius` already follow the host page
+ * through the shadow root's theme class; the variant covers shape and density —
+ * Gemini's roomy floating card versus AI Studio's compact, flatter surface.
  */
 export type SmartScrollbarVariant = 'gemini' | 'aistudio';
 
-interface VariantStyle {
+interface VariantStyles {
   panel: string;
-  /** Collapsed bar width */
+  /** Width of the collapsed dot bar */
   collapsedWidth: string;
-  /** Toggle button padding, collapsed / expanded */
+  /** Outline toggle button in the collapsed / expanded header */
   toggleCollapsed: string;
   toggleExpanded: string;
-  /** Outline row: outer pitch + inner highlight block */
-  row: string;
-  rowInner: string;
-  /** Dot row hit area */
-  dotRow: string;
+  icon: string;
+  /** Clickable cell around each dot */
+  dotCell: string;
   dot: string;
   dotActive: string;
   dotIdle: string;
   dotOff: string;
+  /** Outline row: fixed pitch, and the highlighted block inside it */
+  row: string;
+  rowInner: string;
 }
 
-const VARIANT_STYLES: Record<SmartScrollbarVariant, VariantStyle> = {
+const VARIANT_STYLES: Record<SmartScrollbarVariant, VariantStyles> = {
   gemini: {
     panel: 'rounded-xl border-border/40 bg-background/80 backdrop-blur-xl shadow-lg shadow-black/5',
     collapsedWidth: 'w-8',
     toggleCollapsed: 'p-2',
     toggleExpanded: 'px-3 py-2',
-    row: 'h-8 mx-1',
-    rowInner: 'h-7 px-3 gap-2 rounded-md',
-    dotRow: 'h-4 w-6 rounded-full',
+    icon: 'h-4 w-4',
+    dotCell: 'h-4 w-6',
     dot: 'rounded-full',
     dotActive: 'h-[10px] w-[10px] bg-primary',
     dotIdle: 'h-2 w-2 bg-muted-foreground/40 group-hover:bg-muted-foreground/80',
     dotOff: 'h-2 w-2 bg-muted-foreground/20',
+    row: 'h-8 mx-1',
+    rowInner: 'h-7 px-3 rounded-md',
   },
   aistudio: {
+    // rounded-lg = --radius, which the AI Studio theme sets to 8px
     panel: 'rounded-lg border-border bg-background shadow-sm',
-    collapsedWidth: 'w-7',
+    collapsedWidth: 'w-6',
     toggleCollapsed: 'p-1.5',
     toggleExpanded: 'px-2.5 py-1.5',
-    row: 'h-7 mx-0.5',
-    rowInner: 'h-6 px-2 gap-1.5 rounded',
-    dotRow: 'h-3.5 w-5 rounded-sm',
+    icon: 'h-3.5 w-3.5',
+    dotCell: 'h-3.5 w-5',
     dot: 'rounded-full',
     dotActive: 'h-2 w-2 bg-primary',
     dotIdle: 'h-1.5 w-1.5 bg-muted-foreground/50 group-hover:bg-muted-foreground',
     dotOff: 'h-1.5 w-1.5 bg-muted-foreground/20',
+    row: 'h-7 mx-1',
+    rowInner: 'h-6 px-2 rounded-sm',
   },
 };
 
@@ -188,7 +191,7 @@ export const SmartScrollbarView: React.FC<Props> = ({
               expanded ? styles.toggleExpanded : cn(styles.toggleCollapsed, 'self-center'),
             )}
           >
-            <List className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <List className={cn(styles.icon, 'shrink-0 text-muted-foreground')} />
             {expanded && (
               <span className="text-xs font-medium text-muted-foreground truncate animate-in fade-in duration-200">
                 {t('smartScrollbar.topics')}
@@ -270,7 +273,7 @@ interface DotItemProps {
   item: SmartScrollbarItem;
   isActive: boolean;
   onSelect: (id: string) => void;
-  styles: VariantStyle;
+  styles: (typeof VARIANT_STYLES)[SmartScrollbarVariant];
   activeRef?: React.Ref<HTMLDivElement>;
 }
 
@@ -290,7 +293,8 @@ const DotItem: React.FC<DotItemProps> = ({
           // shrink-0: the column is height-capped, and without it a long list
           // squeezes the rows until the dots touch instead of scrolling
           'group flex items-center justify-center shrink-0',
-          styles.dotRow,
+          styles.dotCell,
+          'rounded-full',
           'transition-all duration-150',
           item.available ? 'cursor-pointer' : 'cursor-default',
         )}
@@ -317,7 +321,7 @@ interface OutlineItemProps {
   index: number;
   isActive: boolean;
   onSelect: (id: string) => void;
-  styles: VariantStyle;
+  styles: VariantStyles;
   activeRef?: React.Ref<HTMLDivElement>;
 }
 
@@ -348,7 +352,7 @@ const OutlineItem: React.FC<OutlineItemProps> = ({
           without changing the overall list height */}
       <div
         className={cn(
-          'flex items-center w-full min-w-0',
+          'flex items-center gap-2 w-full min-w-0',
           styles.rowInner,
           'transition-colors duration-150',
           isActive
