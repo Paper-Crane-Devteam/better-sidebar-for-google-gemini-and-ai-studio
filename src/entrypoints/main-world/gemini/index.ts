@@ -1,6 +1,7 @@
 import { proxy } from 'ajax-hook';
 import { handleGenerateResponse } from './interceptors/generate';
 import { observeStreamGenerate } from './interceptors/stream-generate';
+import { isProcessSessionUrl, observeProcessSession } from './interceptors/process-session';
 import { handleChatContentResponse } from './interceptors/chat-content';
 import { handleListChatResponse } from './interceptors/list-chat';
 import { handleDeleteResponse } from './interceptors/delete';
@@ -75,7 +76,17 @@ export function initGeminiInterceptors() {
         }
       }
 
-      // Notify overlay that a new chat generation has started
+      // Current generation transport (since the 2026-10 web build): WebChannel +
+      // protobuf. Emits GENERATE_START, MODEL_STREAM and the DB events itself.
+      if (isProcessSessionUrl(config.url)) {
+        try {
+          observeProcessSession(config.url, config.body, config.xhr);
+        } catch (e) {
+          console.warn('Better Sidebar (Gemini): could not observe processSession', e);
+        }
+      }
+
+      // Legacy transport, kept while Gemini may still serve it to some users.
       if (config.url?.includes('StreamGenerate')) {
         globalThis.dispatchEvent(
           new CustomEvent('BETTER_SIDEBAR_GENERATE_START'),
