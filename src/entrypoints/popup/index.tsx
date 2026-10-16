@@ -19,7 +19,12 @@ import {
   PlatformEnabledState,
 } from '@/shared/lib/platform-enabled-store';
 import { cn } from '@/shared/lib/utils/utils';
-import { SlidersHorizontal, Settings2, Globe2 } from 'lucide-react';
+import { SlidersHorizontal, Settings2, Globe2, Gem, Sparkle } from 'lucide-react';
+import {
+  isLicenseValid,
+  useLicenseStore,
+  type LicenseState,
+} from '@/shared/lib/license-store';
 import { browser } from 'wxt/browser';
 import {
   applyCachedExtensionPageTheme,
@@ -82,6 +87,56 @@ function DebouncedSlider({ value, min, max, step = 1, onChange }: {
   );
 }
 
+/** `pro` folds into `power`: it is a superset, and a third badge would be noise. */
+type MemberTier = 'support' | 'power' | null;
+
+function selectMemberTier(state: LicenseState): MemberTier {
+  if (!isLicenseValid(state)) return null;
+  if (state.tier === 'support_pack') return 'support';
+  if (state.tier === 'power_pack' || state.tier === 'pro') return 'power';
+  return null;
+}
+
+/**
+ * Small pill beside the popup title for pack owners.
+ *
+ * Tinted with the theme's --highlight accent so it follows every preset. Power
+ * gets a 1px border swept from --highlight into --ring (two-layer background:
+ * an opaque padding-box fill over a gradient border-box), Support a plain
+ * hairline — same family, the higher tier a shade richer.
+ */
+function MemberBadge({ tier }: { tier: Exclude<MemberTier, null> }) {
+  const { t } = useI18n();
+  const isPower = tier === 'power';
+  const Icon = isPower ? Gem : Sparkle;
+
+  return (
+    <span
+      title={t('popup.badgeThanks')}
+      className={cn(
+        'inline-flex items-center gap-1 h-[18px] pl-1.5 pr-2 rounded-full select-none',
+        'text-[10px] font-semibold uppercase tracking-[0.08em] leading-none text-highlight',
+        !isPower && 'bg-highlight/[0.08] ring-1 ring-inset ring-highlight/25',
+      )}
+      style={
+        isPower
+          ? {
+              border: '1px solid transparent',
+              background: [
+                'linear-gradient(rgb(var(--highlight) / 0.1), rgb(var(--highlight) / 0.1)) padding-box',
+                'linear-gradient(rgb(var(--background)), rgb(var(--background))) padding-box',
+                'linear-gradient(120deg, rgb(var(--highlight) / 0.6), rgb(var(--ring) / 0.6)) border-box',
+              ].join(', '),
+            }
+          : undefined
+      }
+    >
+      <Icon className="w-2.5 h-2.5" strokeWidth={2.25} aria-hidden />
+      {t(isPower ? 'popup.badgePower' : 'popup.badgeSupporter')}
+    </span>
+  );
+}
+
 interface OptionsProps {
   initialEnabledState: PlatformEnabledState;
   detectedPlatform: Platform;
@@ -97,6 +152,7 @@ const Options = ({ initialEnabledState, detectedPlatform }: OptionsProps) => {
     return 'platforms';
   });
 
+  const memberTier = useLicenseStore(selectMemberTier);
   const theme = usePegasusStore((state) => state.theme);
   const customTheme = usePegasusStore((state) => state.customTheme);
 
@@ -151,6 +207,7 @@ const Options = ({ initialEnabledState, detectedPlatform }: OptionsProps) => {
           <h1 className="text-base font-bold tracking-tight text-foreground leading-tight">
             {t('popup.title')}
           </h1>
+          {memberTier && <MemberBadge tier={memberTier} />}
         </div>
 
         <div className="flex bg-muted/50 p-1 rounded-lg w-[85%]">

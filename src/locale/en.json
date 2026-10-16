@@ -615,7 +615,10 @@
     "title": "Better Sidebar",
     "description": "Configure the platforms where Better Sidebar is active. Disabling a platform will stop the extension from running on that site entirely.",
     "platforms": "Supported Platforms",
-    "enablePlatform": "Enable on {{platform}}"
+    "enablePlatform": "Enable on {{platform}}",
+    "badgeSupporter": "Supporter",
+    "badgePower": "Power",
+    "badgeThanks": "Thank you for supporting Better Sidebar"
   },
   "feedback": {
     "title": "Get in Touch",

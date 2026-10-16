@@ -615,7 +615,10 @@
     "title": "Better Sidebar",
     "description": "Configura las plataformas donde Better Sidebar está activo. Desactivar una plataforma hará que la extensión deje de ejecutarse por completo en ese sitio.",
     "platforms": "Plataformas compatibles",
-    "enablePlatform": "Activar en {{platform}}"
+    "enablePlatform": "Activar en {{platform}}",
+    "badgeSupporter": "Colaborador",
+    "badgePower": "Power",
+    "badgeThanks": "Gracias por apoyar Better Sidebar"
   },
   "feedback": {
     "title": "Contáctenos",

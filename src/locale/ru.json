@@ -615,7 +615,10 @@
     "title": "Better Sidebar",
     "description": "Настройте платформы, на которых активен Better Sidebar. Отключение платформы полностью остановит работу расширения на этом сайте.",
     "platforms": "Поддерживаемые платформы",
-    "enablePlatform": "Включить на {{platform}}"
+    "enablePlatform": "Включить на {{platform}}",
+    "badgeSupporter": "Поддержка",
+    "badgePower": "Power",
+    "badgeThanks": "Спасибо, что поддерживаете Better Sidebar"
   },
   "feedback": {
     "title": "Связаться с нами",

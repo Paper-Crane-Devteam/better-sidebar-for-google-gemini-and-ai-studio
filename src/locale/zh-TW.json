@@ -615,7 +615,10 @@
     "title": "Better Sidebar",
     "description": "設定 Better Sidebar 啟用的平台。停用某平台後，擴充功能將完全不會在該網站上執行。",
     "platforms": "支援平台",
-    "enablePlatform": "在 {{platform}} 啟用"
+    "enablePlatform": "在 {{platform}} 啟用",
+    "badgeSupporter": "支持者",
+    "badgePower": "Power",
+    "badgeThanks": "感謝你對 Better Sidebar 的支持"
   },
   "feedback": {
     "title": "聯繫我們",

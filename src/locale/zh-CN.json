@@ -615,7 +615,10 @@
     "title": "Better Sidebar",
     "description": "配置 Better Sidebar 生效的平台。禁用某个平台后，扩展将不再响应该网站。",
     "platforms": "支持的平台",
-    "enablePlatform": "在 {{platform}} 上启用"
+    "enablePlatform": "在 {{platform}} 上启用",
+    "badgeSupporter": "支持者",
+    "badgePower": "Power",
+    "badgeThanks": "感谢你对 Better Sidebar 的支持"
   },
   "feedback": {
     "title": "联系我们",

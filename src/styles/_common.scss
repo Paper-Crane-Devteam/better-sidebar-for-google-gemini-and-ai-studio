@@ -102,41 +102,42 @@
 
   /* Account avatar standing in for a sidebar icon. Sized a touch larger than
      --sidebar-icon-size because a filled circle reads smaller than a line icon
-     of the same box, and given a hairline rim so a light photo does not bleed
-     into a light panel. */
+     of the same box. */
   .sidebar-avatar {
     width: calc(var(--sidebar-icon-size) + 4px) !important;
     height: calc(var(--sidebar-icon-size) + 4px) !important;
     border-radius: 9999px;
     object-fit: cover;
-    box-shadow: 0 0 0 1px rgb(var(--border));
+    // Inner hairline keeps a light photo from bleeding into a light panel, and
+    // a soft drop lifts it off the rail so it reads as a chip, not a sticker.
+    box-shadow:
+      inset 0 0 0 1px rgb(0 0 0 / 0.06),
+      0 1px 2px rgb(0 0 0 / 0.12);
   }
 
-  /* Supporter rim. A hairline ring sat 1px off the photo, drawn with a masked
-     ::after so the gap is truly transparent — frosted presets keep showing the
-     panel through it, which a box-shadow "gap" in a fixed colour would not.
-     Support Pack gets a solid ring in the theme's warm --highlight accent;
-     Power Pack gets the same ring swept into --ring, so the two read as one
-     family with the higher tier a shade richer. Kept quiet on purpose: it is a
-     thank-you, not a badge. */
+  /* Rim around the avatar: a hairline ring sat 1.5px off the photo. Drawn with
+     a masked ::after so the gap is truly transparent — frosted presets keep
+     showing the panel through it, which a box-shadow "gap" in a fixed colour
+     would not. The ring fades top-to-bottom like light catching an edge, and
+     tracks the foreground colour so it works on every theme. */
   .sidebar-avatar-frame {
     position: relative;
     display: inline-flex;
     border-radius: 9999px;
   }
 
-  .sidebar-avatar-frame[data-supporter] .sidebar-avatar {
-    // The rim already separates the photo from the panel.
-    box-shadow: none;
-  }
-
-  .sidebar-avatar-frame[data-supporter]::after {
+  .sidebar-avatar-frame::after {
     content: '';
     position: absolute;
     inset: -2.5px;
-    padding: 1.5px;
+    padding: 1px;
     border-radius: inherit;
     pointer-events: none;
+    background: linear-gradient(
+      180deg,
+      rgb(var(--foreground) / 0.28),
+      rgb(var(--foreground) / 0.1)
+    );
     -webkit-mask:
       linear-gradient(#000 0 0) content-box,
       linear-gradient(#000 0 0);
@@ -144,25 +145,17 @@
     mask:
       linear-gradient(#000 0 0) content-box exclude,
       linear-gradient(#000 0 0);
-    opacity: 0.8;
-    transition: opacity 0.15s ease;
+    transition: opacity 0.15s ease, background 0.15s ease;
+    opacity: 0.85;
   }
 
-  .sidebar-avatar-frame[data-supporter='support']::after {
-    background: rgb(var(--highlight));
-  }
-
-  .sidebar-avatar-frame[data-supporter='power']::after {
-    background: conic-gradient(
-      from 200deg,
-      rgb(var(--highlight)),
-      rgb(var(--ring)),
-      rgb(var(--highlight))
-    );
-  }
-
-  button:is(:hover, :focus-visible, [data-state='open']) > .sidebar-avatar-frame[data-supporter]::after {
+  button:is(:hover, :focus-visible, [data-state='open']) > .sidebar-avatar-frame::after {
     opacity: 1;
+    background: linear-gradient(
+      180deg,
+      rgb(var(--primary) / 0.7),
+      rgb(var(--primary) / 0.35)
+    );
   }
 
   * {

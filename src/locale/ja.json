@@ -615,7 +615,10 @@
     "title": "Better Sidebar",
     "description": "Better Sidebar が有効なプラットフォームを設定します。プラットフォームを無効にすると、そのサイトでは拡張機能は動作しなくなります。",
     "platforms": "対応プラットフォーム",
-    "enablePlatform": "{{platform}} で有効にする"
+    "enablePlatform": "{{platform}} で有効にする",
+    "badgeSupporter": "サポーター",
+    "badgePower": "Power",
+    "badgeThanks": "Better Sidebar を応援していただきありがとうございます"
   },
   "feedback": {
     "title": "お問い合わせ",
