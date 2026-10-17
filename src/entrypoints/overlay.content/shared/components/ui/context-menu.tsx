@@ -58,15 +58,102 @@ const ContextMenuSubContent = React.forwardRef<
 })
 ContextMenuSubContent.displayName = ContextMenuPrimitive.SubContent.displayName
 
+// ─── Stale-placement guard ───────────────────────────────────────────────────
+//
+// With real mouse input, Radix places the menu once against a stale virtual
+// anchor (often (0,0) → top-left corner) and corrects it ~40ms later. The
+// enter fade runs on the compositor, so that wrong placement is visible as a
+// flash. We remember where the right-click happened and keep the content
+// hidden until the popper wrapper actually sits at that point.
+
+let lastContextMenuPoint: { x: number; y: number; t: number } | null = null;
+if (typeof window !== "undefined") {
+  window.addEventListener(
+    "contextmenu",
+    (e) => {
+      lastContextMenuPoint = { x: e.clientX, y: e.clientY, t: performance.now() }
+    },
+    true
+  )
+}
+
+/** Max age of the recorded right-click for it to count as "this" open. */
+const POINT_MAX_AGE_MS = 1000
+/** Never keep the menu hidden longer than this, whatever happens. */
+const REVEAL_FALLBACK_MS = 200
+/** Slack around the wrapper rect (sideOffset is 2px). */
+const POINT_SLACK_PX = 4
+
+/**
+ * Called when the Radix content element mounts (callback ref, since the
+ * content only exists while open). Returns a cleanup, or undefined.
+ */
+function guardStalePlacement(content: HTMLElement): (() => void) | undefined {
+  const wrapper = content.parentElement
+  const point = lastContextMenuPoint
+  if (!wrapper || !point) return
+  if (performance.now() - point.t > POINT_MAX_AGE_MS) return
+
+  // A context menu opens to the right of the pointer (or flips to its left),
+  // so one vertical edge must sit at point.x. Mere containment is not enough:
+  // the stale top-left placement can cover a pointer near the top of the page.
+  const isAtPointer = () => {
+    const r = wrapper.getBoundingClientRect()
+    const edgeAtX =
+      Math.abs(r.left - point.x) <= POINT_SLACK_PX ||
+      Math.abs(r.right - point.x) <= POINT_SLACK_PX
+    return (
+      edgeAtX &&
+      point.y >= r.top - POINT_SLACK_PX &&
+      point.y <= r.bottom + POINT_SLACK_PX
+    )
+  }
+
+  // At mount the wrapper is still parked off-screen (translate(0,-200%)),
+  // so this hides the content until a placement lands on the pointer.
+  content.style.visibility = "hidden"
+  let done = false
+  const stop = () => {
+    done = true
+    observer.disconnect()
+    window.clearTimeout(fallback)
+  }
+  const reveal = () => {
+    if (done) return
+    stop()
+    content.style.visibility = ""
+    // Restart the enter animation so the fade starts at the real position.
+    content.getAnimations().forEach((a) => {
+      a.currentTime = 0
+    })
+  }
+  const observer = new MutationObserver(() => {
+    if (isAtPointer()) reveal()
+  })
+  observer.observe(wrapper, { attributes: true, attributeFilter: ["style"] })
+  const fallback = window.setTimeout(reveal, REVEAL_FALLBACK_MS)
+  return stop
+}
+
 const ContextMenuContent = React.forwardRef<
   React.ElementRef<typeof ContextMenuPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Content>
 >(({ className, ...props }, ref) => {
   const portalContainer = getPopupLayerContainer() ?? undefined;
+  const cleanupRef = React.useRef<(() => void) | undefined>(undefined);
+  const setContentRef = React.useCallback(
+    (el: HTMLDivElement | null) => {
+      cleanupRef.current?.();
+      cleanupRef.current = el ? guardStalePlacement(el) : undefined;
+      if (typeof ref === "function") ref(el);
+      else if (ref) ref.current = el;
+    },
+    [ref]
+  );
   return (
     <ContextMenuPrimitive.Portal container={portalContainer}>
       <ContextMenuPrimitive.Content
-        ref={ref}
+        ref={setContentRef}
         className={cn(
           "z-[10000] min-w-[8rem] overflow-hidden rounded-md bg-popover p-1 text-popover-foreground shadow-[shadow:var(--shadow-popover)] animate-in fade-in-80 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
           className
