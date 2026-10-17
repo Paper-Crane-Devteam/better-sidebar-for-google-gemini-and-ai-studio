@@ -173,6 +173,15 @@ export const useGeminiUI = () => {
           margin-inline: 0 !important;
         }
         /*
+         * Gem conversations show the Gem name ("xxx · Custom Gem") above each
+         * response; same 708px cap + centered margin as the action bar.
+         */
+        #chat-history .conversation-container .response-container-content .bot-name,
+        #chat-history .conversation-container .response-container-content .imported-chat-label {
+          max-width: none !important;
+          margin-inline: 0 !important;
+        }
+        /*
          * Tables: Gemini already lets .table-block span the full column, but
          * pads .table-content with \`max(0px, 50% - 354px)\` (450px for 4+ cols)
          * to re-center the table in a fixed 708/900px track. Drop that padding
