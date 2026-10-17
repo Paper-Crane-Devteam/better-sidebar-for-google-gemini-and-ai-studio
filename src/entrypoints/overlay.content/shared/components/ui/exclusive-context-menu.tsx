@@ -91,23 +91,46 @@ export const ExclusiveContextMenu = ({
   const idRef = useRef(id);
   idRef.current = id;
 
+  // Pending deferred open (see handleOpenChange)
+  const openFrameRef = useRef<number | null>(null);
+  const cancelPendingOpen = useCallback(() => {
+    if (openFrameRef.current !== null) {
+      cancelAnimationFrame(openFrameRef.current);
+      openFrameRef.current = null;
+    }
+  }, []);
+
   // Cleanup on unmount: if this menu was active, clear it
   useEffect(() => {
     return () => {
+      cancelPendingOpen();
       storeClose(idRef.current);
     };
-  }, [storeClose]);
+  }, [storeClose, cancelPendingOpen]);
 
   const handleOpenChange = useCallback(
     (nextOpen: boolean) => {
+      cancelPendingOpen();
       if (nextOpen) {
-        storeOpen(id);
-      } else {
-        storeClose(id);
+        // Defer opening by one frame. Radix ContextMenuTrigger stores the
+        // pointer position in state and only hands the new virtual anchor to
+        // the Popper in a passive effect. Opening in the same commit makes
+        // floating-ui place the first frame against the *previous* anchor
+        // ((0,0) on first open → menu flashes at the top-left corner, or at
+        // the last right-click position), then jump under the cursor.
+        // Opening in a later render guarantees React has flushed that effect
+        // first, so the very first placement uses the current pointer.
+        openFrameRef.current = requestAnimationFrame(() => {
+          openFrameRef.current = null;
+          storeOpen(id);
+          onOpenChange?.(true);
+        });
+        return;
       }
-      onOpenChange?.(nextOpen);
+      storeClose(id);
+      onOpenChange?.(false);
     },
-    [id, storeOpen, storeClose, onOpenChange],
+    [id, storeOpen, storeClose, onOpenChange, cancelPendingOpen],
   );
 
   return (
