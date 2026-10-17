@@ -1,0 +1,58 @@
+diff --git a/node_modules/@radix-ui/react-context-menu/dist/index.js b/node_modules/@radix-ui/react-context-menu/dist/index.js
+--- a/node_modules/@radix-ui/react-context-menu/dist/index.js
++++ b/node_modules/@radix-ui/react-context-menu/dist/index.js
+@@ -125,10 +125,14 @@ var ContextMenuTrigger = /* @__PURE__ */ React.forwardRef(
+     const context = useContextMenuContext(TRIGGER_NAME, __scopeContextMenu);
+     const menuScope = useMenuScope(__scopeContextMenu);
+     const [point, setPoint] = React.useState({ x: 0, y: 0 });
++    // PATCH: read the live pointer from a ref. The new anchor only reaches the
++    // Popper in a passive effect, so the first placement used to run against
++    // the previous anchor (0,0 / last right-click) and flash there.
++    const pointRef = React.useRef(point);
+     const virtualRef = React.useMemo(
+       () => ({
+         current: {
+-          getBoundingClientRect: /* @__PURE__ */ __name(() => DOMRect.fromRect({ width: 0, height: 0, ...point }), "getBoundingClientRect")
++          getBoundingClientRect: /* @__PURE__ */ __name(() => DOMRect.fromRect({ width: 0, height: 0, ...pointRef.current }), "getBoundingClientRect")
+         }
+       }),
+       [point]
+@@ -140,7 +144,8 @@ var ContextMenuTrigger = /* @__PURE__ */ React.forwardRef(
+     );
+     const handleOpen = /* @__PURE__ */ __name((event) => {
+       context.hasInteractedRef.current = true;
+-      setPoint({ x: event.clientX, y: event.clientY });
++      pointRef.current = { x: event.clientX, y: event.clientY };
++      setPoint(pointRef.current);
+       context.onOpenChange(true);
+     }, "handleOpen");
+     React.useEffect(() => clearLongPress, [clearLongPress]);
+diff --git a/node_modules/@radix-ui/react-context-menu/dist/index.mjs b/node_modules/@radix-ui/react-context-menu/dist/index.mjs
+--- a/node_modules/@radix-ui/react-context-menu/dist/index.mjs
++++ b/node_modules/@radix-ui/react-context-menu/dist/index.mjs
+@@ -59,10 +59,14 @@ var ContextMenuTrigger = /* @__PURE__ */ React.forwardRef(
+     const context = useContextMenuContext(TRIGGER_NAME, __scopeContextMenu);
+     const menuScope = useMenuScope(__scopeContextMenu);
+     const [point, setPoint] = React.useState({ x: 0, y: 0 });
++    // PATCH: read the live pointer from a ref. The new anchor only reaches the
++    // Popper in a passive effect, so the first placement used to run against
++    // the previous anchor (0,0 / last right-click) and flash there.
++    const pointRef = React.useRef(point);
+     const virtualRef = React.useMemo(
+       () => ({
+         current: {
+-          getBoundingClientRect: /* @__PURE__ */ __name(() => DOMRect.fromRect({ width: 0, height: 0, ...point }), "getBoundingClientRect")
++          getBoundingClientRect: /* @__PURE__ */ __name(() => DOMRect.fromRect({ width: 0, height: 0, ...pointRef.current }), "getBoundingClientRect")
+         }
+       }),
+       [point]
+@@ -74,7 +78,8 @@ var ContextMenuTrigger = /* @__PURE__ */ React.forwardRef(
+     );
+     const handleOpen = /* @__PURE__ */ __name((event) => {
+       context.hasInteractedRef.current = true;
+-      setPoint({ x: event.clientX, y: event.clientY });
++      pointRef.current = { x: event.clientX, y: event.clientY };
++      setPoint(pointRef.current);
+       context.onOpenChange(true);
+     }, "handleOpen");
+     React.useEffect(() => clearLongPress, [clearLongPress]);
