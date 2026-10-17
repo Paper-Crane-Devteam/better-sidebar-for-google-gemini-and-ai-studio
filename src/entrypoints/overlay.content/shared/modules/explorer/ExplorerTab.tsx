@@ -16,6 +16,7 @@ import {
 import { ExclusiveContextMenu } from '../../components/ui/exclusive-context-menu';
 import { OutlineSection } from './components/OutlineSection';
 import { ImportChatListTip, markImportChatListTriggered } from './components/ImportChatListTip';
+import { ScanProgressText } from './components/ScanProgressText';
 
 import type { ExplorerTypeFilter } from '../../types/filter';
 import { ExplorerContext } from './ExplorerContext';
@@ -529,9 +530,7 @@ export const ExplorerTab = ({
       {isScanning && (
         <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background/50 backdrop-blur-[1px] gap-2">
           <Loader2 className="h-8 w-8 animate-spin text-foreground" />
-          <p className="text-sm text-muted-foreground">
-            {t('explorer.scanning')}
-          </p>
+          <ScanProgressText />
         </div>
       )}
 

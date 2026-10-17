@@ -1,4 +1,5 @@
 import { trace } from '@/shared/lib/trace';
+import { emitScanProgress } from '@/shared/lib/scan-progress';
 
 /**
  * DOM Scanner for Manual Library Scan
@@ -139,6 +140,7 @@ export async function scanLibraryDom() {
         console.warn('Error parsing row', e);
       }
     }
+    emitScanProgress(scannedIds);
 
     // B. Check scroll position
     const { scrollTop, scrollHeight, clientHeight } = scrollContainer;

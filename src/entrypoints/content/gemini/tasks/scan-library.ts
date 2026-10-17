@@ -3,6 +3,7 @@ import { apiScanner } from './scan-api';
 import { scrollHistoryToEnd, waitForHistoryScroller } from './history-scroller';
 import i18n from '@/locale/i18n';
 import { trace } from '@/shared/lib/trace';
+import { emitScanProgress } from '@/shared/lib/scan-progress';
 
 /**
  * Full library scan for Gemini.
@@ -31,6 +32,15 @@ export async function scanLibrary() {
   }
 }
 
+/** Push the unique ids captured so far to the overlay's scanning indicator. */
+function reportProgress() {
+  const ids = new Set<string>();
+  for (const item of apiScanner.getItems()) {
+    if (item?.id) ids.add(item.id);
+  }
+  emitScanProgress(ids);
+}
+
 async function runScan() {
   try {
     const scroller = await waitForHistoryScroller(10000);
@@ -41,12 +51,14 @@ async function runScan() {
       );
     } else {
       const before = apiScanner.getItems().length;
+      reportProgress();
       await scrollHistoryToEnd(scroller, {
         logPrefix: 'Gemini Scan',
         onBatchLoaded: () => {
           trace(
             `Gemini Scan: captured ${apiScanner.getItems().length} raw items so far`,
           );
+          reportProgress();
         },
       });
       console.log(
