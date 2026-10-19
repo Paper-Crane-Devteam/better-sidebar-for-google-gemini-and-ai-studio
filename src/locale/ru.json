@@ -663,6 +663,7 @@
     "jumpStop": "Остановить",
     "searching": "Поиск...",
     "resultsSummary": "{{count}} результатов в {{files}} чатах",
+    "matchCount": "Совпадений: {{count}}",
     "whyNoOlder": "Почему не находятся старые диалоги?",
     "context": "Контекст",
     "modelResponse": "Ответ модели",

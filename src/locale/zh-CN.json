@@ -663,6 +663,7 @@
     "jumpStop": "停止",
     "searching": "搜索中...",
     "resultsSummary": "{{files}} 个聊天中共 {{count}} 条结果",
+    "matchCount": "{{count}} 处匹配",
     "whyNoOlder": "为什么找不到更早的对话？",
     "context": "上下文",
     "modelResponse": "模型回复",

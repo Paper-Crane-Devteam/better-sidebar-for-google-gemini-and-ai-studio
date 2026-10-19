@@ -663,6 +663,7 @@
     "jumpStop": "Detener",
     "searching": "Buscando...",
     "resultsSummary": "{{count}} resultados en {{files}} chats",
+    "matchCount": "{{count}} coincidencias",
     "whyNoOlder": "¿Por qué no encuentro conversaciones antiguas?",
     "context": "Contexto",
     "modelResponse": "Respuesta del modelo",

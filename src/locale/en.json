@@ -665,6 +665,7 @@
     "jumpStop": "Stop",
     "searching": "Searching...",
     "resultsSummary": "{{count}} results in {{files}} chats",
+    "matchCount": "{{count}} matches",
     "whyNoOlder": "Why can't I find older chats?",
     "context": "Context",
     "modelResponse": "Model's Response",

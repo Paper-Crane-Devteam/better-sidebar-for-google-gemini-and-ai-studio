@@ -663,6 +663,7 @@
     "jumpStop": "Durdur",
     "searching": "Aranıyor...",
     "resultsSummary": "{{count}}, {{files}} sohbetleriyle sonuçlanır",
+    "matchCount": "{{count}} eşleşme",
     "whyNoOlder": "Neden eski sohbetleri bulamıyorum?",
     "context": "Bağlam",
     "modelResponse": "Modelin Yanıtı",

@@ -663,6 +663,7 @@
     "jumpStop": "停止",
     "searching": "検索中...",
     "resultsSummary": "{{files}} 件のチャットで {{count}} 件の結果",
+    "matchCount": "{{count}} 件一致",
     "whyNoOlder": "古い会話が見つからない理由",
     "context": "コンテキスト",
     "modelResponse": "モデルの応答",
