@@ -2,7 +2,7 @@
 
 Hi friends 👋
 
-Gemini rolled out a new layout recently, and a fair part of this round went into catching up with it. Along the way I added a few things I'd been wanting for a while, mostly around finding your way inside long chats.
+Gemini rolled out a new layout recently, and also changed how its page talks to its servers behind the scenes. A fair part of this round went into catching up with both. Along the way I added a few things I'd been wanting for a while, mostly around finding your way inside long chats.
 
 ---
 
@@ -24,7 +24,7 @@ If you run into any trouble using it, or have ideas you'd like to share, you're 
 3. **🪟 Floating outline**: Pop the outline out into a panel you can drag and resize.
 4. **🧭 Better navigation in AI Studio**: Outline jumps and the dot scrollbar now work there too.
 5. **🔐 Multi-account fix**: Data from different Google accounts no longer gets mixed up.
-6. **🧩 Caught up with Gemini's new layout**: Width controls, input auto-hide and themes work again.
+6. **🧩 Caught up with Gemini's changes**: New chats and messages are saved again, and width controls, input auto-hide and themes work again.
 
 ---
 
@@ -48,27 +48,30 @@ I also simplified how the outline looks: the heading icons and the numbers befor
 
 ### 🧭 AI Studio Gets Outline Jumps and the Dot Scrollbar
 
-Clicking an item in the outline on AI Studio now jumps to that message. The dot scrollbar from Gemini (one dot per message you sent) is also available on AI Studio now. While it's on, it takes the place of AI Studio's built-in scrollbar so the two don't overlap.
+Clicking an item in the outline on AI Studio now jumps to that message. The dot scrollbar from Gemini (one dot per message you sent) is also available on AI Studio now. While it's on, it takes the place of AI Studio's built-in scrollbar so the two don't overlap. It gets its own space on the right of the chat so it never covers message text, and it's a bit more compact there to match AI Studio's style.
 
 ---
 
 ## 🐛 Fixes
 
-- **Data mixing between Google accounts**: If you used several Google accounts in different tabs at the same time, some data could end up saved under the wrong account. This was a real mistake on my part, and I'm sorry about it. Each tab now sticks to its own account's data, and background sync no longer carries over from one account to another.
+- **Data mixing between Google accounts**: If you used several Google accounts in different tabs at the same time, some data could end up saved under the wrong account. This was a real mistake on my part, and I'm sorry about it. Each tab now sticks to its own account's data, and background sync no longer carries over from one account to another. In tabs signed in to a second account (with `/u/1` and so on in the address), background sync also used to ask for the wrong account's chats and fail; it now uses the tab's own account, and a chat that can't be loaded no longer holds up the rest of the queue.
 - **AI Studio chats jumping to the top**: Just opening an AI Studio chat used to count as activity, so it would move to the top of the list. Now only actually editing or creating a chat does that.
 - **Wrong dates in AI Studio search results**: Messages from older AI Studio chats were sometimes dated by when they were synced, so old chats showed up as if they were new. That's fixed, and existing data is repaired automatically.
 - **Background agent replies on AI Studio**: If you switched to another tab while the agent was waiting for a reply, it could time out and report the message as not delivered, even though the answer was there. It now waits properly while the tab is in the background.
 - **Gemini chats opening at the top**: Opening a chat from the sidebar sometimes left you at the very beginning instead of the latest message. It now lands on the latest message as expected.
 - **Opening a Gem from a chat**: Opening a Gem while a chat was open could leave the old chat on screen. It now switches over cleanly.
 - **Inline code formatting**: Inline code in replies no longer shows extra backticks around it.
+- **Renaming Gems**: Gem names come from Gemini itself, so pressing F2 on a Gem no longer opens a rename box that didn't actually save anything.
 
 ---
 
-## 🧩 Catching Up with Gemini's New Layout
+## 🧩 Catching Up with Gemini's Changes
 
-- **Chat and input width controls** work again.
+- **New chats and messages are saved again**: Gemini switched to a new format for sending messages and chat lists, which nothing on screen gives away, but it meant new conversations quietly stopped reaching the sidebar. The extension now understands the new format, so new chats, replies and titles show up like before.
+- **Chat list, renames and deletes sync again**, along with your Gems and notebooks lists. The Gems list is now synced as a whole instead of guessed at on each page load, so Gems that haven't changed no longer look "updated" for no reason.
+- **Chat and input width controls** work again, and the action buttons under each reply stay on the left when the chat is widened.
 - **Tables now follow the chat width**, so the separate "Table Auto Width" option is no longer needed and has been removed.
-- **Input auto-hide** works with the new input area.
+- **Input auto-hide** was reworked for the new input area. It slides in and out more reliably and no longer gets stuck half visible.
 - **Deep Research and Canvas** no longer get squeezed by a forced minimum chat width.
 - **Themes** now also cover the glow around the new-chat input box, so it no longer shows a dark patch on some dark themes.
 - **"Remove Auto Watermark" is turned off and hidden for now**: Gemini now has its own watermark setting, and with it, our removal could leave a faint inverted mark on images that were already clean. Turning it off felt like the safer choice.
@@ -80,8 +83,9 @@ Clicking an item in the outline on AI Studio now jumps to that message. The dot 
 - **Quieter icons**: The icon rail and the action icons in tab headers are now a bit dimmer when idle, and come back to full color when you hover. The sidebar feels less busy this way.
 - **Menus close instantly**: Dropdown and right-click menus no longer play a closing animation.
 - **Workspace**: The empty state now has an "Import folder" option.
+- **About page**: The version info is now a tidier card, with the update check in its footer.
 - **A small thank-you badge**: If you have a Support Pack or Power Pack, the popup now shows a small badge next to the title. It's my quiet way of saying thank you. Everyone's sidebar avatar also got a soft new ring.
 
 ---
 
-That's it for this round. Since Gemini's layout is still changing, there may be spots I haven't caught yet. If something looks off, please let me know and I'll look into it. Thanks for being here ☕
+That's it for this round. Since Gemini is still changing, both on screen and under the hood, there may be spots I haven't caught yet. If something looks off, please let me know and I'll look into it. Thanks for being here ☕

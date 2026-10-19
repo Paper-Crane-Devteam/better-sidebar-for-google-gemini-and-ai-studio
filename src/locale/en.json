@@ -62,6 +62,7 @@
     "scanPrompt": "Open Library to scan your chats.",
     "scanLibrary": "Scan Library",
     "scanning": "Scanning...",
+    "scanProgress": "{{scanned}} chats scanned, {{fresh}} new",
     "newFolder": "New Folder",
     "imported": "Inbox",
     "conversations": "chats",
