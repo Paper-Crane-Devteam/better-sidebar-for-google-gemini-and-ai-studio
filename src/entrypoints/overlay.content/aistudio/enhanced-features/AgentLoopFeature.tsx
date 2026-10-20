@@ -1,4 +1,6 @@
 import { initializeBrowserAgent } from '@/entrypoints/overlay.content/shared/modules/agent-loop/browser/browser-store';
+import { initializeWebAgent, sendToPanel } from '@/entrypoints/overlay.content/shared/modules/agent-loop/web/web-store';
+import { WEB_AGENT_ID } from '@/shared/web-agent/contracts';
 /**
  * AgentLoopFeature — AI Studio entry point for Agent Loop.
  *
@@ -69,7 +71,7 @@ import {
   setValue,
   triggerRun,
 } from '@/entrypoints/overlay.content/shared/lib/aistudio-editor';
-import { useAIStudioEditorIntegration } from './useAIStudioEditorIntegration';
+import { useTextareaEditorIntegration } from '@/entrypoints/overlay.content/shared/features/trigger-popup/useTextareaEditorIntegration';
 
 // See the note in the Gemini feature: the ceiling and the truncation policy both live in
 // `prompts/initial-message.ts` now, instead of a `30000` copied into each platform.
@@ -88,6 +90,7 @@ function isComposerHeldByEngine(): boolean {
 
 export const AgentLoopFeature: React.FC = () => {
   useEffect(initializeBrowserAgent, []);
+  useEffect(initializeWebAgent, []);
   const { t } = useI18n();
   /**
    * Whether typing `>` in the composer may open the agent launcher.
@@ -361,6 +364,13 @@ export const AgentLoopFeature: React.FC = () => {
       return abort(`${entry.agent.id} agent unavailable`, blocked.reason);
     }
 
+    // The Web Agent runs in the side panel (which hosts Gemini), not here. This send is the
+    // handoff; the composer empties once the panel has opened. See the Gemini feature.
+    if (entry.agent.id === WEB_AGENT_ID) {
+      sendToPanel((text.slice(0, match.start) + text.slice(match.end)).trim(), () => adapter.insertText(''));
+      return true;
+    }
+
     /**
      * Assembled before the composer is touched. The other order means a throw in here
      * leaves a half-rewritten composer behind while the exception escapes the handler —
@@ -428,7 +438,7 @@ export const AgentLoopFeature: React.FC = () => {
    * integration would post those launches as raw skill text. The trigger is refused in
    * `onInput` below instead.
    */
-  const { popupPosition } = useAIStudioEditorIntegration({
+  const { popupPosition } = useTextareaEditorIntegration({
     getTextarea,
     enabled: true,
     triggerChar: '>',

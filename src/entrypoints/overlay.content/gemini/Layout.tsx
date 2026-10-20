@@ -205,25 +205,42 @@ async function mountDesktopLayout(
     const wrapperId = 'better-sidebar-for-google-ai-studio-sidebar-wrapper';
 
     /**
-     * Hide one of Gemini's own nav buttons while our panel is open, or restore it.
+     * Park one of Gemini's own sidebar elements out of sight while our panel is
+     * open, or restore it.
      *
-     * Deliberately not parked at `top/left: -9999px`. An offscreen-but-visible
-     * element is still focusable, and focusing it makes the browser scroll it into
-     * view — on a page whose `html` is `overflow: hidden` that scroll cannot be
-     * undone by the user. `visibility: hidden` removes the element from the focus
-     * order entirely, so there is nothing to scroll to.
+     * `visibility: hidden` takes it out of the focus order, so nothing can focus
+     * it and scroll it into view.
+     *
+     * It is anchored by its *bottom* edge (`bottom: calc(100% + 9999px)`), not
+     * by `top: -9999px`. Once absolutely positioned, the native history list
+     * (`.overflow-container`) loses the grid's height limit and grows to the
+     * height of every loaded conversation (13000px+ for a long history). Parked
+     * at `top: -9999px`, anything past ~10000px stuck out *below* the sidebar
+     * and became scrollable overflow of `<chat-app>`. That element is
+     * `overflow: hidden`, so it has no scrollbar but can still be scrolled
+     * programmatically, and Gemini's own `scrollIntoView()` calls (e.g. on
+     * `.conversation-container` when a chat is opened) scroll it. The whole page
+     * then shifts up, leaves a blank strip at the bottom, and only a reload
+     * fixes it. Only users with long histories hit this, which is why it looked
+     * random.
+     *
+     * Bottom-anchored, the element sits entirely above the containing block
+     * however tall it gets. Overflow above or to the left of a scroll container
+     * is never scrollable, so there is nothing left to scroll into.
      */
     const setOffscreen = (el: HTMLElement | null, hidden: boolean) => {
       if (!el) return;
       if (hidden) {
         el.style.position = 'absolute';
-        el.style.top = '-9999px';
+        el.style.top = 'auto';
+        el.style.bottom = 'calc(100% + 9999px)';
         el.style.left = '-9999px';
         el.style.visibility = 'hidden';
         el.style.pointerEvents = 'none';
       } else {
         el.style.position = '';
         el.style.top = '';
+        el.style.bottom = '';
         el.style.left = '';
         el.style.visibility = '';
         el.style.pointerEvents = '';
@@ -398,10 +415,7 @@ async function mountDesktopLayout(
         // Restore original container children
         Array.from(container.children).forEach((child) => {
           if (child.id !== wrapperId) {
-            const el = child as HTMLElement;
-            el.style.position = '';
-            el.style.top = '';
-            el.style.left = '';
+            setOffscreen(child as HTMLElement, false);
           }
         });
 

@@ -10,6 +10,7 @@ import {
 } from '@/shared/lib/hotkey-store';
 import { detectPlatform, Platform } from '@/shared/types/platform';
 import { modal } from '@/shared/lib/modal';
+import { isPanelFrame } from '@/shared/web-agent/contracts';
 
 // ─── Kbd Component ───────────────────────────────────────────────────────────
 
@@ -69,7 +70,8 @@ export const HotkeyCheatsheet = () => {
   const setGeminiFeature = usePegasusStore((s) => s.setGeminiEnhancedFeature);
   const setAIStudioFeature = usePegasusStore((s) => s.setAIStudioEnhancedFeature);
 
-  if (!showHelper) return null;
+  // The side panel is narrow: the floating button would sit on top of the composer's send button.
+  if (!showHelper || isPanelFrame()) return null;
 
   const handleHide = async () => {
     const confirmed = await modal.confirm({

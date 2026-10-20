@@ -189,6 +189,32 @@
     "slashTip": "提示：在輸入框中輸入 / 可快速插入 Prompt。",
     "slashTipDismiss": "知道了"
   },
+  "instructionPrompt": {
+    "library": "提示詞",
+    "fillFromLibrary": "從提示詞庫填入",
+    "saveToLibrary": "儲存到提示詞庫",
+    "searchPlaceholder": "搜尋提示詞...",
+    "filterSystem": "系統",
+    "filterAll": "全部",
+    "noMatches": "沒有符合的提示詞",
+    "emptyLibrary": "提示詞庫還是空的",
+    "goToPrompts": "開啟提示詞庫",
+    "back": "返回",
+    "fill": "填入",
+    "filled": "已填入「{{title}}」",
+    "fillFailed": "未能填入指令，可以試試重新開啟面板。",
+    "undo": "復原",
+    "saveTitle": "儲存為提示詞",
+    "saved": "已儲存到提示詞庫",
+    "nothingToSave": "指令是空的，沒有可儲存的內容",
+    "sourceNative": "AI Studio",
+    "sourceLibrary": "Better Sidebar",
+    "sourceTooltip": "選擇系統指令的來源",
+    "switchTip": "系統指令也可以用 Better Sidebar 的提示詞庫來管理：支援資料夾、變數，Gemini 和 AI Studio 共用同一套提示詞。隨時可以切換回來。",
+    "switchTipSwitch": "切換",
+    "switchTipKeep": "繼續用 AI Studio",
+    "autoImported": "已將 {{count}} 則 AI Studio 指令匯入到 提示詞庫 › {{folder}}"
+  },
   "snippets": {
     "createSnippet": "新增片段",
     "editSnippet": "編輯片段",
@@ -663,6 +689,7 @@
     "jumpStop": "停止",
     "searching": "搜尋中...",
     "resultsSummary": "{{files}} 個聊天中共 {{count}} 則結果",
+    "matchCount": "{{count}} 處相符",
     "whyNoOlder": "為什麼找不到更早的對話？",
     "context": "上下文",
     "modelResponse": "模型回覆",
@@ -1863,6 +1890,28 @@
         }
       }
     },
+    "webPanel": {
+      "title": "讓 AI 幫你閱讀和操作網頁",
+      "riskNotice": "風險提示與權限",
+      "examples": {
+        "summarize": {
+          "label": "總結網頁",
+          "text": "閱讀我目前分頁中的文章，用五個重點概括核心內容，並指出其中值得我再查證的說法。"
+        },
+        "extract": {
+          "label": "擷取網頁資料",
+          "text": "把我開啟的頁面中的主表格擷取為 Markdown。欄位名稱保持原樣，如果有列看起來被截斷或分頁了，請告訴我。"
+        },
+        "compare": {
+          "label": "比較幾個網頁",
+          "text": "開啟我在下面列出的三個選項的商品頁，把價格、規格和退貨政策並排比較，並告訴我你會選哪個、為什麼。"
+        },
+        "fill": {
+          "label": "填寫表單",
+          "text": "用下面的資訊填寫這個頁面上的表單。在按下送出按鈕前停下，把你填的內容給我看一下，方便我核對。"
+        }
+      }
+    },
     "browserIntro": {
       "title": "讓 AI 幫您高效整理分頁與書籤",
       "about": "關於 Browser Agent",
@@ -2039,6 +2088,21 @@
       "about": "關於工作區",
       "howToUseTitle": "如何使用 Workspace",
       "howToUseContent": "Workspace 是您的專屬檔案工作區，AI 可以直接讀取、寫入、精準修改並從零建立文件與程式碼。\n\n如何使用：\n在聊天輸入框中輸入 >Workspace 即可喚起 Agent。您可以將本機現有檔案拖入工作區讓 AI 處理，也可以直接下指令讓 AI 從零為您建立新檔案（例如從零開發一個完整的前端專案）。\n\n支援的功能與格式：\n- 純文字與程式碼（.html, .js, .ts, .py, .md, .txt 等）：支援從零建立與精準編輯！可直接讓 AI 從零建構前端專案、編寫腳本、起草 Markdown 筆記，或對現有程式碼進行檢索與局部重構。\n- Word 文件 (.docx)：逐章審閱論文、透過修訂模式改寫段落（可在 Word 中逐條確認接受/拒絕）、新增批註意見（需上傳現有檔案）。\n- Excel 試算表 (.xlsx/.csv)：資料分析、撰寫計算公式、新增資料欄，且不破壞原有圖表與排版格式（需上傳現有檔案）。\n- PDF 文件：閱讀文獻與報告、擷取文字、合併頁面、新增批註與螢光標記（需上傳現有檔案）。\n- 簡報檔案 (.pptx)：讀取與編輯每頁簡報文字及演講者備忘稿（需上傳現有檔案）。\n- 字幕檔案 (.srt/.vtt)：翻譯與潤色字幕內容，嚴格保持時間軸對齊（需上傳現有檔案）。\n\n💡 提示：文字與程式碼類檔案支援由 AI 從零建立及隨時修改；Word/Excel/PPT/PDF 等特殊格式目前支援基於現有檔案的讀取、批註與精準修改（保護原有排版不亂）。"
+    },
+    "web": {
+      "needsConnector": "🔌 請先設定 Web Agent Connector · 點擊開啟",
+      "addedWhileRunning": "已新增至 Web Agent。執行中的任務可透過 page_list 使用。",
+      "consent": {
+        "connector": {
+          "title": "Web Agent Connector",
+          "missing": "Web Agent 需要一個小型的配套擴充功能才能操作網頁：Better Sidebar Web Agent Connector。Chrome 的頁面偵錯權限由它持有，Better Sidebar 本身不需要這項權限；它也只接受來自 Better Sidebar 的請求。",
+          "outdated": "你的 Web Agent Connector 版本過舊。請在 Chrome 線上應用程式商店更新後再回到這裡。",
+          "paused": "Web Agent Connector 已暫停。點擊 Chrome 工具列中它的圖示，重新開啟即可。",
+          "install": "從 Chrome 線上應用程式商店安裝",
+          "update": "在 Chrome 線上應用程式商店中開啟",
+          "comeBack": "安裝 Connector 後，此頁面會自動更新。"
+        }
+      }
     }
   },
   "backup": {

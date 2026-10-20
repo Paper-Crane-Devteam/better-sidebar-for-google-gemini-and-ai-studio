@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAppStore } from '@/shared/lib/store';
 import { useModalStore } from '@/shared/lib/modal';
 import { openMessageSyncModal } from '../../message-sync/MessageSyncModal';
@@ -24,10 +24,12 @@ import GeminiIcon from '@/assets/icons/gemini.svg';
 import { PLATFORM_CONFIG, Platform } from '@/shared/types/platform';
 import {
   buildSearchRegex,
-  findFirstMatch,
-  splitByMatches,
   type SearchMatchOptions,
 } from '@/shared/lib/search-pattern';
+import {
+  buildSearchSnippets,
+  buildPlainPreview,
+} from '@/shared/lib/search-snippet';
 
 export interface SearchResultItem {
   id: string;
@@ -203,14 +205,22 @@ const ResultGroup = ({
 
       {expanded && (
         <div className="flex flex-col ml-4 pl-2">
-          {data.matches.map((match) => (
-            <MatchItem
-              key={match.id}
-              match={match}
-              onNavigate={onNavigate}
-              platform={data.conversation.platform}
-            />
-          ))}
+          {data.matches.map((match, i) => {
+            const prev = data.matches[i - 1];
+            const showMeta =
+              !prev ||
+              prev.role !== match.role ||
+              !dayjs(prev.timestamp * 1000).isSame(match.timestamp * 1000, 'day');
+            return (
+              <MatchItem
+                key={match.id}
+                match={match}
+                onNavigate={onNavigate}
+                platform={data.conversation.platform}
+                showMeta={showMeta}
+              />
+            );
+          })}
         </div>
       )}
     </div>
@@ -221,99 +231,66 @@ const MatchItem = ({
   match,
   onNavigate,
   platform,
+  showMeta,
 }: {
   match: SearchResultItem;
   onNavigate?: (match: SearchResultItem) => void;
   platform?: string;
+  /** Role / date line. Hidden when it would repeat the previous hit's. */
+  showMeta: boolean;
 }) => {
   const { t } = useI18n();
   const { activeQuery, activeOptions } = useAppStore(
     (state) => state.ui.search,
   );
 
-  const getHighlightedText = (text: string, highlight: string) => {
-    // Helper to render the container structure
-    const userLabel = t('export.roleUser');
-    const modelLabel = t('export.roleModel');
-    const showPlatformIcon =
-      activeOptions.platforms && activeOptions.platforms.length > 1;
+  const showPlatformIcon =
+    !!activeOptions.platforms && activeOptions.platforms.length > 1;
 
-    const renderWrapper = (content: React.ReactNode) => (
-      <div className="text-xs text-muted-foreground py-1 px-2 hover:bg-accent/30 cursor-pointer rounded">
-        <div className="font-sans text-[11px] mb-1 text-muted-foreground flex items-center gap-1">
-          {showPlatformIcon && platform && (
-            <img
-              src={PLATFORM_CONFIG[platform as Platform].icon}
-              className="w-3 h-3 object-contain"
-              alt={PLATFORM_CONFIG[platform as Platform].name}
-            />
-          )}
-          {match.role === 'user' ? userLabel : modelLabel} •{' '}
-          {dayjs(match.timestamp * 1000).format('ll')}
+  const snippetResult = useMemo(() => {
+    const regex = buildSearchRegex(activeQuery, activeOptions, 'g');
+    return regex ? buildSearchSnippets(match.content, regex) : null;
+  }, [match.content, activeQuery, activeOptions]);
+
+  const renderBody = () => {
+    const textClass =
+      'break-words font-sans text-[13px] text-foreground leading-relaxed';
+
+    if (!snippetResult) {
+      return (
+        <div className={cn(textClass, 'line-clamp-3')}>
+          {buildPlainPreview(match.content)}
         </div>
-        <div className="line-clamp-4 break-words whitespace-pre-wrap font-sans text-[13px] text-foreground leading-relaxed">
-          {content}
-        </div>
+      );
+    }
+
+    const { snippets } = snippetResult;
+    // One window gets three lines; two windows share four.
+    const clamp = snippets.length > 1 ? 'line-clamp-2' : 'line-clamp-3';
+    return (
+      <div className="flex flex-col gap-0.5">
+        {snippets.map((parts, i) => (
+          <div key={i} className={cn(textClass, clamp)}>
+            {parts.map((part, j) =>
+              part.isMatch ? (
+                <span
+                  key={j}
+                  className="bg-highlight/65 text-foreground rounded-[2px]"
+                >
+                  {part.text}
+                </span>
+              ) : (
+                <React.Fragment key={j}>{part.text}</React.Fragment>
+              ),
+            )}
+          </div>
+        ))}
       </div>
     );
-
-    if (!highlight.trim()) {
-      return renderWrapper(
-        text.substring(0, 150) + (text.length > 150 ? '...' : ''),
-      );
-    }
-
-    const regex = buildSearchRegex(highlight, activeOptions, 'g');
-    // First non-empty match, so the snippet is centred on an actual hit.
-    const firstHit = regex ? findFirstMatch(text, regex) : null;
-
-    if (!regex || !firstHit) {
-      return renderWrapper(
-        text.substring(0, 100) + (text.length > 100 ? '...' : ''),
-      );
-    }
-
-    const index = firstHit.index;
-    const matchLength = firstHit.length;
-    let start = Math.max(0, index - 40);
-    let end = Math.min(text.length, index + matchLength + 60);
-
-    // Adjust start to previous word boundary to avoid cutting words in half
-    if (start > 0) {
-      const spaceIndex = text.indexOf(' ', start);
-      if (spaceIndex !== -1 && spaceIndex < index) {
-        start = spaceIndex + 1;
-      }
-    }
-
-    // Adjust end to next word boundary to avoid cutting words in half
-    if (end < text.length) {
-      const spaceIndex = text.lastIndexOf(' ', end);
-      if (spaceIndex !== -1 && spaceIndex > index + matchLength) {
-        end = spaceIndex;
-      }
-    }
-
-    const snippet =
-      (start > 0 ? '...' : '') +
-      text.substring(start, end) +
-      (end < text.length ? '...' : '');
-
-    const highlightedContent = splitByMatches(snippet, regex).map((part, i) =>
-      part.isMatch ? (
-        <span
-          key={i}
-          className="bg-highlight/65 text-foreground rounded-[2px]"
-        >
-          {part.text}
-        </span>
-      ) : (
-        <React.Fragment key={i}>{part.text}</React.Fragment>
-      ),
-    );
-
-    return renderWrapper(highlightedContent);
   };
+
+  // Total hits in this message, so a passing mention reads differently from a deep dive.
+  const matchCount = snippetResult?.matchCount ?? 0;
 
   const handleNavigation = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -374,7 +351,37 @@ const MatchItem = ({
 
   return (
     <div className="relative group" onClick={handlePreview}>
-      {getHighlightedText(match.content, activeQuery)}
+      <div className="text-xs text-muted-foreground py-1 px-2 hover:bg-accent/30 cursor-pointer rounded">
+        {(showMeta || matchCount > 1) && (
+          <div className="font-sans text-[11px] mb-0.5 text-muted-foreground/80 flex items-center gap-1">
+            {showMeta && (
+              <>
+                {showPlatformIcon && platform && (
+                  <img
+                    src={PLATFORM_CONFIG[platform as Platform].icon}
+                    className="w-3 h-3 object-contain"
+                    alt={PLATFORM_CONFIG[platform as Platform].name}
+                  />
+                )}
+                <span>
+                  {match.role === 'user'
+                    ? t('export.roleUser')
+                    : t('export.roleModel')}{' '}
+                  • {dayjs(match.timestamp * 1000).format('ll')}
+                </span>
+              </>
+            )}
+            {matchCount > 1 && (
+              <span className="ml-auto shrink-0 tabular-nums group-hover:invisible">
+                {t('search.matchCount', {
+                  count: matchCount >= 999 ? '999+' : matchCount,
+                })}
+              </span>
+            )}
+          </div>
+        )}
+        {renderBody()}
+      </div>
       <SimpleTooltip content={t('search.jumpToConversation')}>
         <button
           onClick={handleNavigation}

@@ -8,6 +8,7 @@ import { detectPlatform, Platform } from '@/shared/types/platform';
 import { removeTab, resolveTabDb, UNBOUND } from './tab-profile-map';
 import { withDb } from '@/shared/db';
 import { handleBrowserAgent } from './handlers/browser-agent';
+import { handleWebAgent } from './handlers/web-agent';
 import {
   handleFolders,
   handleConversations,
@@ -70,6 +71,9 @@ export async function handleMessage(
   sender: MessageSender,
 ): Promise<ExtensionResponse> {
   try {
+    // First, before anything awaits: a handoff opens the side panel, and the user gesture
+    // it rides on does not survive a single `await` (see handlers/web-agent.ts).
+    if (message.type === 'WEB_AGENT') return await handleWebAgent(message.payload, sender);
     if (message.type === 'BROWSER_AGENT') return await handleBrowserAgent(message.payload, sender);
     // The DB bridge broadcasts these to the offscreen document, and
     // runtime.sendMessage reaches every extension context including this one.
@@ -111,10 +115,12 @@ export async function handleMessage(
 
     await ensureDbReady();
 
-    // Detect platform from sender tab and inject into message payload if not present
-    if (sender.tab?.url) {
+    // Detect platform from sender tab and inject into message payload if not present.
+    // `sender.url` covers the Web Agent side panel, whose Gemini iframe is not in a tab.
+    const senderPageUrl = sender.tab?.url ?? sender.url;
+    if (senderPageUrl) {
       try {
-        const url = new URL(sender.tab.url);
+        const url = new URL(senderPageUrl);
         const platform = detectPlatform(url.hostname);
         if (platform !== Platform.UNKNOWN) {
           message.platform = platform;

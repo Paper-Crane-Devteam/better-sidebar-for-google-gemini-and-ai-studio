@@ -10,7 +10,7 @@ export default defineConfig({
   // Manual rebuild + reload: `r` + Enter in the dev terminal, or
   // `npm run devtap reload`. See scripts/dev-reload.mjs.
   hooks: devReload.hooks,
-  manifest: ({ browser: targetBrowser }) => ({
+  manifest: ({ browser: targetBrowser, command }) => ({
     name: '__MSG_extensionName__',
     description: '__MSG_extensionDescription__',
     default_locale: 'en',
@@ -27,8 +27,24 @@ export default defineConfig({
       'scripting',
       'offscreen',
       'identity',
+      // Web Agent (Chrome only). None of these carries an install warning, which matters:
+      // a new warned permission in an update disables the extension until the user
+      // re-approves it. `WithHostAccess` instead of plain dNR for the same reason — it
+      // only acts on the Gemini/AI Studio hosts we already hold.
+      ...(targetBrowser === 'chrome'
+        ? ['sidePanel', 'contextMenus', 'declarativeNetRequestWithHostAccess']
+        : []),
+      // ⚠️ Dev builds only. Chrome refuses `debugger` as an *optional* permission, and as a
+      // required one it carries an install warning that would disable the extension for
+      // every user on update. Production drives pages through the separate Web Agent
+      // Connector extension instead (connector/, §16 of the Web Agent design doc).
+      // `npm run dev:via-connector` leaves it out so the Connector path can be tested in dev.
+      ...(targetBrowser === 'chrome' && command === 'serve' && !process.env.WEB_AGENT_CONNECTOR ? ['debugger'] : []),
     ],
     optional_permissions: ['tabs', 'tabGroups', 'bookmarks'],
+    ...(targetBrowser === 'chrome'
+      ? { side_panel: { default_path: 'web-agent-panel.html' } }
+      : {}),
     host_permissions: [
       'https://aistudio.google.com/*',
       'https://gemini.google.com/*',

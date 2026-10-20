@@ -6,6 +6,33 @@
   "extensionDescription": {
     "message": "使用資料夾、標籤、全文搜尋、提示詞庫、匯出、Drive 同步、AI 工具等整理 Gemini & AI Studio 對話。",
     "description": "插件描述"
+  },
+  "webAgentMenu": {
+    "message": "讓 Web Agent 操作此頁面",
+    "description": "Context menu item that opens the Web Agent side panel for the current page"
+  },
+  "webAgentAddActive": {
+    "message": "+ 目前分頁",
+    "description": "Web Agent side panel toolbar: let the agent operate the active tab"
+  },
+  "webAgentAddAll": {
+    "message": "+ 所有分頁",
+    "description": "Web Agent side panel toolbar: let the agent operate every tab in the window"
+  },
+  "webAgentAddAllConfirm": {
+    "message": "允許 Web Agent 操作此視窗中的所有分頁嗎？（共 $1 個）",
+    "description": "Confirm dialog before adding all tabs. $1 is the tab count"
+  },
+  "webAgentNoTabs": {
+    "message": "尚無受控分頁",
+    "description": "Web Agent side panel toolbar: shown when no tab is under the agent's control"
+  },
+  "webAgentRemoveTab": {
+    "message": "停止控制此分頁",
+    "description": "Web Agent side panel toolbar: tooltip of the × that takes a tab out of the agent's control"
+  },
+  "webAgentCurrentRefused": {
+    "message": "Web Agent 無法操作此頁面",
+    "description": "Web Agent side panel toolbar: tooltip when the active tab cannot be operated (e.g. Gemini itself)"
   }
 }
-

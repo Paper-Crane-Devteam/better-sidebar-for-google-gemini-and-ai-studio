@@ -663,6 +663,7 @@
     "jumpStop": "중지",
     "searching": "검색 중...",
     "resultsSummary": "{{count}} 결과가 {{files}} 채팅으로 나타남",
+    "matchCount": "{{count}}개 일치",
     "whyNoOlder": "이유 이전 채팅을 찾을 수 없나요?",
     "context": "컨텍스트",
     "modelResponse": "모델의 응답",

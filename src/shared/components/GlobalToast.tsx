@@ -1,4 +1,5 @@
 import React from 'react';
+import { TopLayerPortal } from './TopLayerPortal';
 import { useToastStore } from '@/shared/lib/toast';
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 import { cn } from '@/shared/lib/utils/utils'; // Assuming cn utility exists, usually does in shadcn projects
@@ -31,6 +32,7 @@ export const GlobalToast = () => {
   if (toasts.length === 0) return null;
 
   return (
+    <TopLayerPortal>
     <div
       className="fixed top-4 left-1/2 -translate-x-1/2 flex flex-col gap-2 pointer-events-none w-full max-w-sm items-center px-4"
       style={{ zIndex: Z_INDEX.TOAST }}
@@ -64,5 +66,6 @@ export const GlobalToast = () => {
         </div>
       ))}
     </div>
+    </TopLayerPortal>
   );
 };

@@ -190,6 +190,32 @@
     "slashTip": "Tip: Type / in the input box to quickly insert a prompt.",
     "slashTipDismiss": "Got it"
   },
+  "instructionPrompt": {
+    "library": "Prompts",
+    "fillFromLibrary": "Fill from Prompt Library",
+    "saveToLibrary": "Save to Prompt Library",
+    "searchPlaceholder": "Search prompts...",
+    "filterSystem": "System",
+    "filterAll": "All",
+    "noMatches": "No matching prompts",
+    "emptyLibrary": "Your prompt library is empty",
+    "goToPrompts": "Open Prompt Library",
+    "back": "Back",
+    "fill": "Fill",
+    "filled": "Filled \"{{title}}\"",
+    "fillFailed": "Couldn't fill the instructions. Try reopening the panel.",
+    "undo": "Undo",
+    "saveTitle": "Save as Prompt",
+    "saved": "Saved to Prompt Library",
+    "nothingToSave": "The instructions are empty, nothing to save",
+    "sourceNative": "AI Studio",
+    "sourceLibrary": "Better Sidebar",
+    "sourceTooltip": "Choose where system instructions come from",
+    "switchTip": "You can manage system instructions with the Better Sidebar prompt library instead: folders, variables, and the same prompts in Gemini and AI Studio. You can switch back anytime.",
+    "switchTipSwitch": "Switch",
+    "switchTipKeep": "Keep AI Studio",
+    "autoImported": "Imported {{count}} AI Studio instruction(s) into Prompt Library › {{folder}}"
+  },
   "snippets": {
     "createSnippet": "New Snippet",
     "editSnippet": "Edit Snippet",
@@ -665,6 +691,7 @@
     "jumpStop": "Stop",
     "searching": "Searching...",
     "resultsSummary": "{{count}} results in {{files}} chats",
+    "matchCount": "{{count}} matches",
     "whyNoOlder": "Why can't I find older chats?",
     "context": "Context",
     "modelResponse": "Model's Response",
@@ -1755,6 +1782,11 @@
         "name": "Browser Agent",
         "shortName": "Browser",
         "description": "Organize and manage Chrome tabs, tab groups and bookmarks"
+      },
+      "web": {
+        "name": "Web Agent",
+        "shortName": "Web",
+        "description": "Read and operate web pages for you in the side panel"
       }
     },
     "switcher": {
@@ -1862,6 +1894,46 @@
         "open": {
           "label": "Open tabs",
           "text": "Open tabs for "
+        }
+      },
+      "web": {
+        "summarize": {
+          "label": "Summarize this page",
+          "text": "Summarize the page I have open"
+        },
+        "extract": {
+          "label": "Extract a table",
+          "text": "Extract the table on this page as Markdown"
+        },
+        "fill": {
+          "label": "Fill a form",
+          "text": "Fill in the form on this page with "
+        },
+        "open": {
+          "label": "Open a site",
+          "text": "Open "
+        }
+      }
+    },
+    "webPanel": {
+      "title": "Let AI read and operate web pages for you",
+      "riskNotice": "Risk notice and permission",
+      "examples": {
+        "summarize": {
+          "label": "Summarize a page",
+          "text": "Read the article in my current tab and give me the key points in five bullets, plus anything it claims that I should double-check."
+        },
+        "extract": {
+          "label": "Pull data out of a page",
+          "text": "Extract the main table on the page I have open as Markdown. Keep the column names as they are and tell me if any rows look cut off or paginated."
+        },
+        "compare": {
+          "label": "Compare a few pages",
+          "text": "Open the product pages for the three options I list below, compare price, specs and return policy side by side, and tell me which one you would pick and why."
+        },
+        "fill": {
+          "label": "Fill in a form",
+          "text": "Fill in the form on this page with the details below. Stop before the submit button and show me what you entered so I can check it."
         }
       }
     },
@@ -2041,6 +2113,66 @@
       "about": "About the workspace",
       "howToUseTitle": "How to Use Workspace",
       "howToUseContent": "Workspace is your dedicated file environment where AI can directly read, write, edit, and create documents and code from scratch.\n\nHow to use:\nType >Workspace in the chat input to activate the agent. You can drag and drop existing files into the workspace, or simply ask the AI to generate new files from scratch (e.g. building a frontend project from the ground up).\n\nSupported Formats & Capabilities:\n- Plain Text & Code (.html, .js, .ts, .py, .md, .txt, etc.): Full support for creation from scratch and precise editing! Ask AI to scaffold an entire frontend project, write scripts, draft Markdown notes, or refactor existing code.\n- Word (.docx): Review papers chapter by chapter, rewrite paragraphs with tracked changes, and add reviewer comments (requires uploading existing files).\n- Excel (.xlsx/.csv): Analyze data, write formulas, and add columns without altering original formats or charts (requires uploading existing files).\n- PDF: Read papers and reports, extract text, merge pages, and add annotations.\n- PowerPoint (.pptx): Read and edit slide content and speaker notes.\n- Subtitles (.srt/.vtt): Translate and polish subtitles while preserving timestamps.\n\n💡 Tip: Text and code files can be created from scratch and freely edited. Special formats (Word, Excel, PPT, PDF) currently focus on reading, annotating, and precisely editing existing files while preserving their original formatting."
+    },
+    "web": {
+      "needsPowerPack": "⭐ Power Pack feature · click to learn more",
+      "needsConsent": "🔒 Read the risk notice first · click to open",
+      "needsConnector": "🔌 Set up the Web Agent Connector · click to open",
+      "handedOff": "Sent to the Web Agent in the side panel",
+      "panelBusy": "The side panel is still running a task. Finish or stop it first.",
+      "addedWhileRunning": "Added to the Web Agent. The running task can use it via page_list.",
+      "panelBlocked": "Chrome did not open the side panel.",
+      "openPanel": "Open side panel",
+      "consent": {
+        "title": "Before you use the Web Agent",
+        "intro": "The Web Agent lets the AI read web pages and operate them for you: clicking, typing and running scripts in your browser. Please read this before turning it on.",
+        "risks": {
+          "actsAsYou": {
+            "title": "It acts as you",
+            "body": "The agent works in your own browser, with your logged-in accounts. Whatever it does — submitting a form, sending a message, placing an order — is done under your name, and may not be reversible."
+          },
+          "dataToAi": {
+            "title": "Page content goes to the AI",
+            "body": "Everything the agent reads from a page (text, links, form values) becomes part of your Gemini conversation and is sent to Google. Password fields are never read."
+          },
+          "injection": {
+            "title": "Web pages can try to trick it",
+            "body": "A page can contain hidden instructions written for an AI (\"prompt injection\"). Check every action before you approve it, especially on sites you do not know."
+          },
+          "sensitive": {
+            "title": "Keep it away from sensitive pages",
+            "body": "Do not use it on banking, payment, medical or account-security pages, or anywhere a mistake would be expensive."
+          },
+          "mistakes": {
+            "title": "The AI makes mistakes",
+            "body": "It can click the wrong thing or misread a page. You approve every click, every piece of typing and every script. Stay at the computer while it runs."
+          },
+          "stop": {
+            "title": "How to stop it",
+            "body": "Chrome shows a \"started debugging this browser\" bar on every page the agent controls. Press Cancel on that bar, or close the side panel, and it stops immediately."
+          },
+          "responsibility": {
+            "title": "You are responsible for what you approve",
+            "body": "Including following the terms of the websites you use it on. Better Sidebar is provided as is, and is not liable for losses caused by actions you approved."
+          }
+        },
+        "permissionNote": "The agent operates pages through Chrome's page debugger. While it works, Chrome shows a debugging bar on those pages.",
+        "checkbox": "I have read and understand these risks",
+        "cancel": "Not now",
+        "agree": "Agree",
+        "connector": {
+          "title": "Web Agent Connector",
+          "missing": "To operate pages, the Web Agent needs a small companion extension: Better Sidebar Web Agent Connector. It holds Chrome's page debugger permission, so Better Sidebar itself does not have to, and it only accepts requests from Better Sidebar.",
+          "outdated": "Your Web Agent Connector is out of date. Update it from the Chrome Web Store, then come back here.",
+          "paused": "The Web Agent Connector is paused. Click its icon in the Chrome toolbar and turn it back on.",
+          "install": "Install from Chrome Web Store",
+          "update": "Open in Chrome Web Store",
+          "comeBack": "This page updates by itself once the Connector is installed."
+        },
+        "accepted": "You have accepted this notice and the Web Agent is on. Withdrawing turns it off until you accept again.",
+        "withdraw": "Withdraw",
+        "done": "Done"
+      }
     }
   },
   "backup": {

@@ -362,7 +362,9 @@ export const ConversationOverlay: React.FC = () => {
                 // width of a native turn — so alignment is free and there is no chat-width
                 // setting to invent.
                 { width: '100%' }
-              : { maxWidth: `${chatWidth}%`, minWidth: '724px' }
+              : // `min(…, 100%)`: in Gemini's narrow (mobile) layout — the Web Agent side
+                // panel, or a slim window — a fixed 724px floor overflows sideways.
+                { maxWidth: `${chatWidth}%`, minWidth: 'min(724px, 100%)' }
           }
         >
           {messages.length === 0 ? (

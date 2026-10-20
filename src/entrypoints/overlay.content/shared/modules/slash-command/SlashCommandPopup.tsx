@@ -6,6 +6,7 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { PromptIconDisplay } from '@/entrypoints/overlay.content/shared/modules/prompts/lib/prompt-icons';
 import { PopupFooterHints } from '@/entrypoints/overlay.content/shared/features/trigger-popup';
 import { useAppStore } from '@/shared/lib/store';
+import { TopLayerPortal } from '@/shared/components/TopLayerPortal';
 
 interface SlashCommandPopupProps {
   matches: SlashCommandMatch[];
@@ -14,8 +15,8 @@ interface SlashCommandPopupProps {
   onHighlight: (index: number) => void;
   /** Confirm selection on click */
   onConfirm: (index: number) => void;
-  /** Position relative to viewport */
-  position: { bottom: number; left: number };
+  /** Position relative to viewport — anchored by `bottom` (above the input) or `top` (below it) */
+  position: { bottom?: number; top?: number; left: number };
   query: string;
 }
 
@@ -41,12 +42,13 @@ export const SlashCommandPopup: React.FC<SlashCommandPopupProps> = ({
   }, [selectedIndex]);
 
   return (
+    <TopLayerPortal>
     <div
       // How the `>` trigger knows `/` is on screen and stands down — the two share an
       // editor, so without a marker to look for the mutual exclusion never fires.
       data-slash-command-popup=""
       className="fixed z-[9999] min-w-[280px] max-w-[400px] rounded-lg bg-popover shadow-[shadow:var(--shadow-popover)] overflow-hidden"
-      style={{ bottom: position.bottom, left: position.left }}
+      style={{ bottom: position.bottom, top: position.top, left: position.left }}
       onMouseDown={(e) => e.preventDefault()} // Prevent input blur on popup interaction
     >
       {/* Header */}
@@ -104,6 +106,7 @@ export const SlashCommandPopup: React.FC<SlashCommandPopupProps> = ({
       {/* Footer hint */}
       <PopupFooterHints />
     </div>
+    </TopLayerPortal>
   );
 };
 

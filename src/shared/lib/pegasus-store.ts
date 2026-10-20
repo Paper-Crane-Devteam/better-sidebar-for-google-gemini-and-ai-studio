@@ -101,6 +101,13 @@ export interface AIStudioEnhancedFeatures {
   slashCommand: boolean;
   /** `>` in the composer opens the agent launcher popup */
   agentTrigger: boolean;
+  /**
+   * Who manages the System instructions panel: AI Studio's own saved list, or our
+   * prompt library. 'unset' = not chosen yet (the panel shows a one-time hint).
+   */
+  systemInstructionSource: 'unset' | 'native' | 'library';
+  /** AI Studio's saved system instructions were auto-imported into the prompt library once */
+  systemInstructionsImported: boolean;
 }
 
 export type SupportedLanguage =
@@ -192,6 +199,8 @@ export const usePegasusStore = create<PegasusState>()((set) => ({
       showHotkeyHelper: true,
       slashCommand: true,
       agentTrigger: true,
+      systemInstructionSource: 'unset',
+      systemInstructionsImported: false,
     },
   },
   setGeminiEnhancedFeature: (key, value) =>
@@ -268,6 +277,8 @@ const DEFAULT_ENHANCED_FEATURES: PegasusState['enhancedFeatures'] = {
     showHotkeyHelper: true,
     slashCommand: true,
     agentTrigger: true,
+    systemInstructionSource: 'unset',
+    systemInstructionsImported: false,
   },
 };
 
@@ -364,6 +375,27 @@ export const hydratePegasusStoreFromCache = async () => {
     console.warn('[PegasusStore] Cache hydration failed:', err);
   }
   ensureEnhancedFeaturesDefaults();
+};
+
+/**
+ * Read-only store for frames pegasus cannot reach: the Web Agent side panel iframe.
+ *
+ * Pegasus addresses content scripts by tab id, and a side panel is not a tab — the
+ * handshake never completes there and `getPegasusStoreReady()` would hang forever.
+ * Instead, hydrate from the persisted snapshot and follow later writes through
+ * `storage.onChanged`. ⚠️ Writes made in such a frame stay local; they are not persisted.
+ */
+export const mirrorPegasusStoreFromStorage = async () => {
+  await hydratePegasusStoreFromCache();
+  browser.storage.onChanged.addListener((changes, area) => {
+    if (area !== 'local' || !(STORE_STORAGE_KEY in changes)) return;
+    const raw = changes[STORE_STORAGE_KEY].newValue;
+    if (typeof raw !== 'string') return;
+    try {
+      usePegasusStore.setState(JSON.parse(raw));
+      ensureEnhancedFeaturesDefaults();
+    } catch { /* malformed snapshot, keep what we have */ }
+  });
 };
 
 let syncPromise: Promise<void> | null = null;

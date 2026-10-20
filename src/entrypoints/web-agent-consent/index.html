@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en" class="theme-gemini">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Web Agent</title>
+    <!-- Same pre-paint shell as browser-agent-settings.html. -->
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: rgb(var(--background));
+        color: rgb(var(--foreground));
+      }
+      @media (prefers-color-scheme: dark) {
+        html:not(.theme-ready) {
+          --background: 3 3 3;
+          --foreground: 227 227 227;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./index.tsx"></script>
+  </body>
+</html>

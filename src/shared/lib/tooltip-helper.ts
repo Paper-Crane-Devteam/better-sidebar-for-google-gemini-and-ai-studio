@@ -1,4 +1,5 @@
 import { applyShadowStyles } from './utils/utils';
+import { keepOnTopLayer } from './top-layer';
 import type { ThemeVariable } from '@/themes/types';
 import { clearSidebarTheme } from '@/themes/engine';
 
@@ -32,6 +33,9 @@ export class TooltipHelper {
     this.container.style.pointerEvents = 'none'; // Pass through clicks
 
     document.body.appendChild(this.container);
+
+    // Page overlays in the top layer (AI Studio's drawers) would otherwise cover tooltips
+    keepOnTopLayer(this.container, 10);
 
     // Create shadow root
     this.shadow = this.container.attachShadow({ mode: 'open' });

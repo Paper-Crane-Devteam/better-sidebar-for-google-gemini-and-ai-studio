@@ -55,6 +55,12 @@ const QUICK_PROMPTS: Record<AgentId, QuickPrompt[]> = {
     { key: 'findBookmark', label: 'Find bookmarks', text: 'Find my bookmarks about ' },
     { key: 'open', label: 'Open tabs', text: 'Open tabs for ' },
   ],
+  web: [
+    { key: 'summarize', label: 'Summarize this page', text: 'Summarize the page I have open' },
+    { key: 'extract', label: 'Extract a table', text: 'Extract the table on this page as Markdown' },
+    { key: 'fill', label: 'Fill a form', text: 'Fill in the form on this page with ' },
+    { key: 'open', label: 'Open a site', text: 'Open ' },
+  ],
 };
 
 export function getQuickPrompts(agentId: AgentId): QuickPrompt[] {

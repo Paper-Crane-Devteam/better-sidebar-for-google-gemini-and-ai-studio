@@ -15,6 +15,7 @@ import { THEME_MCP } from './theme-mcp';
 import { WORKSPACE_MCP, WORKSPACE_MCP_ID } from './workspace-mcp';
 import { DOCUMENT_MCP, DOCUMENT_MCP_ID } from './document-mcp';
 import { BROWSER_MCP } from './browser-mcp';
+import { WEB_MCP } from './web-mcp';
 import { AGENTS } from '../agents/registry';
 import type { AgentDefinition, AgentId } from '../agents/types';
 import { useAgentConfigStore } from '../agent-config-store';
@@ -32,7 +33,7 @@ const OWNED_SERVERS: MCPServer[] = [
   THEME_MCP,
   WORKSPACE_MCP,
   DOCUMENT_MCP,
-  ...(isChromeBuild() ? [BROWSER_MCP] : []),
+  ...(isChromeBuild() ? [BROWSER_MCP, WEB_MCP] : []),
 ];
 
 /**

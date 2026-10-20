@@ -6,6 +6,7 @@ import { ZenModeFeature } from './ZenModeFeature';
 import { SmartScrollbarFeature } from './SmartScrollbar/SmartScrollbarFeature';
 import { AutoHideInputFeature } from './AutoHideInputFeature';
 import { SlashCommandFeature } from './SlashCommandFeature';
+import { InstructionPromptFeature } from './InstructionPromptFeature';
 import { AgentLoopFeature } from './AgentLoopFeature';
 import { SaveSnippetFeature } from './SaveSnippetFeature';
 import { SelectionToolbarFeature } from './SelectionToolbar/SelectionToolbarFeature';
@@ -72,6 +73,7 @@ export const GeminiEnhancedFeatures = () => {
       <SmartScrollbarFeature />
       <AutoHideInputFeature />
       <SlashCommandFeature />
+      <InstructionPromptFeature />
       <AgentLoopFeature />
       <SaveSnippetFeature />
       <SelectionToolbarFeature />

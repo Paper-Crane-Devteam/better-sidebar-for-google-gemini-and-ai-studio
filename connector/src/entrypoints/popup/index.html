@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Web Agent Connector</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header>
+      <img src="/icons/icon32.png" width="20" height="20" alt="" />
+      <h1>Web Agent Connector</h1>
+    </header>
+
+    <p id="status" class="status" role="status"></p>
+
+    <section>
+      <h2>Tabs being controlled</h2>
+      <ul id="tabs"></ul>
+      <p id="empty" class="muted" hidden>None right now.</p>
+    </section>
+
+    <div class="row">
+      <button id="disconnect" type="button">Disconnect all</button>
+      <label class="switch">
+        <input id="paused" type="checkbox" />
+        <span>Pause</span>
+      </label>
+    </div>
+
+    <p class="muted small">
+      Lets Better Sidebar's Web Agent operate the tabs you add to it, through Chrome's page
+      debugger. It only accepts requests from Better Sidebar and sends nothing anywhere.
+      Pausing disconnects every tab and refuses new ones until you turn it back on.
+    </p>
+
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

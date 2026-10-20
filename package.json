@@ -1,13 +1,16 @@
 {
   "name": "better-sidebar-for-google-ai-studio",
   "type": "module",
-  "version": "2.13.0",
+  "version": "2.13.1",
   "private": true,
   "description": "Organize Gemini & AI Studio chats with folders, tags, full-text search, prompts, export, Drive sync, AI tools & more.",
   "author": "Paper Crane Devteam",
   "scripts": {
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",
+    "dev:via-connector": "WEB_AGENT_CONNECTOR=1 wxt",
+    "build:connector": "wxt build connector",
+    "zip:connector": "wxt zip connector",
     "build": "wxt build",
     "build:firefox": "wxt build -b firefox",
     "zip": "wxt zip",

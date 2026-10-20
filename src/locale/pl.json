@@ -663,6 +663,7 @@
     "jumpStop": "Zatrzymaj",
     "searching": "Wyszukiwanie...",
     "resultsSummary": "{{count}} wyników w {{files}} czatach",
+    "matchCount": "{{count}} dopasowań",
     "whyNoOlder": "Dlaczego nie mogę znaleźć starszych czatów?",
     "context": "Kontekst",
     "modelResponse": "Odpowiedź modelu",

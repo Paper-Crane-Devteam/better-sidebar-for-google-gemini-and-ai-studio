@@ -23,6 +23,7 @@ import {
   LICENSE_RENEWAL_ALARM,
 } from '@/shared/lib/license-renewal';
 import { trace } from '@/shared/lib/trace';
+import { initWebAgent } from './handlers/web-agent';
 import {
   registerUpdateAvailableListener,
   registerUpdateCheckAlarm,
@@ -46,6 +47,8 @@ export default defineBackground(() => {
   // Remembers a downloaded store update so the About page can offer "Update now".
   registerUpdateAvailableListener();
   registerUpdateCheckAlarm();
+  // Side panel, context menu, frame rule and debugger listeners. Chrome only; a no-op elsewhere.
+  initWebAgent();
 
   const setupUninstallUrl = async () => {
     try {

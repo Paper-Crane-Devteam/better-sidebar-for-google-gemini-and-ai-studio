@@ -95,6 +95,121 @@ const HighlightedFence = memo(
 
 HighlightedFence.displayName = 'HighlightedFence';
 
+/** The slice of hast this file touches; avoids a direct dependency on `@types/hast`. */
+interface HastNode {
+  type: string;
+  value?: string;
+  tagName?: string;
+  properties?: Record<string, unknown>;
+  children?: HastNode[];
+  position?: { start: { offset?: number }; end: { offset?: number } };
+}
+
+type Range = [start: number, end: number];
+
+const SEARCH_MARK_CLASSES = ['bg-highlight/65', 'text-foreground', 'rounded-[2px]'];
+
+function textOf(node: HastNode): string {
+  if (node.type === 'text') return node.value ?? '';
+  return (node.children ?? []).map(textOf).join('');
+}
+
+function isMathNode(node: HastNode): boolean {
+  const cls = node.properties?.className;
+  const list = Array.isArray(cls) ? cls.map(String) : typeof cls === 'string' ? [cls] : [];
+  return list.some((c) => c.includes('katex') || c.includes('math-inline') || c.includes('math-display'));
+}
+
+function sourceRange(node: HastNode): Range | null {
+  const s = node.position?.start.offset;
+  const e = node.position?.end.offset;
+  return s == null || e == null ? null : [s, e];
+}
+
+/** Match ranges, as offsets into `text`. */
+function matchRanges(text: string, regex: RegExp): Range[] {
+  const out: Range[] = [];
+  let at = 0;
+  for (const part of splitByMatches(text, regex)) {
+    if (part.isMatch) out.push([at, at + part.text.length]);
+    at += part.text.length;
+  }
+  return out;
+}
+
+/**
+ * Marks search hits in the rendered markdown.
+ *
+ * ⚠️ The query is matched against the **markdown source**, not the rendered text, because
+ * that is what the DB search matched. Matching each rendered text node on its own (what
+ * this used to do) misses two kinds of hit the search happily returns:
+ * - a query that includes markup, e.g. `**行为**` — the rendered text has no asterisks;
+ * - a regex that spans formatting, e.g. `行为.+google` over `**行为** … \`google:search\``
+ *   — the hit is split across a <strong>, a plain text node and a <code>.
+ *
+ * So hits are found once in the source, and each text node marks whatever part of them it
+ * covers, located through its source position. A text node whose value is not a verbatim
+ * slice of its source span (inline code includes its backticks, a fenced block's text has
+ * no position of its own) is found inside the span with `indexOf`; if even that fails
+ * (escapes, entities, stripped list indentation) it falls back to matching its own text.
+ */
+function rehypeSearchMarks({ source, regex }: { source: string; regex: RegExp | null }) {
+  return (tree: HastNode) => {
+    if (!regex) return;
+    const hits = matchRanges(source, regex);
+    if (hits.length === 0) return;
+
+    const localRanges = (value: string, window: Range | null): Range[] => {
+      if (window) {
+        const slice = source.slice(window[0], window[1]);
+        const idx = slice === value ? 0 : slice.indexOf(value);
+        if (idx >= 0) {
+          const base = window[0] + idx;
+          const end = base + value.length;
+          return hits
+            .filter(([a, b]) => b > base && a < end)
+            .map(([a, b]): Range => [Math.max(a, base) - base, Math.min(b, end) - base]);
+        }
+      }
+      return matchRanges(value, regex);
+    };
+
+    const walk = (node: HastNode, window: Range | null) => {
+      if (!node.children || isMathNode(node)) return;
+      const own = sourceRange(node) ?? window;
+      const next: HastNode[] = [];
+      for (const child of node.children) {
+        if (child.type !== 'text' || !child.value) {
+          walk(child, own);
+          next.push(child);
+          continue;
+        }
+        const value = child.value;
+        const ranges = localRanges(value, sourceRange(child) ?? own);
+        if (ranges.length === 0) {
+          next.push(child);
+          continue;
+        }
+        let last = 0;
+        for (const [a, b] of ranges) {
+          if (a > last) next.push({ type: 'text', value: value.slice(last, a) });
+          next.push({
+            type: 'element',
+            tagName: 'span',
+            properties: { className: SEARCH_MARK_CLASSES },
+            children: [{ type: 'text', value: value.slice(a, b) }],
+          });
+          last = b;
+        }
+        if (last < value.length) next.push({ type: 'text', value: value.slice(last) });
+      }
+      node.children = next;
+    };
+
+    walk(tree, sourceRange(tree));
+  };
+}
+
 interface MarkdownRendererProps {
   children: string;
   className?: string;
@@ -103,58 +218,20 @@ interface MarkdownRendererProps {
 }
 
 export const MarkdownRenderer = memo(({ children, className, highlight, highlightOptions }: MarkdownRendererProps) => {
-  
-  const highlightText = (text: string) => {
-    if (!highlight || !highlight.trim()) return text;
+  const searchRegex = useMemo(
+    () => (highlight && highlight.trim() ? buildSearchRegex(highlight, highlightOptions ?? {}, 'g') : null),
+    [highlight, highlightOptions],
+  );
 
-    const regex = buildSearchRegex(highlight, highlightOptions ?? {}, 'g');
-    if (!regex) return text;
-
-    return splitByMatches(text, regex).map((part, i) =>
-      part.isMatch ? (
-        <span
-          key={i}
-          className="bg-highlight/65 text-foreground rounded-[2px]"
-        >
-          {part.text}
-        </span>
-      ) : (
-        <React.Fragment key={i}>{part.text}</React.Fragment>
-      ),
-    );
-  };
-
-  const processChildren = (node: React.ReactNode): React.ReactNode => {
-    if (!node) return node;
-    
-    if (typeof node === 'string') {
-      return highlightText(node);
-    }
-    if (Array.isArray(node)) {
-      return node.map((child, index) => <React.Fragment key={index}>{processChildren(child)}</React.Fragment>);
-    }
-    if (React.isValidElement(node)) {
-       const element = node as React.ReactElement<{ children?: React.ReactNode; className?: string }>;
-       // Skip KaTeX-rendered elements — they have complex internal structure that must not be modified
-       if (element.props?.className && typeof element.props.className === 'string' &&
-           (element.props.className.includes('katex') || element.props.className.includes('math-inline') || element.props.className.includes('math-display'))) {
-         return node;
-       }
-       if (element.props && element.props.children) {
-           return React.cloneElement(element, {
-               children: processChildren(element.props.children)
-           });
-       }
-       return node;
-    }
-    return node;
-  };
-
+  // Search marks are inserted into the hast tree (see `rehypeSearchMarks`), so by the time
+  // the overrides below run, children already contain them and are rendered as-is.
   // We need to override components that can contain text.
   const components: any = {
       // Math components — in react-markdown v10, remark-math outputs code elements with language-math class
       code: ({ node, className, children, ...props }: any) => {
-        const content = String(children).replace(/\n$/, '');
+        // From the hast node, not `String(children)`: with search marks inserted, children
+        // are an array of elements and would stringify to `[object Object]`.
+        const content = (node ? textOf(node) : String(children)).replace(/\n$/, '');
         
         // Inline math: $...$
         if (className === 'language-math math-inline') {
@@ -176,7 +253,7 @@ export const MarkdownRenderer = memo(({ children, className, highlight, highligh
         /*
           Search marking wins over syntax colouring when both apply.
 
-          `processChildren` walks React children to wrap matches in a <span>; the highlighter
+          `rehypeSearchMarks` wraps matches in <span>s in the tree; the highlighter
           returns an HTML string. There is no way to do both without re-implementing one of
           them, and the choice is not close: someone reading with a search term active is
           looking for the term, and a coloured block that hides their hits is worse than an
@@ -204,22 +281,22 @@ export const MarkdownRenderer = memo(({ children, className, highlight, highligh
             )} 
             {...props}
           >
-             {processChildren(children)}
+             {children}
           </code>
         );
       },
       a: ({ node, children, ...props }: any) => (
         <a {...props} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-             {processChildren(children)}
+             {children}
         </a>
       ),
       pre: ({ children }: any) => (
         <pre className="bg-muted p-0 rounded-md overflow-x-auto my-3 border border-border/50 max-w-full">
-          {processChildren(children)}
+          {children}
         </pre>
       ),
-      p: ({ children }: any) => <p className="leading-relaxed [&:not(:first-child)]:mt-3.5">{processChildren(children)}</p>,
-      li: ({ children }: any) => <li>{processChildren(children)}</li>,
+      p: ({ children }: any) => <p className="leading-relaxed [&:not(:first-child)]:mt-3.5">{children}</p>,
+      li: ({ children }: any) => <li>{children}</li>,
       // Nested lists get a tighter vertical rhythm and a different bullet shape,
       // so a sub-level reads as belonging to its parent rather than as a new block.
       ul: ({ children }: any) => (
@@ -232,17 +309,17 @@ export const MarkdownRenderer = memo(({ children, className, highlight, highligh
           {children}
         </ol>
       ),
-      h1: ({ children }: any) => <h1 className="text-xl font-semibold tracking-tight mt-5 mb-2.5 first:mt-0">{processChildren(children)}</h1>,
-      h2: ({ children }: any) => <h2 className="text-lg font-semibold tracking-tight mt-4 mb-2 first:mt-0">{processChildren(children)}</h2>,
-      h3: ({ children }: any) => <h3 className="text-base font-semibold tracking-tight mt-3.5 mb-1.5 first:mt-0">{processChildren(children)}</h3>,
-      h4: ({ children }: any) => <h4 className="text-sm font-semibold tracking-tight mt-3 mb-1.5 first:mt-0">{processChildren(children)}</h4>,
-      h5: ({ children }: any) => <h5 className="text-sm font-medium tracking-tight mt-2.5 mb-1 first:mt-0">{processChildren(children)}</h5>,
-      h6: ({ children }: any) => <h6 className="text-xs font-medium tracking-tight text-muted-foreground mt-2 mb-1 first:mt-0">{processChildren(children)}</h6>,
-      strong: ({ children }: any) => <strong className="font-semibold">{processChildren(children)}</strong>,
-      em: ({ children }: any) => <em className="italic">{processChildren(children)}</em>,
+      h1: ({ children }: any) => <h1 className="text-xl font-semibold tracking-tight mt-5 mb-2.5 first:mt-0">{children}</h1>,
+      h2: ({ children }: any) => <h2 className="text-lg font-semibold tracking-tight mt-4 mb-2 first:mt-0">{children}</h2>,
+      h3: ({ children }: any) => <h3 className="text-base font-semibold tracking-tight mt-3.5 mb-1.5 first:mt-0">{children}</h3>,
+      h4: ({ children }: any) => <h4 className="text-sm font-semibold tracking-tight mt-3 mb-1.5 first:mt-0">{children}</h4>,
+      h5: ({ children }: any) => <h5 className="text-sm font-medium tracking-tight mt-2.5 mb-1 first:mt-0">{children}</h5>,
+      h6: ({ children }: any) => <h6 className="text-xs font-medium tracking-tight text-muted-foreground mt-2 mb-1 first:mt-0">{children}</h6>,
+      strong: ({ children }: any) => <strong className="font-semibold">{children}</strong>,
+      em: ({ children }: any) => <em className="italic">{children}</em>,
       blockquote: ({ children }: any) => (
           <blockquote className="border-l-4 border-primary/50 pl-4 italic my-2">
-              {processChildren(children)}
+              {children}
           </blockquote>
       ),
       table: ({ children }: any) => (
@@ -254,12 +331,12 @@ export const MarkdownRenderer = memo(({ children, className, highlight, highligh
       ),
       th: ({ children }: any) => (
         <th className="border border-border bg-muted p-2 text-left font-medium">
-          {processChildren(children)}
+          {children}
         </th>
       ),
       td: ({ children }: any) => (
         <td className="border border-border p-2">
-          {processChildren(children)}
+          {children}
         </td>
       ),
       img: ({ node, ...props }: any) => (
@@ -286,6 +363,7 @@ export const MarkdownRenderer = memo(({ children, className, highlight, highligh
       )}>
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkMath]}
+          rehypePlugins={[[rehypeSearchMarks, { source: children, regex: searchRegex }]]}
           components={components}
         >
           {children}

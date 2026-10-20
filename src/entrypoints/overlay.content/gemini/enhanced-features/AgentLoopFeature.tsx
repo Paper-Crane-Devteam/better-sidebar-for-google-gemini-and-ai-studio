@@ -1,4 +1,11 @@
 import { initializeBrowserAgent } from '@/entrypoints/overlay.content/shared/modules/agent-loop/browser/browser-store';
+import {
+  claimHandoff,
+  initializeWebAgent,
+  reportPanelRunning,
+  sendToPanel,
+} from '@/entrypoints/overlay.content/shared/modules/agent-loop/web/web-store';
+import { isPanelFrame, PANEL_NUDGE, WEB_AGENT_ID } from '@/shared/web-agent/contracts';
 /**
  * AgentLoopFeature — Gemini entry point for Agent Loop.
  *
@@ -63,7 +70,7 @@ import {
   appendCapsule,
   insertTextAtEnd,
   replaceTextAfterCapsule,
-  triggerSend,
+  ensureCapsule,
   CAPSULE_ATTR_ID,
   CAPSULE_ATTR_CONTENT,
 } from '@/entrypoints/overlay.content/shared/lib/quill-editor';
@@ -90,6 +97,7 @@ function isComposerHeldByEngine(): boolean {
 
 export const AgentLoopFeature: React.FC = () => {
   useEffect(initializeBrowserAgent, []);
+  useEffect(initializeWebAgent, []);
   const { t } = useI18n();
   /**
    * Whether typing `>` in the composer may open the agent launcher.
@@ -433,6 +441,24 @@ export const AgentLoopFeature: React.FC = () => {
       }
 
       /**
+       * The Web Agent runs in the side panel, not here. From a normal tab, this send *is*
+       * the handoff: the text goes to the panel and the composer is emptied once the panel
+       * has opened — as if the message had been sent, just somewhere else.
+       *
+       * `/` capsules are expanded into the copy so their text travels with it; the `>` one is
+       * dropped, because the panel stages its own.
+       */
+      if (entry.agent.id === WEB_AGENT_ID && !isPanelFrame()) {
+        const copy = editor.cloneNode(true) as HTMLElement;
+        copy.querySelectorAll(`.${CAPSULE_CLASS}`).forEach((c) => {
+          if (c.getAttribute('data-trigger') === '>') c.remove();
+          else c.replaceWith(document.createTextNode(c.getAttribute(CAPSULE_ATTR_CONTENT) || ''));
+        });
+        sendToPanel((copy.textContent || '').trim(), () => adapter.insertText(''));
+        return true;
+      }
+
+      /**
        * Assembled before the editor is touched. It used to run after
        * `expandAllCapsules`, so anything throwing in here left the expanded skill
        * text sitting in the composer while the exception escaped the click handler —
@@ -603,14 +629,16 @@ export const AgentLoopFeature: React.FC = () => {
       // Inserting ">Title" would otherwise re-open the trigger popup
       suppressInputRef.current();
 
-      await appendCapsule(editor, `>${entry.title}`, {
+      const displayText = `>${entry.title}`;
+      const capsuleAttrs = {
         className: CAPSULE_CLASS,
         dataAttrs: {
           [CAPSULE_ATTR_ID]: entry.id,
           [CAPSULE_ATTR_CONTENT]: entry.capsuleContent,
           'data-trigger': '>',
         },
-      });
+      };
+      await appendCapsule(editor, displayText, capsuleAttrs);
 
       if (userInput?.trim()) {
         insertTextAtEnd(editor, userInput.trim());
@@ -619,12 +647,82 @@ export const AgentLoopFeature: React.FC = () => {
       agentEventBus.emit('launcher:staged', { entryId, autoSend });
 
       if (autoSend) {
-        // Route through the real send button so the interceptor composes the message
-        await triggerSend({ humanDelay: false });
+        /**
+         * Compose here and now, not by clicking send and letting the interceptor do it.
+         *
+         * ⚠️ The click path reads the capsule back from the DOM 150ms+ later, and on a
+         * freshly loaded Gemini (the Web Agent side panel, every time) Quill can re-render
+         * the composer in between: the text and the bold survive, our class does not. The
+         * interceptor then sees no capsule and Gemini posts `>Web Agent …` as plain text,
+         * with no prompt behind it. So re-wrap the capsule if it was lost, and compose
+         * synchronously — the composed message is plain text, which a re-render keeps.
+         */
+        if (!ensureCapsule(editor, displayText, capsuleAttrs) || !composeAndSend(editor)) {
+          console.warn('[AgentLoop] Launcher could not find its capsule; not sending', editor.innerHTML.slice(0, 200));
+          agentEventBus.emit('launcher:failed', { reason: 'no-editor' });
+        }
       } else {
         editor.focus();
       }
     });
+  }, [getAdapter, composeAndSend]);
+
+  // ─── Web Agent side panel ───────────────────────────────────────────
+
+  /**
+   * Inside the side panel only: pick up the task the opening tab handed over, and keep the
+   * background told whether a task is running here (so a second handoff is refused rather
+   * than replacing this chat mid-task).
+   *
+   * Goes through `launcher:run-entry`, the same path the Agent tab uses, so the task is staged
+   * as a `>Web Agent` capsule and sent by the normal interceptor — nothing about composing a
+   * Web Agent prompt is special-cased here.
+   */
+  useEffect(() => {
+    if (!isPanelFrame()) return;
+    let cancelled = false;
+    const pickUp = async () => {
+      const handoff = await claimHandoff().catch(() => null);
+      if (!handoff || cancelled) return;
+      // Gemini builds its composer a beat after the overlay mounts.
+      for (let i = 0; i < 80 && !getAdapter()?.getEditor(); i++) {
+        await new Promise((r) => setTimeout(r, 250));
+        if (cancelled) return;
+      }
+      /**
+       * Mid-task: the tabs are already in scope (the background added them before the
+       * nudge), so the running agent can reach them through `page_list`. Staging a second
+       * capsule would only be refused, so say what happened instead.
+       */
+      if (useAgentLoopStore.getState().status !== 'idle') {
+        toast.info(t('agent.web.addedWhileRunning', {
+          defaultValue: 'Added to the Web Agent. The running task can use it via page_list.',
+        }));
+        return;
+      }
+      agentEventBus.emit('launcher:run-entry', {
+        entryId: WEB_AGENT_ID,
+        userInput: handoff.userInput,
+        autoSend: handoff.autoSend,
+      });
+    };
+    void pickUp();
+    // An already-open panel: the panel page says a handoff is waiting. Only our own page,
+    // and only our parent — the message itself carries nothing, `claim` does.
+    const extensionOrigin = new URL(browser.runtime.getURL('/')).origin;
+    const onMessage = (e: MessageEvent) => {
+      if (e.source !== window.parent || e.origin !== extensionOrigin || e.data?.type !== PANEL_NUDGE) return;
+      void pickUp();
+    };
+    window.addEventListener('message', onMessage);
+    const unsubscribe = useAgentLoopStore.subscribe((state, prev) => {
+      if ((state.status === 'idle') !== (prev.status === 'idle')) reportPanelRunning(state.status !== 'idle');
+    });
+    return () => {
+      cancelled = true;
+      window.removeEventListener('message', onMessage);
+      unsubscribe();
+    };
   }, [getAdapter]);
 
   // ─── Recovery bridge (dock → engine) ────────────────────────────────

@@ -189,6 +189,32 @@
     "slashTip": "Dica: Digite / na caixa de entrada para inserir rapidamente um prompt.",
     "slashTipDismiss": "Entendi"
   },
+  "instructionPrompt": {
+    "library": "Prompts",
+    "fillFromLibrary": "Preencher a partir da biblioteca de prompts",
+    "saveToLibrary": "Salvar na biblioteca de prompts",
+    "searchPlaceholder": "Pesquisar prompts...",
+    "filterSystem": "Sistema",
+    "filterAll": "Todos",
+    "noMatches": "Nenhum prompt correspondente",
+    "emptyLibrary": "Sua biblioteca de prompts está vazia",
+    "goToPrompts": "Abrir biblioteca de prompts",
+    "back": "Voltar",
+    "fill": "Preencher",
+    "filled": "\"{{title}}\" preenchido",
+    "fillFailed": "Não foi possível preencher as instruções. Tente reabrir o painel.",
+    "undo": "Desfazer",
+    "saveTitle": "Salvar como prompt",
+    "saved": "Salvo na biblioteca de prompts",
+    "nothingToSave": "As instruções estão vazias, não há nada para salvar",
+    "sourceNative": "AI Studio",
+    "sourceLibrary": "Better Sidebar",
+    "sourceTooltip": "Escolha de onde vêm as instruções do sistema",
+    "switchTip": "Você também pode gerenciar as instruções do sistema com a biblioteca de prompts do Better Sidebar: pastas, variáveis e os mesmos prompts no Gemini e no AI Studio. Você pode voltar a qualquer momento.",
+    "switchTipSwitch": "Mudar",
+    "switchTipKeep": "Manter AI Studio",
+    "autoImported": "{{count}} instrução(ões) do AI Studio importada(s) para Biblioteca de prompts › {{folder}}"
+  },
   "snippets": {
     "createSnippet": "Novo Trecho",
     "editSnippet": "Editar Trecho",
@@ -663,6 +689,7 @@
     "jumpStop": "Parar",
     "searching": "Pesquisando...",
     "resultsSummary": "{{count}} resultados em {{files}} chats",
+    "matchCount": "{{count}} ocorrências",
     "whyNoOlder": "Por que não encontro conversas antigas?",
     "context": "Contexto",
     "modelResponse": "Resposta do modelo",
@@ -1863,6 +1890,28 @@
         }
       }
     },
+    "webPanel": {
+      "title": "Deixe a IA ler e operar páginas da web por você",
+      "riskNotice": "Aviso de riscos e permissões",
+      "examples": {
+        "summarize": {
+          "label": "Resumir uma página",
+          "text": "Leia o artigo da minha aba atual e me dê os pontos principais em cinco tópicos, além de qualquer afirmação que eu deva conferir."
+        },
+        "extract": {
+          "label": "Extrair dados de uma página",
+          "text": "Extraia a tabela principal da página que tenho aberta em Markdown. Mantenha os nomes das colunas como estão e me avise se alguma linha parecer cortada ou paginada."
+        },
+        "compare": {
+          "label": "Comparar algumas páginas",
+          "text": "Abra as páginas de produto das três opções que listo abaixo, compare preço, especificações e política de devolução lado a lado e diga qual você escolheria e por quê."
+        },
+        "fill": {
+          "label": "Preencher um formulário",
+          "text": "Preencha o formulário desta página com os dados abaixo. Pare antes do botão de enviar e me mostre o que você preencheu para eu conferir."
+        }
+      }
+    },
     "browserIntro": {
       "title": "Deixe a IA organizar suas abas e favoritos",
       "about": "Sobre o Browser Agent",
@@ -2039,6 +2088,21 @@
       "about": "Sobre o espaço de trabalho",
       "howToUseTitle": "Como Usar o Workspace",
       "howToUseContent": "O Workspace é seu ambiente de arquivos dedicado onde a IA pode ler, gravar, editar e criar documentos e código do zero.\n\nComo usar:\nDigite >Workspace no chat para ativar o agente. Você pode arrastar e soltar arquivos existentes no espaço de trabalho ou pedir à IA que crie novos arquivos do zero (por exemplo, desenvolvendo um projeto frontend completo).\n\nFormatos e recursos suportados:\n- Texto Simples e Código (.html, .js, .ts, .py, .md, .txt, etc.): Suporte total para criação do zero e edição precisa! Peça à IA para estruturar um projeto frontend completo, escrever scripts, redigir notas Markdown ou refactorar código existente.\n- Word (.docx): Revise artigos capítulo por capítulo, reescreva parágrafos com controle de alterações e adicione comentários (requer upload de arquivo existente).\n- Excel (.xlsx/.csv): Analise dados, adicione fórmulas e novas colunas sem alterar formatos ou gráficos originais (requer upload de arquivo existente).\n- PDF: Leia relatórios e artigos, extraia texto, mescle páginas e adicione anotações.\n- PowerPoint (.pptx): Leia e edite o conteúdo dos slides e as anotações do orador.\n- Legendas (.srt/.vtt): Traduza e aprimore legendas mantendo a sincronização dos tempos.\n\n💡 Dica: Arquivos de texto e código podem ser criados do zero e editados livremente. Formatos especiais (Word, Excel, PPT, PDF) atualmente focam na leitura, anotação e edição precisa de arquivos existentes, preservando sua formatação original."
+    },
+    "web": {
+      "needsConnector": "🔌 Configure o Web Agent Connector · clique para abrir",
+      "addedWhileRunning": "Adicionado ao Web Agent. A tarefa em andamento pode usá-lo via page_list.",
+      "consent": {
+        "connector": {
+          "title": "Web Agent Connector",
+          "missing": "Para operar páginas, o Web Agent precisa de uma pequena extensão complementar: Better Sidebar Web Agent Connector. É ela que tem a permissão de depurador de páginas do Chrome, assim o Better Sidebar não precisa dela, e ela só aceita solicitações do Better Sidebar.",
+          "outdated": "Seu Web Agent Connector está desatualizado. Atualize-o pela Chrome Web Store e depois volte aqui.",
+          "paused": "O Web Agent Connector está pausado. Clique no ícone dele na barra de ferramentas do Chrome e ative-o novamente.",
+          "install": "Instalar pela Chrome Web Store",
+          "update": "Abrir na Chrome Web Store",
+          "comeBack": "Esta página se atualiza sozinha assim que o Connector for instalado."
+        }
+      }
     }
   },
   "backup": {

@@ -18,6 +18,7 @@
  * | Better Sidebar | the launcher — what this is, how to start, examples |
  * | Workspace | a short intro, then the file tree itself |
  * | Browser Agent | a short intro, then what it may touch and what it has already done |
+ * | Web Agent | a button that opens the side panel it runs in, then how to start, examples |
  *
  * ⚠️ **The switcher changes the panel, not a running session.** An agent is fixed for the
  * life of a session (the prompt was built from it, and the tool layer enforces its
@@ -41,6 +42,7 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { navigateToNewChat } from '@/shared/lib/navigation';
 import { BrowserIntro } from './components/BrowserIntro';
 import { BrowserView } from './browser/BrowserView';
+import { WebView } from './web/WebView';
 
 export const AgentTab: React.FC = () => {
   const { t } = useI18n();
@@ -82,7 +84,9 @@ export const AgentTab: React.FC = () => {
         instead of pushing the flex parent past the viewport — without it the content grows and
         the switcher slides off screen.
       */}
-      {agent.tabContent === 'browser' ? (
+      {agent.tabContent === 'web' ? (
+        <WebView />
+      ) : agent.tabContent === 'browser' ? (
         <div className="flex min-h-0 flex-1 flex-col">
           <BrowserIntro />
           <BrowserView />

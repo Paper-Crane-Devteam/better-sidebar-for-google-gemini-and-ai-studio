@@ -663,6 +663,7 @@
     "jumpStop": "Interrompi",
     "searching": "Ricerca...",
     "resultsSummary": "{{count}} risultati in {{files}} chat",
+    "matchCount": "{{count}} corrispondenze",
     "whyNoOlder": "Perché non riesco a trovare le chat più vecchie?",
     "context": "Contesto",
     "modelResponse": "Risposta del modello",

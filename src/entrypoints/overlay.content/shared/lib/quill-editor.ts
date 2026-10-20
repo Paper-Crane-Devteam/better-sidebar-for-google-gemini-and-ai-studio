@@ -16,8 +16,17 @@ import i18n from '@/locale/i18n';
 
 // ─── Editor Selector ─────────────────────────────────────────────────────────
 
-const EDITOR_SELECTOR = 'rich-textarea .ql-editor[contenteditable="true"]';
-const EDITOR_SELECTOR_FALLBACK = 'div.ql-editor[contenteditable="true"]';
+// The Gem create/edit page has a second Quill editor — the Gem's instructions —
+// which comes *before* the preview composer in the DOM. Without the exclusion,
+// every composer feature (slash, agent, send) would target the instructions box.
+const GEM_INSTRUCTION_EDITOR = 'rich-textarea[data-test-id="instruction-rich-input-field"]';
+const EDITOR_SELECTOR = `rich-textarea:not([data-test-id="instruction-rich-input-field"]) .ql-editor[contenteditable="true"]`;
+const EDITOR_SELECTOR_FALLBACK = `div.ql-editor[contenteditable="true"]:not(${GEM_INSTRUCTION_EDITOR} *)`;
+
+/** The Gem instructions editor (Gem create/edit page only) */
+export function getGemInstructionEditor(): HTMLElement | null {
+  return document.querySelector<HTMLElement>(`${GEM_INSTRUCTION_EDITOR} .ql-editor[contenteditable="true"]`);
+}
 
 // ─── Capsule Constants ───────────────────────────────────────────────────────
 
@@ -128,6 +137,14 @@ export function clearEditor(editor: HTMLElement): void {
  */
 export function replaceAllContent(editor: HTMLElement, text: string): void {
   editor.innerHTML = '';
+  // Clearing: leave Quill's own empty line. A `\u200B` placeholder here stays in front
+  // of whatever the user types next, and `>` / `/` only trigger at the start of a line
+  // or after whitespace — so the next trigger silently never fired.
+  if (!text) {
+    editor.innerHTML = '<p><br></p>';
+    editor.dispatchEvent(new Event('input', { bubbles: true }));
+    return;
+  }
   const lines = text.split('\n');
   for (const line of lines) {
     const p = document.createElement('p');
@@ -242,6 +259,22 @@ export function appendCapsule(
       resolve(capsule);
     });
   });
+}
+
+/**
+ * The capsule for `displayText`, re-wrapping it if the composer lost it.
+ *
+ * Quill re-renders the composer from its Delta, and a re-render keeps the text and the
+ * bold of our `<strong>` but drops its class and data attributes. Any code that is about
+ * to read a capsule it wrote a moment ago should go through this rather than trust the DOM.
+ */
+export function ensureCapsule(
+  editor: HTMLElement,
+  displayText: string,
+  attrs: CapsuleAttrs,
+): HTMLElement | null {
+  const selector = `.${attrs.className}[${CAPSULE_ATTR_ID}="${CSS.escape(attrs.dataAttrs[CAPSULE_ATTR_ID] ?? '')}"]`;
+  return editor.querySelector<HTMLElement>(selector) ?? wrapTextInCapsule(editor, displayText, attrs);
 }
 
 /**

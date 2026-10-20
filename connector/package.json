@@ -1,0 +1,8 @@
+{
+  "name": "better-sidebar-web-agent-connector",
+  "description": "Lets Better Sidebar's Web Agent operate the tabs you choose. Requires Better Sidebar.",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "author": "Paper Crane Devteam"
+}

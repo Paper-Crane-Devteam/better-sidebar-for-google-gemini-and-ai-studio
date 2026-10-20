@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Web Agent</title>
+    <style>
+      :root {
+        --bg: #1b1c1d;
+        --fg: #e3e3e3;
+        --line: rgba(255, 255, 255, 0.08);
+        --border: rgba(255, 255, 255, 0.16);
+        --hover: rgba(255, 255, 255, 0.08);
+        --accent: #8ab4f8;
+        --accent-bg: rgba(138, 180, 248, 0.14);
+      }
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: #fff;
+          --fg: #1f1f1f;
+          --line: rgba(0, 0, 0, 0.08);
+          --border: rgba(0, 0, 0, 0.16);
+          --hover: rgba(0, 0, 0, 0.05);
+          --accent: #0b57d0;
+          --accent-bg: rgba(11, 87, 208, 0.08);
+        }
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+        background: var(--bg);
+        color: var(--fg);
+        font: 12px/1 system-ui, sans-serif;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+      #toolbar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex: none;
+        height: 36px;
+        padding: 0 8px;
+        border-bottom: 1px solid var(--line);
+      }
+      #tabs {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex: 1;
+        min-width: 0;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      #tabs .empty {
+        opacity: 0.6;
+        white-space: nowrap;
+      }
+      button {
+        font: inherit;
+        color: inherit;
+        background: transparent;
+        border: 0;
+        cursor: pointer;
+      }
+      button:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 1px;
+      }
+      button[hidden] {
+        display: none;
+      }
+      .chip {
+        display: flex;
+        align-items: center;
+        flex: none;
+        height: 24px;
+        max-width: 160px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+      }
+      .chip.current {
+        border-color: var(--accent);
+        background: var(--accent-bg);
+      }
+      .chip-main {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        min-width: 0;
+        height: 100%;
+        padding: 0 2px 0 8px;
+        border-radius: 12px 0 0 12px;
+      }
+      .chip-main img {
+        width: 14px;
+        height: 14px;
+        flex: none;
+      }
+      .chip-main span {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+      .chip-remove {
+        flex: none;
+        width: 20px;
+        height: 100%;
+        font-size: 14px;
+        opacity: 0.6;
+        border-radius: 0 12px 12px 0;
+      }
+      .chip-main:hover,
+      .chip-remove:hover {
+        background: var(--hover);
+        opacity: 1;
+      }
+      .action {
+        flex: none;
+        height: 24px;
+        padding: 0 10px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        white-space: nowrap;
+      }
+      .action:hover:not(:disabled) {
+        background: var(--hover);
+      }
+      .action:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+      iframe {
+        display: block;
+        flex: 1;
+        min-height: 0;
+        border: 0;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="toolbar" role="toolbar" aria-label="Web Agent tabs">
+      <div id="tabs" role="list" aria-live="polite"></div>
+      <button id="add-active" class="action" type="button" hidden></button>
+      <button id="add-all" class="action" type="button" hidden></button>
+    </div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

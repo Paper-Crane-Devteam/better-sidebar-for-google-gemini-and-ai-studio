@@ -15,7 +15,7 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import type { ModuleConfig } from '../shared/types/moduleConfig';
 import { handleSearchNavigation } from '../shared/utils';
 import { toast } from '@/shared/lib/toast';
-import { useShallow } from 'zustand/react/shallow';
+import { importNativeInstructions } from './lib/system-instructions';
 
 const ImportHistoryButton = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -38,72 +38,16 @@ const ImportHistoryButton = () => {
   );
 };
 
-const AISTUDIO_SYSTEM_KEY = 'aistudio_all_system_instructions';
-
-interface AiStudioSystemItem {
-  title?: string;
-  text?: string;
-}
-
 export const useModuleConfig = (): ModuleConfig => {
-  const {
-    setOverlayOpen,
-    createPrompt,
-    createPromptFolder,
-    promptFolders,
-  } = useAppStore(
-    useShallow((s) => ({
-      setOverlayOpen: s.setOverlayOpen,
-      createPrompt: s.createPrompt,
-      createPromptFolder: s.createPromptFolder,
-      promptFolders: s.promptFolders,
-    })),
-  );
+  const setOverlayOpen = useAppStore((s) => s.setOverlayOpen);
   const { t } = useI18n();
 
   const handleImportAiStudioSystem = async () => {
-    try {
-      const res = await browser.runtime.sendMessage({
-        type: 'GET_PAGE_LOCAL_STORAGE',
-        payload: { key: AISTUDIO_SYSTEM_KEY },
-      });
-      if (!res?.success || res.data == null || res.data === '') {
-        toast.info(t('toast.importAiStudioSystemNoData'));
-        return;
-      }
-      let items: AiStudioSystemItem[];
-      try {
-        items = JSON.parse(res.data);
-      } catch {
-        toast.error(t('toast.importAiStudioSystemInvalid'));
-        return;
-      }
-      if (!Array.isArray(items) || items.length === 0) {
-        toast.info(t('toast.importAiStudioSystemNoData'));
-        return;
-      }
-      const folderName = t('prompts.aiStudioSystemFolderName');
-      let folderId: string | null = promptFolders.find((f) => f.name === folderName)?.id ?? null;
-      if (folderId == null) {
-        folderId = await createPromptFolder(folderName, null);
-      }
-      if (folderId == null) {
-        toast.error(t('toast.importAiStudioSystemFailed'));
-        return;
-      }
-      let count = 0;
-      for (const item of items) {
-        const title = (item.title ?? item.text ?? '').trim() || t('prompts.untitledSystem');
-        const content = (item.text ?? item.title ?? '').trim() || '';
-        if (!content) continue;
-        await createPrompt(title, content, 'system', 'Bot', folderId);
-        count += 1;
-      }
-      toast.success(t('toast.importAiStudioSystemSuccess', { count }));
-    } catch (err) {
-      console.error('Import AI Studio system failed:', err);
-      toast.error(t('toast.importAiStudioSystemFailed'));
-    }
+    const result = await importNativeInstructions();
+    if (result.status === 'ok') toast.success(t('toast.importAiStudioSystemSuccess', { count: result.count }));
+    else if (result.status === 'nodata') toast.info(t('toast.importAiStudioSystemNoData'));
+    else if (result.status === 'invalid') toast.error(t('toast.importAiStudioSystemInvalid'));
+    else toast.error(t('toast.importAiStudioSystemFailed'));
   };
 
   return {

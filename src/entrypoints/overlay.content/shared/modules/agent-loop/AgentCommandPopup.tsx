@@ -12,7 +12,7 @@
  */
 
 import React, { useRef } from 'react';
-import { Bot, FolderOpen, Globe } from 'lucide-react';
+import { Bot, FolderOpen, Globe, MousePointerClick } from 'lucide-react';
 import { OverflowTooltip } from '@/shared/components/ui/overflow-tooltip';
 import type { AgentEntry } from './agent-entry';
 import { PopupFooterHints } from '@/entrypoints/overlay.content/shared/features/trigger-popup';
@@ -41,6 +41,7 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Bot,
   FolderOpen,
   Globe,
+  MousePointerClick,
 };
 
 const AgentCommandItem: React.FC<{

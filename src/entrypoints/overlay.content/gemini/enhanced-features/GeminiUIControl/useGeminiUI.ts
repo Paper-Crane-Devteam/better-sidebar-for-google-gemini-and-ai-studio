@@ -214,6 +214,17 @@ export const useGeminiUI = () => {
           margin-left: auto !important;
           margin-right: auto !important;
         }
+        /*
+         * Immersive mode squeezes input-container to ~460px, so the 660px floor
+         * pushes the input box under the right-hand panel. Same escape hatch as
+         * the chat column above.
+         */
+        chat-window.immersives-mode input-container > fieldset,
+        chat-window.immersives-mode input-container > .input-area-container,
+        chat-window.immersives-mode input-container > prompt-flow-bar {
+          min-width: 0 !important;
+          max-width: 100% !important;
+        }
         `;
       }
       css += `}\n`;
