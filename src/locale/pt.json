@@ -1890,6 +1890,28 @@
         }
       }
     },
+    "webPanel": {
+      "title": "Deixe a IA ler e operar páginas da web por você",
+      "riskNotice": "Aviso de riscos e permissões",
+      "examples": {
+        "summarize": {
+          "label": "Resumir uma página",
+          "text": "Leia o artigo da minha aba atual e me dê os pontos principais em cinco tópicos, além de qualquer afirmação que eu deva conferir."
+        },
+        "extract": {
+          "label": "Extrair dados de uma página",
+          "text": "Extraia a tabela principal da página que tenho aberta em Markdown. Mantenha os nomes das colunas como estão e me avise se alguma linha parecer cortada ou paginada."
+        },
+        "compare": {
+          "label": "Comparar algumas páginas",
+          "text": "Abra as páginas de produto das três opções que listo abaixo, compare preço, especificações e política de devolução lado a lado e diga qual você escolheria e por quê."
+        },
+        "fill": {
+          "label": "Preencher um formulário",
+          "text": "Preencha o formulário desta página com os dados abaixo. Pare antes do botão de enviar e me mostre o que você preencheu para eu conferir."
+        }
+      }
+    },
     "browserIntro": {
       "title": "Deixe a IA organizar suas abas e favoritos",
       "about": "Sobre o Browser Agent",

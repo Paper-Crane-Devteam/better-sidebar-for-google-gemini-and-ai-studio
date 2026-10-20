@@ -85,6 +85,7 @@ function newToken(s: Persisted, windowId: number): string {
  */
 function openPanelWith(windowId: number, handoff: WebHandoff): Promise<void> {
   pending.set(windowId, handoff);
+  console.log('[probe:web] openPanelWith', { windowId, handoff, hasPort: panelPorts.has(windowId) }); // [probe]
   const opening = chrome.sidePanel.open({ windowId });
   // An open panel never sends `panel-ready` again, so tell it to start a fresh chat.
   const port = panelPorts.get(windowId);
@@ -510,6 +511,17 @@ export async function handleWebAgent(request: WebAgentRequest, sender: MessageSe
       return { success: true };
     }
 
+    // Same gesture rule as `handoff`. An already-open panel is only focused — reloading it
+    // would throw away whatever chat (or running task) it holds. A fresh one gets an empty,
+    // unsent `>Web Agent` capsule so the user lands ready to type.
+    if (request.action === 'open-panel') {
+      if (!fromHostTab || sender.tab?.windowId === undefined) throw new Error('The side panel can only be opened from a Gemini or AI Studio tab.');
+      const windowId = sender.tab.windowId;
+      if (panelPorts.has(windowId)) await chrome.sidePanel.open({ windowId });
+      else await openPanelWith(windowId, { userInput: '', autoSend: false, createdAt: Date.now() });
+      return { success: true };
+    }
+
     if (request.action === 'panel-ready') {
       if (!fromPage(PANEL_URL())) throw new Error('Not the panel.');
       const s = await load();
@@ -547,6 +559,7 @@ export async function handleWebAgent(request: WebAgentRequest, sender: MessageSe
 
     if (request.action === 'claim') {
       const handoff = pending.get(windowId);
+      console.log('[probe:web] claim', { windowId, handoff, pendingKeys: [...pending.keys()] }); // [probe]
       pending.delete(windowId);
       return { success: true, data: handoff && Date.now() - handoff.createdAt < HANDOFF_TTL ? handoff : null };
     }

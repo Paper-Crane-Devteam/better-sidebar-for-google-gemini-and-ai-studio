@@ -130,7 +130,7 @@ export const AGENTS: AgentDefinition[] = [
           description: 'Read and operate web pages for you in the side panel',
           icon: 'MousePointerClick',
           mcpServerIds: [WEB_MCP_ID],
-          tabContent: 'launcher' as const,
+          tabContent: 'web' as const,
           buildSoul: buildWebSoul,
           /** Power Pack, then the risk notice + debugger permission. Reads are paid too. */
           unavailable: webAgentBlocker,

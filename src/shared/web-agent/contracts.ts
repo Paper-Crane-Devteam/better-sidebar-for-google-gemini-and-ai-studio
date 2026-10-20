@@ -48,6 +48,8 @@ export interface WebAgentStatus { consented: boolean; permitted: boolean }
 export type WebAgentRequest =
   /** From a Gemini / AI Studio tab: open this window's panel and run `userInput` there. */
   | { action: 'handoff'; userInput: string }
+  /** From a Gemini / AI Studio tab: just open (or focus) this window's panel, no task. */
+  | { action: 'open-panel' }
   /** From the panel page, once per load: this window's panel session token. */
   | { action: 'panel-ready'; windowId: number }
   /** From the panel iframe: take the pending handoff, if any. One-shot. */

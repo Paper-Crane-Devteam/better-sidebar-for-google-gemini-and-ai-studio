@@ -1915,6 +1915,28 @@
         }
       }
     },
+    "webPanel": {
+      "title": "Let AI read and operate web pages for you",
+      "riskNotice": "Risk notice and permission",
+      "examples": {
+        "summarize": {
+          "label": "Summarize a page",
+          "text": "Read the article in my current tab and give me the key points in five bullets, plus anything it claims that I should double-check."
+        },
+        "extract": {
+          "label": "Pull data out of a page",
+          "text": "Extract the main table on the page I have open as Markdown. Keep the column names as they are and tell me if any rows look cut off or paginated."
+        },
+        "compare": {
+          "label": "Compare a few pages",
+          "text": "Open the product pages for the three options I list below, compare price, specs and return policy side by side, and tell me which one you would pick and why."
+        },
+        "fill": {
+          "label": "Fill in a form",
+          "text": "Fill in the form on this page with the details below. Stop before the submit button and show me what you entered so I can check it."
+        }
+      }
+    },
     "browserIntro": {
       "title": "Let AI tidy up your tabs and bookmarks",
       "about": "About the Browser Agent",

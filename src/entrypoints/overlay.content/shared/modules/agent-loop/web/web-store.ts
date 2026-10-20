@@ -149,6 +149,18 @@ export function sendToPanel(userInput: string, clearComposer: () => void): void 
   void handoffToPanel(userInput).then(settle);
 }
 
+/**
+ * Open this window's side panel with nothing to run — the Agent tab's button.
+ *
+ * ⚠️ Same gesture rule as {@link handoffToPanel}: call it straight from the click handler.
+ */
+export function openWebPanel(): void {
+  void webRequest({ action: 'open-panel' }).catch((e: Error) => {
+    console.warn('[WebAgent] open panel failed:', e?.message);
+    toast.warning(i18n.t('agent.web.panelBlocked', { defaultValue: 'Chrome did not open the side panel.' }));
+  });
+}
+
 /** Panel only: take whatever task the tab that opened us left. */
 export async function claimHandoff(): Promise<WebHandoff | null> {
   const token = getPanelToken();

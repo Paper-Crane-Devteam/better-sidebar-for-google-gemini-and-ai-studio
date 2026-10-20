@@ -56,9 +56,10 @@ export interface AgentDefinition {
    * `workspace` puts the file tree in the tab, because for that agent the files *are* the
    * subject and hiding them behind a separate tab makes the agent feel like it is working
    * somewhere you cannot see. `browser` shows what it is permitted to touch and the journal
-   * of what it has already done, for the same reason.
+   * of what it has already done, for the same reason. `web` is the Web Agent's own launcher,
+   * with the button that opens the side panel it runs in.
    */
-  tabContent: 'launcher' | 'workspace' | 'browser';
+  tabContent: 'launcher' | 'workspace' | 'browser' | 'web';
   buildSoul(context: SoulContext): string;
   /**
    * Why this agent cannot run yet, and the one action that fixes it. Null when it can.
