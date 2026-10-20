@@ -11,7 +11,7 @@
  */
 
 import React from 'react';
-import { Bot, FolderOpen, Globe, Loader2 } from 'lucide-react';
+import { Bot, FolderOpen, Globe, MousePointerClick, Loader2 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils/utils';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { listAgents } from '../../agent-loop/agents/registry';
@@ -23,6 +23,7 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Bot,
   FolderOpen,
   Globe,
+  MousePointerClick,
 };
 
 interface AgentSwitcherProps {

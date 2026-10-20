@@ -27,8 +27,25 @@ export default defineConfig({
       'scripting',
       'offscreen',
       'identity',
+      // Web Agent (Chrome only). None of these carries an install warning, which matters:
+      // a new warned permission in an update disables the extension until the user
+      // re-approves it. `WithHostAccess` instead of plain dNR for the same reason — it
+      // only acts on the Gemini/AI Studio hosts we already hold.
+      ...(targetBrowser === 'chrome'
+        ? ['sidePanel', 'contextMenus', 'declarativeNetRequestWithHostAccess']
+        : []),
     ],
-    optional_permissions: ['tabs', 'tabGroups', 'bookmarks'],
+    // `debugger` is the Web Agent's, requested from its risk notice window. Chrome only:
+    // an optional permission the browser does not know rejects the whole manifest.
+    optional_permissions: [
+      'tabs',
+      'tabGroups',
+      'bookmarks',
+      ...(targetBrowser === 'chrome' ? ['debugger'] : []),
+    ],
+    ...(targetBrowser === 'chrome'
+      ? { side_panel: { default_path: 'web-agent-panel.html' } }
+      : {}),
     host_permissions: [
       'https://aistudio.google.com/*',
       'https://gemini.google.com/*',

@@ -8,6 +8,26 @@ import { getPegasusStoreReady } from '@/shared/lib/pegasus-store';
 import { initAiStudio } from './aistudio';
 import { initGemini } from './gemini';
 import { initChatGPT } from './chatgpt';
+import {
+  frameRole,
+  PANEL_HASH_PARAM,
+  PANEL_TOKEN_STORAGE_KEY,
+} from '@/shared/web-agent/contracts';
+
+/**
+ * In the Web Agent side panel, take the session token out of the URL hash.
+ *
+ * Here, at `document_start`, because Gemini rewrites its URL as it boots and the hash would
+ * not survive until the overlay runs. Stripped right away so it never ends up in history or
+ * in a link the user copies; `sessionStorage` keeps it across reloads of the frame.
+ */
+function capturePanelToken() {
+  const params = new URLSearchParams(location.hash.slice(1));
+  const token = params.get(PANEL_HASH_PARAM);
+  if (!token) return;
+  try { sessionStorage.setItem(PANEL_TOKEN_STORAGE_KEY, token); } catch { /* storage blocked */ }
+  history.replaceState(history.state, '', location.pathname + location.search);
+}
 
 export default defineContentScript({
   matches: [
@@ -16,7 +36,13 @@ export default defineContentScript({
     // 'https://chatgpt.com/*',
   ],
   runAt: 'document_start',
+  // For the Web Agent side panel, which hosts Gemini in an iframe. Every other frame on these
+  // pages is turned away on the first line of `main`.
+  allFrames: true,
   async main() {
+    const role = frameRole();
+    if (role === 'other') return;
+    if (role === 'panel') capturePanelToken();
     const platform = detectPlatform();
     console.log(
       `Better Sidebar: Content Script Initialized (Platform: ${platform})`,

@@ -8,6 +8,7 @@ import { warnIfNoAccount } from './shared/lib/account-guard';
 import { initPegasusTransport } from '@webext-pegasus/transport/content-script';
 import { getPegasusStoreReady } from '@/shared/lib/pegasus-store';
 import { i18nReady } from '@/locale/i18n';
+import { frameRole } from '@/shared/web-agent/contracts';
 
 export default defineContentScript({
   matches: [
@@ -16,7 +17,10 @@ export default defineContentScript({
     // 'https://chatgpt.com/*',
   ],
   cssInjectionMode: 'ui',
+  // The Web Agent side panel hosts Gemini in an iframe; nothing else framed gets an overlay.
+  allFrames: true,
   async main() {
+    if (frameRole() === 'other') return;
     initPegasusTransport({
       allowWindowMessagingForNamespace: 'better-sidebar',
     });

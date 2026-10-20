@@ -19,6 +19,9 @@ import { BROWSER_MCP_ID } from '../mcp/browser-mcp';
 import { buildBetterSidebarSoul } from '../prompts/souls/bettersidebar-soul';
 import { buildWorkspaceSoul } from '../prompts/souls/workspace-soul';
 import { buildBrowserSoul } from '../prompts/souls/browser-soul';
+import { buildWebSoul } from '../prompts/souls/web-soul';
+import { WEB_MCP_ID } from '../mcp/web-mcp';
+import { webAgentBlocker } from '../web/web-store';
 import type { AgentDefinition, AgentId } from './types';
 import { isChromeBuild } from '@/shared/browser-agent/contracts';
 import {
@@ -112,6 +115,25 @@ export const AGENTS: AgentDefinition[] = [
                   resolve: () => void openBrowserAgentSettings(),
                 }
               : null,
+        },
+      ]
+    : []),
+  // Chrome only — it drives pages through `chrome.debugger`. Runs in the side panel: picked
+  // from a normal tab, the send hands the task over instead of starting here (see
+  // `web/web-store.ts` and `.kiro/docs/web-agent-technical-design.md`).
+  ...(isChromeBuild()
+    ? [
+        {
+          id: 'web' as const,
+          name: 'Web Agent',
+          shortName: 'Web',
+          description: 'Read and operate web pages for you in the side panel',
+          icon: 'MousePointerClick',
+          mcpServerIds: [WEB_MCP_ID],
+          tabContent: 'launcher' as const,
+          buildSoul: buildWebSoul,
+          /** Power Pack, then the risk notice + debugger permission. Reads are paid too. */
+          unavailable: webAgentBlocker,
         },
       ]
     : []),

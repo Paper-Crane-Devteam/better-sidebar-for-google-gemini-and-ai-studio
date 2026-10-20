@@ -1,4 +1,11 @@
 import { initializeBrowserAgent } from '@/entrypoints/overlay.content/shared/modules/agent-loop/browser/browser-store';
+import {
+  claimHandoff,
+  initializeWebAgent,
+  reportPanelRunning,
+  sendToPanel,
+} from '@/entrypoints/overlay.content/shared/modules/agent-loop/web/web-store';
+import { isPanelFrame, WEB_AGENT_ID } from '@/shared/web-agent/contracts';
 /**
  * AgentLoopFeature — Gemini entry point for Agent Loop.
  *
@@ -90,6 +97,7 @@ function isComposerHeldByEngine(): boolean {
 
 export const AgentLoopFeature: React.FC = () => {
   useEffect(initializeBrowserAgent, []);
+  useEffect(initializeWebAgent, []);
   const { t } = useI18n();
   /**
    * Whether typing `>` in the composer may open the agent launcher.
@@ -433,6 +441,24 @@ export const AgentLoopFeature: React.FC = () => {
       }
 
       /**
+       * The Web Agent runs in the side panel, not here. From a normal tab, this send *is*
+       * the handoff: the text goes to the panel and the composer is emptied once the panel
+       * has opened — as if the message had been sent, just somewhere else.
+       *
+       * `/` capsules are expanded into the copy so their text travels with it; the `>` one is
+       * dropped, because the panel stages its own.
+       */
+      if (entry.agent.id === WEB_AGENT_ID && !isPanelFrame()) {
+        const copy = editor.cloneNode(true) as HTMLElement;
+        copy.querySelectorAll(`.${CAPSULE_CLASS}`).forEach((c) => {
+          if (c.getAttribute('data-trigger') === '>') c.remove();
+          else c.replaceWith(document.createTextNode(c.getAttribute(CAPSULE_ATTR_CONTENT) || ''));
+        });
+        sendToPanel((copy.textContent || '').trim(), () => adapter.insertText(''));
+        return true;
+      }
+
+      /**
        * Assembled before the editor is touched. It used to run after
        * `expandAllCapsules`, so anything throwing in here left the expanded skill
        * text sitting in the composer while the exception escaped the click handler —
@@ -625,6 +651,43 @@ export const AgentLoopFeature: React.FC = () => {
         editor.focus();
       }
     });
+  }, [getAdapter]);
+
+  // ─── Web Agent side panel ───────────────────────────────────────────
+
+  /**
+   * Inside the side panel only: pick up the task the opening tab handed over, and keep the
+   * background told whether a task is running here (so a second handoff is refused rather
+   * than replacing this chat mid-task).
+   *
+   * Goes through `launcher:run-entry`, the same path the Agent tab uses, so the task is staged
+   * as a `>Web Agent` capsule and sent by the normal interceptor — nothing about composing a
+   * Web Agent prompt is special-cased here.
+   */
+  useEffect(() => {
+    if (!isPanelFrame()) return;
+    let cancelled = false;
+    void (async () => {
+      const handoff = await claimHandoff().catch(() => null);
+      if (!handoff || cancelled) return;
+      // Gemini builds its composer a beat after the overlay mounts.
+      for (let i = 0; i < 80 && !getAdapter()?.getEditor(); i++) {
+        await new Promise((r) => setTimeout(r, 250));
+        if (cancelled) return;
+      }
+      agentEventBus.emit('launcher:run-entry', {
+        entryId: WEB_AGENT_ID,
+        userInput: handoff.userInput,
+        autoSend: handoff.autoSend,
+      });
+    })();
+    const unsubscribe = useAgentLoopStore.subscribe((state, prev) => {
+      if ((state.status === 'idle') !== (prev.status === 'idle')) reportPanelRunning(state.status !== 'idle');
+    });
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
   }, [getAdapter]);
 
   // ─── Recovery bridge (dock → engine) ────────────────────────────────

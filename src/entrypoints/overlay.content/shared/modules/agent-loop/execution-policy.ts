@@ -18,6 +18,7 @@
 
 import type { ParsedToolCall, ToolRisk } from './types';
 import { isBrowserTool, isBrowserWrite } from '@/shared/browser-agent/contracts';
+import { isWebTool, isWebWrite } from '@/shared/web-agent/contracts';
 import { useAgentLoopStore } from './agent-loop-store';
 import { useAgentPolicyStore } from './agent-policy-store';
 import {
@@ -55,6 +56,7 @@ export function isControlTool(toolName: string): boolean {
  */
 export function getToolRisk(toolCall: ParsedToolCall): ToolRisk {
   if (isBrowserTool(toolCall.name)) return isBrowserWrite(toolCall.name) ? 'write' : 'read';
+  if (isWebTool(toolCall.name)) return isWebWrite(toolCall.name) ? 'write' : 'read';
   if (isControlTool(toolCall.name)) return 'control';
   if (WORKSPACE_WRITE_TOOLS.includes(toolCall.name)) return 'write';
   if (WORKSPACE_READ_TOOLS.includes(toolCall.name)) return 'read';
@@ -111,6 +113,11 @@ export function requiresApproval(toolCall: ParsedToolCall): boolean {
 
   const { speedMode, approveRestOfRound } = useAgentLoopStore.getState();
   if (speedMode || approveRestOfRound) return false;
+
+  // Page actions ignore the standing "auto-run writes" switch. That switch was turned on for
+  // SQL against the user's own data; a click on a stranger's page under their login is a
+  // different risk, and only an approval given in this task may waive it.
+  if (isWebTool(toolCall.name) && isWebWrite(toolCall.name)) return true;
 
   // A handoff takes the tab away for minutes and ends the session (see HANDOFF_TOOLS).
   // Neither switch fits: it isn't a SQL write, and the read switch is on by default,

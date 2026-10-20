@@ -2,6 +2,7 @@ import { Folder, Tag, Prompt, PromptFolder } from './db';
 
 export type ExtensionMessage = (
   | { type: 'BROWSER_AGENT'; payload: import('../browser-agent/contracts').BrowserRequest }
+  | { type: 'WEB_AGENT'; payload: import('../web-agent/contracts').WebAgentRequest }
   | { type: 'GET_FOLDERS' }
   | {
       type: 'CREATE_FOLDER';

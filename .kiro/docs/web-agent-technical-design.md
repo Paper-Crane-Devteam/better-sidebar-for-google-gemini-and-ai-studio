@@ -237,3 +237,27 @@ interface Handoff {
 - `entrypoints/web-agent-panel/`：面板页面
 - `content` / `overlay.content`：`allFrames` + 环境判断 + 面板模式
 - `wxt.config.ts`：权限、`side_panel.default_path`、`action`、`contextMenus`
+
+## 15. POC 实现现状（与上文的差异）
+
+已实现，代码位置见 §14：
+
+- 面板：`entrypoints/web-agent-panel/`。只加载 Gemini（AI Studio 发起的任务也交给 Gemini 面板）。
+- 交接：入口 1 两个平台都接上了（`sendToPanel`）；入口 2 只有右键菜单。
+- 权限与门槛：Power Pack → 风险告知 + `debugger` 权限，顺序见 `web-store.ts` 的 `webAgentBlocker`。
+  告知和权限在同一个窗口 `entrypoints/web-agent-consent/`，「同意并允许」这一次点击同时完成两件事。
+  告知有版本号（`WEB_CONSENT_VERSION`），改了内容、需要重新同意时加一。
+- 工具：`page_list` / `page_snapshot` / `page_open` / `page_click` / `page_type` / `page_run_js`。
+  页面操作类工具不受「自动执行写操作」开关影响，只有本任务内的批准能免掉（`execution-policy.ts`）。
+
+和设计不一致、留到后面的：
+
+| 项 | POC 的做法 | 原因 / 后续 |
+|---|---|---|
+| Agent 标签组（§5） | 每个面板一份 tabId 列表，存在 `storage.session` | 标签组要 `tabGroups` 权限，POC 先不碰 |
+| 工具栏图标入口（§7） | 没做 | `entrypoints/popup` 存在，`action.onClicked` 不会触发，要先决定图标归谁（§13） |
+| 黄条「取消」（§5） | 后续工具调用返回 `STOPPED:`，模型自己结束 | 后台没有直接通知面板 iframe 的通道 |
+| 敏感页面规则（§11） | 没做，只靠 soul 和逐次批准 | |
+| dNR | 面板里的 Gemini frame 整个去掉了 CSP 头 | dNR 只能删整个头，不能只删 `frame-ancestors` |
+| 多账号 profile | 面板 iframe 没有 `sender.tab`，DB 请求走「当前打开的库」 | 多 profile 用户可能写错库，正式版要给面板单独绑定 profile |
+| 快照 | 不进 iframe；shadow DOM 会走，但 shadow 里的 ref 只能用 `__bsRef` 取 | |

@@ -21,7 +21,7 @@ import type { PlatformId } from '../adapters/adapter-factory';
  * messages forever, into `>` capsule attributes, and into persisted UI state. ⚠️ Renaming
  * one orphans every conversation that already carries it — see `LEGACY_AGENT_IDS`.
  */
-export type AgentId = 'bettersidebar' | 'workspace' | 'browser';
+export type AgentId = 'bettersidebar' | 'workspace' | 'browser' | 'web';
 
 /** Context a soul builder gets. Everything dynamic, nothing it could look up itself. */
 export interface SoulContext {
