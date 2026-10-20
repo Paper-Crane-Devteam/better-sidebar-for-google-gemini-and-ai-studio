@@ -1,6 +1,7 @@
 import { WatermarkEngine } from '@/shared/lib/utils/watermark-remover';
 import { getPegasusStoreReady, usePegasusStore } from '@/shared/lib/pegasus-store';
 import { waitForElement } from '@/shared/lib/utils';
+import { isPanelFrame } from '@/shared/web-agent/contracts';
 
 const IMAGE_URL_PATTERN = /lh3\.googleusercontent\.com\/rd-gg(?:-dl)?\//;
 
@@ -76,6 +77,8 @@ export function startImageProcessor(): () => void {
 }
 
 export async function initImageProcessor(): Promise<() => void> {
-  await getPegasusStoreReady();
+  // The side panel has no pegasus transport; its store is mirrored from storage instead
+  // (see `mirrorPegasusStoreFromStorage`), so there is no handshake to wait for.
+  if (!isPanelFrame()) await getPegasusStoreReady();
   return startImageProcessor();
 }
