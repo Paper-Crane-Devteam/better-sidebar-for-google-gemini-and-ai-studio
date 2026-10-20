@@ -377,6 +377,27 @@ export const hydratePegasusStoreFromCache = async () => {
   ensureEnhancedFeaturesDefaults();
 };
 
+/**
+ * Read-only store for frames pegasus cannot reach: the Web Agent side panel iframe.
+ *
+ * Pegasus addresses content scripts by tab id, and a side panel is not a tab — the
+ * handshake never completes there and `getPegasusStoreReady()` would hang forever.
+ * Instead, hydrate from the persisted snapshot and follow later writes through
+ * `storage.onChanged`. ⚠️ Writes made in such a frame stay local; they are not persisted.
+ */
+export const mirrorPegasusStoreFromStorage = async () => {
+  await hydratePegasusStoreFromCache();
+  browser.storage.onChanged.addListener((changes, area) => {
+    if (area !== 'local' || !(STORE_STORAGE_KEY in changes)) return;
+    const raw = changes[STORE_STORAGE_KEY].newValue;
+    if (typeof raw !== 'string') return;
+    try {
+      usePegasusStore.setState(JSON.parse(raw));
+      ensureEnhancedFeaturesDefaults();
+    } catch { /* malformed snapshot, keep what we have */ }
+  });
+};
+
 let syncPromise: Promise<void> | null = null;
 
 /**

@@ -3,7 +3,7 @@
 import { detectPlatform, Platform } from '@/shared/types/platform';
 import { isPlatformEnabled } from '@/shared/lib/platform-enabled-store';
 import { initPegasusTransport } from '@webext-pegasus/transport/content-script';
-import { getPegasusStoreReady } from '@/shared/lib/pegasus-store';
+import { getPegasusStoreReady, mirrorPegasusStoreFromStorage } from '@/shared/lib/pegasus-store';
 
 import { initAiStudio } from './aistudio';
 import { initGemini } from './gemini';
@@ -57,10 +57,15 @@ export default defineContentScript({
       return;
     }
 
-    initPegasusTransport({
-      allowWindowMessagingForNamespace: 'better-sidebar',
-    });
-    getPegasusStoreReady();
+    if (role === 'panel') {
+      // Pegasus routes by tab id and the side panel has none; see `mirrorPegasusStoreFromStorage`.
+      void mirrorPegasusStoreFromStorage();
+    } else {
+      initPegasusTransport({
+        allowWindowMessagingForNamespace: 'better-sidebar',
+      });
+      getPegasusStoreReady();
+    }
 
     switch (platform) {
       case Platform.AI_STUDIO: {

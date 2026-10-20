@@ -6,7 +6,7 @@ import { detectPlatform, Platform } from '@/shared/types/platform';
 import { isPlatformEnabled } from '@/shared/lib/platform-enabled-store';
 import { warnIfNoAccount } from './shared/lib/account-guard';
 import { initPegasusTransport } from '@webext-pegasus/transport/content-script';
-import { getPegasusStoreReady } from '@/shared/lib/pegasus-store';
+import { getPegasusStoreReady, mirrorPegasusStoreFromStorage } from '@/shared/lib/pegasus-store';
 import { i18nReady } from '@/locale/i18n';
 import { frameRole } from '@/shared/web-agent/contracts';
 
@@ -20,11 +20,17 @@ export default defineContentScript({
   // The Web Agent side panel hosts Gemini in an iframe; nothing else framed gets an overlay.
   allFrames: true,
   async main() {
-    if (frameRole() === 'other') return;
-    initPegasusTransport({
-      allowWindowMessagingForNamespace: 'better-sidebar',
-    });
-    await getPegasusStoreReady();
+    const role = frameRole();
+    if (role === 'other') return;
+    if (role === 'panel') {
+      // Pegasus routes by tab id and the side panel has none; its handshake never finishes.
+      await mirrorPegasusStoreFromStorage();
+    } else {
+      initPegasusTransport({
+        allowWindowMessagingForNamespace: 'better-sidebar',
+      });
+      await getPegasusStoreReady();
+    }
     const platform = detectPlatform();
     console.log(
       `Better Sidebar: Overlay Content Script Initialized (Platform: ${platform})`,
