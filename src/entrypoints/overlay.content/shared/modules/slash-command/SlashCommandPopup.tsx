@@ -14,8 +14,8 @@ interface SlashCommandPopupProps {
   onHighlight: (index: number) => void;
   /** Confirm selection on click */
   onConfirm: (index: number) => void;
-  /** Position relative to viewport */
-  position: { bottom: number; left: number };
+  /** Position relative to viewport — anchored by `bottom` (above the input) or `top` (below it) */
+  position: { bottom?: number; top?: number; left: number };
   query: string;
 }
 
@@ -46,7 +46,7 @@ export const SlashCommandPopup: React.FC<SlashCommandPopupProps> = ({
       // editor, so without a marker to look for the mutual exclusion never fires.
       data-slash-command-popup=""
       className="fixed z-[9999] min-w-[280px] max-w-[400px] rounded-lg bg-popover shadow-[shadow:var(--shadow-popover)] overflow-hidden"
-      style={{ bottom: position.bottom, left: position.left }}
+      style={{ bottom: position.bottom, top: position.top, left: position.left }}
       onMouseDown={(e) => e.preventDefault()} // Prevent input blur on popup interaction
     >
       {/* Header */}

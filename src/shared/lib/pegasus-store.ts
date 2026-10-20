@@ -101,6 +101,13 @@ export interface AIStudioEnhancedFeatures {
   slashCommand: boolean;
   /** `>` in the composer opens the agent launcher popup */
   agentTrigger: boolean;
+  /**
+   * Who manages the System instructions panel: AI Studio's own saved list, or our
+   * prompt library. 'unset' = not chosen yet (the panel shows a one-time hint).
+   */
+  systemInstructionSource: 'unset' | 'native' | 'library';
+  /** AI Studio's saved system instructions were auto-imported into the prompt library once */
+  systemInstructionsImported: boolean;
 }
 
 export type SupportedLanguage =
@@ -192,6 +199,8 @@ export const usePegasusStore = create<PegasusState>()((set) => ({
       showHotkeyHelper: true,
       slashCommand: true,
       agentTrigger: true,
+      systemInstructionSource: 'unset',
+      systemInstructionsImported: false,
     },
   },
   setGeminiEnhancedFeature: (key, value) =>
@@ -268,6 +277,8 @@ const DEFAULT_ENHANCED_FEATURES: PegasusState['enhancedFeatures'] = {
     showHotkeyHelper: true,
     slashCommand: true,
     agentTrigger: true,
+    systemInstructionSource: 'unset',
+    systemInstructionsImported: false,
   },
 };
 

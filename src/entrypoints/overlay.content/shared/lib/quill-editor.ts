@@ -16,8 +16,17 @@ import i18n from '@/locale/i18n';
 
 // ─── Editor Selector ─────────────────────────────────────────────────────────
 
-const EDITOR_SELECTOR = 'rich-textarea .ql-editor[contenteditable="true"]';
-const EDITOR_SELECTOR_FALLBACK = 'div.ql-editor[contenteditable="true"]';
+// The Gem create/edit page has a second Quill editor — the Gem's instructions —
+// which comes *before* the preview composer in the DOM. Without the exclusion,
+// every composer feature (slash, agent, send) would target the instructions box.
+const GEM_INSTRUCTION_EDITOR = 'rich-textarea[data-test-id="instruction-rich-input-field"]';
+const EDITOR_SELECTOR = `rich-textarea:not([data-test-id="instruction-rich-input-field"]) .ql-editor[contenteditable="true"]`;
+const EDITOR_SELECTOR_FALLBACK = `div.ql-editor[contenteditable="true"]:not(${GEM_INSTRUCTION_EDITOR} *)`;
+
+/** The Gem instructions editor (Gem create/edit page only) */
+export function getGemInstructionEditor(): HTMLElement | null {
+  return document.querySelector<HTMLElement>(`${GEM_INSTRUCTION_EDITOR} .ql-editor[contenteditable="true"]`);
+}
 
 // ─── Capsule Constants ───────────────────────────────────────────────────────
 

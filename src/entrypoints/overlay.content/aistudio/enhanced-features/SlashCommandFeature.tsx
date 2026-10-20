@@ -27,7 +27,7 @@ import {
 } from '@/entrypoints/overlay.content/shared/modules/prompts/components/VariableFillForm';
 import type { Prompt } from '@/shared/types/db';
 import { useModalStore } from '@/shared/lib/modal';
-import { useAIStudioEditorIntegration } from './useAIStudioEditorIntegration';
+import { useTextareaEditorIntegration } from '@/entrypoints/overlay.content/shared/features/trigger-popup/useTextareaEditorIntegration';
 
 // ─── Textarea Selector ───────────────────────────────────────────────────────
 
@@ -102,7 +102,7 @@ export const SlashCommandFeature: React.FC = () => {
   const doInsertPromptRef = useRef(doInsertPrompt);
   doInsertPromptRef.current = doInsertPrompt;
 
-  const { popupPosition } = useAIStudioEditorIntegration({
+  const { popupPosition } = useTextareaEditorIntegration({
     getTextarea,
     enabled: slashCommandEnabled,
     triggerChar: '/',

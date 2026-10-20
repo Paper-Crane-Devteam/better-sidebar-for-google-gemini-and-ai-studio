@@ -19,10 +19,10 @@ import {
 } from '@/entrypoints/overlay.content/shared/features/trigger-popup';
 import type { TriggerPopupItem, CapsuleClickInfo } from '@/entrypoints/overlay.content/shared/features/trigger-popup';
 import { useModalStore } from '@/shared/lib/modal';
+import { getEditor as getComposerEditor } from '@/entrypoints/overlay.content/shared/lib/quill-editor';
 
-function getEditor(): HTMLElement | null {
-  return document.querySelector('rich-textarea .ql-editor[contenteditable="true"]');
-}
+// Shared composer lookup — skips the Gem instructions editor on the Gem page
+const getEditor = getComposerEditor;
 
 export const SlashCommandFeature: React.FC = () => {
   const slashCommandEnabled = usePegasusStore(

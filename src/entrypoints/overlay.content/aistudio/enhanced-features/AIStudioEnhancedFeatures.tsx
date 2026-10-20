@@ -1,6 +1,7 @@
 import { AutoHideInputFeature } from './AutoHideInputFeature';
 import { AutoHideRunSettingsFeature } from './AutoHideRunSettingsFeature';
 import { SlashCommandFeature } from './SlashCommandFeature';
+import { SystemInstructionPromptFeature } from './SystemInstructionPromptFeature';
 import { AgentLoopFeature } from './AgentLoopFeature';
 import { SaveSnippetFeature } from './SaveSnippetFeature';
 import { SmartScrollbarFeature } from './SmartScrollbar/SmartScrollbarFeature';
@@ -52,6 +53,7 @@ export const AIStudioEnhancedFeatures = () => {
       <AutoHideRunSettingsFeature />
       <SmartScrollbarFeature />
       <SlashCommandFeature />
+      <SystemInstructionPromptFeature />
       <AgentLoopFeature />
       <SaveSnippetFeature />
       <SnippetDragDrawer />

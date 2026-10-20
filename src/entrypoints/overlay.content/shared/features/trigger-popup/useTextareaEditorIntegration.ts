@@ -1,7 +1,11 @@
 /**
- * useAIStudioEditorIntegration — Editor integration for AI Studio's textarea.
+ * useTextareaEditorIntegration — Trigger-popup integration for a plain <textarea>.
  *
- * AI Studio uses a plain Angular-controlled <textarea> (not a contenteditable).
+ * Built for AI Studio's composer (a plain Angular-controlled <textarea>, not a
+ * contenteditable); also drives `/` in the native instruction textareas
+ * (AI Studio system instructions, Gemini Notebook settings) with
+ * `interceptRun: false`.
+ *
  * This hook provides:
  * - Input event listening for trigger char detection
  * - Keyboard navigation (↑↓ Enter Tab Escape)
@@ -30,7 +34,7 @@ export interface PopupPosition {
   left: number;
 }
 
-export interface AIStudioEditorIntegrationConfig {
+export interface TextareaEditorIntegrationConfig {
   /** Get the textarea element */
   getTextarea: () => HTMLTextAreaElement | null;
   /** Whether the feature is enabled */
@@ -58,9 +62,14 @@ export interface AIStudioEditorIntegrationConfig {
    * `>` claims it.
    */
   onBeforeSend?: () => boolean;
+  /**
+   * Install AI Studio's Run interceptor. Default true (composer use).
+   * Pass false for textareas that are not AI Studio's composer.
+   */
+  interceptRun?: boolean;
 }
 
-export function useAIStudioEditorIntegration(config: AIStudioEditorIntegrationConfig) {
+export function useTextareaEditorIntegration(config: TextareaEditorIntegrationConfig) {
   const [popupPosition, setPopupPosition] = useState<PopupPosition>({ bottom: 0, left: 0 });
 
   const configRef = useRef(config);
@@ -79,8 +88,9 @@ export function useAIStudioEditorIntegration(config: AIStudioEditorIntegrationCo
 
     // Both send paths (Run button click, Enter) funnel through one handler so they
     // cannot disagree about what a send means.
-    installRunInterceptor();
-    const unregisterBeforeRun = configRef.current.onBeforeSend
+    const interceptRun = configRef.current.interceptRun ?? true;
+    if (interceptRun) installRunInterceptor();
+    const unregisterBeforeRun = interceptRun && configRef.current.onBeforeSend
       ? registerBeforeRunHandler(() => configRef.current.onBeforeSend?.() ?? false)
       : null;
 

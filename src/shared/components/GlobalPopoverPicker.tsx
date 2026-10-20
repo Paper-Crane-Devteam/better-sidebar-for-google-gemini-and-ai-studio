@@ -10,7 +10,7 @@ import { cn } from '@/shared/lib/utils/utils';
  * Mounted inside the enhanced-features shadow DOM alongside GlobalModal.
  */
 export const GlobalPopoverPicker = () => {
-  const { isOpen, anchorRect, content, width, close } = usePopoverPickerStore();
+  const { isOpen, anchorRect, content, width, placement, close } = usePopoverPickerStore();
   const popoverRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
   const [isPositioned, setIsPositioned] = useState(false);
@@ -23,6 +23,18 @@ export const GlobalPopoverPicker = () => {
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     const gap = 8; // 8px gap between anchor and popover
+
+    if (placement === 'bottom-end') {
+      // Dropdown: below the anchor, right edges aligned; flip above when it doesn't fit
+      let top = anchorRect.bottom + 4;
+      if (top + popoverRect.height > viewportHeight - 8 && anchorRect.top - 4 - popoverRect.height >= 8) {
+        top = anchorRect.top - 4 - popoverRect.height;
+      }
+      top = Math.max(8, Math.min(top, viewportHeight - 8 - popoverRect.height));
+      const left = Math.max(8, Math.min(anchorRect.right - popoverRect.width, viewportWidth - 8 - popoverRect.width));
+      setPosition({ top, left });
+      return;
+    }
 
     let top = anchorRect.top + anchorRect.height / 2 - popoverRect.height / 2;
     let left = anchorRect.right + gap;
@@ -44,7 +56,15 @@ export const GlobalPopoverPicker = () => {
     }
 
     setPosition({ top, left });
-  }, [anchorRect]);
+  }, [anchorRect, placement]);
+
+  // Dropdown content can change height (e.g. switching to an inline form); keep it in view
+  useEffect(() => {
+    if (!isOpen || placement !== 'bottom-end' || !popoverRef.current) return;
+    const ro = new ResizeObserver(() => calculatePosition());
+    ro.observe(popoverRef.current);
+    return () => ro.disconnect();
+  }, [isOpen, placement, calculatePosition]);
 
   // Position on open
   useEffect(() => {
@@ -72,9 +92,13 @@ export const GlobalPopoverPicker = () => {
       // composedPath() crosses shadow DOM boundaries, so we can correctly
       // detect clicks inside the popover even though it's in a shadow root.
       const path = e.composedPath();
-      if (!path.includes(popoverRef.current)) {
-        close();
-      }
+      if (path.includes(popoverRef.current)) return;
+      // Radix popper content (e.g. a Select's option list) opened from inside the
+      // popover is portaled elsewhere; clicking it is still "inside".
+      const inPortaledPopper = path.some(
+        (n) => n instanceof Element && n.hasAttribute('data-radix-popper-content-wrapper'),
+      );
+      if (!inPortaledPopper) close();
     };
 
     // Use setTimeout to avoid immediately closing from the triggering click
@@ -111,7 +135,10 @@ export const GlobalPopoverPicker = () => {
         'fixed z-[10002] rounded-lg shadow-[shadow:var(--shadow-popover)] overflow-hidden',
         'bg-popover',
         isPositioned
-          ? 'animate-in fade-in-0 zoom-in-95 slide-in-from-left-1 duration-150'
+          ? cn(
+              'animate-in fade-in-0 zoom-in-95 duration-150',
+              placement === 'bottom-end' ? 'slide-in-from-top-1' : 'slide-in-from-left-1',
+            )
           : 'opacity-0',
       )}
       style={{

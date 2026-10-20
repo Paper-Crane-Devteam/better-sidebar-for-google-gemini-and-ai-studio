@@ -69,7 +69,7 @@ import {
   setValue,
   triggerRun,
 } from '@/entrypoints/overlay.content/shared/lib/aistudio-editor';
-import { useAIStudioEditorIntegration } from './useAIStudioEditorIntegration';
+import { useTextareaEditorIntegration } from '@/entrypoints/overlay.content/shared/features/trigger-popup/useTextareaEditorIntegration';
 
 // See the note in the Gemini feature: the ceiling and the truncation policy both live in
 // `prompts/initial-message.ts` now, instead of a `30000` copied into each platform.
@@ -428,7 +428,7 @@ export const AgentLoopFeature: React.FC = () => {
    * integration would post those launches as raw skill text. The trigger is refused in
    * `onInput` below instead.
    */
-  const { popupPosition } = useAIStudioEditorIntegration({
+  const { popupPosition } = useTextareaEditorIntegration({
     getTextarea,
     enabled: true,
     triggerChar: '>',
