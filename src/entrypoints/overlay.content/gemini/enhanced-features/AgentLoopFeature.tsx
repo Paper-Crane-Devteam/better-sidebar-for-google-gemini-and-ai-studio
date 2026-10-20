@@ -5,7 +5,7 @@ import {
   reportPanelRunning,
   sendToPanel,
 } from '@/entrypoints/overlay.content/shared/modules/agent-loop/web/web-store';
-import { isPanelFrame, WEB_AGENT_ID } from '@/shared/web-agent/contracts';
+import { isPanelFrame, PANEL_NUDGE, WEB_AGENT_ID } from '@/shared/web-agent/contracts';
 /**
  * AgentLoopFeature — Gemini entry point for Agent Loop.
  *
@@ -454,6 +454,7 @@ export const AgentLoopFeature: React.FC = () => {
           if (c.getAttribute('data-trigger') === '>') c.remove();
           else c.replaceWith(document.createTextNode(c.getAttribute(CAPSULE_ATTR_CONTENT) || ''));
         });
+        console.log('[probe:web] handoff text =', JSON.stringify((copy.textContent || '').trim()));
         sendToPanel((copy.textContent || '').trim(), () => adapter.insertText(''));
         return true;
       }
@@ -667,7 +668,7 @@ export const AgentLoopFeature: React.FC = () => {
   useEffect(() => {
     if (!isPanelFrame()) return;
     let cancelled = false;
-    void (async () => {
+    const pickUp = async () => {
       const handoff = await claimHandoff().catch(() => null);
       if (!handoff || cancelled) return;
       // Gemini builds its composer a beat after the overlay mounts.
@@ -675,17 +676,38 @@ export const AgentLoopFeature: React.FC = () => {
         await new Promise((r) => setTimeout(r, 250));
         if (cancelled) return;
       }
+      /**
+       * Mid-task: the tabs are already in scope (the background added them before the
+       * nudge), so the running agent can reach them through `page_list`. Staging a second
+       * capsule would only be refused, so say what happened instead.
+       */
+      if (useAgentLoopStore.getState().status !== 'idle') {
+        toast.info(t('agent.web.addedWhileRunning', {
+          defaultValue: 'Added to the Web Agent. The running task can use it via page_list.',
+        }));
+        return;
+      }
       agentEventBus.emit('launcher:run-entry', {
         entryId: WEB_AGENT_ID,
         userInput: handoff.userInput,
         autoSend: handoff.autoSend,
       });
-    })();
+    };
+    void pickUp();
+    // An already-open panel: the panel page says a handoff is waiting. Only our own page,
+    // and only our parent — the message itself carries nothing, `claim` does.
+    const extensionOrigin = new URL(browser.runtime.getURL('/')).origin;
+    const onMessage = (e: MessageEvent) => {
+      if (e.source !== window.parent || e.origin !== extensionOrigin || e.data?.type !== PANEL_NUDGE) return;
+      void pickUp();
+    };
+    window.addEventListener('message', onMessage);
     const unsubscribe = useAgentLoopStore.subscribe((state, prev) => {
       if ((state.status === 'idle') !== (prev.status === 'idle')) reportPanelRunning(state.status !== 'idle');
     });
     return () => {
       cancelled = true;
+      window.removeEventListener('message', onMessage);
       unsubscribe();
     };
   }, [getAdapter]);

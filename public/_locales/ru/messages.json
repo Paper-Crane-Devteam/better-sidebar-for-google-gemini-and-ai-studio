@@ -6,5 +6,29 @@
   "extensionDescription": {
     "message": "Организуйте чаты Gemini & AI Studio: папки, теги, поиск, промпты, экспорт, синхронизация Drive, инструменты ИИ и многое другое.",
     "description": "Описание расширения"
+  },
+  "webAgentMenu": {
+    "message": "Поручить Web Agent работу с этой страницей",
+    "description": "Context menu item that opens the Web Agent side panel for the current page"
+  },
+  "webAgentAddActive": {
+    "message": "+ Текущая вкладка",
+    "description": "Web Agent side panel toolbar: let the agent operate the active tab"
+  },
+  "webAgentAddAll": {
+    "message": "+ Все вкладки",
+    "description": "Web Agent side panel toolbar: let the agent operate every tab in the window"
+  },
+  "webAgentAddAllConfirm": {
+    "message": "Разрешить Web Agent управлять всеми вкладками в этом окне? (вкладок: $1)",
+    "description": "Confirm dialog before adding all tabs. $1 is the tab count"
+  },
+  "webAgentTabsAdded": {
+    "message": "Добавлено: $1, пропущено: $2",
+    "description": "Toolbar status after adding tabs. $1 added count, $2 skipped count"
+  },
+  "webAgentNoTabAdded": {
+    "message": "Web Agent не может управлять этой страницей",
+    "description": "Toolbar status when no tab could be added"
   }
 }

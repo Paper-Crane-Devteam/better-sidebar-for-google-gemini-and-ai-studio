@@ -6,6 +6,29 @@
   "extensionDescription": {
     "message": "Organiza chats de Gemini & AI Studio con carpetas, etiquetas, búsqueda, prompts, exportación, Drive sync, herramientas de IA y más.",
     "description": "La descripción de la extensión"
+  },
+  "webAgentMenu": {
+    "message": "Deja que Web Agent trabaje en esta página",
+    "description": "Context menu item that opens the Web Agent side panel for the current page"
+  },
+  "webAgentAddActive": {
+    "message": "+ Pestaña actual",
+    "description": "Web Agent side panel toolbar: let the agent operate the active tab"
+  },
+  "webAgentAddAll": {
+    "message": "+ Todas las pestañas",
+    "description": "Web Agent side panel toolbar: let the agent operate every tab in the window"
+  },
+  "webAgentAddAllConfirm": {
+    "message": "¿Permitir que Web Agent controle todas las pestañas de esta ventana? ($1 pestañas)",
+    "description": "Confirm dialog before adding all tabs. $1 is the tab count"
+  },
+  "webAgentTabsAdded": {
+    "message": "$1 añadidas, $2 omitidas",
+    "description": "Toolbar status after adding tabs. $1 added count, $2 skipped count"
+  },
+  "webAgentNoTabAdded": {
+    "message": "Web Agent no puede controlar esta página",
+    "description": "Toolbar status when no tab could be added"
   }
 }
-

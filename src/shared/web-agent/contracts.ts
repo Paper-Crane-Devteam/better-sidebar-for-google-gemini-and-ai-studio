@@ -27,6 +27,12 @@ export interface WebConsent { version: number; acceptedAt: number }
 export const PANEL_HASH_PARAM = 'bs-web';
 /** Where the iframe keeps that token once the hash has been stripped. */
 export const PANEL_TOKEN_STORAGE_KEY = 'bs-web-agent-token';
+/**
+ * `postMessage` type the panel page sends its iframe: "a handoff is waiting, claim it".
+ * Carries no data — the handoff itself still goes through `claim`, so a forged nudge can
+ * at most make the iframe ask the background for nothing.
+ */
+export const PANEL_NUDGE = 'bs-web-agent-nudge';
 
 export const WEB_READ_TOOLS = ['page_list', 'page_snapshot'] as const;
 export const WEB_WRITE_TOOLS = ['page_open', 'page_click', 'page_type', 'page_run_js'] as const;
@@ -52,6 +58,8 @@ export type WebAgentRequest =
   | { action: 'open-panel' }
   /** From the panel page, once per load: this window's panel session token. */
   | { action: 'panel-ready'; windowId: number }
+  /** From the panel page's toolbar: put this window's active tab, or all its tabs, in scope. */
+  | { action: 'add-tabs'; windowId: number; which: 'active' | 'all' }
   /** From the panel iframe: take the pending handoff, if any. One-shot. */
   | { action: 'claim'; token: string }
   /** From the panel iframe: whether a task is running, so a second handoff can be refused. */

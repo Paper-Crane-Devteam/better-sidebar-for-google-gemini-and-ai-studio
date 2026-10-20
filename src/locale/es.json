@@ -2088,6 +2088,9 @@
       "about": "Acerca del espacio de trabajo",
       "howToUseTitle": "Cómo usar Workspace",
       "howToUseContent": "El agente Workspace es tu entorno de archivos dedicado donde la IA puede leer, escribir, editar y crear documentos y código desde cero.\n\nCómo usar:\nEscribe >Workspace en el campo de chat para activar el agente. Puedes arrastrar y soltar archivos existentes en el espacio de trabajo, o pedirle a la IA que cree nuevos archivos desde cero (por ejemplo, desarrollando un proyecto frontend completo).\n\nFormatos y funciones compatibles:\n- Texto y Código (.html, .js, .ts, .py, .md, .txt, etc.): ¡Compatibilidad total para creación desde cero y edición precisa! Pídele a la IA crear un proyecto frontend completo, escribir scripts, redactar notas Markdown o refactorizar código existente.\n- Word (.docx): Revisa documentos por capítulos, reescribe párrafos con control de cambios y añade comentarios (requiere subir un archivo existente).\n- Excel (.xlsx/.csv): Analiza datos, añade fórmulas y nuevas columnas sin alterar formatos ni gráficos originales (requiere subir un archivo existente).\n- PDF: Lee informes y artículos, extrae texto, combina páginas y añade anotaciones.\n- PowerPoint (.pptx): Lee y edita el texto de diapositivas y notas del orador.\n- Subtítulos (.srt/.vtt): Traduce y pule subtítulos manteniendo la sincronización de tiempos.\n\n💡 Consejo: Los archivos de texto y código se pueden crear desde cero y editar libremente. Los formatos especiales (Word, Excel, PPT, PDF) actualmente se centran en leer, anotar y modificar con precisión archivos existentes preservando su formato original."
+    },
+    "web": {
+      "addedWhileRunning": "Añadido a Web Agent. La tarea en curso puede usarlo mediante page_list."
     }
   },
   "backup": {

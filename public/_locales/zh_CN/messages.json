@@ -6,6 +6,29 @@
   "extensionDescription": {
     "message": "使用文件夹、标签、全文搜索、提示词库、导出、Drive 同步、AI 工具等整理 Gemini & AI Studio 对话。",
     "description": "插件描述"
+  },
+  "webAgentMenu": {
+    "message": "让 Web Agent 操作此页面",
+    "description": "Context menu item that opens the Web Agent side panel for the current page"
+  },
+  "webAgentAddActive": {
+    "message": "+ 当前标签页",
+    "description": "Web Agent side panel toolbar: let the agent operate the active tab"
+  },
+  "webAgentAddAll": {
+    "message": "+ 所有标签页",
+    "description": "Web Agent side panel toolbar: let the agent operate every tab in the window"
+  },
+  "webAgentAddAllConfirm": {
+    "message": "允许 Web Agent 操作此窗口中的所有标签页吗？（共 $1 个）",
+    "description": "Confirm dialog before adding all tabs. $1 is the tab count"
+  },
+  "webAgentTabsAdded": {
+    "message": "已添加 $1 个，跳过 $2 个",
+    "description": "Toolbar status after adding tabs. $1 added count, $2 skipped count"
+  },
+  "webAgentNoTabAdded": {
+    "message": "Web Agent 无法操作此页面",
+    "description": "Toolbar status when no tab could be added"
   }
 }
-

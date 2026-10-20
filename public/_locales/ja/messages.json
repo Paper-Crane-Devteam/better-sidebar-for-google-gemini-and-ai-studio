@@ -6,6 +6,29 @@
   "extensionDescription": {
     "message": "フォルダ、タグ、全文検索、プロンプト、エクスポート、Drive同期、AIツールなどでGemini & AI Studioのチャットを整理。",
     "description": "拡張機能の説明"
+  },
+  "webAgentMenu": {
+    "message": "Web Agent にこのページを操作させる",
+    "description": "Context menu item that opens the Web Agent side panel for the current page"
+  },
+  "webAgentAddActive": {
+    "message": "+ 現在のタブ",
+    "description": "Web Agent side panel toolbar: let the agent operate the active tab"
+  },
+  "webAgentAddAll": {
+    "message": "+ すべてのタブ",
+    "description": "Web Agent side panel toolbar: let the agent operate every tab in the window"
+  },
+  "webAgentAddAllConfirm": {
+    "message": "このウィンドウのすべてのタブを Web Agent に操作させますか？（$1 個のタブ）",
+    "description": "Confirm dialog before adding all tabs. $1 is the tab count"
+  },
+  "webAgentTabsAdded": {
+    "message": "$1 件追加、$2 件スキップ",
+    "description": "Toolbar status after adding tabs. $1 added count, $2 skipped count"
+  },
+  "webAgentNoTabAdded": {
+    "message": "このページは Web Agent で操作できません",
+    "description": "Toolbar status when no tab could be added"
   }
 }
-

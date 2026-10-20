@@ -10,5 +10,25 @@
   "webAgentMenu": {
     "message": "Let Web Agent work on this page",
     "description": "Context menu item that opens the Web Agent side panel for the current page"
+  },
+  "webAgentAddActive": {
+    "message": "+ Current tab",
+    "description": "Web Agent side panel toolbar: let the agent operate the active tab"
+  },
+  "webAgentAddAll": {
+    "message": "+ All tabs",
+    "description": "Web Agent side panel toolbar: let the agent operate every tab in the window"
+  },
+  "webAgentAddAllConfirm": {
+    "message": "Let the Web Agent operate every tab in this window? ($1 tabs)",
+    "description": "Confirm dialog before adding all tabs. $1 is the tab count"
+  },
+  "webAgentTabsAdded": {
+    "message": "$1 added, $2 skipped",
+    "description": "Toolbar status after adding tabs. $1 added count, $2 skipped count"
+  },
+  "webAgentNoTabAdded": {
+    "message": "This page cannot be operated by the Web Agent",
+    "description": "Toolbar status when no tab could be added"
   }
 }

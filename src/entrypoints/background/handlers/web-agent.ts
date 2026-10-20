@@ -83,28 +83,56 @@ function newToken(s: Persisted, windowId: number): string {
  * ⚠️ The handoff is written *before* the open call, so a panel that loads fast cannot ask
  * for it before it exists.
  */
-function openPanelWith(windowId: number, handoff: WebHandoff): Promise<void> {
+function openPanelWith(windowId: number, handoff: WebHandoff, mode: 'fresh' | 'append'): Promise<void> {
   pending.set(windowId, handoff);
-  console.log('[probe:web] openPanelWith', { windowId, handoff, hasPort: panelPorts.has(windowId) }); // [probe]
   const opening = chrome.sidePanel.open({ windowId });
-  // An open panel never sends `panel-ready` again, so tell it to start a fresh chat.
+  // An open panel never sends `panel-ready` again. A new task gets a fresh chat; extra
+  // context (a page, a selection) joins the chat already there.
   const port = panelPorts.get(windowId);
-  if (port) void load().then(s => port.postMessage({ type: 'load', token: tokenFor(s, windowId) ?? '' }));
+  if (port && mode === 'fresh') void load().then(s => port.postMessage({ type: 'load', token: tokenFor(s, windowId) ?? '' }));
+  else if (port) port.postMessage({ type: 'nudge' });
   return opening;
 }
+
+/** One line per tab, so the AI knows the `tab_id` to pass without calling `page_list`. */
+const describeTabs = (tabs: chrome.tabs.Tab[]) =>
+  tabs.map(t => `- tab_id ${t.id}: ${t.title ?? ''} — ${t.url ?? ''}`).join('\n');
 
 /** `chrome.contextMenus` entry point (entry 2). A real click, so the gesture holds. */
 function onMenuClick(info: chrome.contextMenus.OnClickData, tab?: chrome.tabs.Tab) {
   if (info.menuItemId !== MENU_ID || tab?.id === undefined || tab.windowId === undefined) return;
   const selection = info.selectionText?.trim();
+  const url = tab.url ?? info.pageUrl ?? '';
+  const inScope = !GEMINI_ORIGINS.some(o => url.startsWith(o));
+  const parts = [
+    inScope ? `Work on this tab:\n${describeTabs([tab])}` : '',
+    selection ? `Selected text on the page:\n"""\n${selection.slice(0, 4000)}\n"""` : '',
+  ].filter(Boolean);
   void openPanelWith(tab.windowId, {
-    userInput: selection ? `Selected text on the page:\n"""\n${selection.slice(0, 4000)}\n"""\n` : '',
+    userInput: parts.length ? `${parts.join('\n\n')}\n` : '',
     autoSend: false,
     createdAt: Date.now(),
-  }).catch(e => console.warn('[WebAgent] side panel did not open', e));
+  }, 'append').catch(e => console.warn('[WebAgent] side panel did not open', e));
   // The page the user right-clicked on is the one they mean.
-  const url = tab.url ?? info.pageUrl ?? '';
-  if (!GEMINI_ORIGINS.some(o => url.startsWith(o))) void addToScope(tab.windowId, tab.id);
+  if (inScope) void addToScope(tab.windowId, tab.id);
+}
+
+/**
+ * The panel toolbar's "this tab" / "all tabs". Gemini, the Web Store and other refused
+ * hosts are skipped rather than failing the batch.
+ */
+async function addTabs(windowId: number, which: 'active' | 'all') {
+  const tabs = await chrome.tabs.query(which === 'active' ? { windowId, active: true } : { windowId });
+  const added = tabs.filter(t => t.id !== undefined && !refuseUrl(t.url ?? ''));
+  for (const t of added) await addToScope(windowId, t.id!);
+  if (added.length) {
+    pending.set(windowId, {
+      userInput: `${added.length === 1 ? 'Work on this tab' : 'You may work on these tabs'}:\n${describeTabs(added)}\n`,
+      autoSend: false,
+      createdAt: Date.now(),
+    });
+  }
+  return { added: added.length, skipped: tabs.length - added.length };
 }
 
 /**
@@ -419,7 +447,7 @@ async function runTool(token: string, windowId: number, tool: string, params: Re
       const t = targets.find(x => x.tabId === tabId);
       return { tab_id: tabId, title: t?.title ?? '', url: t?.url ?? '', attached: attached.has(tabId) };
     });
-    return rows.length ? JSON.stringify(rows) : 'No tabs in scope. Open one with page_open, or ask the user to right-click a page and choose "Let Web Agent work on this page".';
+    return rows.length ? JSON.stringify(rows) : 'No tabs in scope. Open one with page_open, or ask the user to press "+ Current tab" at the top of the side panel (or right-click a page and choose "Let Web Agent work on this page").';
   }
 
   if (tool === 'page_open') {
@@ -507,7 +535,7 @@ export async function handleWebAgent(request: WebAgentRequest, sender: MessageSe
         void chrome.sidePanel.open({ windowId }).catch(() => {});
         return { success: false, error: 'busy' };
       }
-      await openPanelWith(windowId, { userInput: request.userInput.slice(0, 20000), autoSend: true, createdAt: Date.now() });
+      await openPanelWith(windowId, { userInput: request.userInput.slice(0, 20000), autoSend: true, createdAt: Date.now() }, 'fresh');
       return { success: true };
     }
 
@@ -518,8 +546,14 @@ export async function handleWebAgent(request: WebAgentRequest, sender: MessageSe
       if (!fromHostTab || sender.tab?.windowId === undefined) throw new Error('The side panel can only be opened from a Gemini or AI Studio tab.');
       const windowId = sender.tab.windowId;
       if (panelPorts.has(windowId)) await chrome.sidePanel.open({ windowId });
-      else await openPanelWith(windowId, { userInput: '', autoSend: false, createdAt: Date.now() });
+      else await openPanelWith(windowId, { userInput: '', autoSend: false, createdAt: Date.now() }, 'fresh');
       return { success: true };
+    }
+
+    // The panel page nudges its own iframe once this returns.
+    if (request.action === 'add-tabs') {
+      if (!fromPage(PANEL_URL())) throw new Error('Not the panel.');
+      return { success: true, data: await addTabs(request.windowId, request.which) };
     }
 
     if (request.action === 'panel-ready') {
@@ -559,7 +593,6 @@ export async function handleWebAgent(request: WebAgentRequest, sender: MessageSe
 
     if (request.action === 'claim') {
       const handoff = pending.get(windowId);
-      console.log('[probe:web] claim', { windowId, handoff, pendingKeys: [...pending.keys()] }); // [probe]
       pending.delete(windowId);
       return { success: true, data: handoff && Date.now() - handoff.createdAt < HANDOFF_TTL ? handoff : null };
     }

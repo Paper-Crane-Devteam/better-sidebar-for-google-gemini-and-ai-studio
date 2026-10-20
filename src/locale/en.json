@@ -2119,6 +2119,7 @@
       "needsConsent": "🔒 Read the risk notice first · click to open",
       "handedOff": "Sent to the Web Agent in the side panel",
       "panelBusy": "The side panel is still running a task. Finish or stop it first.",
+      "addedWhileRunning": "Added to the Web Agent. The running task can use it via page_list.",
       "panelBlocked": "Chrome did not open the side panel.",
       "openPanel": "Open side panel",
       "consent": {
