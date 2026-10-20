@@ -262,6 +262,22 @@ export function appendCapsule(
 }
 
 /**
+ * The capsule for `displayText`, re-wrapping it if the composer lost it.
+ *
+ * Quill re-renders the composer from its Delta, and a re-render keeps the text and the
+ * bold of our `<strong>` but drops its class and data attributes. Any code that is about
+ * to read a capsule it wrote a moment ago should go through this rather than trust the DOM.
+ */
+export function ensureCapsule(
+  editor: HTMLElement,
+  displayText: string,
+  attrs: CapsuleAttrs,
+): HTMLElement | null {
+  const selector = `.${attrs.className}[${CAPSULE_ATTR_ID}="${CSS.escape(attrs.dataAttrs[CAPSULE_ATTR_ID] ?? '')}"]`;
+  return editor.querySelector<HTMLElement>(selector) ?? wrapTextInCapsule(editor, displayText, attrs);
+}
+
+/**
  * Replace everything after `capsule` with `text`, leaving the capsule and anything before it.
  *
  * Starts past the capsule's trailing nbsp when it is still there, so the new text sits in

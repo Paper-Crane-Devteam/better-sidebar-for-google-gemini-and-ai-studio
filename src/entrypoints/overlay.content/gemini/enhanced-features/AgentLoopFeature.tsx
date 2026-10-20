@@ -70,7 +70,7 @@ import {
   appendCapsule,
   insertTextAtEnd,
   replaceTextAfterCapsule,
-  triggerSend,
+  ensureCapsule,
   CAPSULE_ATTR_ID,
   CAPSULE_ATTR_CONTENT,
 } from '@/entrypoints/overlay.content/shared/lib/quill-editor';
@@ -454,7 +454,6 @@ export const AgentLoopFeature: React.FC = () => {
           if (c.getAttribute('data-trigger') === '>') c.remove();
           else c.replaceWith(document.createTextNode(c.getAttribute(CAPSULE_ATTR_CONTENT) || ''));
         });
-        console.log('[probe:web] handoff text =', JSON.stringify((copy.textContent || '').trim()));
         sendToPanel((copy.textContent || '').trim(), () => adapter.insertText(''));
         return true;
       }
@@ -630,14 +629,16 @@ export const AgentLoopFeature: React.FC = () => {
       // Inserting ">Title" would otherwise re-open the trigger popup
       suppressInputRef.current();
 
-      await appendCapsule(editor, `>${entry.title}`, {
+      const displayText = `>${entry.title}`;
+      const capsuleAttrs = {
         className: CAPSULE_CLASS,
         dataAttrs: {
           [CAPSULE_ATTR_ID]: entry.id,
           [CAPSULE_ATTR_CONTENT]: entry.capsuleContent,
           'data-trigger': '>',
         },
-      });
+      };
+      await appendCapsule(editor, displayText, capsuleAttrs);
 
       if (userInput?.trim()) {
         insertTextAtEnd(editor, userInput.trim());
@@ -646,13 +647,25 @@ export const AgentLoopFeature: React.FC = () => {
       agentEventBus.emit('launcher:staged', { entryId, autoSend });
 
       if (autoSend) {
-        // Route through the real send button so the interceptor composes the message
-        await triggerSend({ humanDelay: false });
+        /**
+         * Compose here and now, not by clicking send and letting the interceptor do it.
+         *
+         * ⚠️ The click path reads the capsule back from the DOM 150ms+ later, and on a
+         * freshly loaded Gemini (the Web Agent side panel, every time) Quill can re-render
+         * the composer in between: the text and the bold survive, our class does not. The
+         * interceptor then sees no capsule and Gemini posts `>Web Agent …` as plain text,
+         * with no prompt behind it. So re-wrap the capsule if it was lost, and compose
+         * synchronously — the composed message is plain text, which a re-render keeps.
+         */
+        if (!ensureCapsule(editor, displayText, capsuleAttrs) || !composeAndSend(editor)) {
+          console.warn('[AgentLoop] Launcher could not find its capsule; not sending', editor.innerHTML.slice(0, 200));
+          agentEventBus.emit('launcher:failed', { reason: 'no-editor' });
+        }
       } else {
         editor.focus();
       }
     });
-  }, [getAdapter]);
+  }, [getAdapter, composeAndSend]);
 
   // ─── Web Agent side panel ───────────────────────────────────────────
 
