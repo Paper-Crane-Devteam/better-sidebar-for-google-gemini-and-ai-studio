@@ -10,7 +10,7 @@
  * dot are gone too, since the dock already reports what the loop is doing.
  */
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useAgentLoopStore } from '../agent-loop-store';
 import { useAgentViewStore } from '../agent-view-store';
 import { useAgentViewState } from './useAgentViewState';
@@ -67,13 +67,61 @@ function useSidebarOffset(defaultOffset = 16) {
   return width + defaultOffset;
 }
 
+/**
+ * Whether Gemini is in its narrow (mobile) layout — `chat-app.mobile`, the same signal
+ * `gemini/Layout.tsx` switches the sidebar on. Happens in the Web Agent side panel and in
+ * slim windows.
+ *
+ * In that layout the sidebar is a drawer and the conversation starts below Gemini's own
+ * top bar, so neither the sidebar offset nor the 12px top applies.
+ */
+function useGeminiMobileLayout(): boolean {
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    if (detectPlatform() !== Platform.GEMINI) return;
+    let observer: MutationObserver | null = null;
+    const attach = () => {
+      const chatApp = document.querySelector('chat-app');
+      if (!chatApp) return false;
+      const sync = () => setMobile(chatApp.classList.contains('mobile'));
+      sync();
+      observer = new MutationObserver(sync);
+      observer.observe(chatApp, { attributes: true, attributeFilter: ['class'] });
+      return true;
+    };
+    // The switcher only shows on an agent conversation, so chat-app is there by then;
+    // the retry covers the odd mount that beats it.
+    const timer = attach() ? undefined : setInterval(() => { if (attach()) clearInterval(timer); }, 500);
+    return () => { clearInterval(timer); observer?.disconnect(); };
+  }, []);
+  return mobile;
+}
+
+/** Inset from the conversation area's top-left corner, matching the overlay's `pt-14`. */
+const MOBILE_INSET_PX = 12;
+
 export const ConversationViewSwitcher: React.FC = () => {
   const { t } = useI18n();
   const viewMode = useAgentLoopStore((s) => s.viewMode);
   const setViewMode = useAgentLoopStore((s) => s.setViewMode);
   const { hasAgentContent, isRunning } = useAgentViewState();
-  const leftPx = useSidebarOffset(16);
-  const topPx = TOP_OFFSET_PX[detectPlatform()] ?? DEFAULT_TOP_OFFSET_PX;
+  const isMobileLayout = useGeminiMobileLayout();
+  const sidebarLeftPx = useSidebarOffset(16);
+  /**
+   * Mobile: pin to the conversation area (the overlay host sits right under Gemini's top
+   * bar) instead of the window corner, which is where Gemini's menu button and title are.
+   * Measured, not hard-coded — the top bar's height is Gemini's to change.
+   */
+  const mobileTopPx = useMemo(() => {
+    if (!isMobileLayout) return 0;
+    const host = document.getElementById('better-sidebar-conversation-overlay-container');
+    return (host?.getBoundingClientRect().top ?? 64) + MOBILE_INSET_PX;
+    // Re-measured when the view turns on: the host is created with the agent view.
+  }, [isMobileLayout, hasAgentContent, viewMode]);
+  const leftPx = isMobileLayout ? 16 : sidebarLeftPx;
+  const topPx = isMobileLayout
+    ? mobileTopPx
+    : TOP_OFFSET_PX[detectPlatform()] ?? DEFAULT_TOP_OFFSET_PX;
   const conversationId = useCurrentConversationId();
 
   // Nothing to switch between on a plain conversation: the overlay has nothing to

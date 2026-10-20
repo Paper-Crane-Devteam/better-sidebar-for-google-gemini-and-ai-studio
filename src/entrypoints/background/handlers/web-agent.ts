@@ -32,6 +32,7 @@ const PANEL_URL = () => chrome.runtime.getURL('web-agent-panel.html');
 const CONSENT_URL = () => chrome.runtime.getURL('web-agent-consent.html');
 const MENU_ID = 'bs-web-agent';
 const FRAME_RULE_ID = 9101;
+const DEV_FRAME_RULE_ID = 9102;
 /** A handoff nobody claimed in this long is stale — the user went and did something else. */
 const HANDOFF_TTL = 5 * 60 * 1000;
 /** Per tool result. The round budget is ~30k for everything (`handoff/budget.ts`). */
@@ -182,24 +183,40 @@ async function scopeView(windowId: number): Promise<WebScopeView> {
  * frame entirely — dNR can drop a header, not edit one directive of it.
  */
 async function installFrameRule() {
-  await chrome.declarativeNetRequest.updateSessionRules({
-    removeRuleIds: [FRAME_RULE_ID],
-    addRules: [{
-      id: FRAME_RULE_ID,
+  const action: chrome.declarativeNetRequest.RuleAction = {
+    type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
+    responseHeaders: [
+      { header: 'x-frame-options', operation: chrome.declarativeNetRequest.HeaderOperation.REMOVE },
+      { header: 'content-security-policy', operation: chrome.declarativeNetRequest.HeaderOperation.REMOVE },
+    ],
+  };
+  const addRules: chrome.declarativeNetRequest.Rule[] = [{
+    id: FRAME_RULE_ID,
+    priority: 1,
+    action,
+    condition: {
+      requestDomains: ['gemini.google.com'],
+      resourceTypes: [chrome.declarativeNetRequest.ResourceType.SUB_FRAME],
+      tabIds: [chrome.tabs.TAB_ID_NONE],
+    },
+  }];
+  // Dev only: `web-agent-panel.html` opened in a normal tab can frame Gemini too, so the
+  // panel can be resized and inspected with DevTools (a real side panel is not a target).
+  if (import.meta.env.DEV) {
+    addRules.push({
+      id: DEV_FRAME_RULE_ID,
       priority: 1,
-      action: {
-        type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
-        responseHeaders: [
-          { header: 'x-frame-options', operation: chrome.declarativeNetRequest.HeaderOperation.REMOVE },
-          { header: 'content-security-policy', operation: chrome.declarativeNetRequest.HeaderOperation.REMOVE },
-        ],
-      },
+      action,
       condition: {
         requestDomains: ['gemini.google.com'],
         resourceTypes: [chrome.declarativeNetRequest.ResourceType.SUB_FRAME],
-        tabIds: [chrome.tabs.TAB_ID_NONE],
+        initiatorDomains: [chrome.runtime.id],
       },
-    }],
+    });
+  }
+  await chrome.declarativeNetRequest.updateSessionRules({
+    removeRuleIds: [FRAME_RULE_ID, DEV_FRAME_RULE_ID],
+    addRules,
   });
 }
 
@@ -544,7 +561,9 @@ export async function handleWebAgent(request: WebAgentRequest, sender: MessageSe
     if (sender.id !== chrome.runtime.id) throw new Error('Unknown sender.');
     const senderUrl = sender.url ?? '';
     const fromHostTab = !!sender.tab && GEMINI_ORIGINS.some(o => senderUrl.startsWith(o));
-    const fromPanelFrame = !sender.tab && GEMINI_ORIGINS.some(o => senderUrl.startsWith(o));
+    // Dev only: the panel page opened in a tab (see `installFrameRule`) — its iframe has a tab.
+    const devTabPanel = import.meta.env.DEV && !!sender.tab && !!sender.frameId;
+    const fromPanelFrame = (!sender.tab || devTabPanel) && GEMINI_ORIGINS.some(o => senderUrl.startsWith(o));
     const fromPage = (page: string) => senderUrl.split('#')[0] === page;
 
     // ⚠️ First, and synchronous: the Enter that sent this is the only gesture we get.
