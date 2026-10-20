@@ -23,12 +23,16 @@
     "message": "このウィンドウのすべてのタブを Web Agent に操作させますか？（$1 個のタブ）",
     "description": "Confirm dialog before adding all tabs. $1 is the tab count"
   },
-  "webAgentTabsAdded": {
-    "message": "$1 件追加、$2 件スキップ",
-    "description": "Toolbar status after adding tabs. $1 added count, $2 skipped count"
+  "webAgentNoTabs": {
+    "message": "操作中のタブはまだありません",
+    "description": "Web Agent side panel toolbar: shown when no tab is under the agent's control"
   },
-  "webAgentNoTabAdded": {
+  "webAgentRemoveTab": {
+    "message": "このタブの操作をやめる",
+    "description": "Web Agent side panel toolbar: tooltip of the × that takes a tab out of the agent's control"
+  },
+  "webAgentCurrentRefused": {
     "message": "このページは Web Agent で操作できません",
-    "description": "Toolbar status when no tab could be added"
+    "description": "Web Agent side panel toolbar: tooltip when the active tab cannot be operated (e.g. Gemini itself)"
   }
 }

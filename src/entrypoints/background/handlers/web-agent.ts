@@ -19,9 +19,10 @@
 
 import type { MessageSender } from '../types';
 import {
-  WEB_CONSENT_KEY, WEB_CONSENT_VERSION, WEB_PANEL_PORT,
+  WEB_CONSENT_KEY, WEB_CONSENT_VERSION, WEB_PANEL_PORT, WEB_SESSION_KEY,
   isWebTool,
   type WebAgentRequest, type WebAgentStatus, type WebConsent, type WebHandoff,
+  type WebScopeTab, type WebScopeView,
 } from '@/shared/web-agent/contracts';
 
 const GEMINI_ORIGINS = ['https://gemini.google.com', 'https://aistudio.google.com'];
@@ -52,7 +53,7 @@ const stopped = new Set<string>();
  * apart and the worker can be restarted between any two of them.
  */
 interface Persisted { tokens: Record<string, number>; scope: Record<string, number[]> }
-const SESSION_KEY = 'web-agent-state';
+const SESSION_KEY = WEB_SESSION_KEY;
 let state: Persisted | null = null;
 async function load(): Promise<Persisted> {
   if (!state) state = ((await chrome.storage.session.get(SESSION_KEY))[SESSION_KEY] as Persisted | undefined) ?? { tokens: {}, scope: {} };
@@ -94,45 +95,79 @@ function openPanelWith(windowId: number, handoff: WebHandoff, mode: 'fresh' | 'a
   return opening;
 }
 
-/** One line per tab, so the AI knows the `tab_id` to pass without calling `page_list`. */
-const describeTabs = (tabs: chrome.tabs.Tab[]) =>
-  tabs.map(t => `- tab_id ${t.id}: ${t.title ?? ''} — ${t.url ?? ''}`).join('\n');
-
-/** `chrome.contextMenus` entry point (entry 2). A real click, so the gesture holds. */
+/**
+ * `chrome.contextMenus` entry point (entry 2). A real click, so the gesture holds.
+ *
+ * The page joins the scope, which the panel toolbar shows; nothing is typed for it. Only a
+ * selection is worth putting in the composer. An open panel with nothing to stage is just
+ * brought forward.
+ */
 function onMenuClick(info: chrome.contextMenus.OnClickData, tab?: chrome.tabs.Tab) {
   if (info.menuItemId !== MENU_ID || tab?.id === undefined || tab.windowId === undefined) return;
+  const windowId = tab.windowId;
   const selection = info.selectionText?.trim();
-  const url = tab.url ?? info.pageUrl ?? '';
-  const inScope = !GEMINI_ORIGINS.some(o => url.startsWith(o));
-  const parts = [
-    inScope ? `Work on this tab:\n${describeTabs([tab])}` : '',
-    selection ? `Selected text on the page:\n"""\n${selection.slice(0, 4000)}\n"""` : '',
-  ].filter(Boolean);
-  void openPanelWith(tab.windowId, {
-    userInput: parts.length ? `${parts.join('\n\n')}\n` : '',
-    autoSend: false,
-    createdAt: Date.now(),
-  }, 'append').catch(e => console.warn('[WebAgent] side panel did not open', e));
+  const opened = !selection && panelPorts.has(windowId)
+    ? chrome.sidePanel.open({ windowId })
+    : openPanelWith(windowId, {
+      userInput: selection ? `Selected text on the page:\n"""\n${selection.slice(0, 4000)}\n"""\n` : '',
+      autoSend: false,
+      createdAt: Date.now(),
+    }, 'append');
+  void opened.catch(e => console.warn('[WebAgent] side panel did not open', e));
   // The page the user right-clicked on is the one they mean.
-  if (inScope) void addToScope(tab.windowId, tab.id);
+  const url = tab.url ?? info.pageUrl ?? '';
+  if (!GEMINI_ORIGINS.some(o => url.startsWith(o))) void addToScope(windowId, tab.id);
 }
 
 /**
- * The panel toolbar's "this tab" / "all tabs". Gemini, the Web Store and other refused
- * hosts are skipped rather than failing the batch.
+ * This window's tabs, with title / URL / favicon.
+ *
+ * ⚠️ `tabs` is an optional permission, so `chrome.tabs` alone gives ids and `active` but no
+ * URL or title. `debugger.getTargets` has both, and it is what `attach` checks against anyway.
  */
+async function windowTabs(windowId: number): Promise<WebScopeTab[]> {
+  const [tabs, targets] = await Promise.all([
+    chrome.tabs.query({ windowId }),
+    chrome.debugger ? chrome.debugger.getTargets() : Promise.resolve([] as chrome.debugger.TargetInfo[]),
+  ]);
+  return tabs.filter(t => t.id !== undefined).map(t => {
+    const target = targets.find(x => x.tabId === t.id && x.type === 'page');
+    return {
+      id: t.id!,
+      active: !!t.active,
+      title: target?.title ?? t.title ?? '',
+      url: target?.url ?? t.url ?? '',
+      favicon: target?.faviconUrl ?? t.favIconUrl ?? '',
+    };
+  });
+}
+
+/** The panel toolbar's "this tab" / "all tabs". Refused hosts are skipped, not an error. */
 async function addTabs(windowId: number, which: 'active' | 'all') {
-  const tabs = await chrome.tabs.query(which === 'active' ? { windowId, active: true } : { windowId });
-  const added = tabs.filter(t => t.id !== undefined && !refuseUrl(t.url ?? ''));
-  for (const t of added) await addToScope(windowId, t.id!);
-  if (added.length) {
-    pending.set(windowId, {
-      userInput: `${added.length === 1 ? 'Work on this tab' : 'You may work on these tabs'}:\n${describeTabs(added)}\n`,
-      autoSend: false,
-      createdAt: Date.now(),
-    });
-  }
-  return { added: added.length, skipped: tabs.length - added.length };
+  const tabs = (await windowTabs(windowId)).filter(t => which === 'all' || t.active);
+  for (const t of tabs) if (!refuseUrl(t.url)) await addToScope(windowId, t.id);
+}
+
+async function removeTab(windowId: number, tabId: number) {
+  const s = await load();
+  const token = tokenFor(s, windowId);
+  if (!token) return;
+  s.scope[token] = (s.scope[token] ?? []).filter(id => id !== tabId);
+  await save();
+  await detach(tabId);
+}
+
+async function scopeView(windowId: number): Promise<WebScopeView> {
+  const s = await load();
+  const token = tokenFor(s, windowId);
+  const scope = (token && s.scope[token]) || [];
+  const tabs = await windowTabs(windowId);
+  const active = tabs.find(t => t.active);
+  return {
+    tabs: scope.map(id => tabs.find(t => t.id === id)).filter((t): t is WebScopeTab => !!t),
+    current: active ? { id: active.id, inScope: scope.includes(active.id), refused: !!refuseUrl(active.url) } : null,
+    addable: tabs.filter(t => !scope.includes(t.id) && !refuseUrl(t.url)).length,
+  };
 }
 
 /**
@@ -550,10 +585,12 @@ export async function handleWebAgent(request: WebAgentRequest, sender: MessageSe
       return { success: true };
     }
 
-    // The panel page nudges its own iframe once this returns.
-    if (request.action === 'add-tabs') {
+    // The panel toolbar. Each change lands in `storage.session`, which the panel watches.
+    if (request.action === 'add-tabs' || request.action === 'remove-tab' || request.action === 'get-scope') {
       if (!fromPage(PANEL_URL())) throw new Error('Not the panel.');
-      return { success: true, data: await addTabs(request.windowId, request.which) };
+      if (request.action === 'add-tabs') await addTabs(request.windowId, request.which);
+      if (request.action === 'remove-tab') await removeTab(request.windowId, request.tabId);
+      return { success: true, data: await scopeView(request.windowId) };
     }
 
     if (request.action === 'panel-ready') {

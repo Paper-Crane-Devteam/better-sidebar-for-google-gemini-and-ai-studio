@@ -34,6 +34,24 @@ export const PANEL_TOKEN_STORAGE_KEY = 'bs-web-agent-token';
  */
 export const PANEL_NUDGE = 'bs-web-agent-nudge';
 
+/**
+ * `storage.session` key of the background's token / scope state. The panel page watches it
+ * to know when to redraw its tab list; only the background writes it.
+ */
+export const WEB_SESSION_KEY = 'web-agent-state';
+
+/** A tab as the panel toolbar shows it. */
+export interface WebScopeTab { id: number; title: string; url: string; favicon: string; active: boolean }
+
+/** What the panel toolbar draws: the tabs under control, and where the active tab stands. */
+export interface WebScopeView {
+  tabs: WebScopeTab[];
+  /** The window's active tab. `refused` is set when the agent may not drive it at all. */
+  current: { id: number; inScope: boolean; refused: boolean } | null;
+  /** Tabs in this window that could still be added. */
+  addable: number;
+}
+
 export const WEB_READ_TOOLS = ['page_list', 'page_snapshot'] as const;
 export const WEB_WRITE_TOOLS = ['page_open', 'page_click', 'page_type', 'page_run_js'] as const;
 export const WEB_TOOLS: readonly string[] = [...WEB_READ_TOOLS, ...WEB_WRITE_TOOLS];
@@ -60,6 +78,10 @@ export type WebAgentRequest =
   | { action: 'panel-ready'; windowId: number }
   /** From the panel page's toolbar: put this window's active tab, or all its tabs, in scope. */
   | { action: 'add-tabs'; windowId: number; which: 'active' | 'all' }
+  /** From the panel page's toolbar: take one tab out of scope. */
+  | { action: 'remove-tab'; windowId: number; tabId: number }
+  /** From the panel page's toolbar: what to draw. */
+  | { action: 'get-scope'; windowId: number }
   /** From the panel iframe: take the pending handoff, if any. One-shot. */
   | { action: 'claim'; token: string }
   /** From the panel iframe: whether a task is running, so a second handoff can be refused. */

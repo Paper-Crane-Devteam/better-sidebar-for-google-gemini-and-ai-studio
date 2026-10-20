@@ -23,12 +23,16 @@
     "message": "允許 Web Agent 操作此視窗中的所有分頁嗎？（共 $1 個）",
     "description": "Confirm dialog before adding all tabs. $1 is the tab count"
   },
-  "webAgentTabsAdded": {
-    "message": "已新增 $1 個，略過 $2 個",
-    "description": "Toolbar status after adding tabs. $1 added count, $2 skipped count"
+  "webAgentNoTabs": {
+    "message": "尚無受控分頁",
+    "description": "Web Agent side panel toolbar: shown when no tab is under the agent's control"
   },
-  "webAgentNoTabAdded": {
+  "webAgentRemoveTab": {
+    "message": "停止控制此分頁",
+    "description": "Web Agent side panel toolbar: tooltip of the × that takes a tab out of the agent's control"
+  },
+  "webAgentCurrentRefused": {
     "message": "Web Agent 無法操作此頁面",
-    "description": "Toolbar status when no tab could be added"
+    "description": "Web Agent side panel toolbar: tooltip when the active tab cannot be operated (e.g. Gemini itself)"
   }
 }
