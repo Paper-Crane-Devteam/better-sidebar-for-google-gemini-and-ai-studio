@@ -137,6 +137,14 @@ export function clearEditor(editor: HTMLElement): void {
  */
 export function replaceAllContent(editor: HTMLElement, text: string): void {
   editor.innerHTML = '';
+  // Clearing: leave Quill's own empty line. A `\u200B` placeholder here stays in front
+  // of whatever the user types next, and `>` / `/` only trigger at the start of a line
+  // or after whitespace — so the next trigger silently never fired.
+  if (!text) {
+    editor.innerHTML = '<p><br></p>';
+    editor.dispatchEvent(new Event('input', { bubbles: true }));
+    return;
+  }
   const lines = text.split('\n');
   for (const line of lines) {
     const p = document.createElement('p');
