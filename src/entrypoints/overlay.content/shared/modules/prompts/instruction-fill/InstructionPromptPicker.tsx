@@ -30,6 +30,7 @@ const ROW_HEIGHT = 32;
 const MAX_ROWS = 9;
 const PREVIEW_WIDTH = 340;
 const PREVIEW_MIN_WIDTH = 220;
+const PREVIEW_MIN_HEIGHT = 280;
 const PREVIEW_GAP = 8;
 
 type SidePlacement = { left: number; top: number; width: number; height: number };
@@ -48,7 +49,11 @@ function placeBeside(rect: DOMRect): SidePlacement | null {
     if (width < PREVIEW_MIN_WIDTH) return null;
   }
   const left = side === 'right' ? rect.right + PREVIEW_GAP : rect.left - PREVIEW_GAP - width;
-  return { left, top: rect.top, width, height: rect.height };
+  // Match the dropdown's height, but never so short that there's nothing to scroll;
+  // when it grows past the dropdown, shift it up to stay inside the viewport.
+  const height = Math.min(Math.max(rect.height, PREVIEW_MIN_HEIGHT), window.innerHeight - 16);
+  const top = Math.max(8, Math.min(rect.top, window.innerHeight - 8 - height));
+  return { left, top, width, height };
 }
 
 /**
