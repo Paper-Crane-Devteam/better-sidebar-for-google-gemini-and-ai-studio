@@ -48,7 +48,10 @@ const pending = new Map<number, WebHandoff>();
 const panelPorts = new Map<number, chrome.runtime.Port>();
 const busy = new Set<string>();
 const attached = new Set<number>();
-/** Tokens whose user pressed "Cancel" on the debugging bar. Their task is over. */
+/**
+ * Tokens whose user pressed "Cancel" on the debugging bar. Their current task is over;
+ * cleared when the panel reports a new task starting (`report` with `running: true`).
+ */
 const stopped = new Set<string>();
 
 /**
@@ -640,7 +643,14 @@ export async function handleWebAgent(request: WebAgentRequest, sender: MessageSe
     }
 
     if (request.action === 'report') {
-      if (request.running) busy.add(request.token); else busy.delete(request.token);
+      if (request.running) {
+        busy.add(request.token);
+        // A new task the user just sent. "Cancel" on the debugging bar stopped the previous
+        // one, not the panel: this task may attach again.
+        stopped.delete(request.token);
+      } else {
+        busy.delete(request.token);
+      }
       return { success: true };
     }
 
