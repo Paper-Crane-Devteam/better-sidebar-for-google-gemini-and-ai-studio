@@ -10,7 +10,7 @@ export default defineConfig({
   // Manual rebuild + reload: `r` + Enter in the dev terminal, or
   // `npm run devtap reload`. See scripts/dev-reload.mjs.
   hooks: devReload.hooks,
-  manifest: ({ browser: targetBrowser }) => ({
+  manifest: ({ browser: targetBrowser, command }) => ({
     name: '__MSG_extensionName__',
     description: '__MSG_extensionDescription__',
     default_locale: 'en',
@@ -34,15 +34,14 @@ export default defineConfig({
       ...(targetBrowser === 'chrome'
         ? ['sidePanel', 'contextMenus', 'declarativeNetRequestWithHostAccess']
         : []),
+      // ⚠️ POC, dev builds only. Chrome refuses `debugger` as an *optional* permission (it
+      // is silently dropped, and `permissions.request` then says it is not in the
+      // manifest), and as a required one it carries an install warning that would disable
+      // the extension for every user on update. How production gets it is undecided — see
+      // §16 of .kiro/docs/web-agent-technical-design.md.
+      ...(targetBrowser === 'chrome' && command === 'serve' ? ['debugger'] : []),
     ],
-    // `debugger` is the Web Agent's, requested from its risk notice window. Chrome only:
-    // an optional permission the browser does not know rejects the whole manifest.
-    optional_permissions: [
-      'tabs',
-      'tabGroups',
-      'bookmarks',
-      ...(targetBrowser === 'chrome' ? ['debugger'] : []),
-    ],
+    optional_permissions: ['tabs', 'tabGroups', 'bookmarks'],
     ...(targetBrowser === 'chrome'
       ? { side_panel: { default_path: 'web-agent-panel.html' } }
       : {}),

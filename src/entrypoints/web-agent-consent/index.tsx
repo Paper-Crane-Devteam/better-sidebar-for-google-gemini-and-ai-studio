@@ -52,9 +52,11 @@ function Consent() {
   const accept = async () => {
     setBusy(true); setError('');
     try {
-      // First, synchronously inside the click — see the file header.
-      const granted = await chrome.permissions.request({ permissions: ['debugger'] });
-      if (!granted) throw new Error(t('agent.web.consent.denied', { defaultValue: 'Chrome did not grant the permission, so the Web Agent stays off.' }));
+      // `debugger` cannot be an optional permission in Chrome, so there is nothing to
+      // request here: it is either in the manifest or the agent cannot run at all.
+      if (!(await chrome.permissions.contains({ permissions: ['debugger'] }))) {
+        throw new Error(t('agent.web.consent.denied', { defaultValue: 'This build of Better Sidebar does not include the page debugger permission, so the Web Agent cannot run.' }));
+      }
       setStatus(await request('accept-consent'));
       setTimeout(() => window.close(), 900);
     } catch (e) { setError((e as Error).message); }
@@ -93,7 +95,7 @@ function Consent() {
 
     {accepted ? <>
       <p className="mt-5 rounded-md bg-muted px-3 py-2 text-xs leading-relaxed text-muted-foreground">
-        {t('agent.web.consent.accepted', { defaultValue: 'You have accepted this notice and the Web Agent is on. Withdrawing turns it off and removes the Chrome permission.' })}
+        {t('agent.web.consent.accepted', { defaultValue: 'You have accepted this notice and the Web Agent is on. Withdrawing turns it off until you accept again.' })}
       </p>
       <div className="mt-4 flex gap-2">
         <Button variant="outline" className="flex-1" disabled={busy} onClick={() => void withdraw()}>
@@ -105,7 +107,7 @@ function Consent() {
       </div>
     </> : <>
       <p className="mt-5 text-xs leading-relaxed text-muted-foreground">
-        {t('agent.web.consent.permissionNote', { defaultValue: 'Next, Chrome will ask you to allow access to the page debugger. That is what lets the agent operate pages. You can withdraw it here at any time.' })}
+        {t('agent.web.consent.permissionNote', { defaultValue: 'The agent operates pages through Chrome\'s page debugger. While it works, Chrome shows a debugging bar on those pages.' })}
       </p>
       <label className="mt-4 flex cursor-pointer items-start gap-2 text-sm">
         <input type="checkbox" className="mt-0.5 h-4 w-4 shrink-0 accent-primary" checked={read} onChange={e => setRead(e.target.checked)} />
@@ -116,7 +118,7 @@ function Consent() {
           {t('agent.web.consent.cancel', { defaultValue: 'Not now' })}
         </Button>
         <Button className="flex-1" disabled={!read || busy || !status} onClick={() => void accept()}>
-          {t('agent.web.consent.agree', { defaultValue: 'Agree and allow' })}
+          {t('agent.web.consent.agree', { defaultValue: 'Agree' })}
         </Button>
       </div>
     </>}

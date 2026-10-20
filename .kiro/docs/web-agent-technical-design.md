@@ -261,3 +261,19 @@ interface Handoff {
 | dNR | 面板里的 Gemini frame 整个去掉了 CSP 头 | dNR 只能删整个头，不能只删 `frame-ancestors` |
 | 多账号 profile | 面板 iframe 没有 `sender.tab`，DB 请求走「当前打开的库」 | 多 profile 用户可能写错库，正式版要给面板单独绑定 profile |
 | 快照 | 不进 iframe；shadow DOM 会走，但 shadow 里的 ref 只能用 `__bsRef` 取 | |
+
+## 16. ⚠️ `debugger` 不能是 optional 权限（推翻 §3）
+
+Chrome 把 `debugger` 标记为不能作为可选权限：写进 `optional_permissions` 会被静默丢弃，
+`permissions.request` 报 "Only permissions specified in the manifest may be requested"。
+
+POC 的处理：只在 dev 构建（`wxt` serve）里把 `debugger` 放进必需权限，告知窗口只检查、不申请。
+正式构建不带它，Web Agent 在正式版里点「同意」会提示本构建不含该权限。
+
+正式版的选项，需要决定：
+
+| 方案 | 代价 |
+|---|---|
+| 主扩展直接加必需权限 `debugger` | 更新时新增带警告的权限，Chrome 会先停用扩展，等所有现有用户重新同意；商店审核也会更严 |
+| 单独发一个「Web Agent 配套扩展」，只带 `debugger`，主扩展通过 `runtime.sendMessage(extensionId)` 调它 | 用户多装一个扩展；但主扩展的现有用户不受影响，审核风险也隔离开 |
+| 退回 `scripting.executeScript` + `<all_urls>`（optional host 权限可以申请） | 没有黄条、没有 isTrusted 事件，严格 CSP 的站点跑不了 AI 写的脚本 |
