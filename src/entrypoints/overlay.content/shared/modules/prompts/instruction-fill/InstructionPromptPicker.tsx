@@ -1,4 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { useShadowRoot } from '@/shared/components/ShadowRootContext';
 import { ArrowLeft, ChevronRight, Folder, FolderOpen, Search } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { cn } from '@/shared/lib/utils/utils';
@@ -26,6 +28,97 @@ type Row =
 
 const ROW_HEIGHT = 32;
 const MAX_ROWS = 9;
+const PREVIEW_WIDTH = 340;
+const PREVIEW_MIN_WIDTH = 220;
+const PREVIEW_GAP = 8;
+
+type SidePlacement = { left: number; top: number; width: number; height: number };
+
+/** Right of the dropdown if it fits, else left, else the roomier side (if wide enough) */
+function placeBeside(rect: DOMRect): SidePlacement | null {
+  const spaceRight = window.innerWidth - rect.right - PREVIEW_GAP - 8;
+  const spaceLeft = rect.left - PREVIEW_GAP - 8;
+  let side: 'left' | 'right';
+  let width = PREVIEW_WIDTH;
+  if (spaceRight >= PREVIEW_WIDTH) side = 'right';
+  else if (spaceLeft >= PREVIEW_WIDTH) side = 'left';
+  else {
+    side = spaceRight >= spaceLeft ? 'right' : 'left';
+    width = Math.max(spaceRight, spaceLeft);
+    if (width < PREVIEW_MIN_WIDTH) return null;
+  }
+  const left = side === 'right' ? rect.right + PREVIEW_GAP : rect.left - PREVIEW_GAP - width;
+  return { left, top: rect.top, width, height: rect.height };
+}
+
+/**
+ * Full content of the highlighted prompt, beside the dropdown and just as tall.
+ * Scrollable: the mouse can move over it without changing the highlight.
+ * Falls back to a short inline preview when neither side has room.
+ */
+const PromptPreviewPanel: React.FC<{ prompt: Prompt; anchorRef: React.RefObject<HTMLElement | null> }> = ({
+  prompt,
+  anchorRef,
+}) => {
+  const container = useShadowRoot();
+  const [place, setPlace] = useState<SidePlacement | null | undefined>(undefined);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const popover = anchorRef.current?.closest<HTMLElement>('[data-popover-picker]');
+    if (!popover) {
+      setPlace(null);
+      return;
+    }
+    const update = () => setPlace(placeBeside(popover.getBoundingClientRect()));
+    update();
+    // The dropdown animates in and repositions itself; follow it
+    const ro = new ResizeObserver(update);
+    ro.observe(popover);
+    const t1 = setTimeout(update, 60);
+    const t2 = setTimeout(update, 200);
+    window.addEventListener('resize', update);
+    return () => {
+      ro.disconnect();
+      clearTimeout(t1);
+      clearTimeout(t2);
+      window.removeEventListener('resize', update);
+    };
+  }, [anchorRef]);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0 });
+  }, [prompt.id]);
+
+  if (place === undefined) return null;
+
+  if (place === null || !container) {
+    return (
+      <div className="border-t border-border/50 px-3 py-2">
+        <p className="line-clamp-4 whitespace-pre-wrap break-words text-xs text-muted-foreground">{prompt.content}</p>
+      </div>
+    );
+  }
+
+  return createPortal(
+    <div
+      data-popover-picker-keep=""
+      className="fixed z-[10002] flex flex-col rounded-lg bg-popover shadow-[shadow:var(--shadow-popover)] overflow-hidden animate-in fade-in-0 duration-100"
+      style={{ left: place.left, top: place.top, width: place.width, height: place.height }}
+    >
+      <div className="flex shrink-0 items-center gap-2 border-b border-border/50 px-3 py-2">
+        <PromptIconDisplay name={prompt.icon || ''} className="h-4 w-4 shrink-0 text-muted-foreground" />
+        <span className="truncate text-sm font-medium text-foreground">{prompt.title}</span>
+      </div>
+      <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto px-3 py-2 custom-scrollbar">
+        <p className="whitespace-pre-wrap break-words text-xs leading-relaxed text-muted-foreground">
+          {prompt.content}
+        </p>
+      </div>
+    </div>,
+    container,
+  );
+};
 
 // Remembered across opens within the page session
 const expandedFolders = new Set<string>();
@@ -64,6 +157,7 @@ export const InstructionPromptPicker: React.FC = () => {
     variables: PromptVariable[];
   } | null>(null);
 
+  const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const variableFormRef = useRef<VariableFillFormRef | null>(null);
@@ -313,7 +407,7 @@ export const InstructionPromptPicker: React.FC = () => {
   const previewPrompt = activeRow?.kind === 'prompt' ? activeRow.prompt : null;
 
   return (
-    <div className="-mx-6 -my-4 flex flex-col" onKeyDown={handleKeyDown}>
+    <div ref={rootRef} className="-mx-6 -my-4 flex flex-col" onKeyDown={handleKeyDown}>
       {/* Search + type filter */}
       <div className="flex items-center gap-2 px-3 pt-3 pb-2">
         <div className="relative flex-1">
@@ -421,14 +515,8 @@ export const InstructionPromptPicker: React.FC = () => {
         )}
       </div>
 
-      {/* Preview of the highlighted prompt */}
-      {previewPrompt && (
-        <div className="border-t border-border/50 px-3 py-2">
-          <p className="line-clamp-4 whitespace-pre-wrap break-words text-xs text-muted-foreground">
-            {previewPrompt.content}
-          </p>
-        </div>
-      )}
+      {/* Preview of the highlighted prompt (beside the dropdown when there's room) */}
+      {previewPrompt && <PromptPreviewPanel prompt={previewPrompt} anchorRef={rootRef} />}
     </div>
   );
 };

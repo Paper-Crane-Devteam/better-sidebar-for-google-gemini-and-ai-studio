@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { usePopoverPickerStore } from '@/shared/lib/popover-picker';
 import { cn } from '@/shared/lib/utils/utils';
+import { TopLayerPortal } from './TopLayerPortal';
 
 /**
  * A transparent-background popover that positions itself to the right of
@@ -96,7 +97,10 @@ export const GlobalPopoverPicker = () => {
       // Radix popper content (e.g. a Select's option list) opened from inside the
       // popover is portaled elsewhere; clicking it is still "inside".
       const inPortaledPopper = path.some(
-        (n) => n instanceof Element && n.hasAttribute('data-radix-popper-content-wrapper'),
+        (n) =>
+          n instanceof Element &&
+          // Radix poppers, and companions that opt in (e.g. a side preview panel)
+          (n.hasAttribute('data-radix-popper-content-wrapper') || n.hasAttribute('data-popover-picker-keep')),
       );
       if (!inPortaledPopper) close();
     };
@@ -129,8 +133,10 @@ export const GlobalPopoverPicker = () => {
   if (!isOpen || !anchorRect) return null;
 
   return (
+    <TopLayerPortal>
     <div
       ref={popoverRef}
+      data-popover-picker=""
       className={cn(
         'fixed z-[10002] rounded-lg shadow-[shadow:var(--shadow-popover)] overflow-hidden',
         'bg-popover',
@@ -153,5 +159,6 @@ export const GlobalPopoverPicker = () => {
         {content}
       </div>
     </div>
+    </TopLayerPortal>
   );
 };

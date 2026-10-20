@@ -1,4 +1,5 @@
 import React from 'react';
+import { TopLayerPortal } from './TopLayerPortal';
 import { useModalStore } from '@/shared/lib/modal';
 import { Button } from './ui/button';
 import { useI18n } from '@/shared/hooks/useI18n';
@@ -15,7 +16,7 @@ export const GlobalModal = () => {
   if (stack.length === 0) return null;
 
   return (
-    <>
+    <TopLayerPortal>
       {stack.map((current, index) => {
         const { title, content, headerActions, confirmText, cancelText, destructive, onConfirm, onCancel, type, modalClassName } = current;
         const z = BASE_Z + index;
@@ -115,6 +116,6 @@ export const GlobalModal = () => {
           </div>
         );
       })}
-    </>
+    </TopLayerPortal>
   );
 };

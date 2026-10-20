@@ -6,6 +6,7 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { PromptIconDisplay } from '@/entrypoints/overlay.content/shared/modules/prompts/lib/prompt-icons';
 import { PopupFooterHints } from '@/entrypoints/overlay.content/shared/features/trigger-popup';
 import { useAppStore } from '@/shared/lib/store';
+import { TopLayerPortal } from '@/shared/components/TopLayerPortal';
 
 interface SlashCommandPopupProps {
   matches: SlashCommandMatch[];
@@ -41,6 +42,7 @@ export const SlashCommandPopup: React.FC<SlashCommandPopupProps> = ({
   }, [selectedIndex]);
 
   return (
+    <TopLayerPortal>
     <div
       // How the `>` trigger knows `/` is on screen and stands down — the two share an
       // editor, so without a marker to look for the mutual exclusion never fires.
@@ -104,6 +106,7 @@ export const SlashCommandPopup: React.FC<SlashCommandPopupProps> = ({
       {/* Footer hint */}
       <PopupFooterHints />
     </div>
+    </TopLayerPortal>
   );
 };
 

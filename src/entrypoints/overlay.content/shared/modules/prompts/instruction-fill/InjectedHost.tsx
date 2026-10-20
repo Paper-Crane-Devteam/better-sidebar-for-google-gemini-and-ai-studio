@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import mainStyles from '@/index.scss?inline';
-import { applyShadowStyles } from '@/shared/lib/utils';
 import { ShadowRootProvider, useShadowRoot } from '@/shared/components/ShadowRootContext';
+import { createMirroredShadowRoot } from '@/shared/lib/top-layer';
 
 interface InjectedHostProps {
   /** Find the native element to attach to; null = not on screen */
@@ -39,12 +39,12 @@ export const InjectedHost: React.FC<InjectedHostProps> = ({ find, place, hostSty
   useEffect(() => {
     let anchor: Element | null = null;
     let host: HTMLElement | null = null;
-    let themeObserver: MutationObserver | null = null;
+    let disposeTheme: (() => void) | null = null;
     let disposed = false;
 
     const teardown = () => {
-      themeObserver?.disconnect();
-      themeObserver = null;
+      disposeTheme?.();
+      disposeTheme = null;
       host?.remove();
       if (anchor) onDetachRef.current?.(anchor);
       host = null;
@@ -63,22 +63,8 @@ export const InjectedHost: React.FC<InjectedHostProps> = ({ find, place, hostSty
       host.setAttribute('data-bs-injected-host', '');
       if (hostStyle) host.style.cssText = hostStyle;
 
-      const shadow = host.attachShadow({ mode: 'open' });
-      applyShadowStyles(shadow, mainStyles);
-      const root = document.createElement('div');
-      const syncTheme = () => {
-        root.className = mainRoot?.className || 'shadow-body';
-        root.style.cssText = mainRoot?.style.cssText || '';
-        // The enhanced root is a 0×0 box; ours should size to its content
-        root.style.width = 'auto';
-        root.style.height = 'auto';
-      };
-      syncTheme();
-      if (mainRoot) {
-        themeObserver = new MutationObserver(syncTheme);
-        themeObserver.observe(mainRoot, { attributes: true, attributeFilter: ['class', 'style'] });
-      }
-      shadow.appendChild(root);
+      const { root, dispose } = createMirroredShadowRoot(host, mainRoot, mainStyles);
+      disposeTheme = dispose;
 
       placeRef.current(next, host);
       setContainer(root);
