@@ -8,6 +8,7 @@
 
 /** Maximum tool calls honoured in a single AI response */
 import { BROWSER_TOOLS } from '@/shared/browser-agent/contracts';
+import { WEB_READ_TOOLS, WEB_WRITE_TOOLS } from '@/shared/web-agent/contracts';
 
 export const MAX_TOOL_CALLS = 20;
 
@@ -25,6 +26,9 @@ export const TOOL_BLOCK_PATTERN = `${TOOL_OPEN_PATTERN}([\\s\\S]*?)${TOOL_CLOSE_
 /** Tool names the engine can actually execute */
 export const SUPPORTED_TOOLS = [
   ...BROWSER_TOOLS,
+  // Web Agent page tools (see mcp/providers/web-provider.ts).
+  ...WEB_READ_TOOLS,
+  ...WEB_WRITE_TOOLS,
   'execute_sql',
   'sync_conversation_messages',
   'export',
@@ -93,6 +97,13 @@ export const REQUIRED_PARAMS: Record<string, string[]> = {
   list_themes: [],
   create_theme: ['theme'],
   apply_theme: ['theme_id'],
+  // Mirrors the `required` lists in mcp/providers/web-provider.ts.
+  page_list: [],
+  page_snapshot: [],
+  page_open: ['url'],
+  page_click: ['ref'],
+  page_type: ['ref', 'text'],
+  page_run_js: ['code'],
 };
 
 /**
