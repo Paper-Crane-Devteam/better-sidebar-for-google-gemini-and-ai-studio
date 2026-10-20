@@ -2117,6 +2117,7 @@
     "web": {
       "needsPowerPack": "⭐ Power Pack feature · click to learn more",
       "needsConsent": "🔒 Read the risk notice first · click to open",
+      "needsConnector": "🔌 Set up the Web Agent Connector · click to open",
       "handedOff": "Sent to the Web Agent in the side panel",
       "panelBusy": "The side panel is still running a task. Finish or stop it first.",
       "addedWhileRunning": "Added to the Web Agent. The running task can use it via page_list.",
@@ -2159,7 +2160,15 @@
         "checkbox": "I have read and understand these risks",
         "cancel": "Not now",
         "agree": "Agree",
-        "denied": "This build of Better Sidebar does not include the page debugger permission, so the Web Agent cannot run.",
+        "connector": {
+          "title": "Web Agent Connector",
+          "missing": "To operate pages, the Web Agent needs a small companion extension: Better Sidebar Web Agent Connector. It holds Chrome's page debugger permission, so Better Sidebar itself does not have to, and it only accepts requests from Better Sidebar.",
+          "outdated": "Your Web Agent Connector is out of date. Update it from the Chrome Web Store, then come back here.",
+          "paused": "The Web Agent Connector is paused. Click its icon in the Chrome toolbar and turn it back on.",
+          "install": "Install from Chrome Web Store",
+          "update": "Open in Chrome Web Store",
+          "comeBack": "This page updates by itself once the Connector is installed."
+        },
         "accepted": "You have accepted this notice and the Web Agent is on. Withdrawing turns it off until you accept again.",
         "withdraw": "Withdraw",
         "done": "Done"

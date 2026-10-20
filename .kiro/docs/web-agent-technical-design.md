@@ -56,7 +56,7 @@ AI complete_task；debugger detach，黄条消失，标签组保留
 | `sidePanel` | `permissions` | 无 | 面板 |
 | `contextMenus` | `permissions` | 无 | 入口 2 的右键菜单 |
 | `declarativeNetRequestWithHostAccess` | `permissions` | 无（借用已有的 gemini / aistudio host） | 去掉 iframe 拦截头，§4 |
-| `debugger` | `optional_permissions` | 申请时弹一次 | 读写页面 |
+| `debugger` | ~~`optional_permissions`~~ 不在主扩展里，由配套扩展持有，见 §16 | — | 读写页面 |
 
 ⚠️ **不能把带警告的权限加进 `permissions`。** 更新时新增带警告的必需权限，Chrome 会先停用扩展，
 等用户重新同意。所以选 `declarativeNetRequestWithHostAccess`（没有警告），
@@ -277,3 +277,45 @@ POC 的处理：只在 dev 构建（`wxt` serve）里把 `debugger` 放进必需
 | 主扩展直接加必需权限 `debugger` | 更新时新增带警告的权限，Chrome 会先停用扩展，等所有现有用户重新同意；商店审核也会更严 |
 | 单独发一个「Web Agent 配套扩展」，只带 `debugger`，主扩展通过 `runtime.sendMessage(extensionId)` 调它 | 用户多装一个扩展；但主扩展的现有用户不受影响，审核风险也隔离开 |
 | 退回 `scripting.executeScript` + `<all_urls>`（optional host 权限可以申请） | 没有黄条、没有 isTrusted 事件，严格 CSP 的站点跑不了 AI 写的脚本 |
+
+### 16.1 决定：配套扩展 Better Sidebar Web Agent Connector
+
+选第二个方案。Connector 只是一根带护栏的 CDP 管道；tool、snapshot、scope、consent 全部留在主扩展，
+这样 Connector 几乎不用发版（`debugger` 审核慢），Web Agent 的迭代也不会出现两边版本错位。
+
+| 位置 | 内容 |
+|---|---|
+| `src/shared/web-agent/connector-protocol.ts` | 两边共用：ID、协议版本、消息类型、URL 规则、CDP 方法白名单。不准有 import |
+| `src/entrypoints/background/handlers/web-agent-debugger.ts` | 主扩展的 `dbg()`：有 `chrome.debugger` 用 builtin（dev），否则走 Connector |
+| `connector/` | Connector 本体：独立 wxt 工程，`npm run build:connector` / `zip:connector` |
+
+**协议**：无状态 `sendMessage`，不用长连 Port（两边 SW 都会被回收）。主 → Connector：
+`hello / getTargets / attach / detach / detachAll / send`；Connector → 主：`installed / detached / ping`。
+`hello.protocol < MIN_CONNECTOR_PROTOCOL` 算 `outdated`。协议只能向后兼容地扩展。
+
+**Connector 自己守的护栏**：`externally_connectable.ids` + `sender.id` 双重校验；URL 规则在 attach
+**和每条命令之前**都查（attach 后页面跳到黑名单站点会被断开并通知主扩展）；CDP 只放行
+`Runtime / Input / Page / DOM / DOMSnapshot / Accessibility`，并排除 `Page.addScriptToEvaluateOnNewDocument`
+这类会跨导航生效的方法；`Page.navigate` 的目标 URL 也查。
+
+**用户控制**：Connector popup 显示被控 tab、「Disconnect all」、「Pause」。两者都以 `stopped_by_user`
+通知主扩展，语义等同黄条上的 Cancel（任务结束，不自动重连）。Pause 存 `storage.local`，跨重启有效。
+
+**状态**：`WebAgentStatus.debugger` = `builtin | ok | missing | outdated | paused`，`permitted` 只在
+`builtin / ok` 时为真。告知窗口在不可用时显示 Connector 卡片（安装 / 更新 / 已暂停）。
+
+**ID**：主扩展 `cjeoaidogoaekodkbhijgljhenknkenj`（manifest `key` 固定）。Connector 目前用本地生成的
+key，ID `bghhojpdnfijfljnplahhjfnlkggmpeg`。
+
+### 16.2 运维
+
+- **首次上架**：先去掉 `connector/wxt.config.ts` 里的 `key` 打一个 zip 上传草稿，拿到商店 ID；
+  再把 dashboard 里 Package → public key 填回 `key`，并更新 `CONNECTOR_EXTENSION_ID`。之后 dev 和商店同一个 ID。
+- **商店材料**：single purpose（让 Better Sidebar 的 Web Agent 操作用户选定的标签页）；`debugger` 用途说明
+  （只作用于用户加入的标签页、只接受 Better Sidebar 的调用、不收集不上传数据）；隐私政策与主扩展共用；截图用 popup 和黄条。
+- **权限冻结**：永远只有 `debugger` + `storage`。新增带警告的权限会让 Connector 被停用，正是它要避免的事。
+- **发版节奏**：只在协议升级、护栏调整、popup 改动时发。主扩展用 `MIN_CONNECTOR_PROTOCOL` 门控新能力，反过来不行。
+- **本地调试**：`npm run dev` 仍是 builtin，不需要 Connector。测 Connector 路径：`npm run build:connector`，
+  在 dev 浏览器里加载 `connector/.output/chrome-mv3`，再用 `npm run dev:via-connector` 启动主扩展（不带 `debugger`）。
+- **失联**：卸载 Connector → 主扩展状态变 `missing`，Agent tab 提示「Set up the Web Agent Connector」；
+  卸载主扩展 → Connector popup 显示「Better Sidebar was not found」，其余什么都不做。

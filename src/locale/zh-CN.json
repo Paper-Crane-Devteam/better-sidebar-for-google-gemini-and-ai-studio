@@ -2090,7 +2090,19 @@
       "howToUseContent": "Workspace 是您的专属文件工作区，AI 可以直接读取、写入、精准修改并从零创建文档与代码。\n\n如何使用：\n在聊天输入框中输入 >Workspace 即可唤起 Agent。您可以将本地已有文件拖入工作区让 AI 处理，也可以直接对它下指令，让 AI 从零为您创建新文件（例如从零开发一个完整的前端项目）。\n\n支持的功能与格式：\n- 纯文本与代码（.html, .js, .ts, .py, .md, .txt 等）：支持从零创建与精准编辑！可直接让 AI 从零搭建前端项目、编写脚本、起草 Markdown 笔记，或对现有代码进行检索和局部重构。\n- Word 文档 (.docx)：逐章审阅论文、通过修订模式改写段落（可在 Word 中逐条确认接受/拒绝）、添加批注意见（需上传现有文件）。\n- Excel 表格 (.xlsx/.csv)：数据分析、编写计算公式、添加数据列，且不破坏原有图表与排版格式（需上传现有文件）。\n- PDF 文档：阅读文献与报告、提取文字、合并页面、添加批注与高亮（需上传现有文件）。\n- 演示文稿 (.pptx)：读取与编辑每页幻灯片文本及演讲者备注（需上传现有文件）。\n- 字幕文件 (.srt/.vtt)：翻译与润色字幕内容，严格保持时间轴对齐（需上传现有文件）。\n\n💡 提示：文本与代码类文件支持由 AI 从零创建及随时修改；Word/Excel/PPT/PDF 等特殊格式目前支持基于已有文件的读取、批注与精准修改（保护原有排版不乱）。"
     },
     "web": {
-      "addedWhileRunning": "已添加到 Web Agent。正在运行的任务可通过 page_list 使用。"
+      "needsConnector": "🔌 请先设置 Web Agent Connector · 点击打开",
+      "addedWhileRunning": "已添加到 Web Agent。正在运行的任务可通过 page_list 使用。",
+      "consent": {
+        "connector": {
+          "title": "Web Agent Connector",
+          "missing": "Web Agent 需要一个小的配套扩展才能操作网页：Better Sidebar Web Agent Connector。Chrome 的页面调试权限由它持有，Better Sidebar 本身不需要这个权限；它也只接受来自 Better Sidebar 的请求。",
+          "outdated": "你的 Web Agent Connector 版本过旧。请在 Chrome 应用商店更新后再回到这里。",
+          "paused": "Web Agent Connector 已暂停。点击 Chrome 工具栏里它的图标，重新开启即可。",
+          "install": "从 Chrome 应用商店安装",
+          "update": "在 Chrome 应用商店中打开",
+          "comeBack": "安装 Connector 后，本页面会自动更新。"
+        }
+      }
     }
   },
   "backup": {

@@ -16,6 +16,12 @@ export const WEB_PANEL_PORT = 'web-agent-panel';
 export const WEB_CONSENT_KEY = 'web-agent-consent';
 
 /**
+ * `storage.local` key the background touches when the Web Agent Connector announces itself,
+ * so an open notice or Agent tab re-reads the status without waiting for window focus.
+ */
+export const WEB_CONNECTOR_SEEN_KEY = 'web-agent-connector-seen';
+
+/**
  * Bumped when the notice changes in a way that needs agreeing to again. A stored consent
  * with an older version reads as no consent.
  */
@@ -67,7 +73,18 @@ export interface WebHandoff {
   createdAt: number;
 }
 
-export interface WebAgentStatus { consented: boolean; permitted: boolean }
+/**
+ * Who drives the pages. `builtin`: this build carries `debugger` itself (dev only). The rest
+ * are the Web Agent Connector's states — see `shared/web-agent/connector-protocol.ts`.
+ */
+export type WebDebuggerState = 'builtin' | 'ok' | 'missing' | 'outdated' | 'paused';
+
+export interface WebAgentStatus {
+  consented: boolean;
+  /** The pages can be driven right now: `debugger` is `builtin` or `ok`. */
+  permitted: boolean;
+  debugger: WebDebuggerState;
+}
 
 export type WebAgentRequest =
   /** From a Gemini / AI Studio tab: open this window's panel and run `userInput` there. */

@@ -8,6 +8,9 @@
   "scripts": {
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",
+    "dev:via-connector": "WEB_AGENT_CONNECTOR=1 wxt",
+    "build:connector": "wxt build connector",
+    "zip:connector": "wxt zip connector",
     "build": "wxt build",
     "build:firefox": "wxt build -b firefox",
     "zip": "wxt zip",

@@ -19,11 +19,13 @@
 
 import type { MessageSender } from '../types';
 import {
-  WEB_CONSENT_KEY, WEB_CONSENT_VERSION, WEB_PANEL_PORT, WEB_SESSION_KEY,
+  WEB_CONNECTOR_SEEN_KEY, WEB_CONSENT_KEY, WEB_CONSENT_VERSION, WEB_PANEL_PORT, WEB_SESSION_KEY,
   isWebTool,
   type WebAgentRequest, type WebAgentStatus, type WebConsent, type WebHandoff,
   type WebScopeTab, type WebScopeView,
 } from '@/shared/web-agent/contracts';
+import { isUserStop, refuseUrl, type ConnectorTarget } from '@/shared/web-agent/connector-protocol';
+import { dbg, hookDebuggerEvents } from './web-agent-debugger';
 
 const GEMINI_ORIGINS = ['https://gemini.google.com', 'https://aistudio.google.com'];
 const PANEL_URL = () => chrome.runtime.getURL('web-agent-panel.html');
@@ -124,14 +126,15 @@ function onMenuClick(info: chrome.contextMenus.OnClickData, tab?: chrome.tabs.Ta
  *
  * ⚠️ `tabs` is an optional permission, so `chrome.tabs` alone gives ids and `active` but no
  * URL or title. `debugger.getTargets` has both, and it is what `attach` checks against anyway.
+ * Without a debugger (Connector missing) the list still works, just without addresses.
  */
 async function windowTabs(windowId: number): Promise<WebScopeTab[]> {
   const [tabs, targets] = await Promise.all([
     chrome.tabs.query({ windowId }),
-    chrome.debugger ? chrome.debugger.getTargets() : Promise.resolve([] as chrome.debugger.TargetInfo[]),
+    dbg().getTargets().catch(() => [] as ConnectorTarget[]),
   ]);
   return tabs.filter(t => t.id !== undefined).map(t => {
-    const target = targets.find(x => x.tabId === t.id && x.type === 'page');
+    const target = targets.find(x => x.tabId === t.id);
     return {
       id: t.id!,
       active: !!t.active,
@@ -232,9 +235,10 @@ export function initWebAgent() {
     });
   });
 
-  // `chrome.debugger` only exists once the optional permission is granted.
-  hookDebugger();
-  chrome.permissions.onAdded.addListener(hookDebugger);
+  hookDebuggerEvents(onDetached, () => {
+    // Lets an open risk notice or Agent tab notice the Connector without waiting for focus.
+    void chrome.storage.local.set({ [WEB_CONNECTOR_SEEN_KEY]: Date.now() });
+  });
   chrome.tabs.onRemoved.addListener(async tabId => {
     attached.delete(tabId);
     const s = await load();
@@ -246,19 +250,15 @@ export function initWebAgent() {
   });
 }
 
-let debuggerHooked = false;
-function hookDebugger() {
-  if (debuggerHooked || !chrome.debugger) return;
-  debuggerHooked = true;
-  chrome.debugger.onDetach.addListener(async (source, reason) => {
-    if (source.tabId === undefined) return;
-    attached.delete(source.tabId);
-    // The "Cancel" button on Chrome's debugging bar. The user's way of saying stop.
-    if (reason === 'canceled_by_user') {
-      const s = await load();
-      for (const [token, tabs] of Object.entries(s.scope)) if (tabs.includes(source.tabId)) stopped.add(token);
-    }
-  });
+/** A session ended without us asking. Chrome's own, or forwarded by the Connector. */
+async function onDetached(tabId: number, reason: string) {
+  attached.delete(tabId);
+  // The "Cancel" button on Chrome's debugging bar, or the Connector's "Disconnect all" /
+  // "Pause". The user's way of saying stop.
+  if (isUserStop(reason)) {
+    const s = await load();
+    for (const [token, tabs] of Object.entries(s.scope)) if (tabs.includes(tabId)) stopped.add(token);
+  }
 }
 
 async function endPanelSession(windowId: number) {
@@ -276,9 +276,11 @@ async function endPanelSession(windowId: number) {
 
 async function status(): Promise<WebAgentStatus> {
   const consent = (await chrome.storage.local.get(WEB_CONSENT_KEY))[WEB_CONSENT_KEY] as WebConsent | undefined;
+  const driver = await dbg().state();
   return {
     consented: !!consent && consent.version >= WEB_CONSENT_VERSION,
-    permitted: await chrome.permissions.contains({ permissions: ['debugger'] }),
+    permitted: driver === 'builtin' || driver === 'ok',
+    debugger: driver,
   };
 }
 
@@ -291,19 +293,10 @@ async function openConsentWindow() {
 
 // ─── Debugger ────────────────────────────────────────────────────────────────
 
-const BLOCKED_HOSTS = ['gemini.google.com', 'aistudio.google.com', 'chromewebstore.google.com', 'chrome.google.com', 'accounts.google.com'];
+// The URL rule lives in `connector-protocol.ts` because the Connector enforces it too.
 
 async function targetInfo(tabId: number) {
-  return (await chrome.debugger.getTargets()).find(t => t.tabId === tabId);
-}
-
-/** Refuses the pages this agent must never drive, by URL, before anything attaches. */
-function refuseUrl(url: string): string | null {
-  let u: URL;
-  try { u = new URL(url); } catch { return 'This tab has no address the agent can work with.'; }
-  if (!['http:', 'https:'].includes(u.protocol)) return `The agent only works on http(s) pages, not ${u.protocol} pages.`;
-  if (BLOCKED_HOSTS.includes(u.hostname)) return `${u.hostname} is off limits to the Web Agent.`;
-  return null;
+  return (await dbg().getTargets()).find(t => t.tabId === tabId);
 }
 
 async function attach(tabId: number) {
@@ -311,23 +304,17 @@ async function attach(tabId: number) {
   const info = await targetInfo(tabId);
   const refused = refuseUrl(info?.url ?? '');
   if (refused) throw new Error(refused);
-  try {
-    await chrome.debugger.attach({ tabId }, '1.3');
-  } catch (e) {
-    // Survived a worker restart: Chrome still has us attached, our Set forgot.
-    if (!String((e as Error)?.message).includes('Already attached')) throw e;
-  }
+  await dbg().attach(tabId);
   attached.add(tabId);
 }
 
 async function detach(tabId: number) {
   attached.delete(tabId);
-  if (!chrome.debugger) return;
-  await chrome.debugger.detach({ tabId }).catch(() => {});
+  await dbg().detach(tabId).catch(() => {});
 }
 
 function cdp<T = any>(tabId: number, method: string, params?: object): Promise<T> {
-  return chrome.debugger.sendCommand({ tabId }, method, params) as Promise<T>;
+  return dbg().send<T>(tabId, method, params);
 }
 
 /** Evaluate in the page's main world and return the value, or throw what the page threw. */
@@ -477,7 +464,7 @@ async function runTool(token: string, windowId: number, tool: string, params: Re
   const scope = s.scope[token] ?? [];
 
   if (tool === 'page_list') {
-    const targets = await chrome.debugger.getTargets();
+    const targets = await dbg().getTargets();
     const rows = scope.map(tabId => {
       const t = targets.find(x => x.tabId === tabId);
       return { tab_id: tabId, title: t?.title ?? '', url: t?.url ?? '', attached: attached.has(tabId) };
@@ -612,12 +599,11 @@ export async function handleWebAgent(request: WebAgentRequest, sender: MessageSe
     if (request.action === 'accept-consent' || request.action === 'withdraw-consent') {
       if (!fromPage(CONSENT_URL())) throw new Error('Consent can only be given on the notice page.');
       if (request.action === 'accept-consent') {
-        if (!(await status()).permitted) throw new Error('Chrome did not grant the debugger permission.');
+        if (!(await status()).permitted) throw new Error('The Web Agent Connector is not installed, is out of date, or is paused.');
         await chrome.storage.local.set({ [WEB_CONSENT_KEY]: { version: WEB_CONSENT_VERSION, acceptedAt: Date.now() } satisfies WebConsent });
       } else {
         await chrome.storage.local.remove(WEB_CONSENT_KEY);
         for (const tabId of [...attached]) await detach(tabId);
-        await chrome.permissions.remove({ permissions: ['debugger'] }).catch(() => false);
       }
       return { success: true, data: await status() };
     }
@@ -645,7 +631,7 @@ export async function handleWebAgent(request: WebAgentRequest, sender: MessageSe
         return { success: true, data: 'STOPPED: The user pressed "Cancel" on Chrome\'s debugging bar, which means stop. Do not retry; call complete_task now and say where you got to.' };
       }
       const { consented, permitted } = await status();
-      if (!consented || !permitted) throw new Error('The Web Agent risk notice has not been accepted, or the debugger permission was removed.');
+      if (!consented || !permitted) throw new Error('The Web Agent risk notice has not been accepted, or the Web Agent Connector is missing, out of date or paused.');
       try {
         return { success: true, data: await runTool(request.token, windowId, request.tool, request.params ?? {}) };
       } catch (e) {

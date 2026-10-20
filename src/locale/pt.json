@@ -2090,7 +2090,19 @@
       "howToUseContent": "O Workspace é seu ambiente de arquivos dedicado onde a IA pode ler, gravar, editar e criar documentos e código do zero.\n\nComo usar:\nDigite >Workspace no chat para ativar o agente. Você pode arrastar e soltar arquivos existentes no espaço de trabalho ou pedir à IA que crie novos arquivos do zero (por exemplo, desenvolvendo um projeto frontend completo).\n\nFormatos e recursos suportados:\n- Texto Simples e Código (.html, .js, .ts, .py, .md, .txt, etc.): Suporte total para criação do zero e edição precisa! Peça à IA para estruturar um projeto frontend completo, escrever scripts, redigir notas Markdown ou refactorar código existente.\n- Word (.docx): Revise artigos capítulo por capítulo, reescreva parágrafos com controle de alterações e adicione comentários (requer upload de arquivo existente).\n- Excel (.xlsx/.csv): Analise dados, adicione fórmulas e novas colunas sem alterar formatos ou gráficos originais (requer upload de arquivo existente).\n- PDF: Leia relatórios e artigos, extraia texto, mescle páginas e adicione anotações.\n- PowerPoint (.pptx): Leia e edite o conteúdo dos slides e as anotações do orador.\n- Legendas (.srt/.vtt): Traduza e aprimore legendas mantendo a sincronização dos tempos.\n\n💡 Dica: Arquivos de texto e código podem ser criados do zero e editados livremente. Formatos especiais (Word, Excel, PPT, PDF) atualmente focam na leitura, anotação e edição precisa de arquivos existentes, preservando sua formatação original."
     },
     "web": {
-      "addedWhileRunning": "Adicionado ao Web Agent. A tarefa em andamento pode usá-lo via page_list."
+      "needsConnector": "🔌 Configure o Web Agent Connector · clique para abrir",
+      "addedWhileRunning": "Adicionado ao Web Agent. A tarefa em andamento pode usá-lo via page_list.",
+      "consent": {
+        "connector": {
+          "title": "Web Agent Connector",
+          "missing": "Para operar páginas, o Web Agent precisa de uma pequena extensão complementar: Better Sidebar Web Agent Connector. É ela que tem a permissão de depurador de páginas do Chrome, assim o Better Sidebar não precisa dela, e ela só aceita solicitações do Better Sidebar.",
+          "outdated": "Seu Web Agent Connector está desatualizado. Atualize-o pela Chrome Web Store e depois volte aqui.",
+          "paused": "O Web Agent Connector está pausado. Clique no ícone dele na barra de ferramentas do Chrome e ative-o novamente.",
+          "install": "Instalar pela Chrome Web Store",
+          "update": "Abrir na Chrome Web Store",
+          "comeBack": "Esta página se atualiza sozinha assim que o Connector for instalado."
+        }
+      }
     }
   },
   "backup": {

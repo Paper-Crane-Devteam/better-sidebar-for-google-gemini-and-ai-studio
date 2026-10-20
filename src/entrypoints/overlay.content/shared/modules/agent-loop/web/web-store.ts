@@ -7,8 +7,8 @@
  * Three gates, checked in this order by `webAgentBlocker`:
  * 1. **Power Pack.** The whole agent is paid, reads included — unlike the Browser agent.
  * 2. **The risk notice**, accepted once per notice version.
- * 3. **Chrome's `debugger` permission**, granted on the same click as 2.
- * 2 and 3 share one fix (the notice window), so they share one sentence.
+ * 3. **A page debugger**: the Web Agent Connector extension (or `builtin` in dev builds).
+ * 2 and 3 share one fix (the notice window, which also links to the Connector).
  */
 
 import { create } from 'zustand';
@@ -18,6 +18,7 @@ import { showPowerPackPaywall } from '@/shared/lib/powerpack-paywall';
 import { toast } from '@/shared/lib/toast';
 import {
   PANEL_TOKEN_STORAGE_KEY,
+  WEB_CONNECTOR_SEEN_KEY,
   WEB_CONSENT_KEY,
   isPanelFrame,
   type WebAgentRequest,
@@ -39,13 +40,14 @@ interface WebAgentState extends WebAgentStatus {
 export const useWebAgent = create<WebAgentState>((set) => ({
   consented: false,
   permitted: false,
+  debugger: 'missing',
   ready: false,
   refresh: async () => {
     if (import.meta.env.BROWSER !== 'chrome') return;
     try {
       set({ ...(await webRequest<WebAgentStatus>({ action: 'status' })), ready: true });
     } catch {
-      set({ consented: false, permitted: false, ready: false });
+      set({ consented: false, permitted: false, debugger: 'missing', ready: false });
     }
   },
 }));
@@ -59,7 +61,7 @@ export function initializeWebAgent(): () => void {
   const refresh = () => void useWebAgent.getState().refresh();
   refresh();
   const changed = (changes: Record<string, unknown>) => {
-    if (WEB_CONSENT_KEY in changes) refresh();
+    if (WEB_CONSENT_KEY in changes || WEB_CONNECTOR_SEEN_KEY in changes) refresh();
   };
   window.addEventListener('focus', refresh);
   browser.storage.onChanged.addListener(changed);
@@ -82,6 +84,13 @@ export function webAgentBlocker(): { reason: string; resolve: () => void } | nul
     };
   }
   const { consented, permitted } = useWebAgent.getState();
+  // Read the notice first: it is also where the Connector gets installed.
+  if (consented && !permitted) {
+    return {
+      reason: i18n.t('agent.web.needsConnector', { defaultValue: '🔌 Set up the Web Agent Connector · click to open' }),
+      resolve: () => void openWebAgentConsent(),
+    };
+  }
   if (!consented || !permitted) {
     return {
       reason: i18n.t('agent.web.needsConsent', { defaultValue: '🔒 Read the risk notice first · click to open' }),

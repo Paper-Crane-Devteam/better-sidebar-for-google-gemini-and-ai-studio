@@ -34,12 +34,12 @@ export default defineConfig({
       ...(targetBrowser === 'chrome'
         ? ['sidePanel', 'contextMenus', 'declarativeNetRequestWithHostAccess']
         : []),
-      // ⚠️ POC, dev builds only. Chrome refuses `debugger` as an *optional* permission (it
-      // is silently dropped, and `permissions.request` then says it is not in the
-      // manifest), and as a required one it carries an install warning that would disable
-      // the extension for every user on update. How production gets it is undecided — see
-      // §16 of .kiro/docs/web-agent-technical-design.md.
-      ...(targetBrowser === 'chrome' && command === 'serve' ? ['debugger'] : []),
+      // ⚠️ Dev builds only. Chrome refuses `debugger` as an *optional* permission, and as a
+      // required one it carries an install warning that would disable the extension for
+      // every user on update. Production drives pages through the separate Web Agent
+      // Connector extension instead (connector/, §16 of the Web Agent design doc).
+      // `npm run dev:via-connector` leaves it out so the Connector path can be tested in dev.
+      ...(targetBrowser === 'chrome' && command === 'serve' && !process.env.WEB_AGENT_CONNECTOR ? ['debugger'] : []),
     ],
     optional_permissions: ['tabs', 'tabGroups', 'bookmarks'],
     ...(targetBrowser === 'chrome'
