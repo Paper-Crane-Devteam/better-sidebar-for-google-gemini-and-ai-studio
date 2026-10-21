@@ -1,0 +1,28 @@
+BETTER SIDEBAR · NEW FIELDS FOR THE WEB AGENT RELEASE
+(Chrome Web Store dashboard → Privacy practices. Existing justifications stay as they are; add these.)
+
+==============================================================
+NEW PERMISSIONS (Chrome build only)
+==============================================================
+
+sidePanel
+The Web Agent runs its task in Chrome's side panel: a Gemini conversation that stays visible next to the page it is working on, so the user can watch every step and approve or reject each action. The panel opens only when the user starts a Web Agent task (typing ">Web Agent" in Gemini, or the right-click menu item).
+
+contextMenus
+Adds one right-click menu item, "Let Web Agent work on this page", on http(s) pages. Choosing it is how the user hands the current tab (and any selected text) to the Web Agent. No other menu items are added.
+
+declarativeNetRequestWithHostAccess
+The side panel shows gemini.google.com inside an extension page, which Gemini normally refuses through its X-Frame-Options and Content-Security-Policy (frame-ancestors) response headers. One session rule removes these two headers, and only for sub_frame requests to gemini.google.com that do not belong to any browser tab (tabIds: TAB_ID_NONE), which in practice is the extension's own side panel. Gemini opened in normal tabs keeps its headers, and no other website is touched. The WithHostAccess variant is used so the rule can only act on hosts the extension already has access to.
+
+==============================================================
+DATA USAGE · UPDATE
+==============================================================
+
+Tick ☑ Website content (in addition to whatever is already ticked).
+Reason: when the user runs the Web Agent, the text and structure of the pages they hand to it are placed in their own Gemini conversation, which is sent to Google as part of that chat. Nothing goes to the developer.
+
+==============================================================
+TEST INSTRUCTIONS · ADD
+==============================================================
+
+Web Agent (new, Power Pack): operating pages requires the separate companion extension "Better Sidebar Web Agent Connector" (<CONNECTOR STORE URL>), which holds the debugger permission so this extension does not need it. Test license: <TEST LICENSE KEY>. Steps: activate the license in Settings → License, install the Connector, type ">Web Agent" in Gemini and accept the risk notice, then right-click any ordinary website and choose "Let Web Agent work on this page".

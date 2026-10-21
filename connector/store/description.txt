@@ -1,0 +1,55 @@
+Web Agent Connector is a small companion extension for Better Sidebar for Gemini & AI Studio. It lets Better Sidebar's Web Agent read and operate the web pages you hand to it: clicking, typing and running scripts in the tabs you choose, while you watch and approve each step.
+
+It does nothing on its own. Without Better Sidebar installed, it stays idle.
+
+---
+
+🔌 WHY A SEPARATE EXTENSION?
+
+The Web Agent works through Chrome's page debugger (the "debugger" permission). Chrome only allows this permission as a required one, and adding it to Better Sidebar would switch Better Sidebar off for every existing user until they approved it again. Keeping it in a separate extension means only the people who want the Web Agent ever grant it.
+
+---
+
+🧭 WHAT IT DOES
+
+• Attaches Chrome's debugger only to the tabs you give to the Web Agent from Better Sidebar
+• Passes page commands from Better Sidebar to those tabs, and nothing else
+• Shows which tabs are being controlled right now when you click its toolbar icon
+
+---
+
+🛡 GUARDRAILS
+
+• Only Better Sidebar can talk to it. Websites and other extensions get no answer.
+• Chrome shows its "started debugging this browser" bar on every controlled tab. Press Cancel on that bar and the task stops right away.
+• Disconnect all: release every controlled tab with one click from the toolbar icon.
+• Pause: refuse all page control until you turn it back on. The pause stays on across browser restarts.
+• Never operates Gemini, AI Studio, the Chrome Web Store, Google sign-in pages, or browser pages such as chrome://. If a controlled tab navigates to one of them, it is disconnected.
+• Only page-level commands are passed on: reading the page, mouse and keyboard input, and running scripts inside that page. Commands that reach cookies, network traffic, other tabs or the browser itself are refused.
+
+---
+
+🔒 PRIVACY
+
+• The Connector collects nothing, keeps no page content, and sends nothing to any server.
+• It only stores the IDs of the tabs it is attached to (cleared when the browser closes) and your Pause setting.
+• What the Web Agent reads from a page is handled by Better Sidebar and becomes part of your own Gemini conversation, the same as anything you type there yourself.
+
+---
+
+🚀 HOW TO USE
+
+1. Install Better Sidebar for Gemini & AI Studio and turn on the Web Agent (Power Pack feature). Better Sidebar shows a short risk notice first.
+2. When Better Sidebar asks for it, install this Connector.
+3. In Gemini, type ">Web Agent" followed by your task. Or right-click any page and choose "Let Web Agent work on this page".
+4. The task runs in Chrome's side panel. You approve every click, every piece of typing and every script before it runs.
+
+---
+
+Disclaimer: This extension is an independent project and is not affiliated with, endorsed by, or sponsored by Google.
+
+🔗 LINKS
+• Better Sidebar: https://chromewebstore.google.com/detail/cjeoaidogoaekodkbhijgljhenknkenj
+• Privacy policy: https://papercranedev.com/better-sidebar/privacy
+• GitHub: https://github.com/Paper-Crane-Devteam/better-sidebar
+• Discord: https://discord.gg/FRzesxaGAx

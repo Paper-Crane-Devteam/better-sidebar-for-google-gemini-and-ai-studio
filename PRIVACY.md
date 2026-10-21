@@ -1,45 +1,101 @@
 # Privacy Policy
 
-**Last Updated:** [06/01/2026]
+*Last Updated: October 21, 2026*
 
-This Privacy Policy describes how **Better Sidebar for Gemini & AI Studio** ("we", "our", or "the Extension") handles your information. We are committed to protecting your privacy and ensuring you have full control over your data.
+This Privacy Policy covers two browser extensions published by Paper Crane Dev ("we", "our"):
 
-## 1. Data Collection and Storage
+- **Better Sidebar for Gemini & AI Studio** ("Better Sidebar")
+- **Better Sidebar Web Agent Connector** ("the Connector"), an optional companion to Better Sidebar
 
-### Local-First Architecture
-The Extension is designed with a "Local-First" architecture. This means:
+Together they are "the Extensions". In short: your data stays in your browser, we run no server that receives your chats or your organization data, and nothing is sold or used for advertising.
 
-*   **Local Storage:** All organizational data you create (Folders, Tags, Favorites, Notes) is stored locally on your device using an embedded SQLite database within your browser.
-*   **No Cloud Sync:** We do not operate a cloud server to store your prompts or organizational structure. Your data stays on your machine.
-*   **Google AI Studio Data:** The Extension interacts with the Google AI Studio page to identify your conversations for the purpose of organizing them. We do not transmit this content to any third-party servers.
+## 1. Local-First Storage
 
-### What We DO NOT Collect
-*   We do **not** collect, store, or transmit your chat history, prompts, or generated responses to our servers.
-*   We do **not** collect personal identification information (PII) such as your name, email address, or phone number.
-*   We do **not** track your browsing history outside of the Google AI Studio domain.
+- Folders, tags, favorites, notes, prompts, snippets, synced message history, agent sessions and Workspace files are stored on your device, in an SQLite database and extension storage inside your browser.
+- Each profile you create in Better Sidebar has its own separate local database.
+- Automatic backups are snapshots kept in the same local storage.
+- Uninstalling the extension or clearing its browser data deletes all of this. We cannot recover it for you.
 
-## 2. Permissions
+## 2. What We Do Not Collect
 
-The Extension requires specific permissions to function:
+- We do **not** receive, store or read your chat history, prompts, AI replies, files or browsing activity.
+- We do **not** collect personal information such as your name, email address or phone number.
+- We do **not** use analytics, tracking pixels or advertising SDKs.
+- We do **not** sell or share your data, and we never use it to train AI models.
 
-*   `storage`: To save your settings and preferences locally.
-*   `activeTab` / `host_permissions` (`https://aistudio.google.com/*`): To modify the AI Studio interface (injecting the overlay) and read conversation titles/IDs to enable folder organization.
-*   `offscreen`: To run the SQLite database securely in a separate context.
+## 3. Reading Gemini and AI Studio
 
-## 3. Data Backup and Export
+Better Sidebar runs on **gemini.google.com** and **aistudio.google.com**. It reads conversation titles, IDs and messages there so it can organize and search them. Optional background message sync fetches your existing chats from Google's own servers, using your current Google session, and stores them locally. None of this is sent to us.
 
-Since your data is stored locally, you are responsible for backing it up. The Extension provides an **Export** feature that generates a DB file of your organizational data. We strongly recommend regular backups, especially before clearing your browser data.
+## 4. AI Agents
 
-## 4. Third-Party Services
+Better Sidebar's agents (BetterSidebar Agent, Workspace Agent, Browser Agent and Web Agent) work through your own Gemini session in your browser. When an agent runs, the information it needs is placed into your Gemini conversation and is sent to Google, exactly as if you had typed or pasted it yourself. That can include:
 
-*   **Google AI Studio:** The Extension operates on top of Google AI Studio. Your use of Google AI Studio is subject to Google's own Privacy Policy and Terms of Service.
-*   **Feedback Form:** If you choose to use the Feedback form within the extension, the message (including your email if provided) is sent via a third-party email service (EmailJS) directly to our support team. This is the *only* instance where data leaves your browser, and it is initiated solely by you.
+- **BetterSidebar Agent:** chat titles, folders, tags and notes it looks up for you.
+- **Workspace Agent:** contents of the Workspace files you ask it to work on.
+- **Browser Agent:** titles and URLs of your open tabs and bookmarks, only after you grant the optional `tabs`, `tabGroups` or `bookmarks` permission and only within the switches you turn on.
+- **Web Agent:** the text, links, structure and form values of the web pages you hand to it. Password fields are never read.
 
-## 5. Changes to This Policy
+Google processes this under [Google's Privacy Policy](https://policies.google.com/privacy) and Gemini's terms. Agents use no API keys and no servers of ours.
 
-We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page.
+## 5. Web Agent and the Web Agent Connector
 
-## 6. Contact Us
+The Web Agent is optional and off until you accept its risk notice. To operate pages it uses Chrome's page debugger, which is held by the separate Connector extension, not by Better Sidebar.
 
-If you have any questions about this Privacy Policy, please contact us via the GitHub Issues page in this repository.
+The Connector:
 
+- only accepts requests from Better Sidebar, never from websites or other extensions;
+- attaches only to tabs you hand to the Web Agent, and Chrome shows a "started debugging this browser" bar on each of them;
+- refuses Gemini, AI Studio, the Chrome Web Store, Google sign-in pages and browser internal pages;
+- passes page content back to Better Sidebar only, and sends nothing to any server;
+- stores only the IDs of the tabs it is attached to (cleared when the browser closes) and your Pause setting.
+
+What the Web Agent reads from a page goes into your Gemini conversation as described in Section 4. Actions it takes on a website (submitting a form, sending a message) are seen by that website as actions from you.
+
+## 6. Data That Leaves Your Browser
+
+Apart from what you send to Google through Gemini and AI Studio, data leaves your browser only in these cases, each started by you:
+
+- **Google Drive sync (optional):** your organization data (folders, tags, favorites, notes, the chat list with titles, prompts, snippets, and your Gems and notebooks lists) is saved to your own Google Drive, in a hidden app-specific folder (`drive.appdata` scope). The extension cannot see any other files in your Drive. Message history is not synced. Once you connect Drive, changes upload automatically; restoring is always manual. You can disconnect at any time.
+- **Notion export (optional):** when you export to Notion, the content you choose and your Notion integration token are sent to `api.notion.com`. The token is stored locally in your browser.
+- **Obsidian export:** opens Obsidian on your computer through an `obsidian://` link. Nothing goes over the network.
+- **License activation:** when you activate a Support Pack or Power Pack, your license key and a random device ID generated by the extension are sent to our license server to check the key and count activations. Nothing else is sent, and no account is needed. Purchases are handled by Gumroad or Afdian under their own privacy policies.
+- **Themes:** some themes load fonts from Google Fonts (`fonts.googleapis.com`), which sees a standard web request from your browser.
+
+## 7. Permissions
+
+**Better Sidebar**
+
+- `storage`, `unlimitedStorage`: save your data and settings locally.
+- `offscreen`: run the local SQLite database.
+- `alarms`: schedule background message sync, backups and Drive sync.
+- `scripting`: add the sidebar to Gemini and AI Studio pages.
+- `identity`: sign in to Google for the optional Drive sync.
+- Host access to `gemini.google.com` and `aistudio.google.com`: show the sidebar and read your chats there.
+- `sidePanel`, `contextMenus`, `declarativeNetRequestWithHostAccess` (Chrome): open the Web Agent in Chrome's side panel, add the "Let Web Agent work on this page" menu item, and let Gemini load inside that panel.
+- Optional `tabs`, `tabGroups`, `bookmarks`: only requested when you turn on the Browser Agent.
+- Optional access to `api.notion.com`: only requested when you set up Notion export.
+
+**Web Agent Connector**
+
+- `debugger`: operate the tabs you hand to the Web Agent, as described in Section 5.
+- `storage`: remember attached tabs and your Pause setting.
+
+## 8. Your Control
+
+- Export your data any time from Better Sidebar's settings, and restore from local backups.
+- Turn off background sync, Drive sync or any agent at any time.
+- Stop the Web Agent with Cancel on Chrome's debugging bar, by closing the side panel, or with Disconnect all / Pause in the Connector.
+- Uninstall either extension to remove its local data.
+
+## 9. Children
+
+The Extensions are not directed at children under 13, and we do not knowingly collect any data from them.
+
+## 10. Changes to This Policy
+
+We may update this policy as features change. The date at the top shows the latest version. Significant changes will also be mentioned in the extension's update notes.
+
+## 11. Contact
+
+Questions about this policy: [GitHub Issues](https://github.com/Paper-Crane-Devteam/better-sidebar/issues) or our [Discord](https://discord.gg/FRzesxaGAx).

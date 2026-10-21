@@ -1,0 +1,86 @@
+BETTER SIDEBAR WEB AGENT CONNECTOR · CHROME WEB STORE SUBMISSION FIELDS
+(Copy each block into the matching dashboard field. Detailed description: description.txt)
+
+==============================================================
+STORE LISTING
+==============================================================
+
+Title (from manifest)
+Better Sidebar Web Agent Connector
+
+Summary / short description (from manifest, max 132 chars)
+Lets Better Sidebar's Web Agent operate the tabs you choose. Requires Better Sidebar.
+
+Category
+Productivity → Tools   (alternative: Developer Tools; keep it the same as Better Sidebar if unsure)
+
+Language
+English
+
+Homepage URL
+https://papercranedev.com/better-sidebar/
+
+Support URL
+https://github.com/Paper-Crane-Devteam/better-sidebar/issues
+
+Graphics
+• Store icon 128x128: public/icons/icon128.png
+• Screenshots 1280x800 (at least 1):
+  1. The Connector popup with one controlled tab listed ("Connected to Better Sidebar")
+  2. A controlled tab showing Chrome's "started debugging this browser" bar, with the Web Agent side panel open
+  3. Better Sidebar's Web Agent risk notice with the Connector card
+• Small promo tile 440x280
+
+==============================================================
+PRIVACY PRACTICES TAB
+==============================================================
+
+Single purpose
+Lets the Web Agent in the Better Sidebar for Gemini & AI Studio extension read and operate the specific browser tabs the user hands to it, by relaying Chrome debugger commands from Better Sidebar to those tabs. It has no features of its own and does nothing unless Better Sidebar asks.
+
+Permission justification · debugger
+Better Sidebar's Web Agent is a user-started AI assistant that reads a web page and clicks, types or runs a script on it, with the user approving every action. chrome.debugger is the only API that gives it page input events the site treats as real (needed for React/Angular forms) and lets it run on pages with strict Content Security Policy. The debugger is attached only to tabs the user explicitly gives to the Web Agent, and Chrome's "started debugging this browser" bar stays visible on each of them so the user can cancel at any time. Requests are accepted only from Better Sidebar's extension ID (enforced by externally_connectable and a sender.id check). The Connector refuses Gemini, AI Studio, the Chrome Web Store, Google sign-in and non-http(s) pages, re-checks the URL before every command, and forwards only page-level CDP domains (Runtime, Input, Page, DOM, DOMSnapshot, Accessibility). Methods that reach cookies, network traffic, other targets or the browser (Network, Fetch, Storage, Target, Browser, and Page.addScriptToEvaluateOnNewDocument and similar) are refused. The popup lists controlled tabs and offers Disconnect all and Pause. It is a separate extension because Chrome does not allow debugger as an optional permission, and adding it to Better Sidebar would disable Better Sidebar for all existing users.
+
+Permission justification · storage
+Stores two small values locally: the IDs of tabs the debugger is currently attached to (chrome.storage.session, so detaching still works after the service worker restarts; cleared when the browser closes), and the user's Pause switch (chrome.storage.local, so a pause stays on across restarts). No page content or personal data is stored.
+
+Are you using remote code?
+No, I am not using remote code.
+(Justification if asked: All code is packaged in the extension. Scripts run in a page via Runtime.evaluate are commands from Better Sidebar's Web Agent that the user reviewed and approved; the Connector does not download or execute code of its own.)
+
+Data usage · what user data do you collect
+Tick:  ☑ Website content
+       (The Connector relays page text and structure from the tabs the user hands to the Web Agent back to Better Sidebar, which places it in the user's own Gemini conversation. Ticking it keeps the disclosure consistent with Better Sidebar's.)
+Leave everything else unticked.
+
+Certifications (tick all three)
+☑ I do not sell or transfer user data to third parties, outside of the approved use cases
+☑ I do not use or transfer user data for purposes that are unrelated to my item's single purpose
+☑ I do not use or transfer user data to determine creditworthiness or for lending purposes
+
+Privacy policy URL
+https://papercranedev.com/better-sidebar/privacy
+
+==============================================================
+DISTRIBUTION
+==============================================================
+
+Visibility: Public
+Regions: All regions
+(Optional) Deferred publishing: on, so the Connector and the Better Sidebar update that uses it go live together.
+
+==============================================================
+TEST INSTRUCTIONS (Additional information for reviewers)
+==============================================================
+
+This extension is a companion to "Better Sidebar for Gemini & AI Studio" (https://chromewebstore.google.com/detail/cjeoaidogoaekodkbhijgljhenknkenj) and has no function without it.
+
+To test:
+1. Install Better Sidebar and sign in to https://gemini.google.com with any Google account.
+2. Activate the Power Pack test license: open the Better Sidebar sidebar → Settings → License, and enter: <TEST LICENSE KEY>
+3. Install this Connector. Clicking its toolbar icon should show "Connected to Better Sidebar".
+4. In Gemini's input box type ">Web Agent", pick it from the list, read and accept the risk notice.
+5. Open any ordinary website (for example https://example.com) in another tab, right-click the page and choose "Let Web Agent work on this page". The side panel opens with the Web Agent, and Chrome shows the "started debugging this browser" bar on that tab.
+6. Ask for a task, for example "Summarize this page" or "Click the More information link". Each click, typing step or script needs your approval in the side panel.
+7. Click the Connector icon: the controlled tab is listed. "Disconnect all" or "Pause" ends control immediately; so does Cancel on Chrome's debugging bar.
+8. Try the same on https://gemini.google.com or https://chromewebstore.google.com: the Connector refuses to attach.

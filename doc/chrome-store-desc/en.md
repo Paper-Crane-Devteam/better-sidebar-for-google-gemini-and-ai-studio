@@ -133,6 +133,9 @@ Drag in documents (Word, Excel, PDF, code files, and more) and let AI analyze or
 🌐 Browser Agent (Experimental)
 Deduplicate tabs across all your windows, group related tabs, and clean up messy bookmark folders. Separate permission switches for organizing tabs, closing tabs, organizing bookmarks, and deleting bookmarks. A snapshot is taken before every run, with one-click rollback. Reading tabs and bookmarks is free; applying changes needs Power Pack.
 
+🕹 Web Agent (Experimental, Power Pack, Chrome)
+Hand a web page to the AI and let it fill forms, click through steps, or pull a table together for you. Type ">Web Agent" in Gemini, or right-click any page and choose "Let Web Agent work on this page". The task runs in Chrome's side panel, and you approve every click, every piece of typing and every script before it runs. Operating pages needs the free companion extension "Better Sidebar Web Agent Connector", which holds Chrome's page debugger permission so Better Sidebar itself doesn't have to. Press Cancel on Chrome's debugging bar at any time to stop.
+
 ---
 
 🔒 PRIVACY FIRST
@@ -146,7 +149,7 @@ We take your privacy seriously.
 
 WHY DOES THE EXTENSION NEED PERMISSIONS?
 
-We need access to aistudio.google.com and gemini.google.com to add the enhanced sidebar and read chat titles for organization. Tab and bookmark access is optional: it's only requested when you enable the Browser Agent, and only used within the switches you turn on. We do not read your browsing history.
+We need access to aistudio.google.com and gemini.google.com to add the enhanced sidebar and read chat titles for organization. Tab and bookmark access is optional: it's only requested when you enable the Browser Agent, and only used within the switches you turn on. The side panel, right-click menu and network-rule permissions are used only by the Web Agent: to show Gemini in Chrome's side panel and to add its one menu item. We do not read your browsing history.
 
 ---
 
