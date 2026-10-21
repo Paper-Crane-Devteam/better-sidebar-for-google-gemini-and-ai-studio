@@ -134,7 +134,8 @@
   "toast": {
     "imported": "Imported {{count}} chats",
     "scanComplete": "Scan complete, no new chats found",
-    "exportSuccessful": "Export successful",
+    "exportReady": "Backup is ready",
+    "saveFile": "Save file",
     "exportFailed": "Export failed",
     "importSuccessful": "Import successful",
     "importFailed": "Import failed",

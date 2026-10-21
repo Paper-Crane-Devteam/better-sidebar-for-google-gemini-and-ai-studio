@@ -68,15 +68,27 @@ export const useDataManagement = () => {
       }
 
       const blob = new Blob([bytes], { type: 'application/x-sqlite3' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `ai-studio-backup-${new Date().toISOString().split('T')[0]}.db`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      toast.success(t('toast.exportSuccessful'));
+      const filename = `ai-studio-backup-${new Date().toISOString().split('T')[0]}.db`;
+
+      // Don't auto-click: preparing a large DB can outlast Chrome's user-activation
+      // window, and the download then gets silently blocked as an "automatic download"
+      // (never shows in chrome://downloads). Let the user trigger it with a fresh click.
+      // Persistent toast; the X button dismisses it if the user changes their mind.
+      const toastId = toast.withAction(t('toast.exportReady'), 'success', {
+        label: t('toast.saveFile'),
+        onClick: () => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          // Delay revoke so download managers that re-fetch the blob URL still find it.
+          setTimeout(() => URL.revokeObjectURL(url), 60_000);
+          toast.dismiss(toastId);
+        },
+      });
     } catch (error) {
       console.error('Export failed', error);
       toast.error(t('toast.exportFailed'));
