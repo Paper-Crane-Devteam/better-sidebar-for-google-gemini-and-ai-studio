@@ -133,6 +133,9 @@ Belgeleri (Word, Excel, PDF, kod dosyaları ve daha fazlası) sürükleyin ve or
 🌐 Browser Agent (Deneysel)
 Tüm pencerelerinizde sekmeleri tekilleştirin, ilgili sekmeleri gruplayın ve dağınık yer imi klasörlerini temizleyin. Sekmeleri düzenlemek, sekmeleri kapatmak, yer imlerini düzenlemek ve yer imlerini silmek için ayrı izin anahtarları. Tek tıklamayla geri alma ile her çalıştırmadan önce bir anlık görüntü alınır. Sekmeleri ve yer imlerini okumak ücretsizdir; Değişikliklerin uygulanması Power Pack gerektirir.
 
+🕹 Web Agent (Deneysel, Power Pack, Chrome)
+Bir web sayfasını yapay zekaya devredin; formları doldursun, adımlara tıklayarak ilerlesin veya sizin için bir tablo derlesin. Gemini'de ">Web Agent" yazın ya da herhangi bir sayfaya sağ tıklayıp "Web Agent bu sayfada çalışsın" seçeneğini seçin. Görev Chrome'un yan panelinde çalışır ve her tıklamayı, her yazma işlemini ve her betiği çalışmadan önce siz onaylarsınız. Sayfaları kullanmak için ücretsiz yardımcı uzantı "Better Sidebar Web Agent Connector" gerekir; Chrome'un sayfa hata ayıklayıcı iznini bu uzantı taşır, böylece Better Sidebar'ın kendisinin bu izne ihtiyacı olmaz. Durdurmak için istediğiniz zaman Chrome'un hata ayıklama çubuğunda İptal'e basın.
+
 ---
 
 🔒 ÖNCE GİZLİLİK
@@ -146,7 +149,7 @@ Gizliliğinizi ciddiye alıyoruz.
 
 UZANTI NEDEN İZİNLERE İHTİYAÇ DUYAR?
 
-Gelişmiş kenar çubuğunu eklemek ve organizasyon için sohbet başlıklarını okumak için aistudio.google.com ve gemini.google.com'a erişmemiz gerekiyor. Sekme ve yer imi erişimi isteğe bağlıdır: yalnızca Browser Agent'ı etkinleştirdiğinizde istenir ve yalnızca açtığınız anahtarlar içinde kullanılır. Tarama geçmişinizi okumuyoruz.
+Gelişmiş kenar çubuğunu eklemek ve organizasyon için sohbet başlıklarını okumak için aistudio.google.com ve gemini.google.com'a erişmemiz gerekiyor. Sekme ve yer imi erişimi isteğe bağlıdır: yalnızca Browser Agent'ı etkinleştirdiğinizde istenir ve yalnızca açtığınız anahtarlar içinde kullanılır. Yan panel, sağ tık menüsü ve ağ kuralı izinleri yalnızca Web Agent tarafından kullanılır: Gemini'yi Chrome'un yan panelinde göstermek ve tek menü öğesini eklemek için. Tarama geçmişinizi okumuyoruz.
 
 ---
 

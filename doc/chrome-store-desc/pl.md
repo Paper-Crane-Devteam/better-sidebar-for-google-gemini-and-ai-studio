@@ -133,6 +133,9 @@ Przeciągaj dokumenty (Word, Excel, PDF, pliki kodu i inne) i pozwól sztucznej 
 🌐 Browser Agent (eksperymentalny)
 Deduplikuj karty we wszystkich oknach, grupuj powiązane karty i sprzątaj bałagan w folderach zakładek. Oddzielne przełączniki uprawnień do porządkowania kart, zamykania kart, porządkowania zakładek i usuwania zakładek. Przed każdym uruchomieniem wykonywana jest migawka, którą można cofnąć jednym kliknięciem. Czytanie kart i zakładek jest bezpłatne; zastosowanie zmian wymaga pakietu Power Pack.
 
+🕹 Web Agent (eksperymentalny, Power Pack, Chrome)
+Przekaż stronę internetową AI i pozwól jej wypełniać formularze, przeklikać się przez kolejne kroki albo zebrać dla Ciebie tabelę. Wpisz „>Web Agent” w Gemini lub kliknij prawym przyciskiem myszy dowolną stronę i wybierz „Pozwól, aby Web Agent pracował na tej stronie”. Zadanie działa w panelu bocznym Chrome, a Ty zatwierdzasz każde kliknięcie, każde wpisanie tekstu i każdy skrypt, zanim zostanie wykonany. Do obsługi stron potrzebne jest bezpłatne rozszerzenie towarzyszące „Better Sidebar Web Agent Connector”, które posiada uprawnienie Chrome do debugowania stron, dzięki czemu samo Better Sidebar nie musi go mieć. Aby zatrzymać, w dowolnym momencie naciśnij Anuluj na pasku debugowania Chrome.
+
 ---
 
 🔒 PRYWATNOŚĆ PRZEDE WSZYSTKIM
@@ -146,7 +149,7 @@ Poważnie podchodzimy do Twojej prywatności.
 
 DLACZEGO ROZSZERZENIE WYMAGA UPRAWNIEŃ?
 
-Potrzebujemy dostępu do aistudio.google.com i gemini.google.com, aby dodać ulepszony pasek boczny i czytać tytuły czatów dla organizacji. Dostęp do zakładek i zakładek jest opcjonalny: jest wymagany tylko po włączeniu agenta przeglądarki i używany tylko w przypadku włączonych przełączników. Nie czytamy Twojej historii przeglądania.
+Potrzebujemy dostępu do aistudio.google.com i gemini.google.com, aby dodać ulepszony pasek boczny i czytać tytuły czatów dla organizacji. Dostęp do zakładek i zakładek jest opcjonalny: jest wymagany tylko po włączeniu agenta przeglądarki i używany tylko w przypadku włączonych przełączników. Uprawnienia do panelu bocznego, menu kontekstowego i reguł sieciowych są używane wyłącznie przez Web Agent: do wyświetlania Gemini w panelu bocznym Chrome i dodania jego jedynej pozycji menu. Nie czytamy Twojej historii przeglądania.
 
 ---
 

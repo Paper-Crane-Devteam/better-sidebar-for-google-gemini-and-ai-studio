@@ -133,6 +133,9 @@ AI Studio：
 🌐 Browser Agent（實驗性）
 跨所有視窗去除重複分頁、把相關分頁分組、清理雜亂的書籤資料夾。整理分頁、關閉分頁、整理書籤、刪除書籤各有獨立的權限開關。每次執行前都會自動建立快照，支援一鍵復原。讀取分頁和書籤免費；實際套用變更需要 Power Pack。
 
+🕹 Web Agent（實驗性、Power Pack、Chrome）
+把網頁交給 AI，讓它幫你填寫表單、依步驟點擊，或整理出一張表格。在 Gemini 中輸入 ">Web Agent"，或在任意網頁上按右鍵選擇「讓 Web Agent 操作此頁面」。任務在 Chrome 側邊面板中執行，每一次點擊、每一次輸入、每一段腳本在執行前都需要你核准。操作網頁需要安裝免費的配套擴充功能「Better Sidebar Web Agent Connector」，由它持有 Chrome 的頁面偵錯權限，Better Sidebar 本身不需要申請。隨時點擊 Chrome 偵錯提示列上的「取消」即可停止。
+
 ---
 
 🔒 隱私優先
@@ -146,7 +149,7 @@ AI Studio：
 
 為什麼需要這些權限？
 
-我們需要存取 aistudio.google.com 和 gemini.google.com，用於載入增強側邊欄、讀取對話標題以便整理。分頁和書籤權限是選用的：只有在你啟用 Browser Agent 時才會申請，並且只在你開啟的開關範圍內使用。我們不會讀取你的瀏覽紀錄。
+我們需要存取 aistudio.google.com 和 gemini.google.com，用於載入增強側邊欄、讀取對話標題以便整理。分頁和書籤權限是選用的：只有在你啟用 Browser Agent 時才會申請，並且只在你開啟的開關範圍內使用。側邊面板、右鍵選單和網路規則權限僅供 Web Agent 使用：用於在 Chrome 側邊面板中顯示 Gemini，以及新增它唯一的一個選單項目。我們不會讀取你的瀏覽紀錄。
 
 ---
 

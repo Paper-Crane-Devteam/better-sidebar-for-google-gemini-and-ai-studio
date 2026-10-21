@@ -133,6 +133,9 @@ Trascina i documenti (Word, Excel, PDF, file di codice e altro) e lascia che l'i
 🌐 Browser Agent (sperimentale)
 Deduplica le schede in tutte le finestre, raggruppa le schede correlate e ripulisci le cartelle di segnalibri disordinate. Interruttori di autorizzazione separati per organizzare le schede, chiudere le schede, organizzare i segnalibri ed eliminare i segnalibri. Prima di ogni esecuzione viene scattata un'istantanea, con rollback con un clic. La lettura di schede e segnalibri è gratuita; per applicare le modifiche è necessario il Power Pack.
 
+🕹 Web Agent (sperimentale, Power Pack, Chrome)
+Affida una pagina web all'IA e lascia che compili moduli, completi i passaggi a colpi di clic o metta insieme una tabella per te. Digita ">Web Agent" in Gemini, oppure fai clic destro su qualsiasi pagina e scegli "Lascia lavorare Web Agent su questa pagina". L'attività viene eseguita nel pannello laterale di Chrome e approvi ogni clic, ogni testo digitato e ogni script prima che venga eseguito. Per operare sulle pagine serve l'estensione complementare gratuita "Better Sidebar Web Agent Connector", che detiene l'autorizzazione di debug delle pagine di Chrome, così Better Sidebar non deve richiederla. Premi Annulla nella barra di debug di Chrome in qualsiasi momento per interrompere.
+
 ---
 
 🔒 LA PRIVACY PRIMA DI TUTTO
@@ -146,7 +149,7 @@ Prendiamo sul serio la tua privacy.
 
 PERCHÉ L'ESTENSIONE HA BISOGNO DI AUTORIZZAZIONI?
 
-Dobbiamo accedere ad aistudio.google.com e gemini.google.com per aggiungere la barra laterale migliorata e leggere i titoli delle chat per l'organizzazione. L'accesso alle schede e ai segnalibri è facoltativo: è richiesto solo quando abiliti il Browser Agent e utilizzato solo con gli interruttori attivati. Non leggiamo la tua cronologia di navigazione.
+Dobbiamo accedere ad aistudio.google.com e gemini.google.com per aggiungere la barra laterale migliorata e leggere i titoli delle chat per l'organizzazione. L'accesso alle schede e ai segnalibri è facoltativo: è richiesto solo quando abiliti il Browser Agent e utilizzato solo con gli interruttori attivati. Le autorizzazioni per pannello laterale, menu contestuale e regole di rete sono usate solo dal Web Agent: per mostrare Gemini nel pannello laterale di Chrome e aggiungere la sua unica voce di menu. Non leggiamo la tua cronologia di navigazione.
 
 ---
 

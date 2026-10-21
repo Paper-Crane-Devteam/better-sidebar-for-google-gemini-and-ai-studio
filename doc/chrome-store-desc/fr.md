@@ -133,6 +133,9 @@ Glissez des documents (Word, Excel, PDF, fichiers de code, etc.) et laissez l'IA
 🌐 Browser Agent (expérimental)
 Dédoublonnez les onglets sur toutes vos fenêtres, regroupez les onglets liés et rangez les dossiers de favoris en désordre. Des interrupteurs de permission distincts pour organiser les onglets, fermer les onglets, organiser les favoris et supprimer les favoris. Un instantané est pris avant chaque exécution, avec retour arrière en un clic. La lecture des onglets et favoris est gratuite ; appliquer les modifications nécessite le Power Pack.
 
+🕹 Web Agent (expérimental, Power Pack, Chrome)
+Confiez une page web à l'IA et laissez-la remplir des formulaires, cliquer à travers les étapes ou compiler un tableau pour vous. Tapez « >Web Agent » dans Gemini, ou faites un clic droit sur n'importe quelle page et choisissez « Laisser Web Agent travailler sur cette page ». La tâche s'exécute dans le panneau latéral de Chrome, et vous approuvez chaque clic, chaque saisie et chaque script avant son exécution. Piloter des pages nécessite l'extension compagnon gratuite « Better Sidebar Web Agent Connector », qui détient l'autorisation de débogage de pages de Chrome afin que Better Sidebar n'ait pas à la demander. Appuyez à tout moment sur Annuler dans la barre de débogage de Chrome pour arrêter.
+
 ---
 
 🔒 CONFIDENTIALITÉ D'ABORD
@@ -146,7 +149,7 @@ Nous prenons votre vie privée au sérieux.
 
 POURQUOI L'EXTENSION A-T-ELLE BESOIN D'AUTORISATIONS ?
 
-Nous avons besoin d'accéder à aistudio.google.com et gemini.google.com pour ajouter la barre latérale améliorée et lire les titres des chats afin de les organiser. L'accès aux onglets et aux favoris est facultatif : il n'est demandé que lorsque vous activez le Browser Agent, et n'est utilisé que dans la limite des interrupteurs que vous activez. Nous ne lisons pas votre historique de navigation.
+Nous avons besoin d'accéder à aistudio.google.com et gemini.google.com pour ajouter la barre latérale améliorée et lire les titres des chats afin de les organiser. L'accès aux onglets et aux favoris est facultatif : il n'est demandé que lorsque vous activez le Browser Agent, et n'est utilisé que dans la limite des interrupteurs que vous activez. Les autorisations de panneau latéral, de menu contextuel et de règles réseau sont utilisées uniquement par le Web Agent : pour afficher Gemini dans le panneau latéral de Chrome et ajouter son unique élément de menu. Nous ne lisons pas votre historique de navigation.
 
 ---
 

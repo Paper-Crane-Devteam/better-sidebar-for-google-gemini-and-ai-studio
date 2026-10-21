@@ -133,6 +133,9 @@ Ziehen Sie Dokumente (Word, Excel, PDF, Codedateien und mehr) hinein und lassen 
 🌐 Browser-Agent (experimentell)
 Deduplizieren Sie Tabs in allen Ihren Fenstern, gruppieren Sie verwandte Tabs und bereinigen Sie unordentliche Lesezeichenordner. Separate Berechtigungsschalter zum Organisieren von Tabs, Schließen von Tabs, Organisieren von Lesezeichen und Löschen von Lesezeichen. Vor jedem Lauf wird ein Schnappschuss erstellt, mit einem Rollback mit einem Klick. Das Lesen von Tabs und Lesezeichen ist kostenlos; Für die Anwendung von Änderungen ist ein Power Pack erforderlich.
 
+🕹 Web Agent (experimentell, Power Pack, Chrome)
+Übergeben Sie eine Webseite an die KI und lassen Sie sie Formulare ausfüllen, sich durch mehrere Schritte klicken oder eine Tabelle für Sie zusammenstellen. Geben Sie in Gemini „>Web Agent“ ein oder klicken Sie mit der rechten Maustaste auf eine beliebige Seite und wählen Sie „Web Agent auf dieser Seite arbeiten lassen“. Die Aufgabe läuft im Seitenbereich von Chrome, und Sie bestätigen jeden Klick, jede Texteingabe und jedes Skript, bevor es ausgeführt wird. Zum Bedienen von Seiten wird die kostenlose Begleiterweiterung „Better Sidebar Web Agent Connector“ benötigt. Sie besitzt die Debugger-Berechtigung von Chrome, damit Better Sidebar selbst sie nicht benötigt. Klicken Sie jederzeit in der Debugging-Leiste von Chrome auf „Abbrechen“, um den Vorgang zu beenden.
+
 ---
 
 🔒 DATENSCHUTZ AN ERSTER STELLE
@@ -146,7 +149,7 @@ Wir nehmen Ihre Privatsphäre ernst.
 
 WARUM BENÖTIGT DIE ERWEITERUNG BERECHTIGUNGEN?
 
-Wir benötigen Zugriff auf aistudio.google.com und gemini.google.com, um die erweiterte Seitenleiste hinzuzufügen und Chattitel zur Organisation zu lesen. Der Zugriff auf Tabs und Lesezeichen ist optional: Er wird nur angefordert, wenn Sie den Browser Agent aktivieren, und wird nur innerhalb der von Ihnen aktivierten Schalter verwendet. Wir lesen Ihren Browserverlauf nicht.
+Wir benötigen Zugriff auf aistudio.google.com und gemini.google.com, um die erweiterte Seitenleiste hinzuzufügen und Chattitel zur Organisation zu lesen. Der Zugriff auf Tabs und Lesezeichen ist optional: Er wird nur angefordert, wenn Sie den Browser Agent aktivieren, und wird nur innerhalb der von Ihnen aktivierten Schalter verwendet. Die Berechtigungen für den Seitenbereich, das Kontextmenü und Netzwerkregeln werden nur vom Web Agent verwendet: um Gemini im Seitenbereich von Chrome anzuzeigen und seinen einzigen Menüeintrag hinzuzufügen. Wir lesen Ihren Browserverlauf nicht.
 
 ---
 

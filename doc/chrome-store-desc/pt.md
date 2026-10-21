@@ -133,6 +133,9 @@ Arraste documentos (Word, Excel, PDF, arquivos de código e muito mais) e deixe 
 🌐 Browser Agent (experimental)
 Elimine a duplicação de guias em todas as suas janelas, agrupe guias relacionadas e limpe pastas bagunçadas de favoritos. Chaves de permissão separadas para organizar guias, fechar guias, organizar marcadores e excluir marcadores. Um instantâneo é obtido antes de cada execução, com reversão com um clique. A leitura de guias e marcadores é gratuita; a aplicação de mudanças precisa do Power Pack.
 
+🕹 Web Agent (experimental, Power Pack, Chrome)
+Entregue uma página da web para a IA e deixe que ela preencha formulários, avance pelas etapas clicando ou monte uma tabela para você. Digite ">Web Agent" no Gemini ou clique com o botão direito em qualquer página e escolha "Deixar o Web Agent trabalhar nesta página". A tarefa é executada no painel lateral do Chrome, e você aprova cada clique, cada digitação e cada script antes de serem executados. Operar páginas requer a extensão complementar gratuita "Better Sidebar Web Agent Connector", que detém a permissão de depuração de páginas do Chrome para que o próprio Better Sidebar não precise dela. Pressione Cancelar na barra de depuração do Chrome a qualquer momento para parar.
+
 ---
 
 🔒 PRIVACIDADE EM PRIMEIRO LUGAR
@@ -146,7 +149,7 @@ Levamos a sua privacidade a sério.
 
 POR QUE A EXTENSÃO PRECISA DE PERMISSÕES?
 
-Precisamos de acesso a aistudio.google.com e gemini.google.com para adicionar a barra lateral aprimorada e ler os títulos dos bate-papos para organização. O acesso às guias e aos favoritos é opcional: ele só é solicitado quando você ativa o Browser Agent e é usado apenas nos switches que você ativa. Não lemos seu histórico de navegação.
+Precisamos de acesso a aistudio.google.com e gemini.google.com para adicionar a barra lateral aprimorada e ler os títulos dos bate-papos para organização. O acesso às guias e aos favoritos é opcional: ele só é solicitado quando você ativa o Browser Agent e é usado apenas nos switches que você ativa. As permissões de painel lateral, menu de contexto e regras de rede são usadas apenas pelo Web Agent: para mostrar o Gemini no painel lateral do Chrome e adicionar seu único item de menu. Não lemos seu histórico de navegação.
 
 ---
 

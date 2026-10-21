@@ -133,6 +133,9 @@ Arrastra documentos (Word, Excel, PDF, archivos de código y más) y deja que la
 🌐 Browser Agent (experimental)
 Elimina pestañas duplicadas en todas tus ventanas, agrupa pestañas relacionadas y ordena carpetas de marcadores desordenadas. Interruptores de permiso separados para organizar pestañas, cerrar pestañas, organizar marcadores y eliminar marcadores. Antes de cada ejecución se toma una instantánea, con reversión en un clic. Leer pestañas y marcadores es gratis; aplicar cambios requiere Power Pack.
 
+🕹 Web Agent (experimental, Power Pack, Chrome)
+Entrega una página web a la IA y deja que rellene formularios, avance por los pasos haciendo clic o reúna una tabla por ti. Escribe ">Web Agent" en Gemini, o haz clic derecho en cualquier página y elige "Deja que Web Agent trabaje en esta página". La tarea se ejecuta en el panel lateral de Chrome y tú apruebas cada clic, cada texto que se escribe y cada script antes de que se ejecute. Para operar páginas se necesita la extensión complementaria gratuita "Better Sidebar Web Agent Connector", que tiene el permiso de depuración de páginas de Chrome para que Better Sidebar no tenga que pedirlo. Pulsa Cancelar en la barra de depuración de Chrome en cualquier momento para detenerla.
+
 ---
 
 🔒 PRIVACIDAD PRIMERO
@@ -146,7 +149,7 @@ Nos tomamos tu privacidad en serio.
 
 ¿POR QUÉ NECESITA PERMISOS LA EXTENSIÓN?
 
-Necesitamos acceso a aistudio.google.com y gemini.google.com para añadir la barra lateral mejorada y leer los títulos de los chats para organizarlos. El acceso a pestañas y marcadores es opcional: solo se solicita cuando activas el Browser Agent, y solo se usa dentro de los interruptores que actives. No leemos tu historial de navegación.
+Necesitamos acceso a aistudio.google.com y gemini.google.com para añadir la barra lateral mejorada y leer los títulos de los chats para organizarlos. El acceso a pestañas y marcadores es opcional: solo se solicita cuando activas el Browser Agent, y solo se usa dentro de los interruptores que actives. Los permisos de panel lateral, menú contextual y reglas de red solo los usa el Web Agent: para mostrar Gemini en el panel lateral de Chrome y añadir su único elemento de menú. No leemos tu historial de navegación.
 
 ---
 

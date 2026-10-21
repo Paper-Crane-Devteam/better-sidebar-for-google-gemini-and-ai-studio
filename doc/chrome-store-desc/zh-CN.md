@@ -133,6 +133,9 @@ AI Studio：
 🌐 Browser Agent（实验性）
 跨所有窗口去重标签页、把相关标签页分组、清理杂乱的书签文件夹。整理标签页、关闭标签页、整理书签、删除书签各有独立的权限开关。每次执行前都会自动创建快照，支持一键回退。读取标签页和书签免费；实际应用更改需要 Power Pack。
 
+🕹 Web Agent（实验性、Power Pack、Chrome）
+把网页交给 AI，让它帮你填表单、按步骤点击，或者整理出一张表格。在 Gemini 中输入 ">Web Agent"，或在任意网页上右键选择「让 Web Agent 操作此页面」。任务在 Chrome 侧边栏中运行，每一次点击、每一次输入、每一段脚本在执行前都需要你批准。操作网页需要安装免费的配套扩展「Better Sidebar Web Agent Connector」，由它持有 Chrome 的页面调试权限，Better Sidebar 本身无需申请。随时点击 Chrome 调试提示栏上的「取消」即可停止。
+
 ---
 
 🔒 隐私优先
@@ -146,7 +149,7 @@ AI Studio：
 
 为什么需要这些权限？
 
-我们需要访问 aistudio.google.com 和 gemini.google.com，用于加载增强侧边栏、读取对话标题以便整理。标签页和书签权限是可选的：只有在你启用 Browser Agent 时才会申请，并且只在你打开的开关范围内使用。我们不会读取你的浏览历史。
+我们需要访问 aistudio.google.com 和 gemini.google.com，用于加载增强侧边栏、读取对话标题以便整理。标签页和书签权限是可选的：只有在你启用 Browser Agent 时才会申请，并且只在你打开的开关范围内使用。侧边栏、右键菜单和网络规则权限仅供 Web Agent 使用：用于在 Chrome 侧边栏中显示 Gemini，以及添加它唯一的一个菜单项。我们不会读取你的浏览历史。
 
 ---
 
