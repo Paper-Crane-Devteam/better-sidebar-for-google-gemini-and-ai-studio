@@ -137,6 +137,43 @@ export function initAiStudioInterceptors() {
     }
   });
 
+  // Our rename goes straight to the API, but AI Studio's in-memory prompt still
+  // holds the old title, and every UpdatePrompt it sends (e.g. after a reply
+  // lands) carries the whole prompt, title included. Without a correction the
+  // first post-reply save reverts the rename until the page is reloaded.
+  //
+  // So remember what we renamed and from what, and rewrite only requests that
+  // still carry that exact stale title. A different title means the user
+  // renamed it natively, which wins. A page-issued ResolveDriveResource for the
+  // prompt means the page has reloaded fresh state, so the override is done.
+  const titleOverrides = new Map<string, { title: string; staleTitle: string }>();
+
+  const applyTitleOverride = (config: { body?: any }) => {
+    if (titleOverrides.size === 0) return;
+    try {
+      const body = typeof config.body === 'string' ? JSON.parse(config.body) : config.body;
+      const item = Array.isArray(body) ? body[0] : null;
+      if (!Array.isArray(item) || typeof item[0] !== 'string' || !Array.isArray(item[4])) return;
+
+      const id = item[0].split('/').pop() || '';
+      const override = titleOverrides.get(id);
+      if (!override) return;
+
+      const current = item[4][0] ?? '';
+      if (current === override.title) return;
+      if (current !== override.staleTitle) {
+        titleOverrides.delete(id);
+        return;
+      }
+
+      item[4][0] = override.title;
+      config.body = JSON.stringify(body);
+      console.log('Better Sidebar (AI Studio): Restored renamed title in UpdatePrompt:', override.title);
+    } catch (e) {
+      console.warn('Better Sidebar (AI Studio): Failed to apply title override', e);
+    }
+  };
+
   // AI Studio rename: fetch full prompt data, replace title, then update
   globalThis.addEventListener('AISTUDIO_RENAME', async (e: Event) => {
     const { promptId, newName, callbackEvent } = (e as CustomEvent).detail || {};
@@ -168,6 +205,9 @@ export function initAiStudioInterceptors() {
         root = root[0];
       }
 
+      const staleTitle: string =
+        (Array.isArray(root) && Array.isArray(root[4]) ? root[4][0] : '') ?? '';
+
       // Step 2: Replace title at index [4][0]
       if (Array.isArray(root) && root.length > 4 && Array.isArray(root[4])) {
         root[4][0] = newName;
@@ -185,6 +225,10 @@ export function initAiStudioInterceptors() {
         body: [root],
       });
       const updateText = await updateRes.text();
+
+      if (updateRes.ok && staleTitle !== newName) {
+        titleOverrides.set(promptId, { title: newName, staleTitle });
+      }
 
       globalThis.dispatchEvent(
         new CustomEvent(callbackEvent, {
@@ -227,6 +271,10 @@ export function initAiStudioInterceptors() {
           }
         }
 
+        if (config.url.includes('UpdatePrompt')) {
+          applyTitleOverride(config);
+        }
+
         // Notify overlay that a new chat generation has started
         if (config.url?.includes('CreatePrompt')) {
           // If a custom title is pending, inject it into the CreatePrompt request body
@@ -262,6 +310,17 @@ export function initAiStudioInterceptors() {
       const url = response.config.url;
       try {
         if (url.includes('ResolveDriveResource')) {
+          // The page now holds fresh server state for this prompt
+          if (titleOverrides.size > 0) {
+            try {
+              const reqBody = response.config.body;
+              const parsed = typeof reqBody === 'string' ? JSON.parse(reqBody) : reqBody;
+              const id = Array.isArray(parsed) ? parsed[0] : null;
+              if (typeof id === 'string') titleOverrides.delete(id.split('/').pop() || id);
+            } catch {
+              // non-critical
+            }
+          }
           // Opening a prompt, not activity on it
           handleChatResponse(response, url, false);
         } else if (url.endsWith('ListPrompts')) {
