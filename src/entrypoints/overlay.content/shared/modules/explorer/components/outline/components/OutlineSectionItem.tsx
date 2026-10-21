@@ -43,7 +43,8 @@ export function OutlineSectionItem({
       <div
         className={cn(
           'group flex items-center gap-1 px-2 py-1 rounded-md relative min-w-0',
-          'cursor-pointer hover:bg-accent/50',
+          hasChildren && 'cursor-pointer',
+          'hover:bg-accent/50',
         )}
         onClick={() => hasChildren && onToggle()}
       >

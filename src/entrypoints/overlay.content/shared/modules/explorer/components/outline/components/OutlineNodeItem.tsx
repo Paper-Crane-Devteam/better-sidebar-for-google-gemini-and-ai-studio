@@ -138,7 +138,8 @@ export function OutlineNodeItem({
         className={cn(
           'group flex items-center gap-1 px-2 py-1 rounded-md relative min-w-0',
           'transition-colors duration-100',
-          'cursor-pointer hover:bg-accent/50',
+          hasChildren && 'cursor-pointer',
+          'hover:bg-accent/50',
         )}
         style={{ paddingLeft: `${8 + depth * 12}px` }}
       >
