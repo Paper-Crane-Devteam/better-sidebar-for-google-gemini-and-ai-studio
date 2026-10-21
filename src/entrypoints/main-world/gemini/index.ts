@@ -8,13 +8,22 @@
  *                    request, response} and dispatched by rpcid in
  *                    `interceptors/rpc-handlers.ts`. Sent via fetch since the
  *                    2026-10 web build, via XHR before — both are tapped.
- *   processSession   generation (WebChannel + protobuf, XHR). Streams, so it is
- *                    observed from the request onward, not on completion —
- *                    `interceptors/process-session.ts`.
+ *   generation       streams, so it is observed from the request onward, not on
+ *                    completion. Gemini has switched transport twice in a week, so
+ *                    every variant seen so far stays tapped as a fallback:
+ *                      - StreamGenerate via fetch (2026-10-20 build, current)
+ *                      - StreamGenerate via XHR   (before 2026-10-15)
+ *                      - processSession WebChannel + protobuf via XHR (2026-10-15)
+ *                    `interceptors/stream-generate.ts`, `interceptors/process-session.ts`.
  */
 
 import { proxy } from 'ajax-hook';
 import { isProcessSessionUrl, observeProcessSession } from './interceptors/process-session';
+import {
+  isStreamGenerateUrl,
+  observeStreamGenerateFetch,
+  observeStreamGenerateXhr,
+} from './interceptors/stream-generate';
 import { observeBatchExecute } from './interceptors/rpc-handlers';
 import { handleDownloadResponse } from './interceptors/download';
 import { geminiRequestBuilder } from './lib/request-builder';
@@ -89,6 +98,9 @@ export function initGeminiInterceptors() {
     if (isBatchExecute(url)) {
       return tapFetch(input, init, url, nativeFetch, onBatchExecute);
     }
+    if (isStreamGenerateUrl(url)) {
+      return observeStreamGenerateFetch(input, init, nativeFetch);
+    }
     return nativeFetch(input, init);
   };
 
@@ -99,6 +111,13 @@ export function initGeminiInterceptors() {
           observeProcessSession(config.url, config.body, config.xhr);
         } catch (e) {
           console.warn('Better Sidebar (Gemini): could not observe processSession', e);
+        }
+      }
+      if (isStreamGenerateUrl(config.url) && config.xhr) {
+        try {
+          observeStreamGenerateXhr(config.xhr, config.body);
+        } catch (e) {
+          console.warn('Better Sidebar (Gemini): could not observe StreamGenerate', e);
         }
       }
       handler.next(config);

@@ -1,9 +1,10 @@
 /**
  * Captures Gemini turns sent over the WebChannel `processSession` protocol.
  *
- * Writes each turn to the DB and feeds the live stream the agent loop reads. Replaced
- * the `StreamGenerate` interceptors when the 2026-10 web build stopped using that
- * endpoint. Wire format and field paths: `lib/process-session.ts`.
+ * Writes each turn to the DB and feeds the live stream the agent loop reads. Served by
+ * the 2026-10-15 web build only; the 2026-10-20 build went back to `StreamGenerate`
+ * (`interceptors/stream-generate.ts`). Kept as a fallback in case Gemini flips again.
+ * Wire format and field paths: `lib/process-session.ts`.
  *
  * A WebChannel session is several XHRs sharing one `gsessionid`: forward-channel POSTs
  * carrying the prompt, and one long-lived `RID=rpc` back channel carrying the reply.
@@ -21,8 +22,7 @@
 import throttle from 'lodash/throttle';
 import { parseUplink, ProcessSessionReader, type ProcessSessionTurn } from '../lib/process-session';
 import { MODEL_STREAM_EVENT, type ModelStreamDetail } from '@/shared/types/model-stream';
-import { detectGeminiContext } from '@/shared/lib/gemini-context';
-import { isGeminiTemporaryChat } from '@/shared/lib/dom-selectors';
+import { persistGeminiTurn } from '../lib/persist-turn';
 import { trace } from '@/shared/lib/trace';
 
 const DISPATCH_INTERVAL_MS = 100;
@@ -192,68 +192,16 @@ function observeBackChannel(key: string, xhr: XMLHttpRequest): void {
 }
 
 function persistTurn(session: SessionState, turn: ProcessSessionTurn): void {
-  const timestamp = Math.floor(Date.now() / 1000);
-  const { conversationId } = turn;
-
-  const messages: Record<string, unknown>[] = [];
-  if (session.prompt) {
-    messages.push({
-      role: 'user',
-      id: turn.turnId || crypto.randomUUID(),
-      conversation_id: conversationId,
-      content: session.prompt,
-      message_type: 'text',
-      created_at: timestamp,
-    });
-  }
-  messages.push({
-    role: 'model',
-    id: turn.modelMessageId || crypto.randomUUID(),
-    conversation_id: conversationId,
-    content: turn.answer,
-    message_type: 'text',
-    created_at: timestamp,
-  });
-
-  // A new chat is one whose uplink named no conversation. Its title normally arrives
-  // after the finish frame; if it somehow does not, the prompt stands in until the
-  // next chat-list sync replaces it.
-  const isNewChat = session.sawOpen && !session.uplinkConversationId;
-  const title = turn.title || (isNewChat ? session.prompt.slice(0, 80) : '');
-
-  console.log('Better Sidebar (Gemini): Captured turn', {
-    conversationId,
+  persistGeminiTurn({
+    conversationId: turn.conversationId,
+    prompt: session.prompt,
     userMessageId: turn.turnId,
     modelMessageId: turn.modelMessageId,
-    promptChars: session.prompt.length,
-    replyChars: turn.answer.length,
+    answer: turn.answer,
+    title: turn.title,
+    // A new chat is one whose uplink named no conversation.
+    isNewChat: session.sawOpen && !session.uplinkConversationId,
     via: 'processSession',
-    ...(isNewChat ? { newChat: true, title } : {}),
   });
-
-  if (title) {
-    const ctx = detectGeminiContext(globalThis.location?.pathname || '', null);
-    const isTemporary = isGeminiTemporaryChat();
-    globalThis.dispatchEvent(
-      new CustomEvent('BETTER_SIDEBAR_PROMPT_CREATE', {
-        detail: {
-          id: conversationId,
-          title,
-          messages,
-          created_at: timestamp,
-          type: ctx.type,
-          gem_id: ctx.gemId ?? undefined,
-          notebook_id: ctx.notebookId ?? undefined,
-          is_temporary: isTemporary,
-        },
-      }),
-    );
-  } else {
-    globalThis.dispatchEvent(
-      new CustomEvent('GEMINI_CHAT_CONTENT_RESPONSE', {
-        detail: { conversationId, messages },
-      }),
-    );
-  }
   trace('Better Sidebar (Gemini): processSession turn', turn);
 }
