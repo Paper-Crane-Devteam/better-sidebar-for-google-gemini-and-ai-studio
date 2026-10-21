@@ -18,11 +18,10 @@ export default defineConfig({
     short_name: 'Web Agent Connector',
     description: "Lets Better Sidebar's Web Agent operate the tabs you choose. Requires Better Sidebar.",
     /**
-     * Fixes the id (see `CONNECTOR_EXTENSION_ID`). ⚠️ A locally generated key until the first
-     * Web Store upload; then replace it with the public key from the store dashboard
-     * (Package → View public key) so dev and store builds share one id.
+     * The Web Store public key (dashboard → Package → View public key). Fixes the id to
+     * `CONNECTOR_EXTENSION_ID` so dev and store builds share one id.
      */
-    key: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlMa9STBy32yREPQQKXllWu5b9qnkSU3xWrTVbXWVidWWfBPjaDT20V1IHHLsR89TVQ/1o5zfZK0yACIDVP8WnTvu4Ms6spms5vPVsaJ+zkNcvrPZtsb2+eYjdxFhBCkybkuubyimXqnVouTRN1cRE2no69FLoOf6YJm0YpVXil1bzsl1ZwhBCMRlaNlP2B6xaREoLDCRvQIJ0z9+nx4ppwFKI6yGa4WUL0qwnBdBixwd4RdTl6zgzX8xywVZg0+jcDtdFfe5Qlo61PDcLs7X3JJXJHJBccI367gDwTK2wHEZ68OHCySraNLmAzHakUraWZf4BFqK5ewmV8V7nUKdKQIDAQAB',
+    key: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtKwQZ4tDggBQmHmWEYdhs3AoH2riRUFKvL+rSJjwoPc5EZCpKRAHM7awPz9VVnUdvjQqsmBWpgtSfaV/isGVpUm7Ru0e2wFqWzzc+29H7jyggvauKkNf6WDeTmd+ohnuSMMwtbsS2E3d1Cb5SY9J2Etk2mD2153ymXuCjq2RXzkG6ifOw5nm+LVs27C4qDBTyRLZBuBROa+jwnXmtsr7Ky97qLR8kpUMnJypsG82AkmV0v86vX2ua722alxNT2MRFvMEVapNftGNQLI8btvfkPP1ltbCd2gwegyD66wjLyBnkj693uwmeMrHqPLJMPMNwj+ssDVinMsdZi4R013ccQIDAQAB',
     icons: {
       '16': 'icons/icon16.png',
       '32': 'icons/icon32.png',

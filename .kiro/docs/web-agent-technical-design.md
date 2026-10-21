@@ -304,13 +304,13 @@ POC 的处理：只在 dev 构建（`wxt` serve）里把 `debugger` 放进必需
 **状态**：`WebAgentStatus.debugger` = `builtin | ok | missing | outdated | paused`，`permitted` 只在
 `builtin / ok` 时为真。告知窗口在不可用时显示 Connector 卡片（安装 / 更新 / 已暂停）。
 
-**ID**：主扩展 `cjeoaidogoaekodkbhijgljhenknkenj`（manifest `key` 固定）。Connector 目前用本地生成的
-key，ID `bghhojpdnfijfljnplahhjfnlkggmpeg`。
+**ID**：主扩展 `cjeoaidogoaekodkbhijgljhenknkenj`（manifest `key` 固定）。Connector `dmogbaiecikhmldgdpapobncijaoeamc`
+（manifest `key` 为商店 public key）。
 
 ### 16.2 运维
 
-- **首次上架**：先去掉 `connector/wxt.config.ts` 里的 `key` 打一个 zip 上传草稿，拿到商店 ID；
-  再把 dashboard 里 Package → public key 填回 `key`，并更新 `CONNECTOR_EXTENSION_ID`。之后 dev 和商店同一个 ID。
+- **商店 ID**：`dmogbaiecikhmldgdpapobncijaoeamc`。`connector/wxt.config.ts` 的 `key` 已换成商店 public key，
+  dev 和商店同一个 ID。
 - **商店材料**：single purpose（让 Better Sidebar 的 Web Agent 操作用户选定的标签页）；`debugger` 用途说明
   （只作用于用户加入的标签页、只接受 Better Sidebar 的调用、不收集不上传数据）；隐私政策与主扩展共用；截图用 popup 和黄条。
 - **权限冻结**：永远只有 `debugger` + `storage`。新增带警告的权限会让 Connector 被停用，正是它要避免的事。

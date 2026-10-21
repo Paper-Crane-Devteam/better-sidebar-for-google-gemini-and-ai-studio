@@ -20,14 +20,8 @@
 /** Better Sidebar. Fixed by the `key` in the main `wxt.config.ts`, same in dev and store. */
 export const MAIN_EXTENSION_ID = 'cjeoaidogoaekodkbhijgljhenknkenj';
 
-/**
- * The Connector. Fixed by the `key` in `connector/wxt.config.ts`.
- *
- * ⚠️ Until the first Chrome Web Store upload this is the id of a locally generated key. After
- * the upload, copy the store's public key into `connector/wxt.config.ts` and its id here, so
- * dev and store share one id from then on.
- */
-export const CONNECTOR_EXTENSION_ID = 'bghhojpdnfijfljnplahhjfnlkggmpeg';
+/** The Connector. Fixed by the store public `key` in `connector/wxt.config.ts`, same in dev and store. */
+export const CONNECTOR_EXTENSION_ID = 'dmogbaiecikhmldgdpapobncijaoeamc';
 
 export const CONNECTOR_STORE_URL = `https://chromewebstore.google.com/detail/${CONNECTOR_EXTENSION_ID}`;
 export const MAIN_STORE_URL = `https://chromewebstore.google.com/detail/${MAIN_EXTENSION_ID}`;
