@@ -38,6 +38,17 @@ import {
 export const DEFAULT_AGENT_ID: AgentId = 'bettersidebar';
 
 /**
+ * Temporary kill switch for the Web Agent.
+ *
+ * ⚠️ Off until the Web Agent Connector companion extension passes Chrome Web Store review —
+ * without it the agent can't operate pages, so offering it would only lead to a dead end.
+ * With this off the agent drops out of both the Agent tab dropdown and the `>` list, and any
+ * stored `web` id falls back to the default agent via `normalizeAgentId`. Flip to `true` once
+ * the Connector is live.
+ */
+const WEB_AGENT_ENABLED = false;
+
+/**
  * Ids that used to mean something else.
  *
  * `__agent_auto__` was the "let the AI pick a skill" sentinel, and it is sitting in the
@@ -121,7 +132,7 @@ export const AGENTS: AgentDefinition[] = [
   // Chrome only — it drives pages through `chrome.debugger`. Runs in the side panel: picked
   // from a normal tab, the send hands the task over instead of starting here (see
   // `web/web-store.ts` and `.kiro/docs/web-agent-technical-design.md`).
-  ...(isChromeBuild()
+  ...(isChromeBuild() && WEB_AGENT_ENABLED
     ? [
         {
           id: 'web' as const,
