@@ -32,6 +32,40 @@ export const loadFlat = () => {
 const matchesPrefix = (key, prefixes) =>
   prefixes.length === 0 || prefixes.some((p) => key === p || key.startsWith(`${p}.`));
 
+const PLURAL_SUFFIX = /_(zero|one|two|few|many|other)$/;
+const pluralCategoryCache = new Map();
+const pluralCategories = (locale) => {
+  if (!pluralCategoryCache.has(locale)) {
+    // Only categories ordinary counts hit: es/fr/it/pt report `many`, but
+    // only for 1e6-style numbers, which never shows up in this UI.
+    const rules = new Intl.PluralRules(locale);
+    const used = new Set();
+    for (let n = 0; n <= 1000; n++) used.add(rules.select(n));
+    pluralCategoryCache.set(locale, used);
+  }
+  return pluralCategoryCache.get(locale);
+};
+
+/**
+ * i18next plural variants are per-language: ru/pl need `_few`/`_many`, ja/zh
+ * only `_other`, en never has `_few`. A plural-suffixed key is only expected in
+ * a locale whose plural rules actually use that category.
+ *
+ * `_zero`/`_two`/`_few`/`_many` may also be skipped on purpose: i18next falls
+ * back to the bare key when a variant is missing, so a locale can phrase the
+ * bare key count-neutrally ("Kroki: {{count}}") instead of spelling out every
+ * form. Only `_one`/`_other` are always required where the language uses them.
+ */
+const expectedIn = (key, locale, flatLocale) => {
+  const m = PLURAL_SUFFIX.exec(key);
+  if (!m) return true;
+  const cat = m[1];
+  if (cat === 'other') return true;
+  if (!pluralCategories(locale).has(cat)) return false;
+  if (cat === 'one') return true;
+  return !flatLocale.has(key.slice(0, m.index));
+};
+
 /**
  * Keys that exist in at least one locale but not in all requested ones.
  * Each entry: { key, missing: string[], present: string[], source, sourceLocale }
@@ -41,7 +75,7 @@ export const findMissing = ({ locales = LOCALES, prefixes = [] } = {}) => {
   const rows = [];
   for (const key of keys) {
     if (!matchesPrefix(key, prefixes)) continue;
-    const missing = locales.filter((l) => !flat[l].has(key));
+    const missing = locales.filter((l) => !flat[l].has(key) && expectedIn(key, l, flat[l]));
     if (missing.length === 0) continue;
     const present = LOCALES.filter((l) => flat[l].has(key));
     const sourceLocale = flat[SOURCE_LOCALE].has(key) ? SOURCE_LOCALE : present[0];

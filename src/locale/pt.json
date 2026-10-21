@@ -62,6 +62,7 @@
     "scanPrompt": "Abra a Biblioteca para escanear seus chats",
     "scanLibrary": "Escanear Biblioteca",
     "scanning": "Escaneando...",
+    "scanProgress": "{{scanned}} chats verificados, {{fresh}} novos",
     "newFolder": "Nova Pasta",
     "imported": "Caixa de entrada",
     "conversations": "conversas",
@@ -133,7 +134,8 @@
   "toast": {
     "imported": "{{count}} conversas importadas",
     "scanComplete": "Varredura concluída, nenhuma nova conversa encontrada",
-    "exportSuccessful": "Exportação bem-sucedida",
+    "exportReady": "O backup está pronto",
+    "saveFile": "Salvar arquivo",
     "exportFailed": "Exportação falhou",
     "importSuccessful": "Importação bem-sucedida",
     "importFailed": "Importação falhou",
@@ -270,6 +272,7 @@
     "versionNumber": "1.1.0",
     "developer": "Desenvolvedor",
     "developerName": "Paper Crane Dev",
+    "byDeveloper": "por {{name}}",
     "license": "Licença",
     "sourceCode": "Código Fonte",
     "githubRepository": "Repositório GitHub",
@@ -1780,6 +1783,11 @@
         "name": "Browser Agent",
         "shortName": "Navegador",
         "description": "Organiza abas, grupos de abas e favoritos do Chrome"
+      },
+      "web": {
+        "name": "Web Agent",
+        "shortName": "Web",
+        "description": "Lê e opera páginas da web por você no painel lateral"
       }
     },
     "switcher": {
@@ -1887,6 +1895,24 @@
         "open": {
           "label": "Abrir abas",
           "text": "Abra abas para "
+        }
+      },
+      "web": {
+        "summarize": {
+          "label": "Resumir esta página",
+          "text": "Resuma a página que tenho aberta"
+        },
+        "extract": {
+          "label": "Extrair uma tabela",
+          "text": "Extraia a tabela desta página em Markdown"
+        },
+        "fill": {
+          "label": "Preencher um formulário",
+          "text": "Preencha o formulário desta página com "
+        },
+        "open": {
+          "label": "Abrir um site",
+          "text": "Abra "
         }
       }
     },
@@ -2090,9 +2116,51 @@
       "howToUseContent": "O Workspace é seu ambiente de arquivos dedicado onde a IA pode ler, gravar, editar e criar documentos e código do zero.\n\nComo usar:\nDigite >Workspace no chat para ativar o agente. Você pode arrastar e soltar arquivos existentes no espaço de trabalho ou pedir à IA que crie novos arquivos do zero (por exemplo, desenvolvendo um projeto frontend completo).\n\nFormatos e recursos suportados:\n- Texto Simples e Código (.html, .js, .ts, .py, .md, .txt, etc.): Suporte total para criação do zero e edição precisa! Peça à IA para estruturar um projeto frontend completo, escrever scripts, redigir notas Markdown ou refactorar código existente.\n- Word (.docx): Revise artigos capítulo por capítulo, reescreva parágrafos com controle de alterações e adicione comentários (requer upload de arquivo existente).\n- Excel (.xlsx/.csv): Analise dados, adicione fórmulas e novas colunas sem alterar formatos ou gráficos originais (requer upload de arquivo existente).\n- PDF: Leia relatórios e artigos, extraia texto, mescle páginas e adicione anotações.\n- PowerPoint (.pptx): Leia e edite o conteúdo dos slides e as anotações do orador.\n- Legendas (.srt/.vtt): Traduza e aprimore legendas mantendo a sincronização dos tempos.\n\n💡 Dica: Arquivos de texto e código podem ser criados do zero e editados livremente. Formatos especiais (Word, Excel, PPT, PDF) atualmente focam na leitura, anotação e edição precisa de arquivos existentes, preservando sua formatação original."
     },
     "web": {
+      "needsPowerPack": "⭐ Recurso do Power Pack · clique para saber mais",
+      "needsConsent": "🔒 Leia primeiro o aviso de riscos · clique para abrir",
       "needsConnector": "🔌 Configure o Web Agent Connector · clique para abrir",
+      "handedOff": "Enviado ao Web Agent no painel lateral",
+      "panelBusy": "O painel lateral ainda está executando uma tarefa. Conclua ou interrompa-a primeiro.",
       "addedWhileRunning": "Adicionado ao Web Agent. A tarefa em andamento pode usá-lo via page_list.",
+      "panelBlocked": "O Chrome não abriu o painel lateral.",
+      "openPanel": "Abrir painel lateral",
       "consent": {
+        "title": "Antes de usar o Web Agent",
+        "intro": "O Web Agent permite que a IA leia páginas da web e as opere por você: clicando, digitando e executando scripts no seu navegador. Leia isto antes de ativá-lo.",
+        "risks": {
+          "actsAsYou": {
+            "title": "Ele age como você",
+            "body": "O agente trabalha no seu próprio navegador, com as suas contas conectadas. Tudo o que ele faz (enviar um formulário, mandar uma mensagem, fazer um pedido) é feito em seu nome e pode não ter volta."
+          },
+          "dataToAi": {
+            "title": "O conteúdo da página vai para a IA",
+            "body": "Tudo o que o agente lê de uma página (texto, links, valores de formulário) passa a fazer parte da sua conversa no Gemini e é enviado ao Google. Campos de senha nunca são lidos."
+          },
+          "injection": {
+            "title": "Páginas da web podem tentar enganá-lo",
+            "body": "Uma página pode conter instruções ocultas escritas para uma IA (\"injeção de prompt\"). Confira cada ação antes de aprová-la, principalmente em sites que você não conhece."
+          },
+          "sensitive": {
+            "title": "Mantenha-o longe de páginas sensíveis",
+            "body": "Não o use em páginas de banco, pagamento, saúde ou segurança de conta, nem em qualquer lugar onde um erro sairia caro."
+          },
+          "mistakes": {
+            "title": "A IA comete erros",
+            "body": "Ele pode clicar no lugar errado ou interpretar mal uma página. Você aprova cada clique, cada digitação e cada script. Fique no computador enquanto ele trabalha."
+          },
+          "stop": {
+            "title": "Como interrompê-lo",
+            "body": "O Chrome mostra uma barra \"começou a depurar este navegador\" em cada página que o agente controla. Clique em Cancelar nessa barra ou feche o painel lateral, e ele para na hora."
+          },
+          "responsibility": {
+            "title": "Você é responsável pelo que aprova",
+            "body": "Isso inclui seguir os termos dos sites em que você o usa. O Better Sidebar é fornecido no estado em que se encontra e não se responsabiliza por perdas causadas por ações que você aprovou."
+          }
+        },
+        "permissionNote": "O agente opera as páginas pelo depurador de páginas do Chrome. Enquanto ele trabalha, o Chrome mostra uma barra de depuração nessas páginas.",
+        "checkbox": "Li e entendo esses riscos",
+        "cancel": "Agora não",
+        "agree": "Concordo",
         "connector": {
           "title": "Web Agent Connector",
           "missing": "Para operar páginas, o Web Agent precisa de uma pequena extensão complementar: Better Sidebar Web Agent Connector. É ela que tem a permissão de depurador de páginas do Chrome, assim o Better Sidebar não precisa dela, e ela só aceita solicitações do Better Sidebar.",
@@ -2101,7 +2169,10 @@
           "install": "Instalar pela Chrome Web Store",
           "update": "Abrir na Chrome Web Store",
           "comeBack": "Esta página se atualiza sozinha assim que o Connector for instalado."
-        }
+        },
+        "accepted": "Você aceitou este aviso e o Web Agent está ativado. Retirar o consentimento o desativa até você aceitar novamente.",
+        "withdraw": "Retirar",
+        "done": "Concluído"
       }
     }
   },

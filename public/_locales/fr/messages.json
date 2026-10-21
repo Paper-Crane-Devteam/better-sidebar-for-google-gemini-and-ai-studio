@@ -6,5 +6,33 @@
   "extensionDescription": {
     "message": "Organisez vos chats Gemini & AI Studio avec dossiers, tags, recherche intégrale, prompts, export, synchronisation Drive, outils IA, etc.",
     "description": "Description de l'extension"
+  },
+  "webAgentMenu": {
+    "message": "Laisser le Web Agent agir sur cette page",
+    "description": "Context menu item that opens the Web Agent side panel for the current page"
+  },
+  "webAgentAddActive": {
+    "message": "+ Onglet actuel",
+    "description": "Web Agent side panel toolbar: let the agent operate the active tab"
+  },
+  "webAgentAddAll": {
+    "message": "+ Tous les onglets",
+    "description": "Web Agent side panel toolbar: let the agent operate every tab in the window"
+  },
+  "webAgentAddAllConfirm": {
+    "message": "Laisser le Web Agent utiliser tous les onglets de cette fenêtre ? ($1 onglets)",
+    "description": "Confirm dialog before adding all tabs. $1 is the tab count"
+  },
+  "webAgentNoTabs": {
+    "message": "Aucun onglet contrôlé pour l’instant",
+    "description": "Web Agent side panel toolbar: shown when no tab is under the agent's control"
+  },
+  "webAgentRemoveTab": {
+    "message": "Ne plus contrôler cet onglet",
+    "description": "Web Agent side panel toolbar: tooltip of the × that takes a tab out of the agent's control"
+  },
+  "webAgentCurrentRefused": {
+    "message": "Le Web Agent ne peut pas utiliser cette page",
+    "description": "Web Agent side panel toolbar: tooltip when the active tab cannot be operated (e.g. Gemini itself)"
   }
 }

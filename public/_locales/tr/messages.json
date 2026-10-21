@@ -6,5 +6,33 @@
   "extensionDescription": {
     "message": "Gemini ve AI Studio sohbetlerini klasörler, etiketler, tam metin arama, istemler, dışa aktarma, Drive senkronizasyonu ve yapay zeka araçlarıyla düzenleyin.",
     "description": "Uzantının açıklaması"
+  },
+  "webAgentMenu": {
+    "message": "Web Agent bu sayfada çalışsın",
+    "description": "Context menu item that opens the Web Agent side panel for the current page"
+  },
+  "webAgentAddActive": {
+    "message": "+ Geçerli sekme",
+    "description": "Web Agent side panel toolbar: let the agent operate the active tab"
+  },
+  "webAgentAddAll": {
+    "message": "+ Tüm sekmeler",
+    "description": "Web Agent side panel toolbar: let the agent operate every tab in the window"
+  },
+  "webAgentAddAllConfirm": {
+    "message": "Web Agent bu penceredeki tüm sekmeleri kullansın mı? ($1 sekme)",
+    "description": "Confirm dialog before adding all tabs. $1 is the tab count"
+  },
+  "webAgentNoTabs": {
+    "message": "Henüz kontrol edilen sekme yok",
+    "description": "Web Agent side panel toolbar: shown when no tab is under the agent's control"
+  },
+  "webAgentRemoveTab": {
+    "message": "Bu sekmeyi kontrol etmeyi bırak",
+    "description": "Web Agent side panel toolbar: tooltip of the × that takes a tab out of the agent's control"
+  },
+  "webAgentCurrentRefused": {
+    "message": "Web Agent bu sayfayı kullanamaz",
+    "description": "Web Agent side panel toolbar: tooltip when the active tab cannot be operated (e.g. Gemini itself)"
   }
 }

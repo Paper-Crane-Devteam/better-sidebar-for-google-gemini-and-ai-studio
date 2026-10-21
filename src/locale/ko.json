@@ -62,6 +62,7 @@
     "scanPrompt": "라이브러리를 열어 채팅을 스캔하세요.",
     "scanLibrary": "라이브러리 스캔",
     "scanning": "스캔 중...",
+    "scanProgress": "채팅 {{scanned}}개 스캔, 새 채팅 {{fresh}}개",
     "newFolder": "새로 만들기 폴더",
     "imported": "받은 편지함",
     "conversations": "채팅",
@@ -133,7 +134,8 @@
   "toast": {
     "imported": "가져온 {{count}} 채팅",
     "scanComplete": "스캔이 완료되었으며 새 채팅을 찾을 수 없습니다.",
-    "exportSuccessful": "내보내기 성공",
+    "exportReady": "백업이 준비되었습니다",
+    "saveFile": "파일 저장",
     "exportFailed": "내보내기 실패",
     "importSuccessful": "가져오기 성공",
     "importFailed": "가져오기 실패",
@@ -188,6 +190,32 @@
     "selectAnOption": "옵션 선택",
     "slashTip": "팁: 프롬프트를 빠르게 삽입하려면 입력 상자에 /를 입력하세요.",
     "slashTipDismiss": "확인"
+  },
+  "instructionPrompt": {
+    "library": "프롬프트",
+    "fillFromLibrary": "프롬프트 라이브러리에서 채우기",
+    "saveToLibrary": "프롬프트 라이브러리에 저장",
+    "searchPlaceholder": "프롬프트 검색...",
+    "filterSystem": "시스템",
+    "filterAll": "전체",
+    "noMatches": "일치하는 프롬프트가 없습니다",
+    "emptyLibrary": "프롬프트 라이브러리가 비어 있습니다",
+    "goToPrompts": "프롬프트 라이브러리 열기",
+    "back": "뒤로",
+    "fill": "채우기",
+    "filled": "\"{{title}}\" 채움",
+    "fillFailed": "지침을 채우지 못했습니다. 패널을 다시 열어 보세요.",
+    "undo": "실행 취소",
+    "saveTitle": "프롬프트로 저장",
+    "saved": "프롬프트 라이브러리에 저장했습니다",
+    "nothingToSave": "지침이 비어 있어 저장할 내용이 없습니다",
+    "sourceNative": "AI Studio",
+    "sourceLibrary": "Better Sidebar",
+    "sourceTooltip": "시스템 지침을 가져올 곳을 선택하세요",
+    "switchTip": "시스템 지침을 Better Sidebar 프롬프트 라이브러리로 관리할 수도 있습니다. 폴더와 변수를 쓸 수 있고, Gemini와 AI Studio에서 같은 프롬프트를 사용합니다. 언제든 다시 전환할 수 있습니다.",
+    "switchTipSwitch": "전환",
+    "switchTipKeep": "AI Studio 유지",
+    "autoImported": "AI Studio 지침 {{count}}개를 프롬프트 라이브러리 › {{folder}}(으)로 가져왔습니다"
   },
   "snippets": {
     "createSnippet": "새 스니펫",
@@ -244,6 +272,7 @@
     "versionNumber": "2.1.0",
     "developer": "개발자",
     "developerName": "Paper Crane Dev",
+    "byDeveloper": "{{name}} 제작",
     "license": "라이선스",
     "sourceCode": "소스 코드",
     "githubRepository": "GitHub 저장소",
@@ -271,7 +300,7 @@
   },
   "sponsor": {
     "title": "친구와 공유",
-    "enjoying": "더 나은 사이드바를 즐기시겠습니까?",
+    "enjoying": "Better Sidebar가 마음에 드시나요?",
     "shareDescription": "친구와 공유하고 더 많은 사람들이 이 무료 오픈 소스 생산성 도구를 찾을 수 있도록 도와주세요.",
     "sponsorOnGithub": "GitHub에 별표 표시",
     "copyLink": "링크 및 텍스트 복사",
@@ -763,7 +792,7 @@
     "headlineAccent": "더 많은 가능성.",
     "intro": "Gemini와 AI Studio 대화를 위한 차분한 공간입니다. 중요한 내용을 정리하고, 더 빠르게 찾고, 가장 좋은 메시지를 가까이에 두세요.",
     "watch": "튜토리얼 보기",
-    "previewAlt": "Gemini와 함께 실행되는 더 나은 사이드바",
+    "previewAlt": "Gemini와 함께 실행 중인 Better Sidebar",
     "previewCaption": "아름답게 정리된 대화",
     "basics": "필수적인 것부터 시작하세요.",
     "organizeTitle": "모든 채팅을 폴더로 만들고 태그를 추가하여 프로젝트를 보관하세요. 함께.",
@@ -957,7 +986,7 @@
     "all": "모두"
   },
   "footer": {
-    "madeWith": "더 나은 사이드바 • Paper Crane Dev가 ♥️로 제작"
+    "madeWith": "Better Sidebar • Paper Crane Dev가 ♥를 담아 제작"
   },
   "gems": {
     "title": "Gems",
@@ -1013,7 +1042,7 @@
     "fixes": "개선 사항 및 수정 사항",
     "welcome": "최신 버전에 오신 것을 환영합니다! 업데이트를 즐겨보세요.",
     "awesome": "멋지네요!",
-    "enjoyingIt": "더 나은 사이드바를 즐기고 계시나요? 사랑을 보여주세요",
+    "enjoyingIt": "Better Sidebar가 마음에 드시나요? 응원해 주세요",
     "rateUs": "평가 👍",
     "starOnGithub": "별 ⭐",
     "buyMeACoffee": "커피 녹",
@@ -1382,20 +1411,20 @@
       "pausedTitle": "루프가 일시중지되었습니다."
     },
     "checkIn": {
-      "title_one": "{{count}} 단계가 자체적으로 완료되었습니다.",
-      "title_other": "{{count}} 단계가 자체적으로 완료되었습니다.",
-      "title": "{{count}} 단계는 자체적으로 완료되었습니다. 자신의",
+      "title_one": "{{count}}단계를 스스로 진행했습니다",
+      "title_other": "{{count}}단계를 스스로 진행했습니다",
+      "title": "{{count}}단계를 스스로 진행했습니다",
       "desc": "아무것도 잘못된 것이 없습니다. 계속 진행하기 전에 수행한 작업을 검토할 수 있도록 에이전트가 일시 중지되었습니다.",
-      "failedNote_one": "{{count}} 단계가 도중에 실패했습니다. 채팅에서 살펴볼 가치가 있습니다.",
-      "failedNote_other": "{{count}} 단계가 도중에 실패했습니다. 채팅에서 살펴볼 가치가 있습니다.",
-      "failedNote": "{{count}} 단계가 도중에 실패했습니다. — 살펴볼 가치가 있습니다. chat.",
+      "failedNote_one": "진행 중 {{count}}단계가 실패했습니다. 채팅에서 확인해 보세요.",
+      "failedNote_other": "진행 중 {{count}}단계가 실패했습니다. 채팅에서 확인해 보세요.",
+      "failedNote": "진행 중 {{count}}단계가 실패했습니다. 채팅에서 확인해 보세요.",
       "continue": "계속 진행하세요",
       "stop": "여기서 중지"
     },
     "owed": {
-      "title_one": "{{count}} 결과는 AI에 도달하지 못했습니다.",
-      "title_other": "{{count}} 결과는 AI에 도달하지 못했습니다.",
-      "title": "{{count}} 결과는 AI에 도달하지 못했습니다.",
+      "title_one": "결과 {{count}}개가 AI에 전달되지 않았습니다",
+      "title_other": "결과 {{count}}개가 AI에 전달되지 않았습니다",
+      "title": "결과 {{count}}개가 AI에 전달되지 않았습니다",
       "desc": "이 단계는 페이지가 다시 로드되기 전에 실행되었지만 AI는 전혀 확인하지 못했습니다. 결과가 나오므로 작업이 중단됩니다. 이를 보내면 작업을 다시 실행하지 않고도 작업을 계속할 수 있습니다.",
       "descWrites": "이 단계는 페이지가 다시 로드되기 전에 실행되었으며 일부 단계는 데이터를 변경했습니다. 해당 변경 사항은 이미 저장되었습니다. AI가 결과를 보지 못했기 때문에 작업이 중단되었습니다. 파일을 보내면 작업을 다시 수행하지 않고도 작업을 계속할 수 있습니다.",
       "send": "보내기",
@@ -1419,9 +1448,9 @@
       "writeTitle": "이 변경 사항을 승인하시겠습니까?",
       "newChatTitle": "새 채팅을 열까요?",
       "run": "실행",
-      "runRest_one": "이 {{count}}도 실행",
-      "runRest_other": "다음 실행 {{count}}도",
-      "runRest": "이 {{count}}도 실행하세요",
+      "runRest_one": "나머지 {{count}}개도 실행",
+      "runRest_other": "나머지 {{count}}개도 실행",
+      "runRest": "나머지 {{count}}개도 실행",
       "allTask": "이 작업에 대해 다시 묻지 마세요",
       "reject": "거부",
       "back": "뒤로",
@@ -1523,9 +1552,9 @@
       "paywallWorkspaceDesc": "무료 요금제에는 최대 {{max}} 파일이 포함된 작업 공간 1개가 포함됩니다. 무제한 액세스하려면 업그레이드하세요.",
       "paywallBrowserDesc": "탭과 북마크 읽기는 무료입니다. 변경 사항을 적용하려면 파워 팩이 필요합니다. 업그레이드한 다음 다시 요청하고 동일한 배치를 승인하세요.",
       "paywallFeature": "에이전트 데이터베이스 쓰기",
-      "steps_one": "{{count}} 단계 실행",
-      "steps_other": "{{count}} 단계 실행",
-      "steps": "{{count}} 단계 실행",
+      "steps_one": "{{count}}단계 실행됨",
+      "steps_other": "{{count}}단계 실행됨",
+      "steps": "{{count}}단계 실행됨",
       "failed": "{{count}} 실패",
       "noSteps": "실행된 도구가 없습니다.",
       "upgrade": "계획 보기",
@@ -1539,9 +1568,9 @@
       "title": "에이전트의 변경 사항을 실행 취소하시겠습니까?",
       "body": "이렇게 하면 {{tables}}이(가) 작업이 시작되었을 때의 상태로 복원됩니다. 이후 변경사항은 모두 되돌려집니다.",
       "confirm": "변경사항 실행 취소",
-      "done_one": "되돌린 {{count}} 행",
-      "done_other": "되돌린 {{count}} 행",
-      "done": "되돌린 {{count}} 행",
+      "done_one": "{{count}}개 행을 되돌렸습니다",
+      "done_other": "{{count}}개 행을 되돌렸습니다",
+      "done": "{{count}}개 행을 되돌렸습니다",
       "aiUnaware": "AI는 이에 대해 모릅니다. 대화를 계속하기 전에 알려주세요.",
       "reverted": "변경 사항이 취소되었습니다.",
       "toastPrompt": "에이전트가 데이터를 변경했습니다.",
@@ -1680,12 +1709,12 @@
         "description": "모든 상담원이 사용할 수 있으며 항상 켜져 있습니다."
       },
       "bettersidebar": {
-        "name": "더 나은 사이드바 데이터",
+        "name": "Better Sidebar 데이터",
         "description": "대화, 폴더, 태그 및 프롬프트 쿼리 및 변경"
       }
     },
     "entry": {
-      "autoTitle": "더 나은 사이드바 에이전트",
+      "autoTitle": "Better Sidebar 에이전트",
       "autoDescription": "작업을 설명하고 상담원이 올바른 도구를 선택하도록 합니다."
     },
     "workspace": {
@@ -1754,6 +1783,11 @@
         "name": "브라우저 에이전트",
         "shortName": "브라우저",
         "description": "Chrome 탭, 탭 그룹 및 북마크 구성 및 관리"
+      },
+      "web": {
+        "name": "Web Agent",
+        "shortName": "웹",
+        "description": "사이드 패널에서 웹페이지를 대신 읽고 조작합니다"
       }
     },
     "switcher": {
@@ -1861,6 +1895,46 @@
         "open": {
           "label": "탭 열기",
           "text": "다음에 대한 탭 열기"
+        }
+      },
+      "web": {
+        "summarize": {
+          "label": "이 페이지 요약",
+          "text": "지금 열려 있는 페이지를 요약해 줘"
+        },
+        "extract": {
+          "label": "표 추출",
+          "text": "이 페이지의 표를 Markdown으로 추출해 줘"
+        },
+        "fill": {
+          "label": "양식 작성",
+          "text": "이 페이지의 양식을 다음 내용으로 작성해 줘: "
+        },
+        "open": {
+          "label": "사이트 열기",
+          "text": "다음 사이트를 열어 줘: "
+        }
+      }
+    },
+    "webPanel": {
+      "title": "AI에게 웹페이지 읽기와 조작을 맡기세요",
+      "riskNotice": "위험 안내 및 권한",
+      "examples": {
+        "summarize": {
+          "label": "페이지 요약",
+          "text": "현재 탭의 글을 읽고 핵심 내용을 다섯 개의 글머리표로 정리해 줘. 다시 확인해 봐야 할 주장도 함께 알려 줘."
+        },
+        "extract": {
+          "label": "페이지에서 데이터 추출",
+          "text": "열려 있는 페이지의 주요 표를 Markdown으로 추출해 줘. 열 이름은 그대로 두고, 잘리거나 페이지가 나뉜 것처럼 보이는 행이 있으면 알려 줘."
+        },
+        "compare": {
+          "label": "여러 페이지 비교",
+          "text": "아래에 적은 세 가지 제품 페이지를 열어서 가격, 사양, 반품 정책을 나란히 비교하고, 어떤 걸 고를지와 그 이유를 알려 줘."
+        },
+        "fill": {
+          "label": "양식 작성",
+          "text": "아래 정보로 이 페이지의 양식을 작성해 줘. 제출 버튼을 누르기 전에 멈추고, 내가 확인할 수 있게 입력한 내용을 보여 줘."
         }
       }
     },
@@ -2040,6 +2114,66 @@
       "about": "작업 공간 정보",
       "howToUseTitle": "작업 공간 사용 방법",
       "howToUseContent": "Workspace는 AI가 처음부터 문서와 코드를 직접 읽고, 쓰고, 편집하고 생성할 수 있는 전용 파일 환경입니다.\n\n사용 방법:\n에이전트를 활성화하려면 채팅 입력에 >Workspace를 입력하세요. 기존 파일을 작업 공간으로 끌어다 놓거나 AI에게 처음부터 새 파일을 생성하도록 요청할 수 있습니다(예: 처음부터 프런트엔드 프로젝트 구축).\n\n지원 형식 및 기능:\n- 일반 텍스트 및 코드(.html, .js, .ts, .py, .md, .txt 등): 처음부터 생성하고 정확한 편집을 완벽하게 지원합니다! AI에게 전체 프런트엔드 프로젝트 스캐폴딩, 스크립트 작성, Markdown 메모 초안 작성 또는 기존 코드 리팩터링을 요청하세요.\n- Word(.docx): 논문을 장별로 검토하고, 변경 사항을 추적하여 단락을 다시 작성하고, 검토자 의견을 추가합니다(기존 파일 업로드 필요).\n- Excel(.xlsx/.csv): 원본 형식이나 차트를 변경하지 않고 데이터 분석, 수식 작성, 열 추가(기존 파일 업로드 필요) 파일).\n- PDF: 논문 및 보고서 읽기, 텍스트 추출, 페이지 병합, 주석 추가.\n- PowerPoint(.pptx): 슬라이드 콘텐츠 및 발표자 노트 읽기 및 편집.\n- 자막(.srt/.vtt): 타임스탬프를 유지하면서 자막을 번역하고 다듬습니다.\n\n💡 팁: 텍스트 및 코드 파일을 처음부터 만들고 자유롭게 편집할 수 있습니다. 특수 형식(Word, Excel, PPT, PDF)은 현재 원본 형식을 유지하면서 기존 파일을 읽고 주석을 달고 정밀하게 편집하는 데 중점을 두고 있습니다."
+    },
+    "web": {
+      "needsPowerPack": "⭐ Power Pack 기능 · 클릭하여 자세히 알아보기",
+      "needsConsent": "🔒 먼저 위험 안내를 읽어 주세요 · 클릭하여 열기",
+      "needsConnector": "🔌 Web Agent Connector를 설정하세요 · 클릭하여 열기",
+      "handedOff": "사이드 패널의 Web Agent로 보냈습니다",
+      "panelBusy": "사이드 패널에서 아직 작업이 실행 중입니다. 먼저 완료하거나 중지해 주세요.",
+      "addedWhileRunning": "Web Agent에 추가했습니다. 실행 중인 작업에서 page_list로 사용할 수 있습니다.",
+      "panelBlocked": "Chrome에서 사이드 패널을 열지 못했습니다.",
+      "openPanel": "사이드 패널 열기",
+      "consent": {
+        "title": "Web Agent를 사용하기 전에",
+        "intro": "Web Agent를 사용하면 AI가 웹페이지를 읽고 브라우저에서 클릭, 입력, 스크립트 실행 등의 조작을 대신합니다. 켜기 전에 아래 내용을 읽어 주세요.",
+        "risks": {
+          "actsAsYou": {
+            "title": "사용자 본인으로서 동작합니다",
+            "body": "에이전트는 로그인된 계정을 그대로 사용해 사용자의 브라우저에서 작동합니다. 양식 제출, 메시지 전송, 주문 등 에이전트가 하는 모든 작업은 사용자 이름으로 이루어지며 되돌리지 못할 수도 있습니다."
+          },
+          "dataToAi": {
+            "title": "페이지 내용이 AI로 전송됩니다",
+            "body": "에이전트가 페이지에서 읽은 모든 내용(텍스트, 링크, 양식 값)은 Gemini 대화의 일부가 되어 Google로 전송됩니다. 비밀번호 필드는 읽지 않습니다."
+          },
+          "injection": {
+            "title": "웹페이지가 에이전트를 속이려 할 수 있습니다",
+            "body": "페이지에 AI를 겨냥한 숨겨진 지시(\"프롬프트 인젝션\")가 들어 있을 수 있습니다. 특히 잘 모르는 사이트에서는 승인하기 전에 모든 작업을 확인하세요."
+          },
+          "sensitive": {
+            "title": "민감한 페이지에서는 사용하지 마세요",
+            "body": "은행, 결제, 의료, 계정 보안 페이지 등 실수가 큰 손해로 이어질 수 있는 곳에서는 사용하지 마세요."
+          },
+          "mistakes": {
+            "title": "AI는 실수할 수 있습니다",
+            "body": "엉뚱한 곳을 클릭하거나 페이지를 잘못 이해할 수 있습니다. 모든 클릭, 입력, 스크립트는 사용자가 승인합니다. 실행되는 동안에는 컴퓨터 앞에 있어 주세요."
+          },
+          "stop": {
+            "title": "중지하는 방법",
+            "body": "에이전트가 제어하는 모든 페이지에 Chrome이 \"이 브라우저 디버깅을 시작했습니다\" 표시줄을 띄웁니다. 표시줄에서 취소를 누르거나 사이드 패널을 닫으면 즉시 중지됩니다."
+          },
+          "responsibility": {
+            "title": "승인한 작업에 대한 책임은 사용자에게 있습니다",
+            "body": "사용하는 웹사이트의 이용약관을 지키는 것도 포함됩니다. Better Sidebar는 있는 그대로 제공되며, 사용자가 승인한 작업으로 인한 손실에 대해 책임지지 않습니다."
+          }
+        },
+        "permissionNote": "에이전트는 Chrome의 페이지 디버거를 통해 페이지를 조작합니다. 작업하는 동안 Chrome은 해당 페이지에 디버깅 표시줄을 표시합니다.",
+        "checkbox": "위 위험 사항을 읽었으며 이해합니다",
+        "cancel": "나중에",
+        "agree": "동의",
+        "connector": {
+          "title": "Web Agent Connector",
+          "missing": "페이지를 조작하려면 Web Agent에 작은 보조 확장 프로그램인 Better Sidebar Web Agent Connector가 필요합니다. Chrome 페이지 디버거 권한은 이 확장 프로그램이 갖기 때문에 Better Sidebar 자체에는 필요하지 않으며, Better Sidebar의 요청만 받습니다.",
+          "outdated": "Web Agent Connector가 오래된 버전입니다. Chrome 웹 스토어에서 업데이트한 뒤 여기로 돌아오세요.",
+          "paused": "Web Agent Connector가 일시 중지되었습니다. Chrome 툴바에서 아이콘을 클릭해 다시 켜 주세요.",
+          "install": "Chrome 웹 스토어에서 설치",
+          "update": "Chrome 웹 스토어에서 열기",
+          "comeBack": "Connector가 설치되면 이 페이지가 자동으로 업데이트됩니다."
+        },
+        "accepted": "이 안내에 동의하여 Web Agent가 켜져 있습니다. 동의를 철회하면 다시 동의할 때까지 꺼집니다.",
+        "withdraw": "동의 철회",
+        "done": "완료"
+      }
     }
   },
   "backup": {

@@ -62,6 +62,7 @@
     "scanPrompt": "Apri Libreria per scansionare le tue chat.",
     "scanLibrary": "Scansiona libreria",
     "scanning": "Scansione in corso...",
+    "scanProgress": "{{scanned}} chat analizzate, {{fresh}} nuove",
     "newFolder": "Nuova Cartella",
     "imported": "Posta in arrivo",
     "conversations": "chat",
@@ -133,7 +134,8 @@
   "toast": {
     "imported": "Chat {{count}} importate",
     "scanComplete": "Scansione completata, nessuna nuova chat trovata",
-    "exportSuccessful": "Esportazione riuscita",
+    "exportReady": "Il backup è pronto",
+    "saveFile": "Salva file",
     "exportFailed": "Esportazione non riuscita",
     "importSuccessful": "Importazione riuscita",
     "importFailed": "Importazione non riuscita",
@@ -189,6 +191,32 @@
     "slashTip": "Suggerimento: digita / nella casella di input per inserire rapidamente un prompt.",
     "slashTipDismiss": "OK"
   },
+  "instructionPrompt": {
+    "library": "Prompt",
+    "fillFromLibrary": "Compila dalla libreria di prompt",
+    "saveToLibrary": "Salva nella libreria di prompt",
+    "searchPlaceholder": "Cerca prompt...",
+    "filterSystem": "Sistema",
+    "filterAll": "Tutti",
+    "noMatches": "Nessun prompt corrispondente",
+    "emptyLibrary": "La tua libreria di prompt è vuota",
+    "goToPrompts": "Apri la libreria di prompt",
+    "back": "Indietro",
+    "fill": "Compila",
+    "filled": "\"{{title}}\" inserito",
+    "fillFailed": "Impossibile compilare le istruzioni. Prova a riaprire il pannello.",
+    "undo": "Annulla",
+    "saveTitle": "Salva come prompt",
+    "saved": "Salvato nella libreria di prompt",
+    "nothingToSave": "Le istruzioni sono vuote, niente da salvare",
+    "sourceNative": "AI Studio",
+    "sourceLibrary": "Better Sidebar",
+    "sourceTooltip": "Scegli da dove provengono le istruzioni di sistema",
+    "switchTip": "Puoi gestire le istruzioni di sistema con la libreria di prompt di Better Sidebar: cartelle, variabili e gli stessi prompt in Gemini e AI Studio. Puoi tornare indietro in qualsiasi momento.",
+    "switchTipSwitch": "Cambia",
+    "switchTipKeep": "Mantieni AI Studio",
+    "autoImported": "Istruzioni di AI Studio importate nella libreria di prompt › {{folder}}: {{count}}"
+  },
   "snippets": {
     "createSnippet": "Nuovo frammento",
     "editSnippet": "Modifica snippet",
@@ -239,11 +267,12 @@
   },
   "about": {
     "title": "Informazioni",
-    "appName": "Barra laterale migliore per Gemini e AI Studio",
+    "appName": "Better Sidebar per Gemini e AI Studio",
     "version": "Versione",
     "versionNumber": "2.1.0",
     "developer": "Sviluppatore",
     "developerName": "Paper Crane Dev",
+    "byDeveloper": "di {{name}}",
     "license": "Licenza",
     "sourceCode": "Codice sorgente",
     "githubRepository": "Repository GitHub",
@@ -957,7 +986,7 @@
     "all": "Tutti"
   },
   "footer": {
-    "madeWith": "Barra laterale migliore • Realizzato con ♥️ da Paper Crane Dev"
+    "madeWith": "Better Sidebar • Realizzato con ♥ da Paper Crane Dev"
   },
   "gems": {
     "title": "Gems",
@@ -1382,20 +1411,20 @@
       "pausedTitle": "Loop in pausa"
     },
     "checkIn": {
-      "title_one": "{{count}} passaggio eseguito da solo",
-      "title_other": "{{count}} passaggi eseguiti da solo",
-      "title": "{{count}} passaggi eseguiti da solo",
+      "title_one": "{{count}} passaggio eseguito in autonomia",
+      "title_other": "{{count}} passaggi eseguiti in autonomia",
+      "title": "{{count}} passaggi eseguiti in autonomia",
       "desc": "Non c'è niente di sbagliato: l'agente è appena stato messo in pausa in modo da poter controllare cosa ha fatto prima di continuare.",
-      "failedNote_one": "{{count}} passaggio non riuscito lungo il percorso: vale la pena dare un'occhiata nella chat.",
-      "failedNote_other": "{{count}} passaggi lungo il percorso non riusciti: vale la pena dare un'occhiata alla chat.",
-      "failedNote": "{{count}} passaggi non riusciti comunque, vale la pena dare un'occhiata alla chat.",
+      "failedNote_one": "{{count}} passaggio non è riuscito lungo il percorso: dai un'occhiata alla chat.",
+      "failedNote_other": "{{count}} passaggi non sono riusciti lungo il percorso: dai un'occhiata alla chat.",
+      "failedNote": "{{count}} passaggi non sono riusciti lungo il percorso: dai un'occhiata alla chat.",
       "continue": "Continua",
       "stop": "Fermati qui"
     },
     "owed": {
-      "title_one": "Il risultato di {{count}} non ha mai raggiunto l'IA",
-      "title_other": "I risultati di {{count}} non ha mai raggiunto l'AI",
-      "title": "I risultati di {{count}} non hanno mai raggiunto l'IA",
+      "title_one": "{{count}} risultato non è mai arrivato all'IA",
+      "title_other": "{{count}} risultati non sono mai arrivati all'IA",
+      "title": "{{count}} risultati non sono mai arrivati all'IA",
       "desc": "Questi i passaggi sono stati eseguiti prima che la pagina venisse ricaricata, ma l'intelligenza artificiale non ha mai visto i risultati, quindi l'attività è bloccata. L'invio consente di continuare senza ripetere il lavoro.",
       "descWrites": "Questi passaggi sono stati eseguiti prima che la pagina venisse ricaricata e alcuni di essi hanno modificato i tuoi dati: tali modifiche sono già salvate. L'intelligenza artificiale non ha mai visto i risultati, quindi l'attività è bloccata. Inviarli consente di continuare senza ripetere il lavoro.",
       "send": "Inviarli",
@@ -1419,7 +1448,7 @@
       "writeTitle": "Approvare questa modifica?",
       "newChatTitle": "Aprire una nuova chat?",
       "run": "Esegui",
-      "runRest_one": "Esegui anche questa {{count}}",
+      "runRest_one": "Esegui anche questo ({{count}})",
       "runRest_other": "Esegui anche questi {{count}}",
       "runRest": "Esegui anche questi {{count}}",
       "allTask": "Non chiedere più questa attività",
@@ -1523,7 +1552,7 @@
       "paywallWorkspaceDesc": "Il piano gratuito include 1 area di lavoro con un massimo di {{max}} file. Esegui l'upgrade per un accesso illimitato.",
       "paywallBrowserDesc": "Leggere le tue schede e i tuoi segnalibri è gratuito. L'applicazione delle modifiche richiede Power Pack: aggiorna, quindi chiedi di nuovo e approva lo stesso batch.",
       "paywallFeature": "Il database dell'agente scrive",
-      "steps_one": "{{count}} passaggi eseguiti",
+      "steps_one": "{{count}} passaggio eseguito",
       "steps_other": "{{count}} passaggi eseguiti",
       "steps": "{{count}} passaggi eseguiti",
       "failed": "{{count}} non riuscita",
@@ -1539,9 +1568,9 @@
       "title": "Annullare le modifiche dell'agente?",
       "body": "Questo ripristina {{tables}} allo stato in cui si trovava all'avvio dell'attività. Verranno annullate anche tutte le altre modifiche apportate successivamente.",
       "confirm": "Annulla modifiche",
-      "done_one": "Riga {{count}} ripristinata",
-      "done_other": "Righe {{count}} ripristinate",
-      "done": "Righe {{count}} ripristinate",
+      "done_one": "{{count}} riga ripristinata",
+      "done_other": "{{count}} righe ripristinate",
+      "done": "{{count}} righe ripristinate",
       "aiUnaware": "L'intelligenza artificiale non lo sa: dillo prima di continuare la conversazione.",
       "reverted": "Modifiche annullate",
       "toastPrompt": "L'agente ha modificato i tuoi dati.",
@@ -1754,6 +1783,11 @@
         "name": "Agente browser",
         "shortName": "Browser",
         "description": "Organizza e gestisci schede, gruppi di schede e segnalibri di Chrome"
+      },
+      "web": {
+        "name": "Web Agent",
+        "shortName": "Web",
+        "description": "Legge e gestisce le pagine web per te nel pannello laterale"
       }
     },
     "switcher": {
@@ -1861,6 +1895,46 @@
         "open": {
           "label": "Schede aperte",
           "text": "Schede aperte per "
+        }
+      },
+      "web": {
+        "summarize": {
+          "label": "Riassumi questa pagina",
+          "text": "Riassumi la pagina che ho aperto"
+        },
+        "extract": {
+          "label": "Estrai una tabella",
+          "text": "Estrai la tabella di questa pagina in Markdown"
+        },
+        "fill": {
+          "label": "Compila un modulo",
+          "text": "Compila il modulo di questa pagina con "
+        },
+        "open": {
+          "label": "Apri un sito",
+          "text": "Apri "
+        }
+      }
+    },
+    "webPanel": {
+      "title": "Lascia che l'IA legga e gestisca le pagine web per te",
+      "riskNotice": "Avviso sui rischi e autorizzazione",
+      "examples": {
+        "summarize": {
+          "label": "Riassumi una pagina",
+          "text": "Leggi l'articolo nella scheda corrente e dammi i punti chiave in cinque elenchi puntati, più le affermazioni che dovrei verificare."
+        },
+        "extract": {
+          "label": "Estrai dati da una pagina",
+          "text": "Estrai in Markdown la tabella principale della pagina aperta. Mantieni i nomi delle colonne e dimmi se alcune righe sembrano tagliate o suddivise in più pagine."
+        },
+        "compare": {
+          "label": "Confronta alcune pagine",
+          "text": "Apri le pagine prodotto delle tre opzioni elencate qui sotto, confronta prezzo, specifiche e politica di reso fianco a fianco e dimmi quale sceglieresti e perché."
+        },
+        "fill": {
+          "label": "Compila un modulo",
+          "text": "Compila il modulo di questa pagina con i dati qui sotto. Fermati prima del pulsante di invio e mostrami cosa hai inserito, così posso controllare."
         }
       }
     },
@@ -2040,6 +2114,66 @@
       "about": "Informazioni sull'area di lavoro",
       "howToUseTitle": "Come utilizzare Workspace",
       "howToUseContent": "Workspace è il tuo ambiente di file dedicato in cui l'intelligenza artificiale può leggere, scrivere, modificare e creare direttamente documenti e codice da zero.\n\nCome utilizzare:\nDigita >Area di lavoro nell'input della chat per attivare l'agente. Puoi trascinare e rilasciare i file esistenti nell'area di lavoro o semplicemente chiedere all'intelligenza artificiale di generare nuovi file da zero (ad esempio creando un progetto frontend da zero).\n\nFormati e funzionalità supportati:\n- Testo semplice e codice (.html, .js, .ts, .py, .md, .txt, ecc.): supporto completo per la creazione da zero e modifica precisa! Chiedi all'intelligenza artificiale di impalcare un intero progetto frontend, scrivere script, creare bozze di note Markdown o eseguire il refactoring del codice esistente.\n- Word (.docx): rivedere i documenti capitolo per capitolo, riscrivere i paragrafi con modifiche tracciate e aggiungere commenti del revisore (richiede il caricamento di file esistenti).\n- Excel (.xlsx/.csv): analizzare dati, scrivere formule e aggiungere colonne senza alterare formati o grafici originali (richiede il caricamento di file esistenti).\n- PDF: leggi documenti e relazioni, estrai testo, unisci pagine e aggiungi annotazioni.\n- PowerPoint (.pptx): leggi e modifica il contenuto delle diapositive e le note del relatore.\n- Sottotitoli (.srt/.vtt): traduci e perfeziona i sottotitoli preservando i timestamp.\n\n💡 Suggerimento: i file di testo e di codice possono essere creati da zero e modificati liberamente. I formati speciali (Word, Excel, PPT, PDF) attualmente si concentrano sulla lettura, annotazione e modifica precisa dei file esistenti preservandone la formattazione originale."
+    },
+    "web": {
+      "needsPowerPack": "⭐ Funzione Power Pack · clicca per saperne di più",
+      "needsConsent": "🔒 Leggi prima l'avviso sui rischi · clicca per aprire",
+      "needsConnector": "🔌 Configura il Web Agent Connector · clicca per aprire",
+      "handedOff": "Inviato al Web Agent nel pannello laterale",
+      "panelBusy": "Il pannello laterale sta ancora eseguendo un'attività. Completala o interrompila prima.",
+      "addedWhileRunning": "Aggiunto al Web Agent. L'attività in corso può usarlo tramite page_list.",
+      "panelBlocked": "Chrome non ha aperto il pannello laterale.",
+      "openPanel": "Apri pannello laterale",
+      "consent": {
+        "title": "Prima di usare il Web Agent",
+        "intro": "Il Web Agent permette all'IA di leggere le pagine web e di usarle per te: fare clic, digitare ed eseguire script nel tuo browser. Leggi qui prima di attivarlo.",
+        "risks": {
+          "actsAsYou": {
+            "title": "Agisce al posto tuo",
+            "body": "L'agente lavora nel tuo browser, con gli account a cui hai effettuato l'accesso. Qualunque cosa faccia (inviare un modulo, mandare un messaggio, effettuare un ordine) viene fatta a tuo nome e potrebbe non essere reversibile."
+          },
+          "dataToAi": {
+            "title": "Il contenuto della pagina viene inviato all'IA",
+            "body": "Tutto ciò che l'agente legge da una pagina (testo, link, valori dei moduli) entra a far parte della tua conversazione Gemini e viene inviato a Google. I campi password non vengono mai letti."
+          },
+          "injection": {
+            "title": "Le pagine web possono cercare di ingannarlo",
+            "body": "Una pagina può contenere istruzioni nascoste scritte per un'IA (\"prompt injection\"). Controlla ogni azione prima di approvarla, soprattutto sui siti che non conosci."
+          },
+          "sensitive": {
+            "title": "Tienilo lontano dalle pagine sensibili",
+            "body": "Non usarlo su pagine bancarie, di pagamento, mediche o di sicurezza dell'account, né ovunque un errore possa costare caro."
+          },
+          "mistakes": {
+            "title": "L'IA commette errori",
+            "body": "Può cliccare sulla cosa sbagliata o leggere male una pagina. Approvi ogni clic, ogni testo digitato e ogni script. Resta al computer mentre è in esecuzione."
+          },
+          "stop": {
+            "title": "Come fermarlo",
+            "body": "Chrome mostra una barra \"ha avviato il debug di questo browser\" su ogni pagina controllata dall'agente. Premi Annulla su quella barra o chiudi il pannello laterale e si ferma subito."
+          },
+          "responsibility": {
+            "title": "Sei responsabile di ciò che approvi",
+            "body": "Incluso il rispetto dei termini dei siti web su cui lo usi. Better Sidebar è fornito così com'è e non è responsabile di perdite causate da azioni che hai approvato."
+          }
+        },
+        "permissionNote": "L'agente gestisce le pagine tramite il debugger delle pagine di Chrome. Mentre lavora, Chrome mostra una barra di debug su quelle pagine.",
+        "checkbox": "Ho letto e compreso questi rischi",
+        "cancel": "Non ora",
+        "agree": "Accetto",
+        "connector": {
+          "title": "Web Agent Connector",
+          "missing": "Per gestire le pagine, il Web Agent ha bisogno di una piccola estensione complementare: Better Sidebar Web Agent Connector. È lei a detenere l'autorizzazione al debugger delle pagine di Chrome, così Better Sidebar non deve averla, e accetta richieste solo da Better Sidebar.",
+          "outdated": "Il tuo Web Agent Connector non è aggiornato. Aggiornalo dal Chrome Web Store, poi torna qui.",
+          "paused": "Il Web Agent Connector è in pausa. Fai clic sulla sua icona nella barra degli strumenti di Chrome e riattivalo.",
+          "install": "Installa dal Chrome Web Store",
+          "update": "Apri nel Chrome Web Store",
+          "comeBack": "Questa pagina si aggiorna da sola una volta installato il Connector."
+        },
+        "accepted": "Hai accettato questo avviso e il Web Agent è attivo. Se revochi il consenso, verrà disattivato finché non accetterai di nuovo.",
+        "withdraw": "Revoca",
+        "done": "Fine"
+      }
     }
   },
   "backup": {

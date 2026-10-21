@@ -62,6 +62,7 @@
     "scanPrompt": "Otwórz bibliotekę, aby przeskanować swoje czaty.",
     "scanLibrary": "Skanuj bibliotekę",
     "scanning": "Skanowanie...",
+    "scanProgress": "Przeskanowane czaty: {{scanned}}, nowe: {{fresh}}",
     "newFolder": "Nowy folder",
     "imported": "Skrzynka odbiorcza",
     "conversations": "czaty",
@@ -133,7 +134,8 @@
   "toast": {
     "imported": "Zaimportowano czaty {{count}}",
     "scanComplete": "Skanowanie zakończone, nie znaleziono nowych czatów",
-    "exportSuccessful": "Eksport pomyślny",
+    "exportReady": "Kopia zapasowa jest gotowa",
+    "saveFile": "Zapisz plik",
     "exportFailed": "Eksport nie powiódł się",
     "importSuccessful": "Import zakończył się sukcesem",
     "importFailed": "Import nie powiódł się",
@@ -189,6 +191,32 @@
     "slashTip": "Wskazówka: wpisz / w polu wiadomości, aby szybko wstawić prompt.",
     "slashTipDismiss": "Rozumiem"
   },
+  "instructionPrompt": {
+    "library": "Prompty",
+    "fillFromLibrary": "Wypełnij z biblioteki promptów",
+    "saveToLibrary": "Zapisz w bibliotece promptów",
+    "searchPlaceholder": "Szukaj promptów...",
+    "filterSystem": "Systemowe",
+    "filterAll": "Wszystkie",
+    "noMatches": "Brak pasujących promptów",
+    "emptyLibrary": "Twoja biblioteka promptów jest pusta",
+    "goToPrompts": "Otwórz bibliotekę promptów",
+    "back": "Wstecz",
+    "fill": "Wypełnij",
+    "filled": "Wstawiono „{{title}}”",
+    "fillFailed": "Nie udało się wstawić instrukcji. Spróbuj ponownie otworzyć panel.",
+    "undo": "Cofnij",
+    "saveTitle": "Zapisz jako prompt",
+    "saved": "Zapisano w bibliotece promptów",
+    "nothingToSave": "Instrukcje są puste, nie ma czego zapisać",
+    "sourceNative": "AI Studio",
+    "sourceLibrary": "Better Sidebar",
+    "sourceTooltip": "Wybierz źródło instrukcji systemowych",
+    "switchTip": "Instrukcjami systemowymi możesz też zarządzać w bibliotece promptów Better Sidebar: foldery, zmienne i te same prompty w Gemini i AI Studio. W każdej chwili możesz wrócić.",
+    "switchTipSwitch": "Przełącz",
+    "switchTipKeep": "Zostaw AI Studio",
+    "autoImported": "Zaimportowano instrukcje AI Studio do biblioteki promptów › {{folder}}: {{count}}"
+  },
   "snippets": {
     "createSnippet": "Nowy fragment",
     "editSnippet": "Edytuj fragment",
@@ -239,11 +267,12 @@
   },
   "about": {
     "title": "Informacje",
-    "appName": "Lepszy pasek boczny dla Gemini i AI Studio",
+    "appName": "Better Sidebar dla Gemini i AI Studio",
     "version": "Wersja",
     "versionNumber": "2.1.0",
     "developer": "Programista",
     "developerName": "Paper Crane Dev",
+    "byDeveloper": "autor: {{name}}",
     "license": "Licencja",
     "sourceCode": "Kod źródłowy",
     "githubRepository": "Repozytorium GitHub",
@@ -611,8 +640,8 @@
     "unknownDate": "Nieznana data"
   },
   "popup": {
-    "title": "Lepszy pasek boczny",
-    "description": "Skonfiguruj platformy, na których aktywny jest Lepszy pasek boczny. Wyłączenie platformy spowoduje całkowite zatrzymanie działania rozszerzenia w tej witrynie.",
+    "title": "Better Sidebar",
+    "description": "Skonfiguruj platformy, na których działa Better Sidebar. Wyłączenie platformy całkowicie zatrzyma rozszerzenie na tej stronie.",
     "platforms": "Obsługiwane platformy",
     "enablePlatform": "Włącz na {{platform}}",
     "badgeSupporter": "Wspierający",
@@ -763,7 +792,7 @@
     "headlineAccent": "Więcej możliwości.",
     "intro": "Spokojniejszy dom do rozmów w Gemini i AI Studio. Porządkuj to, co ważne, znajdź to szybciej i przechowuj najlepsze podpowiedzi blisko.",
     "watch": "Obejrzyj samouczek",
-    "previewAlt": "Lepszy pasek boczny działający obok Gemini",
+    "previewAlt": "Better Sidebar działający obok Gemini",
     "previewCaption": "Twoje rozmowy są doskonale zorganizowane",
     "basics": "Zacznij od najważniejszych",
     "organizeTitle": "Daj każdemu czatowi dom",
@@ -957,7 +986,7 @@
     "all": "Wszystkie"
   },
   "footer": {
-    "madeWith": "Lepszy pasek boczny • Wykonane za pomocą ♥️ przez Paper Crane Dev"
+    "madeWith": "Better Sidebar • Stworzone z ♥ przez Paper Crane Dev"
   },
   "gems": {
     "title": "Gems",
@@ -1382,20 +1411,20 @@
       "pausedTitle": "Pętla wstrzymana"
     },
     "checkIn": {
-      "title_one": "{{count}} krok wykonany samodzielnie",
-      "title_other": "{{count}} kroki wykonane samodzielnie",
-      "title": "{{count}} kroki wykonane samodzielnie",
+      "title_one": "Kroki wykonane samodzielnie: {{count}}",
+      "title_other": "Kroki wykonane samodzielnie: {{count}}",
+      "title": "Kroki wykonane samodzielnie: {{count}}",
       "desc": "Nic się nie stało — agent właśnie się zatrzymał, więc możesz sprawdzić, co zrobił, zanim zacznie działać dalej.",
-      "failedNote_one": "{{count}} krok nie powiódł się po drodze — warto zajrzeć na czacie.",
-      "failedNote_other": "{{count}} kroki po drodze nie powiodły się — warto sprawdzić na czacie.",
-      "failedNote": "{{count}} kroki nie powiodły się po drodze — warto sprawdzić na czacie czat.",
+      "failedNote_one": "Kroki zakończone błędem: {{count}}. Warto zajrzeć do czatu.",
+      "failedNote_other": "Kroki zakończone błędem: {{count}}. Warto zajrzeć do czatu.",
+      "failedNote": "Kroki zakończone błędem: {{count}}. Warto zajrzeć do czatu.",
       "continue": "Kontynuuj",
       "stop": "Zatrzymaj się tutaj"
     },
     "owed": {
-      "title_one": "{{count}} wynik nigdy nie osiągnął AI",
-      "title_other": "{{count}} wyniki nigdy nie dotarł do AI",
-      "title": "{{count}} wyniki nigdy nie dotarły do AI",
+      "title_one": "Wyniki, które nie dotarły do AI: {{count}}",
+      "title_other": "Wyniki, które nie dotarły do AI: {{count}}",
+      "title": "Wyniki, które nie dotarły do AI: {{count}}",
       "desc": "Te kroki zostały wykonane przed ponownym załadowaniem strony, ale sztuczna inteligencja nigdy widziałem wyniki, więc zadanie utknęło. Wysłanie ich pozwala kontynuować pracę bez konieczności powtarzania pracy.",
       "descWrites": "Te kroki zostały wykonane przed ponownym załadowaniem strony, a niektóre z nich zmieniły Twoje dane – te zmiany są już zapisane. Sztuczna inteligencja nigdy nie widziała wyników, więc zadanie utknęło. Wysłanie ich pozwala kontynuować pracę bez konieczności powtarzania.",
       "send": "Wyślij je",
@@ -1419,9 +1448,9 @@
       "writeTitle": "Zatwierdzić tę zmianę?",
       "newChatTitle": "Otworzyć nowy czat?",
       "run": "Uruchom",
-      "runRest_one": "Uruchom również to {{count}}",
-      "runRest_other": "Uruchom także te {{count}}",
-      "runRest": "Uruchom także te {{count}}",
+      "runRest_one": "Uruchom też pozostałe ({{count}})",
+      "runRest_other": "Uruchom też pozostałe ({{count}})",
+      "runRest": "Uruchom też pozostałe ({{count}})",
       "allTask": "Nie pytaj ponownie o to zadanie",
       "reject": "Odrzuć",
       "back": "Wstecz",
@@ -1523,9 +1552,9 @@
       "paywallWorkspaceDesc": "Bezpłatny plan obejmuje 1 obszar roboczy z maksymalnie {{max}} plikami. Uaktualnij, aby uzyskać nieograniczony dostęp.",
       "paywallBrowserDesc": "Czytanie kart i zakładek jest bezpłatne. Zastosowanie zmian wymaga pakietu Power Pack — zaktualizuj, następnie zapytaj ponownie i zatwierdź tę samą partię.",
       "paywallFeature": "Zapisy w bazie danych agenta",
-      "steps_one": "{{count}} wykonanie kroku",
-      "steps_other": "{{count}} wykonanie kroków",
-      "steps": "{{count}} wykonanie kroków",
+      "steps_one": "Wykonane kroki: {{count}}",
+      "steps_other": "Wykonane kroki: {{count}}",
+      "steps": "Wykonane kroki: {{count}}",
       "failed": "{{count}} nie powiodła się",
       "noSteps": "Żadne narzędzia nie zostały uruchomione.",
       "upgrade": "Zobacz plany",
@@ -1539,9 +1568,9 @@
       "title": "Cofnąć zmiany agenta?",
       "body": "To przywraca {{tables}} stan, jaki miał w chwili rozpoczęcia zadania. Wszelkie inne zmiany wprowadzone w nich od tego czasu również zostaną cofnięte.",
       "confirm": "Cofnij zmiany",
-      "done_one": "Przywrócono {{count}} wierszy",
-      "done_other": "Przywrócono {{count}} wierszy",
-      "done": "Przywrócono {{count}} wierszy",
+      "done_one": "Przywrócone wiersze: {{count}}",
+      "done_other": "Przywrócone wiersze: {{count}}",
+      "done": "Przywrócone wiersze: {{count}}",
       "aiUnaware": "Sztuczna inteligencja o tym nie wie — powiedz to, zanim będziesz kontynuować rozmowę.",
       "reverted": "Zmiany cofnięto",
       "toastPrompt": "Agent zmienił Twoje dane.",
@@ -1627,7 +1656,7 @@
     },
     "mcp": {
       "builtin": {
-        "name": "Lepszy pasek boczny",
+        "name": "Better Sidebar",
         "description": "Podstawowe narzędzia do zarządzania rozmowami, danymi i zadaniami"
       },
       "tools": {
@@ -1741,7 +1770,7 @@
     },
     "agents": {
       "bettersidebar": {
-        "name": "Lepszy pasek boczny",
+        "name": "Better Sidebar",
         "shortName": "Pasek boczny",
         "description": "Organizuj rozmowy, foldery, tagi, podpowiedzi i fragmenty"
       },
@@ -1754,6 +1783,11 @@
         "name": "Agent przeglądarki",
         "shortName": "Przeglądarka",
         "description": "Organizuj karty, grupy kart i zakładki Chrome i zarządzaj nimi"
+      },
+      "web": {
+        "name": "Web Agent",
+        "shortName": "Web",
+        "description": "Czyta i obsługuje strony internetowe za Ciebie w panelu bocznym"
       }
     },
     "switcher": {
@@ -1861,6 +1895,46 @@
         "open": {
           "label": "Otwórz karty",
           "text": "Otwórz karty dla "
+        }
+      },
+      "web": {
+        "summarize": {
+          "label": "Podsumuj tę stronę",
+          "text": "Podsumuj stronę, którą mam otwartą"
+        },
+        "extract": {
+          "label": "Wyodrębnij tabelę",
+          "text": "Wyodrębnij tabelę z tej strony jako Markdown"
+        },
+        "fill": {
+          "label": "Wypełnij formularz",
+          "text": "Wypełnij formularz na tej stronie danymi: "
+        },
+        "open": {
+          "label": "Otwórz stronę",
+          "text": "Otwórz "
+        }
+      }
+    },
+    "webPanel": {
+      "title": "Pozwól AI czytać i obsługiwać strony za Ciebie",
+      "riskNotice": "Informacja o ryzyku i uprawnienia",
+      "examples": {
+        "summarize": {
+          "label": "Podsumuj stronę",
+          "text": "Przeczytaj artykuł w mojej bieżącej karcie i podaj najważniejsze punkty w pięciu wypunktowaniach, a także twierdzenia, które warto sprawdzić."
+        },
+        "extract": {
+          "label": "Wyciągnij dane ze strony",
+          "text": "Wyodrębnij główną tabelę z otwartej strony jako Markdown. Zachowaj nazwy kolumn i daj znać, jeśli jakieś wiersze wyglądają na ucięte lub podzielone na strony."
+        },
+        "compare": {
+          "label": "Porównaj kilka stron",
+          "text": "Otwórz strony produktów dla trzech opcji wymienionych poniżej, porównaj obok siebie cenę, specyfikację i zasady zwrotów, i powiedz, którą byś wybrał i dlaczego."
+        },
+        "fill": {
+          "label": "Wypełnij formularz",
+          "text": "Wypełnij formularz na tej stronie poniższymi danymi. Zatrzymaj się przed przyciskiem wysyłania i pokaż mi, co wpisałeś, żebym mógł to sprawdzić."
         }
       }
     },
@@ -2040,6 +2114,66 @@
       "about": "Informacje o obszarze roboczym",
       "howToUseTitle": "Jak korzystać z Workspace",
       "howToUseContent": "Workspace to dedykowane środowisko plików, w którym sztuczna inteligencja może bezpośrednio czytać, pisać, edytować oraz tworzyć dokumenty i kod od podstaw.\n\nJak korzystać:\nWpisz >Workspace w polu tekstowym, aby aktywować agenta. Możesz przeciągać i upuszczać istniejące pliki do obszaru roboczego lub po prostu poprosić sztuczną inteligencję o wygenerowanie nowych plików od podstaw (np. zbudowanie projektu frontendowego od podstaw).\n\nObsługiwane formaty i możliwości:\n- Zwykły tekst i kod (.html, .js, .ts, .py, .md, .txt itp.): Pełne wsparcie dla tworzenia od podstaw i precyzyjnej edycji! Poproś sztuczną inteligencję o szkielet całego projektu frontendowego, napisanie skryptów, szkic notatek Markdown lub refaktoryzację istniejącego kodu.\n- Word (.docx): przeglądanie artykułów rozdział po rozdziale, przepisywanie akapitów ze śledzonymi zmianami i dodawanie komentarzy recenzentów (wymaga przesłania istniejących plików).\n- Excel (.xlsx/.csv): analizowanie danych, pisanie formuł i dodawanie kolumn bez zmiany oryginalnych formatów lub wykresów (wymaga przesyłania istniejących pliki).\n- PDF: czytaj artykuły i raporty, wyodrębniaj tekst, łącz strony i dodawaj adnotacje.\n- PowerPoint (.pptx): czytaj i edytuj zawartość slajdów i notatki prelegenta.\n- Napisy (.srt/.vtt): tłumacz i poleruj napisy z zachowaniem sygnatur czasowych.\n\n💡 Wskazówka: pliki tekstowe i kodowe można tworzyć od podstaw i dowolnie edytować. Specjalne formaty (Word, Excel, PPT, PDF) skupiają się obecnie na czytaniu, dodawaniu adnotacji i precyzyjnej edycji istniejących plików przy jednoczesnym zachowaniu ich oryginalnego formatowania."
+    },
+    "web": {
+      "needsPowerPack": "⭐ Funkcja Power Pack · kliknij, aby dowiedzieć się więcej",
+      "needsConsent": "🔒 Najpierw przeczytaj informację o ryzyku · kliknij, aby otworzyć",
+      "needsConnector": "🔌 Skonfiguruj Web Agent Connector · kliknij, aby otworzyć",
+      "handedOff": "Wysłano do Web Agenta w panelu bocznym",
+      "panelBusy": "Panel boczny wciąż wykonuje zadanie. Najpierw je zakończ lub zatrzymaj.",
+      "addedWhileRunning": "Dodano do Web Agenta. Trwające zadanie może z tego korzystać przez page_list.",
+      "panelBlocked": "Chrome nie otworzył panelu bocznego.",
+      "openPanel": "Otwórz panel boczny",
+      "consent": {
+        "title": "Zanim użyjesz Web Agenta",
+        "intro": "Web Agent pozwala AI czytać strony internetowe i obsługiwać je za Ciebie: klikać, wpisywać tekst i uruchamiać skrypty w Twojej przeglądarce. Przeczytaj to, zanim go włączysz.",
+        "risks": {
+          "actsAsYou": {
+            "title": "Działa jako Ty",
+            "body": "Agent działa w Twojej własnej przeglądarce, na zalogowanych kontach. Wszystko, co zrobi — wysłanie formularza, wiadomości, złożenie zamówienia — dzieje się w Twoim imieniu i może być nieodwracalne."
+          },
+          "dataToAi": {
+            "title": "Treść strony trafia do AI",
+            "body": "Wszystko, co agent odczyta ze strony (tekst, linki, wartości formularzy), staje się częścią Twojej rozmowy w Gemini i jest wysyłane do Google. Pola haseł nigdy nie są odczytywane."
+          },
+          "injection": {
+            "title": "Strony internetowe mogą próbować go oszukać",
+            "body": "Strona może zawierać ukryte instrukcje napisane dla AI („prompt injection”). Sprawdzaj każdą akcję przed zatwierdzeniem, zwłaszcza na nieznanych stronach."
+          },
+          "sensitive": {
+            "title": "Trzymaj go z dala od wrażliwych stron",
+            "body": "Nie używaj go na stronach bankowych, płatniczych, medycznych ani dotyczących bezpieczeństwa konta, ani wszędzie tam, gdzie błąd byłby kosztowny."
+          },
+          "mistakes": {
+            "title": "AI popełnia błędy",
+            "body": "Może kliknąć coś niewłaściwego lub źle odczytać stronę. Zatwierdzasz każde kliknięcie, każdy wpisany tekst i każdy skrypt. Zostań przy komputerze, gdy działa."
+          },
+          "stop": {
+            "title": "Jak go zatrzymać",
+            "body": "Na każdej stronie kontrolowanej przez agenta Chrome wyświetla pasek „rozpoczęto debugowanie tej przeglądarki”. Kliknij Anuluj na tym pasku lub zamknij panel boczny, a agent natychmiast się zatrzyma."
+          },
+          "responsibility": {
+            "title": "Odpowiadasz za to, co zatwierdzasz",
+            "body": "W tym przestrzeganie regulaminów stron, na których go używasz. Better Sidebar jest udostępniany w stanie „tak jak jest” i nie odpowiada za straty spowodowane zatwierdzonymi przez Ciebie działaniami."
+          }
+        },
+        "permissionNote": "Agent obsługuje strony za pomocą debugera stron Chrome. Podczas jego pracy Chrome wyświetla na tych stronach pasek debugowania.",
+        "checkbox": "Przeczytałem(-am) i rozumiem te ryzyka",
+        "cancel": "Nie teraz",
+        "agree": "Zgadzam się",
+        "connector": {
+          "title": "Web Agent Connector",
+          "missing": "Aby obsługiwać strony, Web Agent potrzebuje małego rozszerzenia towarzyszącego: Better Sidebar Web Agent Connector. To ono ma uprawnienie do debugera stron Chrome, więc samo Better Sidebar go nie potrzebuje, i przyjmuje żądania tylko od Better Sidebar.",
+          "outdated": "Twój Web Agent Connector jest nieaktualny. Zaktualizuj go w Chrome Web Store, a potem wróć tutaj.",
+          "paused": "Web Agent Connector jest wstrzymany. Kliknij jego ikonę na pasku narzędzi Chrome i włącz go ponownie.",
+          "install": "Zainstaluj z Chrome Web Store",
+          "update": "Otwórz w Chrome Web Store",
+          "comeBack": "Ta strona odświeży się sama po zainstalowaniu Connectora."
+        },
+        "accepted": "Ta informacja została zaakceptowana, a Web Agent jest włączony. Wycofanie zgody wyłączy go do czasu ponownej akceptacji.",
+        "withdraw": "Wycofaj",
+        "done": "Gotowe"
+      }
     }
   },
   "backup": {

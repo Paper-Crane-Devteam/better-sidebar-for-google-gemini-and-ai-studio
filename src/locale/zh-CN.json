@@ -62,6 +62,7 @@
     "scanPrompt": "打开库以扫描您的聊天记录",
     "scanLibrary": "扫描库",
     "scanning": "扫描中...",
+    "scanProgress": "已扫描 {{scanned}} 个对话，新增 {{fresh}} 个",
     "newFolder": "新建文件夹",
     "imported": "收件箱",
     "conversations": "条对话",
@@ -133,7 +134,8 @@
   "toast": {
     "imported": "已导入 {{count}} 条对话",
     "scanComplete": "扫描完成，未发现新对话",
-    "exportSuccessful": "导出成功",
+    "exportReady": "备份已准备好",
+    "saveFile": "保存文件",
     "exportFailed": "导出失败",
     "importSuccessful": "导入成功",
     "importFailed": "导入失败",
@@ -270,6 +272,7 @@
     "versionNumber": "2.1.0",
     "developer": "开发者",
     "developerName": "Paper Crane Dev",
+    "byDeveloper": "由 {{name}} 开发",
     "license": "许可证",
     "sourceCode": "源代码",
     "githubRepository": "GitHub 仓库",
@@ -1780,6 +1783,11 @@
         "name": "Browser Agent",
         "shortName": "浏览器",
         "description": "智能整理 Chrome 标签页、标签组与书签"
+      },
+      "web": {
+        "name": "Web Agent",
+        "shortName": "网页",
+        "description": "在侧边面板中帮你阅读和操作网页"
       }
     },
     "switcher": {
@@ -1887,6 +1895,24 @@
         "open": {
           "label": "打开标签页",
           "text": "帮我打开这些页面："
+        }
+      },
+      "web": {
+        "summarize": {
+          "label": "总结此页面",
+          "text": "总结我当前打开的页面"
+        },
+        "extract": {
+          "label": "提取表格",
+          "text": "把此页面上的表格提取为 Markdown"
+        },
+        "fill": {
+          "label": "填写表单",
+          "text": "用以下内容填写此页面上的表单："
+        },
+        "open": {
+          "label": "打开网站",
+          "text": "打开 "
         }
       }
     },
@@ -2090,9 +2116,51 @@
       "howToUseContent": "Workspace 是您的专属文件工作区，AI 可以直接读取、写入、精准修改并从零创建文档与代码。\n\n如何使用：\n在聊天输入框中输入 >Workspace 即可唤起 Agent。您可以将本地已有文件拖入工作区让 AI 处理，也可以直接对它下指令，让 AI 从零为您创建新文件（例如从零开发一个完整的前端项目）。\n\n支持的功能与格式：\n- 纯文本与代码（.html, .js, .ts, .py, .md, .txt 等）：支持从零创建与精准编辑！可直接让 AI 从零搭建前端项目、编写脚本、起草 Markdown 笔记，或对现有代码进行检索和局部重构。\n- Word 文档 (.docx)：逐章审阅论文、通过修订模式改写段落（可在 Word 中逐条确认接受/拒绝）、添加批注意见（需上传现有文件）。\n- Excel 表格 (.xlsx/.csv)：数据分析、编写计算公式、添加数据列，且不破坏原有图表与排版格式（需上传现有文件）。\n- PDF 文档：阅读文献与报告、提取文字、合并页面、添加批注与高亮（需上传现有文件）。\n- 演示文稿 (.pptx)：读取与编辑每页幻灯片文本及演讲者备注（需上传现有文件）。\n- 字幕文件 (.srt/.vtt)：翻译与润色字幕内容，严格保持时间轴对齐（需上传现有文件）。\n\n💡 提示：文本与代码类文件支持由 AI 从零创建及随时修改；Word/Excel/PPT/PDF 等特殊格式目前支持基于已有文件的读取、批注与精准修改（保护原有排版不乱）。"
     },
     "web": {
+      "needsPowerPack": "⭐ Power Pack 功能 · 点击了解详情",
+      "needsConsent": "🔒 请先阅读风险说明 · 点击打开",
       "needsConnector": "🔌 请先设置 Web Agent Connector · 点击打开",
+      "handedOff": "已发送给侧边面板中的 Web Agent",
+      "panelBusy": "侧边面板中还有任务在运行，请先完成或停止它。",
       "addedWhileRunning": "已添加到 Web Agent。正在运行的任务可通过 page_list 使用。",
+      "panelBlocked": "Chrome 没有打开侧边面板。",
+      "openPanel": "打开侧边面板",
       "consent": {
+        "title": "使用 Web Agent 之前",
+        "intro": "Web Agent 让 AI 帮你阅读和操作网页：在你的浏览器里点击、输入、运行脚本。开启前请先读一下以下内容。",
+        "risks": {
+          "actsAsYou": {
+            "title": "它以你的身份操作",
+            "body": "Agent 在你自己的浏览器里、用你已登录的账号工作。它做的任何事——提交表单、发送消息、下单——都以你的名义完成，而且可能无法撤回。"
+          },
+          "dataToAi": {
+            "title": "页面内容会发给 AI",
+            "body": "Agent 从页面读到的所有内容（文字、链接、表单值）都会成为你 Gemini 对话的一部分并发送给 Google。密码框永远不会被读取。"
+          },
+          "injection": {
+            "title": "网页可能会试图诱导它",
+            "body": "页面里可能藏有专门写给 AI 的指令（“提示词注入”）。批准每个操作前都请检查一下，尤其是在不熟悉的网站上。"
+          },
+          "sensitive": {
+            "title": "别在敏感页面上用它",
+            "body": "不要在银行、支付、医疗或账号安全页面上使用，也不要用在任何出错代价很高的地方。"
+          },
+          "mistakes": {
+            "title": "AI 会犯错",
+            "body": "它可能点错地方，或者看错页面。每一次点击、每一段输入、每一个脚本都需要你批准。它运行时请留在电脑前。"
+          },
+          "stop": {
+            "title": "如何停止它",
+            "body": "Agent 控制的每个页面上，Chrome 都会显示“已开始调试此浏览器”的提示条。点提示条上的“取消”，或关闭侧边面板，它就会立即停止。"
+          },
+          "responsibility": {
+            "title": "你批准的操作由你负责",
+            "body": "包括遵守你所使用网站的条款。Better Sidebar 按现状提供，不对你批准的操作所造成的损失承担责任。"
+          }
+        },
+        "permissionNote": "Agent 通过 Chrome 的页面调试器操作网页。工作期间，Chrome 会在这些页面上显示调试提示条。",
+        "checkbox": "我已阅读并了解这些风险",
+        "cancel": "暂不",
+        "agree": "同意",
         "connector": {
           "title": "Web Agent Connector",
           "missing": "Web Agent 需要一个小的配套扩展才能操作网页：Better Sidebar Web Agent Connector。Chrome 的页面调试权限由它持有，Better Sidebar 本身不需要这个权限；它也只接受来自 Better Sidebar 的请求。",
@@ -2101,7 +2169,10 @@
           "install": "从 Chrome 应用商店安装",
           "update": "在 Chrome 应用商店中打开",
           "comeBack": "安装 Connector 后，本页面会自动更新。"
-        }
+        },
+        "accepted": "你已接受此说明，Web Agent 已开启。撤回后它会关闭，直到你再次接受。",
+        "withdraw": "撤回",
+        "done": "完成"
       }
     }
   },

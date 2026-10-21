@@ -195,4 +195,5 @@ node scripts/i18n.mjs sort
 - **兄弟节点对齐**：通过 `apply` 插入的新词条会自动定位到 `en.json` 中对应兄弟节点的位置，确保 git diff 只产生新增行，不造成大面积文件重排。
 - **占位符校验**：写入时会自动比对 `{{placeholder}}`，与英文不一致时会给出 warning。
 - **保守判定**：`unused` 扫描会识别静态调用 `t('a.b')`、点分字符串、模板拼接 `t(\`a.b.${x}\`)` 以及复数后缀（`_one`/`_other` 等），防止误删动态拼接词条。
+- **复数按语言判定**：`missing`/`check` 只要求该语言真正用到的复数类别（按 `Intl.PluralRules` 对 0–1000 的结果），`_other` 始终必需；`_zero`/`_two`/`_few`/`_many` 在该语言已有 base key 时可省略（i18next 会回退到 base key）。所以波兰语这类复杂语言可以把 base/`_one`/`_other` 写成“名词: {{count}}”的中性句式，不必补 `_few`/`_many`；俄语保留完整变体。
 - **语言检测策略**：应用初始化时优先读取 Chrome Storage 中用户的偏好语言；首次进入自动识别浏览器语言（若是 `zh-*` 则使用中文，否则回退为英文）。

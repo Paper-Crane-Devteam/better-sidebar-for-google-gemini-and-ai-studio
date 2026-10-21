@@ -6,5 +6,33 @@
   "extensionDescription": {
     "message": "Organizza le chat di Gemini e AI Studio con cartelle, tag, ricerca full-text, prompt, esportazione, sincronizzazione Drive, strumenti AI e altro.",
     "description": "Descrizione dell'estensione"
+  },
+  "webAgentMenu": {
+    "message": "Fai lavorare il Web Agent su questa pagina",
+    "description": "Context menu item that opens the Web Agent side panel for the current page"
+  },
+  "webAgentAddActive": {
+    "message": "+ Scheda corrente",
+    "description": "Web Agent side panel toolbar: let the agent operate the active tab"
+  },
+  "webAgentAddAll": {
+    "message": "+ Tutte le schede",
+    "description": "Web Agent side panel toolbar: let the agent operate every tab in the window"
+  },
+  "webAgentAddAllConfirm": {
+    "message": "Consentire al Web Agent di gestire tutte le schede di questa finestra? ($1 schede)",
+    "description": "Confirm dialog before adding all tabs. $1 is the tab count"
+  },
+  "webAgentNoTabs": {
+    "message": "Nessuna scheda controllata",
+    "description": "Web Agent side panel toolbar: shown when no tab is under the agent's control"
+  },
+  "webAgentRemoveTab": {
+    "message": "Smetti di controllare questa scheda",
+    "description": "Web Agent side panel toolbar: tooltip of the × that takes a tab out of the agent's control"
+  },
+  "webAgentCurrentRefused": {
+    "message": "Il Web Agent non può gestire questa pagina",
+    "description": "Web Agent side panel toolbar: tooltip when the active tab cannot be operated (e.g. Gemini itself)"
   }
 }

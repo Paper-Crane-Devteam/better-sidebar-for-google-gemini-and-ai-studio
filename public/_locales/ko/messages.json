@@ -6,5 +6,33 @@
   "extensionDescription": {
     "message": "폴더, 태그, 전체 텍스트 검색, 프롬프트, 내보내기, Drive 동기화, AI 도구 등으로 Gemini & AI Studio 대화를 정리하세요.",
     "description": "확장 프로그램 설명"
+  },
+  "webAgentMenu": {
+    "message": "이 페이지에서 Web Agent 사용",
+    "description": "Context menu item that opens the Web Agent side panel for the current page"
+  },
+  "webAgentAddActive": {
+    "message": "+ 현재 탭",
+    "description": "Web Agent side panel toolbar: let the agent operate the active tab"
+  },
+  "webAgentAddAll": {
+    "message": "+ 모든 탭",
+    "description": "Web Agent side panel toolbar: let the agent operate every tab in the window"
+  },
+  "webAgentAddAllConfirm": {
+    "message": "Web Agent가 이 창의 모든 탭을 조작하도록 허용할까요? (탭 $1개)",
+    "description": "Confirm dialog before adding all tabs. $1 is the tab count"
+  },
+  "webAgentNoTabs": {
+    "message": "아직 제어 중인 탭이 없습니다",
+    "description": "Web Agent side panel toolbar: shown when no tab is under the agent's control"
+  },
+  "webAgentRemoveTab": {
+    "message": "이 탭 제어 중지",
+    "description": "Web Agent side panel toolbar: tooltip of the × that takes a tab out of the agent's control"
+  },
+  "webAgentCurrentRefused": {
+    "message": "Web Agent는 이 페이지를 조작할 수 없습니다",
+    "description": "Web Agent side panel toolbar: tooltip when the active tab cannot be operated (e.g. Gemini itself)"
   }
 }

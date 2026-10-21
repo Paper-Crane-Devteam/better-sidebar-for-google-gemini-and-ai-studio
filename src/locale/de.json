@@ -62,6 +62,7 @@
     "scanPrompt": "Bibliothek öffnen, um Ihre Chats zu scannen.",
     "scanLibrary": "Bibliothek scannen",
     "scanning": "Scannen...",
+    "scanProgress": "{{scanned}} Chats gescannt, {{fresh}} neu",
     "newFolder": "Neu Ordner",
     "imported": "Posteingang",
     "conversations": "Chats",
@@ -133,7 +134,8 @@
   "toast": {
     "imported": "Importierte {{count}}-Chats",
     "scanComplete": "Scan abgeschlossen, keine neuen Chats gefunden",
-    "exportSuccessful": "Export erfolgreich",
+    "exportReady": "Backup ist bereit",
+    "saveFile": "Datei speichern",
     "exportFailed": "Export fehlgeschlagen",
     "importSuccessful": "Import erfolgreich",
     "importFailed": "Import fehlgeschlagen",
@@ -189,6 +191,32 @@
     "slashTip": "Tipp: Geben Sie / in das Eingabefeld ein, um schnell einen Prompt einzufügen.",
     "slashTipDismiss": "Verstanden"
   },
+  "instructionPrompt": {
+    "library": "Prompts",
+    "fillFromLibrary": "Aus der Prompt-Bibliothek einfügen",
+    "saveToLibrary": "In der Prompt-Bibliothek speichern",
+    "searchPlaceholder": "Prompts durchsuchen...",
+    "filterSystem": "System",
+    "filterAll": "Alle",
+    "noMatches": "Keine passenden Prompts",
+    "emptyLibrary": "Ihre Prompt-Bibliothek ist leer",
+    "goToPrompts": "Prompt-Bibliothek öffnen",
+    "back": "Zurück",
+    "fill": "Einfügen",
+    "filled": "„{{title}}“ eingefügt",
+    "fillFailed": "Die Anweisungen konnten nicht eingefügt werden. Öffnen Sie das Panel erneut.",
+    "undo": "Rückgängig",
+    "saveTitle": "Als Prompt speichern",
+    "saved": "In der Prompt-Bibliothek gespeichert",
+    "nothingToSave": "Die Anweisungen sind leer, es gibt nichts zu speichern",
+    "sourceNative": "AI Studio",
+    "sourceLibrary": "Better Sidebar",
+    "sourceTooltip": "Wählen Sie die Quelle der Systemanweisungen",
+    "switchTip": "Sie können Systemanweisungen stattdessen mit der Prompt-Bibliothek von Better Sidebar verwalten: Ordner, Variablen und dieselben Prompts in Gemini und AI Studio. Sie können jederzeit zurückwechseln.",
+    "switchTipSwitch": "Wechseln",
+    "switchTipKeep": "AI Studio beibehalten",
+    "autoImported": "AI Studio-Anweisungen in Prompt-Bibliothek › {{folder}} importiert: {{count}}"
+  },
   "snippets": {
     "createSnippet": "Neues Snippet",
     "editSnippet": "Snippet bearbeiten",
@@ -239,11 +267,12 @@
   },
   "about": {
     "title": "Über",
-    "appName": "Bessere Seitenleiste für Gemini & AI Studio",
+    "appName": "Better Sidebar für Gemini & AI Studio",
     "version": "Version",
     "versionNumber": "2.1.0",
     "developer": "Entwickler",
     "developerName": "Paper Crane Dev",
+    "byDeveloper": "von {{name}}",
     "license": "Lizenz",
     "sourceCode": "Quellcode",
     "githubRepository": "GitHub Repository",
@@ -763,7 +792,7 @@
     "headlineAccent": "Mehr Möglichkeiten.",
     "intro": "Ein ruhigeres Zuhause für Ihre Gemini- und AI Studio-Gespräche. Organisieren Sie, was wichtig ist, finden Sie es schneller und behalten Sie Ihre besten Prompts immer griffbereit.",
     "watch": "Sehen Sie sich das Tutorial an",
-    "previewAlt": "Bessere Seitenleiste läuft neben Gemini",
+    "previewAlt": "Better Sidebar läuft neben Gemini",
     "previewCaption": "Ihre Gespräche, schön organisiert",
     "basics": "Beginnen Sie mit dem Wesentlichen",
     "organizeTitle": "Geben Sie jedem Chat ein Zuhause",
@@ -957,7 +986,7 @@
     "all": "Alle"
   },
   "footer": {
-    "madeWith": "Bessere Seitenleiste • Erstellt mit ♥️ von Paper Crane Dev"
+    "madeWith": "Better Sidebar • Mit ♥ gemacht von Paper Crane Dev"
   },
   "gems": {
     "title": "Gems",
@@ -1382,20 +1411,20 @@
       "pausedTitle": "Schleife angehalten"
     },
     "checkIn": {
-      "title_one": "{{count}}-Schritt allein ausgeführt",
-      "title_other": "{{count}}-Schritte unabhängig ausgeführt",
-      "title": "{{count}}-Schritte einzeln ausgeführt besitzen",
+      "title_one": "{{count}} Schritt selbstständig ausgeführt",
+      "title_other": "{{count}} Schritte selbstständig ausgeführt",
+      "title": "{{count}} Schritte selbstständig ausgeführt",
       "desc": "Nichts ist falsch – der Agent hat nur pausiert, damit Sie sehen können, was er getan hat, bevor er fortfährt.",
-      "failedNote_one": "{{count}}-Schritt ist unterwegs fehlgeschlagen – ein Blick im Chat lohnt sich.",
-      "failedNote_other": "{{count}}-Schritte sind unterwegs fehlgeschlagen – ein Blick im Chat lohnt sich.",
-      "failedNote": "{{count}}-Schritte sind unterwegs fehlgeschlagen – ein Blick lohnt sich Der Chat.",
+      "failedNote_one": "{{count}} Schritt ist unterwegs fehlgeschlagen – ein Blick in den Chat lohnt sich.",
+      "failedNote_other": "{{count}} Schritte sind unterwegs fehlgeschlagen – ein Blick in den Chat lohnt sich.",
+      "failedNote": "{{count}} Schritte sind unterwegs fehlgeschlagen – ein Blick in den Chat lohnt sich.",
       "continue": "Weitermachen",
       "stop": "Hier anhalten"
     },
     "owed": {
-      "title_one": "{{count}}-Ergebnis hat die KI nie erreicht",
-      "title_other": "{{count}}-Ergebnis hat die KI nie erreicht",
-      "title": "{{count}}-Ergebnis hat die KI nie erreicht",
+      "title_one": "{{count}} Ergebnis hat die KI nie erreicht",
+      "title_other": "{{count}} Ergebnisse haben die KI nie erreicht",
+      "title": "{{count}} Ergebnisse haben die KI nie erreicht",
       "desc": "Diese Schritte wurden ausgeführt, bevor die Seite neu geladen wurde, aber die KI nie Ich habe die Ergebnisse gesehen, daher bleibt die Aufgabe hängen. Durch das Senden können Sie fortfahren, ohne die Arbeit wiederholen zu müssen.",
       "descWrites": "Diese Schritte wurden ausgeführt, bevor die Seite neu geladen wurde, und einige davon haben Ihre Daten geändert – diese Änderungen sind bereits gespeichert. Die KI hat die Ergebnisse nie gesehen, daher bleibt die Aufgabe hängen. Durch das Senden können Sie weitermachen, ohne die Arbeit wiederholen zu müssen.",
       "send": "Senden Sie sie",
@@ -1419,9 +1448,9 @@
       "writeTitle": "Diese Änderung genehmigen?",
       "newChatTitle": "Neuen Chat öffnen?",
       "run": "Ausführen",
-      "runRest_one": "Diese {{count}} auch ausführen",
-      "runRest_other": "Diese {{count}} auch ausführen",
-      "runRest": "Diese {{count}} auch ausführen",
+      "runRest_one": "Auch den restlichen ({{count}}) ausführen",
+      "runRest_other": "Auch die restlichen {{count}} ausführen",
+      "runRest": "Auch die restlichen {{count}} ausführen",
       "allTask": "Diese Aufgabe nicht noch einmal anfordern",
       "reject": "Ablehnen",
       "back": "Zurück",
@@ -1523,9 +1552,9 @@
       "paywallWorkspaceDesc": "Der kostenlose Plan umfasst 1 Arbeitsbereich mit bis zu {{max}} Dateien. Upgrade für unbegrenzten Zugriff.",
       "paywallBrowserDesc": "Das Lesen Ihrer Tabs und Lesezeichen ist kostenlos. Zum Anwenden von Änderungen ist Power Pack erforderlich – aktualisieren Sie, fragen Sie dann erneut und genehmigen Sie den gleichen Stapel.",
       "paywallFeature": "Agent-Datenbank schreibt",
-      "steps_one": "{{count}}-Schritte ausführen",
-      "steps_other": "{{count}}-Schritte ausführen",
-      "steps": "{{count}}-Schritte ausführen",
+      "steps_one": "{{count}} Schritt ausgeführt",
+      "steps_other": "{{count}} Schritte ausgeführt",
+      "steps": "{{count}} Schritte ausgeführt",
       "failed": "{{count}} fehlgeschlagen",
       "noSteps": "Es wurden keine Tools ausgeführt.",
       "upgrade": "Siehe Pläne",
@@ -1539,9 +1568,9 @@
       "title": "Änderungen des Agenten rückgängig machen?",
       "body": "Dadurch wird {{tables}} wieder in den Zustand versetzt, in dem es war, als die Aufgabe gestartet wurde. Alle anderen seitdem daran vorgenommenen Änderungen werden ebenfalls rückgängig gemacht.",
       "confirm": "Änderungen rückgängig machen",
-      "done_one": "Zeile {{count}} zurückgesetzt",
-      "done_other": "Zeilen {{count}} zurückgesetzt",
-      "done": "Zeilen {{count}} zurückgesetzt",
+      "done_one": "{{count}} Zeile zurückgesetzt",
+      "done_other": "{{count}} Zeilen zurückgesetzt",
+      "done": "{{count}} Zeilen zurückgesetzt",
       "aiUnaware": "Die KI weiß nichts davon – erzählen Sie es, bevor Sie das Gespräch fortsetzen.",
       "reverted": "Änderungen rückgängig gemacht",
       "toastPrompt": "Der Agent hat Ihre Daten geändert.",
@@ -1754,6 +1783,11 @@
         "name": "Browser-Agent",
         "shortName": "Browser",
         "description": "Chrome-Registerkarten, Registerkartengruppen und Lesezeichen organisieren und verwalten"
+      },
+      "web": {
+        "name": "Web Agent",
+        "shortName": "Web",
+        "description": "Liest und bedient Webseiten für Sie im Seitenbereich"
       }
     },
     "switcher": {
@@ -1861,6 +1895,46 @@
         "open": {
           "label": "Tabs öffnen",
           "text": "Tabs öffnen für "
+        }
+      },
+      "web": {
+        "summarize": {
+          "label": "Diese Seite zusammenfassen",
+          "text": "Fasse die Seite zusammen, die ich gerade geöffnet habe"
+        },
+        "extract": {
+          "label": "Tabelle extrahieren",
+          "text": "Extrahiere die Tabelle auf dieser Seite als Markdown"
+        },
+        "fill": {
+          "label": "Formular ausfüllen",
+          "text": "Fülle das Formular auf dieser Seite aus mit "
+        },
+        "open": {
+          "label": "Website öffnen",
+          "text": "Öffne "
+        }
+      }
+    },
+    "webPanel": {
+      "title": "Lassen Sie die KI Webseiten für Sie lesen und bedienen",
+      "riskNotice": "Risikohinweis und Berechtigung",
+      "examples": {
+        "summarize": {
+          "label": "Seite zusammenfassen",
+          "text": "Lies den Artikel in meinem aktuellen Tab und gib mir die wichtigsten Punkte in fünf Stichpunkten, dazu alle Behauptungen, die ich noch einmal prüfen sollte."
+        },
+        "extract": {
+          "label": "Daten aus einer Seite holen",
+          "text": "Extrahiere die Haupttabelle der geöffneten Seite als Markdown. Behalte die Spaltennamen bei und sag mir, ob Zeilen abgeschnitten oder auf mehrere Seiten verteilt wirken."
+        },
+        "compare": {
+          "label": "Mehrere Seiten vergleichen",
+          "text": "Öffne die Produktseiten der drei unten aufgeführten Optionen, vergleiche Preis, technische Daten und Rückgaberichtlinien nebeneinander und sag mir, welche du wählen würdest und warum."
+        },
+        "fill": {
+          "label": "Formular ausfüllen",
+          "text": "Fülle das Formular auf dieser Seite mit den Angaben unten aus. Halte vor dem Absenden an und zeig mir, was du eingetragen hast, damit ich es prüfen kann."
         }
       }
     },
@@ -2040,6 +2114,66 @@
       "about": "Über den Arbeitsbereich",
       "howToUseTitle": "So verwenden Sie Workspace",
       "howToUseContent": "Workspace ist Ihre dedizierte Dateiumgebung, in der KI Dokumente und Code direkt von Grund auf lesen, schreiben, bearbeiten und erstellen kann.\n\nVerwendung:\nGeben Sie >Workspace in die Chat-Eingabe ein, um den Agenten zu aktivieren. Sie können vorhandene Dateien per Drag-and-Drop in den Arbeitsbereich ziehen oder einfach die KI bitten, neue Dateien von Grund auf zu generieren (z. B. ein Frontend-Projekt von Grund auf zu erstellen).\n\nUnterstützte Formate und Funktionen:\n- Einfacher Text und Code (.html, .js, .ts, .py, .md, .txt usw.): Volle Unterstützung für die Erstellung von Grund auf und präzise Bearbeitung! Bitten Sie die KI, das Gerüst für ein gesamtes Frontend-Projekt zu erstellen, Skripte zu schreiben, Markdown-Notizen zu entwerfen oder vorhandenen Code umzugestalten.\n- Word (.docx): Arbeiten Sie Kapitel für Kapitel durch, schreiben Sie Absätze mit nachverfolgten Änderungen neu und fügen Sie Gutachterkommentare hinzu (erfordert das Hochladen vorhandener Dateien).\n- Excel (.xlsx/.csv): Analysieren Sie Daten, schreiben Sie Formeln und fügen Sie Spalten hinzu, ohne die ursprünglichen Formate oder Diagramme zu ändern (erfordert das Hochladen bestehender Dateien).\n- PDF: Artikel und Berichte lesen, Text extrahieren, Seiten zusammenführen und Anmerkungen hinzufügen.\n- PowerPoint (.pptx): Folieninhalte und Sprechernotizen lesen und bearbeiten.\n- Untertitel (.srt/.vtt): Untertitel übersetzen und polieren, dabei Zeitstempel beibehalten.\n\n💡 Tipp: Text- und Codedateien können von Grund auf neu erstellt und frei bearbeitet werden. Spezielle Formate (Word, Excel, PPT, PDF) konzentrieren sich derzeit auf das Lesen, Kommentieren und präzise Bearbeiten vorhandener Dateien unter Beibehaltung ihrer ursprünglichen Formatierung."
+    },
+    "web": {
+      "needsPowerPack": "⭐ Power Pack-Funktion · Klicken für mehr Infos",
+      "needsConsent": "🔒 Bitte zuerst den Risikohinweis lesen · Klicken zum Öffnen",
+      "needsConnector": "🔌 Web Agent Connector einrichten · Klicken zum Öffnen",
+      "handedOff": "An den Web Agent im Seitenbereich gesendet",
+      "panelBusy": "Im Seitenbereich läuft noch eine Aufgabe. Schließen Sie sie zuerst ab oder stoppen Sie sie.",
+      "addedWhileRunning": "Zum Web Agent hinzugefügt. Die laufende Aufgabe kann es über page_list verwenden.",
+      "panelBlocked": "Chrome hat den Seitenbereich nicht geöffnet.",
+      "openPanel": "Seitenbereich öffnen",
+      "consent": {
+        "title": "Bevor Sie den Web Agent verwenden",
+        "intro": "Mit dem Web Agent kann die KI Webseiten lesen und für Sie bedienen: klicken, tippen und Skripte in Ihrem Browser ausführen. Bitte lesen Sie dies, bevor Sie ihn aktivieren.",
+        "risks": {
+          "actsAsYou": {
+            "title": "Er handelt in Ihrem Namen",
+            "body": "Der Agent arbeitet in Ihrem eigenen Browser mit Ihren angemeldeten Konten. Alles, was er tut – ein Formular absenden, eine Nachricht senden, eine Bestellung aufgeben –, geschieht in Ihrem Namen und lässt sich womöglich nicht rückgängig machen."
+          },
+          "dataToAi": {
+            "title": "Seiteninhalte gehen an die KI",
+            "body": "Alles, was der Agent von einer Seite liest (Text, Links, Formularwerte), wird Teil Ihrer Gemini-Unterhaltung und an Google gesendet. Passwortfelder werden nie gelesen."
+          },
+          "injection": {
+            "title": "Webseiten können versuchen, ihn zu täuschen",
+            "body": "Eine Seite kann versteckte Anweisungen für eine KI enthalten („Prompt Injection“). Prüfen Sie jede Aktion, bevor Sie sie genehmigen, besonders auf Websites, die Sie nicht kennen."
+          },
+          "sensitive": {
+            "title": "Halten Sie ihn von sensiblen Seiten fern",
+            "body": "Verwenden Sie ihn nicht auf Banking-, Zahlungs-, Gesundheits- oder Kontosicherheitsseiten oder überall dort, wo ein Fehler teuer wäre."
+          },
+          "mistakes": {
+            "title": "Die KI macht Fehler",
+            "body": "Er kann das Falsche anklicken oder eine Seite falsch verstehen. Sie genehmigen jeden Klick, jede Eingabe und jedes Skript. Bleiben Sie am Computer, solange er läuft."
+          },
+          "stop": {
+            "title": "So stoppen Sie ihn",
+            "body": "Chrome zeigt auf jeder Seite, die der Agent steuert, eine Leiste „Debugging dieses Browsers gestartet“ an. Klicken Sie in dieser Leiste auf „Abbrechen“ oder schließen Sie den Seitenbereich, und er stoppt sofort."
+          },
+          "responsibility": {
+            "title": "Sie sind für das verantwortlich, was Sie genehmigen",
+            "body": "Dazu gehört auch, die Nutzungsbedingungen der Websites einzuhalten, auf denen Sie ihn verwenden. Better Sidebar wird ohne Gewähr bereitgestellt und haftet nicht für Schäden durch Aktionen, die Sie genehmigt haben."
+          }
+        },
+        "permissionNote": "Der Agent bedient Seiten über den Seiten-Debugger von Chrome. Während er arbeitet, zeigt Chrome auf diesen Seiten eine Debugging-Leiste an.",
+        "checkbox": "Ich habe diese Risiken gelesen und verstanden",
+        "cancel": "Jetzt nicht",
+        "agree": "Zustimmen",
+        "connector": {
+          "title": "Web Agent Connector",
+          "missing": "Um Seiten zu bedienen, benötigt der Web Agent eine kleine Begleiterweiterung: Better Sidebar Web Agent Connector. Sie hält die Debugger-Berechtigung von Chrome, damit Better Sidebar selbst sie nicht braucht, und nimmt nur Anfragen von Better Sidebar an.",
+          "outdated": "Ihr Web Agent Connector ist veraltet. Aktualisieren Sie ihn im Chrome Web Store und kehren Sie dann hierher zurück.",
+          "paused": "Der Web Agent Connector ist pausiert. Klicken Sie auf sein Symbol in der Chrome-Symbolleiste und schalten Sie ihn wieder ein.",
+          "install": "Aus dem Chrome Web Store installieren",
+          "update": "Im Chrome Web Store öffnen",
+          "comeBack": "Diese Seite aktualisiert sich automatisch, sobald der Connector installiert ist."
+        },
+        "accepted": "Sie haben diesem Hinweis zugestimmt und der Web Agent ist aktiv. Wenn Sie die Zustimmung widerrufen, wird er deaktiviert, bis Sie erneut zustimmen.",
+        "withdraw": "Widerrufen",
+        "done": "Fertig"
+      }
     }
   },
   "backup": {

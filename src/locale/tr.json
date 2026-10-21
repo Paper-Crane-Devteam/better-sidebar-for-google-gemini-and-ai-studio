@@ -62,6 +62,7 @@
     "scanPrompt": "Sohbetlerinizi taramak için Kitaplığı açın.",
     "scanLibrary": "Kütüphaneyi Tara",
     "scanning": "Taranıyor...",
+    "scanProgress": "{{scanned}} sohbet tarandı, {{fresh}} yeni",
     "newFolder": "Yeni Klasör",
     "imported": "Gelen Kutusu",
     "conversations": "sohbetler",
@@ -133,7 +134,8 @@
   "toast": {
     "imported": "İçe aktarılan {{count}} sohbetler",
     "scanComplete": "Tarama tamamlandı, yeni sohbet bulunamadı",
-    "exportSuccessful": "Dışa aktarma başarılı",
+    "exportReady": "Yedek hazır",
+    "saveFile": "Dosyayı kaydet",
     "exportFailed": "Dışa aktarma başarısız",
     "importSuccessful": "İçe aktarma başarılı",
     "importFailed": "İçe aktarma başarısız",
@@ -189,6 +191,32 @@
     "slashTip": "İpucu: Hızlı bir şekilde istem eklemek için giriş kutusuna / yazın.",
     "slashTipDismiss": "Anladım"
   },
+  "instructionPrompt": {
+    "library": "İstemler",
+    "fillFromLibrary": "İstem Kitaplığından doldur",
+    "saveToLibrary": "İstem Kitaplığına kaydet",
+    "searchPlaceholder": "İstemlerde ara...",
+    "filterSystem": "Sistem",
+    "filterAll": "Tümü",
+    "noMatches": "Eşleşen istem yok",
+    "emptyLibrary": "İstem kitaplığınız boş",
+    "goToPrompts": "İstem Kitaplığını aç",
+    "back": "Geri",
+    "fill": "Doldur",
+    "filled": "\"{{title}}\" dolduruldu",
+    "fillFailed": "Talimatlar doldurulamadı. Paneli yeniden açmayı deneyin.",
+    "undo": "Geri al",
+    "saveTitle": "İstem olarak kaydet",
+    "saved": "İstem Kitaplığına kaydedildi",
+    "nothingToSave": "Talimatlar boş, kaydedilecek bir şey yok",
+    "sourceNative": "AI Studio",
+    "sourceLibrary": "Better Sidebar",
+    "sourceTooltip": "Sistem talimatlarının nereden geleceğini seçin",
+    "switchTip": "Sistem talimatlarını bunun yerine Better Sidebar istem kitaplığıyla yönetebilirsiniz: klasörler, değişkenler ve Gemini ile AI Studio'da aynı istemler. İstediğiniz zaman geri dönebilirsiniz.",
+    "switchTipSwitch": "Geç",
+    "switchTipKeep": "AI Studio'da kal",
+    "autoImported": "{{count}} AI Studio talimatı İstem Kitaplığı › {{folder}} klasörüne aktarıldı"
+  },
   "snippets": {
     "createSnippet": "Yeni Snippet",
     "editSnippet": "Snippet'i Düzenle",
@@ -239,11 +267,12 @@
   },
   "about": {
     "title": "Hakkında",
-    "appName": "Gemini ve AI Studio için Daha İyi Kenar Çubuğu",
+    "appName": "Gemini ve AI Studio için Better Sidebar",
     "version": "Sürüm",
     "versionNumber": "2.1.0",
     "developer": "Geliştirici",
     "developerName": "Paper Crane Dev",
+    "byDeveloper": "{{name}} tarafından",
     "license": "Lisans",
     "sourceCode": "Kaynak Kodu",
     "githubRepository": "GitHub Deposu",
@@ -271,7 +300,7 @@
   },
   "sponsor": {
     "title": "Arkadaşlarınızla Paylaşın",
-    "enjoying": "Daha İyi Kenar Çubuğundan Yararlanıyor musunuz?",
+    "enjoying": "Better Sidebar'ı beğendiniz mi?",
     "shareDescription": "Arkadaşlarınızla paylaşın ve daha fazla kişinin bu ücretsiz, açık kaynaklı üretkenlik aracını keşfetmesine yardımcı olun",
     "sponsorOnGithub": "GitHub'da Yıldız",
     "copyLink": "Bağlantıyı Kopyala ve Metin",
@@ -611,8 +640,8 @@
     "unknownDate": "Bilinmeyen Tarih"
   },
   "popup": {
-    "title": "Daha İyi Kenar Çubuğu",
-    "description": "Daha İyi Kenar Çubuğu'nun etkin olduğu platformları yapılandırın. Bir platformun devre dışı bırakılması, uzantının söz konusu sitede çalışmasını tamamen durduracaktır.",
+    "title": "Better Sidebar",
+    "description": "Better Sidebar'ın etkin olduğu platformları yapılandırın. Bir platformu devre dışı bırakmak, uzantının o sitede çalışmasını tamamen durdurur.",
     "platforms": "Desteklenen Platformlar",
     "enablePlatform": "{{platform}} tarihinde etkinleştirin",
     "badgeSupporter": "Destekçi",
@@ -749,7 +778,7 @@
     "skip": "Atla"
   },
   "onboarding": {
-    "welcome": "Daha İyi Kenar Çubuğuna Hoş Geldiniz",
+    "welcome": "Better Sidebar'a Hoş Geldiniz",
     "description": "Google AI Studio'da iş akışınızı güçlendirin, Sohbetlerinizi düzenlemenin daha iyi bir yolu ve güzel bir kullanıcı arayüzü ile Gemini, ChatGPT ve Claude.",
     "getStarted": "Hemen Başlayın",
     "comingSoon": "Çok Yakında",
@@ -776,7 +805,7 @@
     "choose": "Nereden başlayacağınızı seçin",
     "firstStep": "Oturum açtıktan sonra platform sayfasında Better Sidebar'ı açın. Sohbetleriniz için bir klasör oluşturarak başlayın.",
     "tutorialTitle": "Küçük bir tur. Bir adım önde.",
-    "tutorialBody": "Daha İyi Kenar Çubuğu'nu çalışırken görün ve ardından kendi çalışma alanınızda takip edin. İhtiyacınız olduğunda duraklatın ve geri dönün.",
+    "tutorialBody": "Better Sidebar'ı iş başında görün, ardından kendi çalışma alanınızda adım adım uygulayın. İstediğiniz zaman duraklatıp geri dönebilirsiniz.",
     "openYoutube": "YouTube'da açın",
     "videoNote": "Uzantı sayfaları oynatıcıyı barındıramadığından eğitim yeni bir YouTube sekmesinde açılır.",
     "help": "Yardıma mı ihtiyacınız var?",
@@ -840,7 +869,7 @@
     "profileNotFound": "Profil {{profileId}} bulunamadı"
   },
   "account": {
-    "signInRequired": "Oturum açılmış Google hesabı algılanmadı. Daha İyi Kenar Çubuğu'nu kullanmak için lütfen oturum açın."
+    "signInRequired": "Oturum açmış bir Google hesabı algılanmadı. Better Sidebar'ı kullanmak için lütfen oturum açın."
   },
   "profile": {
     "selectProfile": "Profil Seçin",
@@ -957,7 +986,7 @@
     "all": "Tümü"
   },
   "footer": {
-    "madeWith": "Daha İyi Kenar Çubuğu • ♥️ ile Paper Crane Dev tarafından yapılmıştır"
+    "madeWith": "Better Sidebar • Paper Crane Dev tarafından ♥ ile yapıldı"
   },
   "gems": {
     "title": "Gems",
@@ -1013,7 +1042,7 @@
     "fixes": "İyileştirmeler ve Düzeltmeler",
     "welcome": "En son sürüme hoş geldiniz! Güncellemelerin keyfini çıkarın.",
     "awesome": "Harika!",
-    "enjoyingIt": "Daha İyi Kenar Çubuğundan memnun musunuz? Biraz sevgi gösterin",
+    "enjoyingIt": "Better Sidebar'ı beğendiniz mi? Biraz destek olun",
     "rateUs": "Oy verin 👍",
     "starOnGithub": "Yıldız ⭐",
     "buyMeACoffee": "Kahve ☕",
@@ -1382,20 +1411,20 @@
       "pausedTitle": "Döngü duraklatıldı"
     },
     "checkIn": {
-      "title_one": "{{count}} adım kendi başına yapıldı",
-      "title_other": "{{count}} adımlar kendi başına yapıldı",
-      "title": "{{count}} adımlar kendi başına yapıldı kendi",
+      "title_one": "{{count}} adım kendi kendine tamamlandı",
+      "title_other": "{{count}} adım kendi kendine tamamlandı",
+      "title": "{{count}} adım kendi kendine tamamlandı",
       "desc": "Hiçbir sorun yok — temsilci, devam etmeden önce ne yaptığına bakabilmeniz için durakladı.",
-      "failedNote_one": "{{count}} yol boyunca adım başarısız oldu — sohbete göz atmaya değer.",
-      "failedNote_other": "{{count}} yol boyunca adımlar başarısız oldu — sohbete göz atmaya değer.",
-      "failedNote": "{{count}} yol boyunca adımlar başarısız oldu — göz atmaya değer sohbet.",
+      "failedNote_one": "Yol boyunca {{count}} adım başarısız oldu; sohbete göz atmakta fayda var.",
+      "failedNote_other": "Yol boyunca {{count}} adım başarısız oldu; sohbete göz atmakta fayda var.",
+      "failedNote": "Yol boyunca {{count}} adım başarısız oldu; sohbete göz atmakta fayda var.",
       "continue": "Devam edin",
       "stop": "Burada durun"
     },
     "owed": {
-      "title_one": "{{count}} sonuç hiçbir zaman yapay zekaya ulaşmadı",
-      "title_other": "{{count}} sonuçlar hiçbir zaman yapay zekaya ulaşmadı",
-      "title": "{{count}} sonuçlar hiçbir zaman yapay zekaya ulaşmadı",
+      "title_one": "{{count}} sonuç yapay zekâya hiç ulaşmadı",
+      "title_other": "{{count}} sonuç yapay zekâya hiç ulaşmadı",
+      "title": "{{count}} sonuç yapay zekâya hiç ulaşmadı",
       "desc": "Bu adımlar sayfa yeniden yüklenmeden önce uygulandı, ancak yapay zeka hiçbir zaman sonuçlar, dolayısıyla görev takılıp kalır. Bunları göndermek, işi yeniden yapmadan devam etmesine olanak tanır.",
       "descWrites": "Bu adımlar sayfa yeniden yüklenmeden önce gerçekleştirildi ve bunlardan bazıları verilerinizi değiştirdi; bu değişiklikler zaten kaydedildi. Yapay zeka sonuçları hiç görmedi, bu yüzden görev sıkıştı. Bunları göndermek, işi yeniden yapmadan devam edilmesini sağlar.",
       "send": "Gönder",
@@ -1419,9 +1448,9 @@
       "writeTitle": "Bu değişikliği onaylıyor musunuz?",
       "newChatTitle": "Yeni bir sohbet açılsın mı?",
       "run": "Çalıştır",
-      "runRest_one": "Bunu da çalıştır {{count}}",
-      "runRest_other": "Bu {{count}}'yi de çalıştırın",
-      "runRest": "Bu {{count}}'yi de çalıştırın",
+      "runRest_one": "Kalan {{count}} taneyi de çalıştır",
+      "runRest_other": "Kalan {{count}} taneyi de çalıştır",
+      "runRest": "Kalan {{count}} taneyi de çalıştır",
       "allTask": "Bu görevi bir daha isteme",
       "reject": "Reddet",
       "back": "Geri",
@@ -1523,9 +1552,9 @@
       "paywallWorkspaceDesc": "Ücretsiz plan, en fazla {{max}} dosya içeren 1 çalışma alanı içerir. Sınırsız erişim için yükseltme yapın.",
       "paywallBrowserDesc": "Sekmelerinizi ve yer işaretlerinizi okumak ücretsizdir. Değişikliklerin uygulanması için Güç Paketi gerekir; yükseltme yapın, ardından tekrar sorun ve aynı toplu işlemi onaylayın.",
       "paywallFeature": "Agent veritabanı yazar",
-      "steps_one": "{{count}} adım çalıştırma",
-      "steps_other": "{{count}} adım çalıştırma",
-      "steps": "{{count}} adım çalıştırma",
+      "steps_one": "{{count}} adım çalıştırıldı",
+      "steps_other": "{{count}} adım çalıştırıldı",
+      "steps": "{{count}} adım çalıştırıldı",
       "failed": "{{count}} başarısız oldu",
       "noSteps": "Hiçbir araç çalıştırılmadı.",
       "upgrade": "Planlara bakın",
@@ -1539,9 +1568,9 @@
       "title": "Aracının değişiklikleri geri alınsın mı?",
       "body": "Bu, {{tables}} öğesini görev başlatıldığındaki durumuna geri yükler. O zamandan bu yana yapılan diğer değişiklikler de geri alınacak.",
       "confirm": "Değişiklikleri geri al",
-      "done_one": "Geri alınan {{count}} satırı",
-      "done_other": "Geri alınan {{count}} satırları",
-      "done": "Geri alınan {{count}} satırları",
+      "done_one": "{{count}} satır geri alındı",
+      "done_other": "{{count}} satır geri alındı",
+      "done": "{{count}} satır geri alındı",
       "aiUnaware": "Yapay zekanın bundan haberi yok; görüşmeye devam etmeden önce söyleyin.",
       "reverted": "Değişiklikler geri alındı",
       "toastPrompt": "Aracı, verilerinizi değiştirdi.",
@@ -1627,7 +1656,7 @@
     },
     "mcp": {
       "builtin": {
-        "name": "Daha İyi Kenar Çubuğu",
+        "name": "Better Sidebar",
         "description": "Konuşmaları, verileri ve görevleri yönetmek için temel araçlar"
       },
       "tools": {
@@ -1685,7 +1714,7 @@
       }
     },
     "entry": {
-      "autoTitle": "Daha İyi Kenar Çubuğu Aracısı",
+      "autoTitle": "Better Sidebar Ajanı",
       "autoDescription": "Bir görevi tanımlayın ve temsilcinin doğruyu seçmesine izin verin araçlar"
     },
     "workspace": {
@@ -1741,7 +1770,7 @@
     },
     "agents": {
       "bettersidebar": {
-        "name": "Daha İyi Kenar Çubuğu",
+        "name": "Better Sidebar",
         "shortName": "Kenar Çubuğu",
         "description": "Konuşmaları, klasörleri, etiketleri, istemleri ve snippet'leri düzenleyin"
       },
@@ -1754,6 +1783,11 @@
         "name": "Tarayıcı Aracısı",
         "shortName": "Tarayıcı",
         "description": "Chrome sekmelerini, sekme gruplarını ve yer işaretlerini düzenleyin ve yönetin"
+      },
+      "web": {
+        "name": "Web Agent",
+        "shortName": "Web",
+        "description": "Yan panelde web sayfalarını sizin için okur ve kullanır"
       }
     },
     "switcher": {
@@ -1861,6 +1895,46 @@
         "open": {
           "label": "Sekmeleri aç",
           "text": "Şunun için sekmeleri aç: "
+        }
+      },
+      "web": {
+        "summarize": {
+          "label": "Bu sayfayı özetle",
+          "text": "Açık olan sayfayı özetle"
+        },
+        "extract": {
+          "label": "Tablo çıkar",
+          "text": "Bu sayfadaki tabloyu Markdown olarak çıkar"
+        },
+        "fill": {
+          "label": "Form doldur",
+          "text": "Bu sayfadaki formu şu bilgilerle doldur: "
+        },
+        "open": {
+          "label": "Bir site aç",
+          "text": "Şunu aç: "
+        }
+      }
+    },
+    "webPanel": {
+      "title": "Web sayfalarını yapay zekâ sizin için okusun ve kullansın",
+      "riskNotice": "Risk bildirimi ve izin",
+      "examples": {
+        "summarize": {
+          "label": "Bir sayfayı özetle",
+          "text": "Mevcut sekmemdeki makaleyi oku ve ana noktaları beş madde halinde ver; ayrıca iki kez kontrol etmem gereken iddiaları da belirt."
+        },
+        "extract": {
+          "label": "Sayfadan veri çek",
+          "text": "Açık olan sayfadaki ana tabloyu Markdown olarak çıkar. Sütun adlarını olduğu gibi bırak ve kesilmiş ya da sayfalara bölünmüş görünen satır varsa söyle."
+        },
+        "compare": {
+          "label": "Birkaç sayfayı karşılaştır",
+          "text": "Aşağıda listelediğim üç seçeneğin ürün sayfalarını aç, fiyat, özellikler ve iade politikasını yan yana karşılaştır ve hangisini neden seçeceğini söyle."
+        },
+        "fill": {
+          "label": "Form doldur",
+          "text": "Bu sayfadaki formu aşağıdaki bilgilerle doldur. Gönder düğmesinden önce dur ve kontrol edebilmem için ne girdiğini göster."
         }
       }
     },
@@ -2040,6 +2114,66 @@
       "about": "Çalışma alanı hakkında",
       "howToUseTitle": "Çalışma Alanı Nasıl Kullanılır",
       "howToUseContent": "Çalışma alanı, yapay zekanın doğrudan belgeleri ve kodları sıfırdan okuyabildiği, yazabildiği, düzenleyebildiği ve oluşturabildiği özel dosya ortamınızdır.\n\nNasıl kullanılır:\nAracıyı etkinleştirmek için sohbet girişine >Çalışma Alanı yazın. Mevcut dosyaları çalışma alanına sürükleyip bırakabilir veya yapay zekadan sıfırdan yeni dosyalar oluşturmasını isteyebilirsiniz (örneğin, sıfırdan bir ön uç projesi oluşturmak).\n\nDesteklenen Formatlar ve Yetenekler:\n- Düz Metin ve Kod (.html, .js, .ts, .py, .md, .txt, vb.): Sıfırdan oluşturma ve hassas düzenleme için tam destek! Yapay zekadan ön uç projesinin tamamını oluşturmasını, komut dosyaları yazmasını, Markdown notlarının taslağını oluşturmasını veya mevcut kodu yeniden düzenlemesini isteyin.\n- Word (.docx): Makaleleri bölüm bölüm inceleyin, takip edilen değişikliklerle paragrafları yeniden yazın ve inceleyen yorumları ekleyin (mevcut dosyaların yüklenmesini gerektirir).\n- Excel (.xlsx/.csv): Orijinal formatları veya grafikleri değiştirmeden verileri analiz edin, formüller yazın ve sütunlar ekleyin (mevcut dosyaların yüklenmesini gerektirir).\n- PDF: Makaleleri ve raporları okuyun, metin çıkarın, sayfaları birleştirin ve ek açıklamalar ekleyin.\n- PowerPoint (.pptx): Slayt içeriğini ve konuşmacı notlarını okuyun ve düzenleyin.\n- Altyazılar (.srt/.vtt): Zaman damgalarını korurken altyazıları çevirin ve cilalayın.\n\n💡 İpucu: Metin ve kod dosyaları sıfırdan oluşturulabilir ve serbestçe düzenlenebilir. Özel formatlar (Word, Excel, PPT, PDF) şu anda orijinal formatlarını korurken mevcut dosyaları okumaya, açıklama eklemeye ve hassas bir şekilde düzenlemeye odaklanmaktadır."
+    },
+    "web": {
+      "needsPowerPack": "⭐ Power Pack özelliği · daha fazla bilgi için tıklayın",
+      "needsConsent": "🔒 Önce risk bildirimini okuyun · açmak için tıklayın",
+      "needsConnector": "🔌 Web Agent Connector'ı kurun · açmak için tıklayın",
+      "handedOff": "Yan paneldeki Web Agent'a gönderildi",
+      "panelBusy": "Yan panel hâlâ bir görev çalıştırıyor. Önce bitirin veya durdurun.",
+      "addedWhileRunning": "Web Agent'a eklendi. Çalışan görev bunu page_list ile kullanabilir.",
+      "panelBlocked": "Chrome yan paneli açmadı.",
+      "openPanel": "Yan paneli aç",
+      "consent": {
+        "title": "Web Agent'ı kullanmadan önce",
+        "intro": "Web Agent, yapay zekânın web sayfalarını okumasına ve sizin yerinize kullanmasına olanak tanır: tarayıcınızda tıklama, yazma ve komut dosyası çalıştırma. Açmadan önce lütfen bunu okuyun.",
+        "risks": {
+          "actsAsYou": {
+            "title": "Sizin adınıza hareket eder",
+            "body": "Ajan, oturum açtığınız hesaplarla kendi tarayıcınızda çalışır. Yaptığı her şey (form göndermek, mesaj göndermek, sipariş vermek) sizin adınıza yapılır ve geri alınamayabilir."
+          },
+          "dataToAi": {
+            "title": "Sayfa içeriği yapay zekâya gider",
+            "body": "Ajanın bir sayfadan okuduğu her şey (metin, bağlantılar, form değerleri) Gemini sohbetinizin parçası olur ve Google'a gönderilir. Parola alanları asla okunmaz."
+          },
+          "injection": {
+            "title": "Web sayfaları onu kandırmaya çalışabilir",
+            "body": "Bir sayfa, yapay zekâ için yazılmış gizli talimatlar içerebilir (\"istem enjeksiyonu\"). Özellikle tanımadığınız sitelerde her işlemi onaylamadan önce kontrol edin."
+          },
+          "sensitive": {
+            "title": "Hassas sayfalardan uzak tutun",
+            "body": "Bankacılık, ödeme, sağlık veya hesap güvenliği sayfalarında ya da bir hatanın pahalıya patlayacağı her yerde kullanmayın."
+          },
+          "mistakes": {
+            "title": "Yapay zekâ hata yapar",
+            "body": "Yanlış yere tıklayabilir veya bir sayfayı yanlış okuyabilir. Her tıklamayı, her yazmayı ve her komut dosyasını siz onaylarsınız. Çalışırken bilgisayarın başında kalın."
+          },
+          "stop": {
+            "title": "Nasıl durdurulur",
+            "body": "Chrome, ajanın kontrol ettiği her sayfada \"bu tarayıcıda hata ayıklamaya başladı\" çubuğu gösterir. Bu çubukta İptal'e basın veya yan paneli kapatın; hemen durur."
+          },
+          "responsibility": {
+            "title": "Onayladıklarınızdan siz sorumlusunuz",
+            "body": "Kullandığınız web sitelerinin koşullarına uymak da buna dahildir. Better Sidebar olduğu gibi sunulur ve onayladığınız işlemlerin yol açtığı kayıplardan sorumlu değildir."
+          }
+        },
+        "permissionNote": "Ajan, sayfaları Chrome'un sayfa hata ayıklayıcısı aracılığıyla kullanır. Çalışırken Chrome bu sayfalarda bir hata ayıklama çubuğu gösterir.",
+        "checkbox": "Bu riskleri okudum ve anlıyorum",
+        "cancel": "Şimdi değil",
+        "agree": "Kabul ediyorum",
+        "connector": {
+          "title": "Web Agent Connector",
+          "missing": "Sayfaları kullanabilmek için Web Agent'ın küçük bir yardımcı uzantıya ihtiyacı var: Better Sidebar Web Agent Connector. Chrome'un sayfa hata ayıklayıcı iznini bu uzantı taşır, böylece Better Sidebar'ın kendisinin buna ihtiyacı olmaz; ayrıca yalnızca Better Sidebar'dan gelen istekleri kabul eder.",
+          "outdated": "Web Agent Connector'ınız güncel değil. Chrome Web Mağazası'ndan güncelleyin, sonra buraya dönün.",
+          "paused": "Web Agent Connector duraklatıldı. Chrome araç çubuğundaki simgesine tıklayıp yeniden açın.",
+          "install": "Chrome Web Mağazası'ndan yükle",
+          "update": "Chrome Web Mağazası'nda aç",
+          "comeBack": "Connector yüklendiğinde bu sayfa kendiliğinden güncellenir."
+        },
+        "accepted": "Bu bildirimi kabul ettiniz ve Web Agent açık. Onayı geri çekerseniz, tekrar kabul edene kadar kapanır.",
+        "withdraw": "Geri çek",
+        "done": "Bitti"
+      }
     }
   },
   "backup": {
