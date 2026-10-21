@@ -1,0 +1,6 @@
+Tool: built-in image_gen
+Source: image copy 3.png
+Output: controlled-tab-en.png
+Use case: text-localization
+Prompt: Replace only Chinese UI labels with English while preserving the screenshot composition, native styling and existing page content. Debugging notice: "Better Sidebar Web Agent Connector" started debugging this browser. Button: Cancel. Panel title: Better Sidebar: Gemini Folders & Search. Reddit tab: Reddit - The heart of the internet. Tab button: + All tabs. Preserve other controls, English text, colors and layout; no added framing or decorations.
+Review: English replacements are visible. This is an AI-edited promotional copy, not a pixel-identical screenshot; small text and icons may differ. Original screenshot is preserved. Not yet formatted to 1280x800.

@@ -1,0 +1,32 @@
+[
+  {
+    "file": "01-connector-1280x800.png",
+    "width": 1280,
+    "height": 800,
+    "alpha": false
+  },
+  {
+    "file": "02-web-agent-1280x800.png",
+    "width": 1280,
+    "height": 800,
+    "alpha": false
+  },
+  {
+    "file": "03-approval-1280x800.png",
+    "width": 1280,
+    "height": 800,
+    "alpha": false
+  },
+  {
+    "file": "04-risk-notice-1280x800.png",
+    "width": 1280,
+    "height": 800,
+    "alpha": false
+  },
+  {
+    "file": "05-small-promo-440x280.png",
+    "width": 440,
+    "height": 280,
+    "alpha": false
+  }
+]
