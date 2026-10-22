@@ -47,8 +47,14 @@ export const UpdateAvailableToast: React.FC = () => {
   if (!version) return null;
 
   const dismiss = () => {
-    browser.storage.local.set({ [DISMISSED_UPDATE_KEY]: version }).catch(() => {});
+    // Hide first: if another tab already applied the update, this script is orphaned
+    // and `browser.storage` throws synchronously ("Extension context invalidated").
     setVersion(null);
+    try {
+      browser.storage.local.set({ [DISMISSED_UPDATE_KEY]: version }).catch(() => {});
+    } catch {
+      // Orphaned context — the next page load runs the new version anyway.
+    }
   };
 
   const update = async () => {
