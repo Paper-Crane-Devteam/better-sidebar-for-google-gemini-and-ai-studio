@@ -7,6 +7,10 @@ import { snippetDragBus } from '../snippet-drag-bus';
 import type { SnippetFolder } from '@/shared/types/db';
 import { useShallow } from 'zustand/react/shallow';
 
+/** Below this the sidebar is treated as collapsed. */
+const MIN_DRAWER_WIDTH = 200;
+const COLLAPSED_FALLBACK_WIDTH = 300;
+
 interface FolderNodeProps {
   folder: SnippetFolder;
   children: SnippetFolder[];
@@ -111,10 +115,17 @@ export const SnippetDragDrawer = () => {
         getComputedStyle(sidebar).getPropertyValue('--bard-sidenav-open-width').trim() || '360px';
       left = sidebar.getBoundingClientRect().left;
     } else {
-      // AI Studio: use the wrapper's actual width
+      // AI Studio: use the wrapper's actual width. When the sidebar is
+      // collapsed the wrapper is 0px wide, which would make the drawer
+      // invisible — fall back to a fixed width pinned to the left edge.
       const rect = sidebar.getBoundingClientRect();
-      openWidth = `${rect.width}px`;
-      left = rect.left;
+      if (rect.width >= MIN_DRAWER_WIDTH) {
+        openWidth = `${rect.width}px`;
+        left = rect.left;
+      } else {
+        openWidth = `${COLLAPSED_FALLBACK_WIDTH}px`;
+        left = 0;
+      }
     }
   }
 

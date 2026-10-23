@@ -52,13 +52,15 @@ export const SaveSnippetFeature = () => {
         }
 
         // Create shadow DOM host for the button.
-        // Placed inside the turn at the right end of the author-label row
-        // (which is otherwise empty) so it never gets clipped by the scroll
-        // container when the chat column is narrow.
+        // Placed inside the turn at the top-left (close to the sidebar, so the
+        // hold-to-drag path stays short). Inside, not in the left gutter: the
+        // gutter disappears when the chat column is narrow and the button got
+        // clipped by the scroll container. Turns with an author label have an
+        // empty ~29px band above it, which fits the 28px button.
         const host = document.createElement('div');
         host.className = 'bs-snippet-btn-host';
         host.style.cssText =
-          'position:absolute;top:24px;right:12px;z-index:10;opacity:0;transition:opacity 0.15s;';
+          'position:absolute;top:0;left:12px;z-index:10;opacity:0;transition:opacity 0.15s;';
 
         const shadow = host.attachShadow({ mode: 'open' });
         applyShadowStyles(shadow, mainStyles);
