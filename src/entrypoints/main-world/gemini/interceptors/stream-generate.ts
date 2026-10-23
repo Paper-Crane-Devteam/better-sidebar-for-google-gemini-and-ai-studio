@@ -20,8 +20,12 @@ const DISPATCH_INTERVAL_MS = 100;
 
 let streamCounter = 0;
 
+/**
+ * The real path is `/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate`
+ * — the service name is dot-qualified, so don't anchor on a `/` before it.
+ */
 export function isStreamGenerateUrl(url: string | undefined): boolean {
-  return !!url && url.includes('/BardFrontendService/StreamGenerate');
+  return !!url && url.includes('BardFrontendService/StreamGenerate');
 }
 
 export interface StreamGenerateObserver {

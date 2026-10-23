@@ -15,6 +15,7 @@
  * inner[0][0]   the prompt
  * inner[2]      [c_<conversationId>, r_…?, rc_…?, …] — absent/empty for a new chat.
  *               rc_ names the reply being regenerated, when there is one.
+ *               Moved to inner[71] in 20261021 (inner[2] null there).
  * inner[19]     "notebooks/<uuid>" inside a notebook
  * ```
  *
@@ -42,6 +43,20 @@ export interface StreamGenerateRequest {
   notebookId: string | null;
 }
 
+const isConversationContext = (v: unknown): v is unknown[] =>
+  Array.isArray(v) && typeof v[0] === 'string' && v[0].startsWith('c_');
+
+/**
+ * `[c_<id>, r_…?, rc_…?, …]`. It sat at inner[2] up to the 20261020 build and moved
+ * to inner[71] in 20261021 (inner[2] is now null). Known slots first, then any
+ * top-level array shaped like it, so the next move doesn't silently turn every turn
+ * into a "new chat".
+ */
+function findConversationContext(inner: unknown[]): unknown[] | null {
+  for (const v of [inner[2], inner[71]]) if (isConversationContext(v)) return v;
+  return (inner.find(isConversationContext) as unknown[] | undefined) ?? null;
+}
+
 /** Reads the `f.req` body. Never throws; fields it cannot find stay empty. */
 export function parseStreamGenerateRequest(body: unknown): StreamGenerateRequest {
   const out: StreamGenerateRequest = {
@@ -58,14 +73,17 @@ export function parseStreamGenerateRequest(body: unknown): StreamGenerateRequest
 
     if (typeof inner[0]?.[0] === 'string') out.prompt = inner[0][0];
 
-    const ctx = inner[2];
-    if (Array.isArray(ctx)) {
-      if (typeof ctx[0] === 'string') out.conversationId = ctx[0].replace(/^c_/, '');
+    const ctx = findConversationContext(inner);
+    if (ctx) {
+      out.conversationId = (ctx[0] as string).replace(/^c_/, '');
       if (typeof ctx[2] === 'string' && ctx[2].startsWith('rc_')) out.previousModelResponseId = ctx[2];
     }
 
-    const nb = inner[19];
-    if (typeof nb === 'string' && nb.startsWith('notebooks/')) out.notebookId = nb.slice('notebooks/'.length);
+    const nb =
+      typeof inner[19] === 'string' && inner[19].startsWith('notebooks/')
+        ? inner[19]
+        : inner.find((v) => typeof v === 'string' && v.startsWith('notebooks/'));
+    if (typeof nb === 'string') out.notebookId = nb.slice('notebooks/'.length);
   } catch {
     // Malformed body: return what we have.
   }
