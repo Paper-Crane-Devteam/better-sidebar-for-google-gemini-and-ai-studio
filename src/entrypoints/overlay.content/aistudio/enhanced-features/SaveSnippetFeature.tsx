@@ -41,7 +41,13 @@ export const SaveSnippetFeature = () => {
 
       modelTurns.forEach((turn) => {
         const hasModelContainer = turn.querySelector('.model-prompt-container');
-        const hasTextChunk = turn.querySelector('ms-text-chunk');
+        // Thinking models render the thoughts as a separate turn whose only
+        // ms-text-chunk lives inside ms-thought-chunk. extractSnippetData skips
+        // thoughts, so such a turn yields nothing — don't give it a button.
+        // Not marked as processed, so it's re-checked if real content arrives.
+        const hasTextChunk = Array.from(turn.querySelectorAll('ms-text-chunk')).some(
+          (chunk) => !chunk.closest('ms-thought-chunk'),
+        );
         if (!hasModelContainer || !hasTextChunk) return;
 
         turn.setAttribute(PROCESSED_ATTR, 'true');
