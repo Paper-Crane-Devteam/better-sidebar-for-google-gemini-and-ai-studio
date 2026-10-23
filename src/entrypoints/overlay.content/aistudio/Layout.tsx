@@ -92,6 +92,7 @@ export async function initAiStudioOverlay(mainStyles: string): Promise<void> {
   const updateSidebarWidth = (widthPx: number) => {
     sidebarStyle.textContent = `
       #better-sidebar-for-google-ai-studio-sidebar-wrapper {
+        --better-sidebar-panel-width: ${widthPx}px;
         height: 100%;
         width: ${widthPx}px;
         flex-shrink: 0;
@@ -179,6 +180,17 @@ export async function initAiStudioOverlay(mainStyles: string): Promise<void> {
   const rootContainer = document.createElement('div');
   rootContainer.classList.add('shadow-body');
   rootContainer.classList.add('theme-aistudio');
+  /*
+    Pin the panel to the open width instead of `.shadow-body`'s 100%. The
+    wrapper animates its width on collapse/expand and clips with
+    overflow:hidden, so the panel just slides out of view. Tracking the
+    wrapper's width would re-layout the whole tree on every animation frame
+    and fire the folder tree's ResizeObserver, re-rendering react-arborist
+    each frame — that was most of the stutter on our side. The custom
+    property is set on the wrapper (see updateSidebarWidth) and inherits
+    through the shadow boundary.
+  */
+  rootContainer.style.width = 'var(--better-sidebar-panel-width, 100%)';
 
   const syncTheme = () => {
     const isDark = document.body.classList.contains('dark-theme');
