@@ -11,6 +11,9 @@ import { ShadowRootProvider } from '@/shared/components/ShadowRootContext';
 import { snippetDragBus } from '@/entrypoints/overlay.content/shared/modules/snippets/snippet-drag-bus';
 
 const PROCESSED_ATTR = 'data-bs-snippet-processed';
+const CHAT_CONTAINER_SELECTOR = 'ms-autoscroll-container';
+/** Space needed to the left of the turn for the out-of-turn button (36px offset). */
+const GUTTER_REQUIRED_PX = 36;
 
 /**
  * SaveSnippetFeature for AI Studio — injects a shadow-DOM "save snippet" button
@@ -101,8 +104,30 @@ export const SaveSnippetFeature = () => {
           </ShadowRootProvider>,
         );
 
+        // The button normally sits in the left gutter outside the turn. When the
+        // chat column is narrow (e.g. sidebar expanded), the centered content
+        // loses its side margin and the gutter gets clipped by the scroll
+        // container's overflow — fall back to the empty right end of the
+        // author-label row inside the turn.
+        const positionHost = () => {
+          const clip = turnEl.closest(CHAT_CONTAINER_SELECTOR) ?? turnEl.parentElement;
+          const gutter = clip
+            ? turnEl.getBoundingClientRect().left - clip.getBoundingClientRect().left
+            : 0;
+          if (gutter >= GUTTER_REQUIRED_PX) {
+            host.style.left = '-36px';
+            host.style.right = 'auto';
+            host.style.top = '8px';
+          } else {
+            host.style.left = 'auto';
+            host.style.right = '12px';
+            host.style.top = '24px';
+          }
+        };
+
         // Show/hide on turn hover
         turnEl.addEventListener('mouseenter', () => {
+          positionHost();
           host.style.opacity = '1';
         });
         turnEl.addEventListener('mouseleave', () => {
@@ -258,7 +283,6 @@ export const SaveSnippetFeature = () => {
     });
 
     // Observe the chat container (ms-autoscroll-container or body)
-    const CHAT_CONTAINER_SELECTOR = 'ms-autoscroll-container';
     let currentContainer: Element | null = null;
 
     const startObserving = () => {
