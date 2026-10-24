@@ -506,15 +506,20 @@ function PurchaseView({
             />
             <FeatureItem
               icon={<UIcon icon="fluent-color:bot-sparkle-24" width={14} height={14} />}
-              text={t('packs.ppFeatureAgent')}
+              text={t('packs.ppFeatureSidebarAgent')}
             />
             <FeatureItem
-              icon={<UIcon icon="fluent-color:database-24" width={14} height={14} />}
-              text={t('packs.ppFeatureWrite')}
+              icon={<UIcon icon="fluent-color:document-folder-24" width={14} height={14} />}
+              text={t('packs.ppFeatureWorkspaceAgent')}
             />
             <FeatureItem
-              icon={<UIcon icon="fluent-color:history-24" width={14} height={14} />}
-              text={t('packs.ppFeatureHistory')}
+              icon={<UIcon icon="fluent-color:apps-24" width={14} height={14} />}
+              text={t('packs.ppFeatureBrowserAgent')}
+            />
+            <FeatureItem
+              icon={<UIcon icon="fluent-color:globe-24" width={14} height={14} />}
+              text={t('packs.ppFeatureWebAgent')}
+              badge={t('packs.chromeOnly')}
             />
             <FeatureItem
               icon={<UIcon icon="fluent-color:share-android-24" width={14} height={14} />}

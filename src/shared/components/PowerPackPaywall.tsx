@@ -16,12 +16,13 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { cn } from '@/shared/lib/utils/utils';
 import { Z_INDEX } from '@/shared/lib/z-index';
 
-const FEATURES = [
-  { icon: 'fluent-color:bot-sparkle-24', key: 'ppFeatureAgent' },
-  { icon: 'fluent-color:database-24', key: 'ppFeatureWrite' },
-  { icon: 'fluent-color:history-24', key: 'ppFeatureHistory' },
+const FEATURES: ReadonlyArray<{ icon: string; key: string; badge?: string }> = [
+  { icon: 'fluent-color:bot-sparkle-24', key: 'ppFeatureSidebarAgent' },
+  { icon: 'fluent-color:document-folder-24', key: 'ppFeatureWorkspaceAgent' },
+  { icon: 'fluent-color:apps-24', key: 'ppFeatureBrowserAgent' },
+  { icon: 'fluent-color:globe-24', key: 'ppFeatureWebAgent', badge: 'chromeOnly' },
   { icon: 'fluent-color:share-android-24', key: 'ppFeatureExport' },
-] as const;
+];
 
 export const PowerPackPaywall = () => {
   const { isOpen, featureName, close } = usePaywallStore();
@@ -106,12 +107,17 @@ export const PowerPackPaywall = () => {
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               {t('paywall.includedFeatures')}
             </p>
-            {FEATURES.map(({ icon: iconName, key }) => (
+            {FEATURES.map(({ icon: iconName, key, badge }) => (
               <div key={key} className="flex items-center gap-2">
                 <div className="h-6 w-6 rounded-md bg-violet-500/10 flex items-center justify-center shrink-0">
                   <UIcon icon={iconName} width={14} height={14} />
                 </div>
                 <span className="text-sm">{t(`packs.${key}`)}</span>
+                {badge && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-violet-500/15 text-violet-600 dark:text-violet-300 whitespace-nowrap">
+                    {t(`packs.${badge}`)}
+                  </span>
+                )}
               </div>
             ))}
           </div>
