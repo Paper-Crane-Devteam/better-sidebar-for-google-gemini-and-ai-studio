@@ -1241,7 +1241,23 @@
     "rejectedTitle": "Questa licenza non è più attiva",
     "rejectedRevoked": "La licenza è stata revocata, solitamente dopo un rimborso o uno storno di addebito. Contatta l'assistenza se ritieni che sia sbagliato.",
     "rejectedMaxDevices": "Tutti gli slot di attivazione sono in uso e questo non è più tra questi. Rilascia uno slot da un altro profilo del browser o contatta l'assistenza.",
-    "rejectedGeneric": "Il server delle licenze non riconosce più questo token. Contatta l'assistenza se ritieni che sia sbagliato."
+    "rejectedGeneric": "Il server delle licenze non riconosce più questo token. Contatta l'assistenza se ritieni che sia sbagliato.",
+    "trialEndedTitle": "Il tuo codice di prova è scaduto",
+    "rejectedTrialExpired": "Il periodo di prova di questo codice è terminato. Ottieni Power Pack per continuare a usare Web Agent e tutte le altre funzioni di Power Pack.",
+    "codeExpired": "Questo codice di prova è scaduto.",
+    "codeAlreadyUsed": "Questo codice è già stato riscattato. Ogni codice di prova vale per una sola persona."
+  },
+  "trial": {
+    "bannerTitle": "Prova di Power Pack attiva",
+    "bannerDesc": "Tutte le funzioni di Power Pack, incluso Web Agent, sono sbloccate per 3 giorni. Hai un codice di prova? Attivalo ora o al termine di questa prova.",
+    "activeUntil": "Attivo fino al",
+    "codeTierLabel": "Prova di Power Pack",
+    "endedTitle": "La tua prova di Power Pack è terminata",
+    "endedDesc": "Grazie per averlo provato. Com'è andata?",
+    "feedback": "Lascia un feedback",
+    "feedbackHint": "Un breve modulo. Ci aiuta a decidere cosa sistemare e cosa sviluppare dopo.",
+    "buy": "Ottieni Power Pack",
+    "close": "Chiudi"
   },
   "hotkeys": {
     "title": "Scorciatoie da tastiera",

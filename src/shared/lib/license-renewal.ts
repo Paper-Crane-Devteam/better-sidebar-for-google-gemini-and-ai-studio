@@ -125,7 +125,7 @@ async function runRenewal({ force = false }: { force?: boolean }): Promise<void>
     if (result.success) {
       useLicenseStore
         .getState()
-        .markRenewed(result.signedPayload, result.expiresAt, result.tier);
+        .markRenewed(result.signedPayload, result.expiresAt, result.tier, result.endsAt);
       console.log('[License] Renewed until', new Date(result.expiresAt).toISOString());
       return;
     }

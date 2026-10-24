@@ -60,6 +60,11 @@ export default defineContentScript({
     );
     scheduleRenewalCheckFromPage();
 
+    // The 3-day Power Pack trial starts the first time an overlay runs this
+    // version, for new and existing installs alike. Non-blocking.
+    const { ensureLocalTrialStarted } = await import('@/shared/lib/trial-store');
+    void ensureLocalTrialStarted();
+
     switch (platform) {
       case Platform.AI_STUDIO: {
         const { initAiStudioOverlay } = await import('./aistudio/Layout');

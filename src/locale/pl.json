@@ -1241,7 +1241,23 @@
     "rejectedTitle": "Ta licencja nie jest już aktywna",
     "rejectedRevoked": "Licencja została unieważniona, zwykle po zwrocie środków lub obciążeniu zwrotnym. Jeśli uważasz, że jest to nieprawidłowe, skontaktuj się z pomocą techniczną.",
     "rejectedMaxDevices": "Wszystkie miejsca aktywacji są zajęte, a tego już nie ma. Zwolnij miejsce w innym profilu przeglądarki lub skontaktuj się z pomocą techniczną.",
-    "rejectedGeneric": "Serwer licencji nie rozpoznaje już tego tokena. Jeśli uważasz, że jest to nieprawidłowe, skontaktuj się z pomocą techniczną."
+    "rejectedGeneric": "Serwer licencji nie rozpoznaje już tego tokena. Jeśli uważasz, że jest to nieprawidłowe, skontaktuj się z pomocą techniczną.",
+    "trialEndedTitle": "Twój kod próbny wygasł",
+    "rejectedTrialExpired": "Okres próbny tego kodu dobiegł końca. Kup Power Pack, aby dalej korzystać z Web Agent i wszystkich innych funkcji Power Pack.",
+    "codeExpired": "Ten kod próbny wygasł.",
+    "codeAlreadyUsed": "Ten kod został już wykorzystany. Każdy kod próbny działa tylko dla jednej osoby."
+  },
+  "trial": {
+    "bannerTitle": "Okres próbny Power Pack aktywny",
+    "bannerDesc": "Wszystkie funkcje Power Pack, w tym Web Agent, są odblokowane na 3 dni. Masz kod próbny? Aktywuj go teraz albo po zakończeniu tego okresu.",
+    "activeUntil": "Aktywny do",
+    "codeTierLabel": "Próbny Power Pack",
+    "endedTitle": "Okres próbny Power Pack dobiegł końca",
+    "endedDesc": "Dzięki za wypróbowanie. Jak wrażenia?",
+    "feedback": "Prześlij opinię",
+    "feedbackHint": "Krótki formularz. Pomaga nam zdecydować, co poprawić i co zbudować dalej.",
+    "buy": "Kup Power Pack",
+    "close": "Zamknij"
   },
   "hotkeys": {
     "title": "Skróty klawiaturowe",

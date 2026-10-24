@@ -1241,7 +1241,23 @@
     "rejectedTitle": "This license is no longer active",
     "rejectedRevoked": "The license was revoked, usually after a refund or a chargeback. Contact support if you think this is wrong.",
     "rejectedMaxDevices": "All activation slots are in use and this one is no longer among them. Release a slot from another browser profile, or contact support.",
-    "rejectedGeneric": "The license server no longer recognises this token. Contact support if you think this is wrong."
+    "rejectedGeneric": "The license server no longer recognises this token. Contact support if you think this is wrong.",
+    "trialEndedTitle": "Your trial code has ended",
+    "rejectedTrialExpired": "The trial period for this code is over. Get Power Pack to keep using the Web Agent and every other Power Pack feature.",
+    "codeExpired": "This trial code has expired.",
+    "codeAlreadyUsed": "This code has already been redeemed. Each trial code works for one person only."
+  },
+  "trial": {
+    "bannerTitle": "Power Pack trial active",
+    "bannerDesc": "Every Power Pack feature, including the Web Agent, is unlocked for 3 days. Got a trial code? Activate it now or once this trial ends.",
+    "activeUntil": "Active until",
+    "codeTierLabel": "Power Pack trial",
+    "endedTitle": "Your Power Pack trial has ended",
+    "endedDesc": "Thanks for trying it out. How did it go?",
+    "feedback": "Share feedback",
+    "feedbackHint": "A short form. It tells us what to fix and build next.",
+    "buy": "Get Power Pack",
+    "close": "Close"
   },
   "hotkeys": {
     "title": "Keyboard Shortcuts",

@@ -1241,7 +1241,23 @@
     "rejectedTitle": "Cette licence n'est plus active",
     "rejectedRevoked": "La licence a été révoquée, généralement après un remboursement ou une rétrofacturation. Contactez le support si vous pensez que c'est faux.",
     "rejectedMaxDevices": "Tous les emplacements d'activation sont utilisés et celui-ci n'en fait plus partie. Libérez un emplacement depuis un autre profil de navigateur ou contactez le support.",
-    "rejectedGeneric": "Le serveur de licences ne reconnaît plus ce token. Contactez l'assistance si vous pensez que c'est une erreur."
+    "rejectedGeneric": "Le serveur de licences ne reconnaît plus ce token. Contactez l'assistance si vous pensez que c'est une erreur.",
+    "trialEndedTitle": "Votre code d'essai a expiré",
+    "rejectedTrialExpired": "La période d'essai de ce code est terminée. Obtenez Power Pack pour continuer à utiliser Web Agent et toutes les autres fonctionnalités Power Pack.",
+    "codeExpired": "Ce code d'essai a expiré.",
+    "codeAlreadyUsed": "Ce code a déjà été utilisé. Chaque code d'essai ne vaut que pour une seule personne."
+  },
+  "trial": {
+    "bannerTitle": "Essai Power Pack actif",
+    "bannerDesc": "Toutes les fonctionnalités Power Pack, y compris Web Agent, sont débloquées pendant 3 jours. Vous avez un code d'essai ? Activez-le maintenant ou à la fin de cet essai.",
+    "activeUntil": "Actif jusqu'au",
+    "codeTierLabel": "Essai Power Pack",
+    "endedTitle": "Votre essai Power Pack est terminé",
+    "endedDesc": "Merci de l'avoir essayé. Qu'en avez-vous pensé ?",
+    "feedback": "Donner mon avis",
+    "feedbackHint": "Un court formulaire. Il nous aide à choisir quoi corriger et construire ensuite.",
+    "buy": "Obtenir Power Pack",
+    "close": "Fermer"
   },
   "hotkeys": {
     "title": "Raccourcis clavier",

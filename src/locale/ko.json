@@ -1241,7 +1241,23 @@
     "rejectedTitle": "이 라이선스가 더 이상 활성화되지 않을 때까지 활성 상태를 유지합니다.",
     "rejectedRevoked": "일반적으로 환불 또는 지불 거절 후 라이선스가 취소됩니다. 이것이 잘못되었다고 생각되면 지원팀에 문의하세요.",
     "rejectedMaxDevices": "모든 활성화 슬롯이 사용 중이며 이 슬롯은 더 이상 그 중 하나가 아닙니다. 다른 브라우저 프로필에서 슬롯을 해제하거나 지원팀에 문의하세요.",
-    "rejectedGeneric": "라이선스 서버는 더 이상 이 토큰을 인식하지 않습니다. 이것이 잘못되었다고 생각되면 지원팀에 문의하세요."
+    "rejectedGeneric": "라이선스 서버는 더 이상 이 토큰을 인식하지 않습니다. 이것이 잘못되었다고 생각되면 지원팀에 문의하세요.",
+    "trialEndedTitle": "체험 코드 기간이 끝났습니다",
+    "rejectedTrialExpired": "이 코드의 체험 기간이 끝났습니다. Web Agent를 비롯한 모든 Power Pack 기능을 계속 사용하려면 Power Pack을 구매하세요.",
+    "codeExpired": "이 체험 코드는 만료되었습니다.",
+    "codeAlreadyUsed": "이미 사용된 코드입니다. 체험 코드는 한 사람만 사용할 수 있습니다."
+  },
+  "trial": {
+    "bannerTitle": "Power Pack 체험 중",
+    "bannerDesc": "Web Agent를 포함한 모든 Power Pack 기능이 3일 동안 열립니다. 체험 코드가 있다면 지금 활성화하거나 이번 체험이 끝난 뒤 활성화하세요.",
+    "activeUntil": "유효 기간:",
+    "codeTierLabel": "Power Pack 체험",
+    "endedTitle": "Power Pack 체험이 끝났습니다",
+    "endedDesc": "체험해 주셔서 감사합니다. 사용해 보니 어떠셨나요?",
+    "feedback": "피드백 보내기",
+    "feedbackHint": "짧은 설문입니다. 다음에 무엇을 고치고 만들지 정하는 데 도움이 됩니다.",
+    "buy": "Power Pack 구매",
+    "close": "닫기"
   },
   "hotkeys": {
     "title": "키보드 단축키",

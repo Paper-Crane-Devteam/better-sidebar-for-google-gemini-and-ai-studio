@@ -17,8 +17,10 @@ import {
   useLicenseStore,
   isLicenseValid,
   isLicenseInGracePeriod,
+  hasLicensePowerPack,
   type LicenseTier,
 } from '@/shared/lib/license-store';
+import { useTrialStore, localTrialEndsAt } from '@/shared/lib/trial-store';
 import {
   activateLicense,
   identifyTokenSource,
@@ -33,6 +35,10 @@ export const SupportPackSettings = () => {
   const licenseState = useLicenseStore();
   const hasLicense = isLicenseValid(licenseState);
   const inGracePeriod = isLicenseInGracePeriod(licenseState);
+  const localTrialEnd = useTrialStore((s) => localTrialEndsAt(s));
+  // Only worth mentioning when the license itself doesn't already cover it.
+  const showLocalTrial =
+    !!localTrialEnd && Date.now() < localTrialEnd && !hasLicensePowerPack(licenseState);
   // Set only by a successful activation in this panel, so renewals and other tabs
   // syncing the license never set off the fireworks.
   const [celebrating, setCelebrating] = useState(false);
@@ -59,6 +65,8 @@ export const SupportPackSettings = () => {
         <Separator />
       </div>
 
+      {showLocalTrial && localTrialEnd && <LocalTrialBanner t={t} endsAt={localTrialEnd} />}
+
       {hasLicense ? (
         <ActivatedView
           t={t}
@@ -72,6 +80,24 @@ export const SupportPackSettings = () => {
     </div>
   );
 };
+
+/** The 3-day install trial is running: say so, and until when. */
+function LocalTrialBanner({ t, endsAt }: { t: (key: string) => string; endsAt: number }) {
+  return (
+    <div className="rounded-xl bg-violet-500/10 p-4">
+      <div className="flex items-start gap-3">
+        <UIcon icon="fluent-color:premium-24" width={20} height={20} className="shrink-0 mt-0.5" />
+        <div className="space-y-1">
+          <p className="text-sm font-medium">{t('trial.bannerTitle')}</p>
+          <p className="text-xs text-muted-foreground">{t('trial.bannerDesc')}</p>
+          <p className="text-xs text-muted-foreground">
+            {t('trial.activeUntil')} {new Date(endsAt).toLocaleString()}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /**
  * Banner shown while the license is only alive thanks to the grace window, i.e.
@@ -131,11 +157,17 @@ function RenewalWarning({ t }: { t: (key: string) => string }) {
  * the sales page would just look like a bug.
  */
 function RenewalRejected({ t }: { t: (key: string) => string }) {
-  const { lastRenewError, token, deactivate } = useLicenseStore();
+  const { lastRenewError, token, endsAt, deactivate } = useLicenseStore();
   const [retrying, setRetrying] = useState(false);
 
-  const reasonKey =
-    lastRenewError === 'license_revoked'
+  // A time-limited code past its end reads as "ended", not "revoked", even
+  // before the next renewal has confirmed it with the server.
+  const trialEnded =
+    lastRenewError === 'trial_expired' || (!!endsAt && Date.now() >= endsAt);
+
+  const reasonKey = trialEnded
+    ? 'supportPack.rejectedTrialExpired'
+    : lastRenewError === 'license_revoked'
       ? 'supportPack.rejectedRevoked'
       : lastRenewError === 'max_devices_reached'
         ? 'supportPack.rejectedMaxDevices'
@@ -152,7 +184,9 @@ function RenewalRejected({ t }: { t: (key: string) => string }) {
       <div className="flex items-start gap-2">
         <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
         <div className="space-y-1">
-          <p className="text-sm font-medium">{t('supportPack.rejectedTitle')}</p>
+          <p className="text-sm font-medium">
+            {t(trialEnded ? 'supportPack.trialEndedTitle' : 'supportPack.rejectedTitle')}
+          </p>
           <p className="text-xs text-muted-foreground">{t(reasonKey)}</p>
           {token && (
             <p className="text-xs font-mono text-muted-foreground">
@@ -170,20 +204,23 @@ function RenewalRejected({ t }: { t: (key: string) => string }) {
         >
           {t('supportPack.dismiss')}
         </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          className="h-7 text-xs gap-1.5"
-          onClick={handleRetry}
-          disabled={retrying}
-        >
-          {retrying ? (
-            <Loader2 className="h-3 w-3 animate-spin" />
-          ) : (
-            <RefreshCw className="h-3 w-3" />
-          )}
-          {t('supportPack.retryNow')}
-        </Button>
+        {/* Retrying an ended trial code can't bring it back. */}
+        {!trialEnded && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 text-xs gap-1.5"
+            onClick={handleRetry}
+            disabled={retrying}
+          >
+            {retrying ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : (
+              <RefreshCw className="h-3 w-3" />
+            )}
+            {t('supportPack.retryNow')}
+          </Button>
+        )}
       </div>
     </div>
   );
@@ -202,8 +239,11 @@ function ActivatedView({
   justActivated?: boolean;
 }) {
   const token = useLicenseStore((s) => s.token);
+  const endsAt = useLicenseStore((s) => s.endsAt);
 
-  const tierLabel = tier === 'pro' ? 'Pro' : tier === 'power_pack' ? 'Power Pack' : 'Support Pack';
+  const tierLabel = endsAt
+    ? t('trial.codeTierLabel')
+    : tier === 'pro' ? 'Pro' : tier === 'power_pack' ? 'Power Pack' : 'Support Pack';
   const isPowerOrPro = tier === 'power_pack' || tier === 'pro';
 
   return (
@@ -235,6 +275,11 @@ function ActivatedView({
             <p className="text-xs text-muted-foreground">
               {token?.slice(0, 12)}...
             </p>
+            {endsAt && (
+              <p className="text-xs text-muted-foreground">
+                {t('trial.activeUntil')} {new Date(endsAt).toLocaleString()}
+              </p>
+            )}
           </div>
         </div>
         <p className="text-sm text-muted-foreground">
@@ -381,7 +426,10 @@ function PurchaseView({
   const links = getPurchaseLinks();
   // A leftover token means a previously working license was rejected on renewal,
   // rather than this being a first-time visitor.
-  const wasRejected = useLicenseStore((s) => !!s.token && !!s.lastRenewError);
+  // A time-limited code past its end counts too, before renewal confirms it.
+  const wasRejected = useLicenseStore(
+    (s) => !!s.token && (!!s.lastRenewError || (!!s.endsAt && Date.now() >= s.endsAt)),
+  );
 
   return (
     <div className="space-y-6">
@@ -571,7 +619,7 @@ function ActivationInput({
     setLoading(false);
 
     if (result.success) {
-      activate(trimmed, result.signedPayload, result.expiresAt, result.tier);
+      activate(trimmed, result.signedPayload, result.expiresAt, result.tier, result.endsAt);
       setSuccess(true);
       setInputToken('');
       onActivated();
@@ -579,9 +627,13 @@ function ActivationInput({
       const errorMsg =
         result.error === 'network_error'
           ? t('supportPack.networkError')
-          : result.error === 'max_devices_reached'
-            ? t('supportPack.maxDevices')
-            : t('supportPack.activationFailed');
+          : result.error === 'trial_expired'
+            ? t('supportPack.codeExpired')
+            : result.error === 'code_already_used'
+              ? t('supportPack.codeAlreadyUsed')
+              : result.error === 'max_devices_reached'
+                ? t('supportPack.maxDevices')
+                : t('supportPack.activationFailed');
       setError(errorMsg);
     }
   };

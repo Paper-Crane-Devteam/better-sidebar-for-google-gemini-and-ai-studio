@@ -44,6 +44,7 @@ import { Lock, SlidersHorizontal } from 'lucide-react';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useAppStore } from '@/shared/lib/store';
 import { useLicenseStore } from '@/shared/lib/license-store';
+import { useTrialStore, isLocalTrialActive } from '@/shared/lib/trial-store';
 import { DestinationRow } from './DestinationRow';
 import { LauncherCta } from './LauncherCta';
 import { LauncherExamples } from './LauncherExamples';
@@ -54,7 +55,9 @@ export const AgentLauncher: React.FC = () => {
   const { t } = useI18n();
   const setSettingsOpen = useAppStore((s) => s.setSettingsOpen);
   const tier = useLicenseStore((s) => s.tier);
-  const canWrite = tier === 'power_pack' || tier === 'pro' || tier === 'support_pack';
+  const inLocalTrial = useTrialStore((s) => isLocalTrialActive(s));
+  const canWrite =
+    tier === 'power_pack' || tier === 'pro' || tier === 'support_pack' || inLocalTrial;
 
   /**
    * This panel belongs to the Better Sidebar agent specifically.

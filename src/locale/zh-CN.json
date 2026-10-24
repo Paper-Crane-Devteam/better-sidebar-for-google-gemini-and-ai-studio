@@ -1241,7 +1241,23 @@
     "rejectedTitle": "这个授权已失效",
     "rejectedRevoked": "授权已被撤销，通常发生在退款或支付被撤回之后。如果你觉得有误，请联系我们。",
     "rejectedMaxDevices": "激活名额都被占满了，而这一个已经不在名单里。可以到别的浏览器配置里释放一个名额，或者联系我们。",
-    "rejectedGeneric": "授权服务器不再认可这个激活码。如果你觉得有误，请联系我们。"
+    "rejectedGeneric": "授权服务器不再认可这个激活码。如果你觉得有误，请联系我们。",
+    "trialEndedTitle": "你的试用码已到期",
+    "rejectedTrialExpired": "这个试用码的试用期已结束。购买 Power Pack 即可继续使用 Web Agent 及所有 Power Pack 功能。",
+    "codeExpired": "这个试用码已过期。",
+    "codeAlreadyUsed": "这个码已经被使用过了。每个试用码只能一个人使用。"
+  },
+  "trial": {
+    "bannerTitle": "Power Pack 试用中",
+    "bannerDesc": "3 天内可使用全部 Power Pack 功能，包括 Web Agent。有试用码？现在激活或等这次试用结束后再激活都可以。",
+    "activeUntil": "有效期至",
+    "codeTierLabel": "Power Pack 试用",
+    "endedTitle": "Power Pack 试用已结束",
+    "endedDesc": "感谢试用，用得怎么样？",
+    "feedback": "填写反馈",
+    "feedbackHint": "一份简短的问卷，帮我们决定接下来修什么、做什么。",
+    "buy": "购买 Power Pack",
+    "close": "关闭"
   },
   "hotkeys": {
     "title": "快捷键",

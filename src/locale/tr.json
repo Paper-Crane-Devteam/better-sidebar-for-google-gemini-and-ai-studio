@@ -1241,7 +1241,23 @@
     "rejectedTitle": "Bu lisans artık etkin değil",
     "rejectedRevoked": "Lisans, genellikle geri ödeme veya ters ibraz sonrasında iptal edildi. Bunun yanlış olduğunu düşünüyorsanız destek ekibiyle iletişime geçin.",
     "rejectedMaxDevices": "Tüm etkinleştirme yuvaları kullanımda ve bu yuva artık aralarında yer almıyor. Başka bir tarayıcı profilinden bir yuva serbest bırakın veya destek ekibiyle iletişime geçin.",
-    "rejectedGeneric": "Lisans sunucusu artık bu belirteci tanımıyor. Bunun yanlış olduğunu düşünüyorsanız destek ekibiyle iletişime geçin."
+    "rejectedGeneric": "Lisans sunucusu artık bu belirteci tanımıyor. Bunun yanlış olduğunu düşünüyorsanız destek ekibiyle iletişime geçin.",
+    "trialEndedTitle": "Deneme kodunuzun süresi doldu",
+    "rejectedTrialExpired": "Bu kodun deneme süresi sona erdi. Web Agent ve diğer tüm Power Pack özelliklerini kullanmaya devam etmek için Power Pack edinin.",
+    "codeExpired": "Bu deneme kodunun süresi dolmuş.",
+    "codeAlreadyUsed": "Bu kod zaten kullanılmış. Her deneme kodu yalnızca bir kişi içindir."
+  },
+  "trial": {
+    "bannerTitle": "Power Pack denemesi etkin",
+    "bannerDesc": "Web Agent dahil tüm Power Pack özellikleri 3 gün boyunca açık. Deneme kodunuz mu var? Şimdi ya da bu deneme bittiğinde etkinleştirin.",
+    "activeUntil": "Geçerlilik sonu:",
+    "codeTierLabel": "Power Pack denemesi",
+    "endedTitle": "Power Pack denemeniz sona erdi",
+    "endedDesc": "Denediğiniz için teşekkürler. Nasıl buldunuz?",
+    "feedback": "Geri bildirim gönder",
+    "feedbackHint": "Kısa bir form. Sırada neyi düzeltip neyi geliştireceğimize karar vermemize yardımcı olur.",
+    "buy": "Power Pack edinin",
+    "close": "Kapat"
   },
   "hotkeys": {
     "title": "Klavye Kısayolları",

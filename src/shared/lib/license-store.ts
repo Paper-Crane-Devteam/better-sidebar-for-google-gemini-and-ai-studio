@@ -18,10 +18,15 @@
  *
  * A license is only revoked locally when the server explicitly says the token is
  * no longer good (refund, chargeback, manual revoke). See `license-renewal.ts`.
+ *
+ * Time-limited licenses (trial codes, promo key) add a third: `endsAt`, a hard
+ * stop from the server. `expiresAt` never runs past it and grace never extends
+ * beyond it.
  */
 
 import { create } from 'zustand';
 import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
+import { isLocalTrialActive } from './trial-store';
 
 /** License tier derived from token prefix */
 export type LicenseTier = 'support_pack' | 'power_pack' | 'pro' | 'none';
@@ -47,6 +52,12 @@ export interface LicenseState {
   signedPayload: string | null;
   /** Expiry timestamp (ms) for the cached validation */
   expiresAt: number | null;
+  /**
+   * Hard end (ms) of a time-limited license (trial code, promo key). The
+   * license stops at this moment even offline, and gets no grace past it.
+   * Null for lifetime licenses.
+   */
+  endsAt: number | null;
   /** Unique device ID generated on first install */
   deviceId: string;
   /** When the server last confirmed this license (ms) */
@@ -64,7 +75,13 @@ export interface LicenseState {
   previewThemeId: string | null;
 
   // Actions
-  activate: (token: string, signedPayload: string, expiresAt: number, tier: LicenseTier) => void;
+  activate: (
+    token: string,
+    signedPayload: string,
+    expiresAt: number,
+    tier: LicenseTier,
+    endsAt?: number | null,
+  ) => void;
   /**
    * Forget the license on this install only.
    *
@@ -75,7 +92,12 @@ export interface LicenseState {
    */
   deactivate: () => void;
   /** Renewal reached the server and the token is still good. */
-  markRenewed: (signedPayload: string, expiresAt: number, tier: LicenseTier) => void;
+  markRenewed: (
+    signedPayload: string,
+    expiresAt: number,
+    tier: LicenseTier,
+    endsAt?: number | null,
+  ) => void;
   /** Renewal couldn't reach the server. Keep the entitlement, extend grace. */
   markRenewUnreachable: (error: string) => void;
   /** The server rejected the token for good. Drop the entitlement, keep the reason. */
@@ -123,6 +145,7 @@ export const useLicenseStore = create<LicenseState>()(
       token: null,
       signedPayload: null,
       expiresAt: null,
+      endsAt: null,
       deviceId: generateDeviceId(),
       lastValidatedAt: null,
       graceUntil: null,
@@ -130,13 +153,14 @@ export const useLicenseStore = create<LicenseState>()(
       isPreviewActive: false,
       previewThemeId: null,
 
-      activate: (token, signedPayload, expiresAt, tier) =>
+      activate: (token, signedPayload, expiresAt, tier, endsAt = null) =>
         set({
           isActivated: true,
           tier,
           token,
           signedPayload,
           expiresAt,
+          endsAt,
           lastValidatedAt: Date.now(),
           graceUntil: null,
           lastRenewError: null,
@@ -149,30 +173,35 @@ export const useLicenseStore = create<LicenseState>()(
           token: null,
           signedPayload: null,
           expiresAt: null,
+          endsAt: null,
           lastValidatedAt: null,
           graceUntil: null,
           lastRenewError: null,
         }),
 
-      markRenewed: (signedPayload, expiresAt, tier) =>
+      markRenewed: (signedPayload, expiresAt, tier, endsAt = null) =>
         set({
           isActivated: true,
           tier,
           signedPayload,
           expiresAt,
+          endsAt,
           lastValidatedAt: Date.now(),
           graceUntil: null,
           lastRenewError: null,
         }),
 
       markRenewUnreachable: (error) => {
-        const { graceUntil, expiresAt } = get();
+        const { graceUntil, expiresAt, endsAt } = get();
         // Anchor the grace window to the moment the validation window lapsed, not
         // to "now" — otherwise every retry would push the deadline further out and
         // the window would never close.
         const anchor = expiresAt ?? Date.now();
+        // A time-limited license keeps working to its end while offline, but
+        // never past it.
+        const fallback = endsAt ?? anchor + RENEWAL_GRACE_MS;
         set({
-          graceUntil: graceUntil ?? anchor + RENEWAL_GRACE_MS,
+          graceUntil: graceUntil ?? fallback,
           lastRenewError: error,
         });
       },
@@ -206,8 +235,13 @@ export const useLicenseStore = create<LicenseState>()(
     {
       name: LICENSE_STORAGE_KEY,
       storage: createJSONStorage(() => storage),
-      version: 2,
+      version: 3,
       migrate: (persistedState: any, version: number) => {
+        if (version < 3) {
+          // v3 adds `endsAt`. Unknown for existing licenses; the next renewal
+          // fills it in for time-limited ones.
+          persistedState.endsAt = null;
+        }
         if (version < 2) {
           // v1 had no renewal bookkeeping and no background renewal job, so a
           // 14-day-old install is sitting on an expired `expiresAt` through no
@@ -237,6 +271,8 @@ export const useLicenseStore = create<LicenseState>()(
 export function isLicenseValid(state: LicenseState): boolean {
   if (!state.isActivated) return false;
   const now = Date.now();
+  // Time-limited licenses stop at their end, whatever the cache or grace says.
+  if (state.endsAt && now >= state.endsAt) return false;
   if (state.expiresAt && now < state.expiresAt) return true;
   if (state.graceUntil && now < state.graceUntil) return true;
   return false;
@@ -252,14 +288,27 @@ export function isLicenseInGracePeriod(state: LicenseState): boolean {
   return !(state.expiresAt && now < state.expiresAt);
 }
 
+/** True when the stored license itself (paid or trial code) grants Power Pack. */
+export function hasLicensePowerPack(state: LicenseState): boolean {
+  if (!isLicenseValid(state)) return false;
+  return state.tier === 'power_pack' || state.tier === 'pro';
+}
+
+/** True when the stored license is a time-limited one (trial code, promo key). */
+export function isTimeLimitedLicense(state: LicenseState): boolean {
+  return !!state.endsAt;
+}
+
 /**
  * Check if the current user has Power Pack (or higher) tier.
  * Used by Agent Loop for paywall checks.
+ *
+ * Includes the local install trial (see trial-store), so every Power Pack gate
+ * that routes through here unlocks during it.
  */
 export function isPowerPackUser(): boolean {
-  const state = useLicenseStore.getState();
-  if (!isLicenseValid(state)) return false;
-  return state.tier === 'power_pack' || state.tier === 'pro';
+  if (hasLicensePowerPack(useLicenseStore.getState())) return true;
+  return isLocalTrialActive();
 }
 
 // Keep every extension context in step. Activation happens in the settings panel

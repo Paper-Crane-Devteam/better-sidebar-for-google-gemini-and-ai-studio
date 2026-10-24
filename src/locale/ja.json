@@ -1241,7 +1241,23 @@
     "rejectedTitle": "このライセンスは無効になりました",
     "rejectedRevoked": "ライセンスが取り消されました。通常は返金またはチャージバックの後に起こります。心当たりがない場合はサポートまでご連絡ください。",
     "rejectedMaxDevices": "アクティベーション枠がすべて使用中で、この枠はもうリストに含まれていません。別のブラウザプロファイルで枠を解放するか、サポートまでご連絡ください。",
-    "rejectedGeneric": "ライセンスサーバーがこのトークンを認識できません。心当たりがない場合はサポートまでご連絡ください。"
+    "rejectedGeneric": "ライセンスサーバーがこのトークンを認識できません。心当たりがない場合はサポートまでご連絡ください。",
+    "trialEndedTitle": "トライアルコードの期間が終了しました",
+    "rejectedTrialExpired": "このコードのトライアル期間は終了しました。Web Agent をはじめとする Power Pack の機能を引き続き使うには、Power Pack をご購入ください。",
+    "codeExpired": "このトライアルコードは期限切れです。",
+    "codeAlreadyUsed": "このコードはすでに使用されています。トライアルコードはお一人様 1 回限りです。"
+  },
+  "trial": {
+    "bannerTitle": "Power Pack トライアル中",
+    "bannerDesc": "Web Agent を含むすべての Power Pack 機能を 3 日間ご利用いただけます。トライアルコードをお持ちの場合は、今すぐでも、このトライアル終了後でも有効化できます。",
+    "activeUntil": "有効期限：",
+    "codeTierLabel": "Power Pack トライアル",
+    "endedTitle": "Power Pack のトライアルが終了しました",
+    "endedDesc": "お試しいただきありがとうございます。使い心地はいかがでしたか？",
+    "feedback": "フィードバックを送る",
+    "feedbackHint": "短いフォームです。次に直すべき点や作るべき機能の参考にします。",
+    "buy": "Power Pack を購入",
+    "close": "閉じる"
   },
   "hotkeys": {
     "title": "キーボードショートカット",

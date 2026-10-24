@@ -1241,7 +1241,23 @@
     "rejectedTitle": "Diese Lizenz ist nicht mehr aktiv",
     "rejectedRevoked": "Die Lizenz wurde widerrufen, normalerweise nach einer Rückerstattung oder einer Rückbuchung. Wenden Sie sich an den Support, wenn Sie der Meinung sind, dass dies falsch ist.",
     "rejectedMaxDevices": "Alle Aktivierungsslots sind belegt und dieser ist nicht mehr dabei. Geben Sie einen Slot aus einem anderen Browserprofil frei oder wenden Sie sich an den Support.",
-    "rejectedGeneric": "Der Lizenzserver erkennt dieses Token nicht mehr. Wenden Sie sich an den Support, wenn Sie der Meinung sind, dass dies falsch ist."
+    "rejectedGeneric": "Der Lizenzserver erkennt dieses Token nicht mehr. Wenden Sie sich an den Support, wenn Sie der Meinung sind, dass dies falsch ist.",
+    "trialEndedTitle": "Dein Testcode ist abgelaufen",
+    "rejectedTrialExpired": "Der Testzeitraum für diesen Code ist vorbei. Hol dir Power Pack, um Web Agent und alle anderen Power Pack-Funktionen weiter zu nutzen.",
+    "codeExpired": "Dieser Testcode ist abgelaufen.",
+    "codeAlreadyUsed": "Dieser Code wurde bereits eingelöst. Jeder Testcode gilt nur für eine Person."
+  },
+  "trial": {
+    "bannerTitle": "Power Pack-Test aktiv",
+    "bannerDesc": "Alle Power Pack-Funktionen, einschließlich Web Agent, sind 3 Tage lang freigeschaltet. Du hast einen Testcode? Aktiviere ihn jetzt oder nach Ende dieses Tests.",
+    "activeUntil": "Aktiv bis",
+    "codeTierLabel": "Power Pack-Test",
+    "endedTitle": "Dein Power Pack-Test ist vorbei",
+    "endedDesc": "Danke fürs Ausprobieren. Wie war's?",
+    "feedback": "Feedback geben",
+    "feedbackHint": "Ein kurzes Formular. Es hilft uns zu entscheiden, was wir als Nächstes verbessern und bauen.",
+    "buy": "Power Pack holen",
+    "close": "Schließen"
   },
   "hotkeys": {
     "title": "Tastaturkürzel",

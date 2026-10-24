@@ -16,6 +16,9 @@ const AFDIAN_SP_URL = 'https://afdian.com/item/9f96a3ca5a5e11f1950152540025c377'
 /** 爱发电 — Power Pack (China) */
 const AFDIAN_PP_URL = 'https://afdian.com/item/cf5531a073b111f18c9c5254001e7c00';
 
+/** Google Form shown when a Power Pack trial ends. */
+export const TRIAL_FEEDBACK_FORM_URL = 'https://forms.gle/57E9sA93rfyZG8197';
+
 /**
  * Open the purchase page based on user locale.
  * Chinese locale → 爱发电 (Support Pack), otherwise → Gumroad (Power Pack).

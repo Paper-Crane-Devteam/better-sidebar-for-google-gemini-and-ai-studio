@@ -1241,7 +1241,23 @@
     "rejectedTitle": "這個授權已失效",
     "rejectedRevoked": "授權已被撤銷，通常發生在退款或付款被撤回之後。如果你覺得有誤，請聯絡我們。",
     "rejectedMaxDevices": "啟用名額都被佔滿了，而這一個已經不在名單裡。可以到別的瀏覽器設定檔裡釋放一個名額，或者聯絡我們。",
-    "rejectedGeneric": "授權伺服器不再認可這個啟用碼。如果你覺得有誤，請聯絡我們。"
+    "rejectedGeneric": "授權伺服器不再認可這個啟用碼。如果你覺得有誤，請聯絡我們。",
+    "trialEndedTitle": "你的試用碼已到期",
+    "rejectedTrialExpired": "這個試用碼的試用期已結束。購買 Power Pack 即可繼續使用 Web Agent 及所有 Power Pack 功能。",
+    "codeExpired": "這個試用碼已過期。",
+    "codeAlreadyUsed": "這個碼已經被使用過了。每個試用碼只能一個人使用。"
+  },
+  "trial": {
+    "bannerTitle": "Power Pack 試用中",
+    "bannerDesc": "3 天內可使用全部 Power Pack 功能，包括 Web Agent。有試用碼？現在啟用或等這次試用結束後再啟用都可以。",
+    "activeUntil": "有效期限至",
+    "codeTierLabel": "Power Pack 試用",
+    "endedTitle": "Power Pack 試用已結束",
+    "endedDesc": "感謝試用，用得怎麼樣？",
+    "feedback": "填寫回饋",
+    "feedbackHint": "一份簡短的問卷，幫我們決定接下來修什麼、做什麼。",
+    "buy": "購買 Power Pack",
+    "close": "關閉"
   },
   "hotkeys": {
     "title": "鍵盤快捷鍵",

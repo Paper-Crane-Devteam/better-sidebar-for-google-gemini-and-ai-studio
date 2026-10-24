@@ -1241,7 +1241,23 @@
     "rejectedTitle": "Esta licencia ya no está activa",
     "rejectedRevoked": "La licencia fue revocada, normalmente tras un reembolso o un contracargo. Contacta con soporte si crees que es un error.",
     "rejectedMaxDevices": "Todas las plazas de activación están en uso y esta ya no está entre ellas. Libera una plaza desde otro perfil de navegador o contacta con soporte.",
-    "rejectedGeneric": "El servidor de licencias ya no reconoce este token. Contacta con soporte si crees que es un error."
+    "rejectedGeneric": "El servidor de licencias ya no reconoce este token. Contacta con soporte si crees que es un error.",
+    "trialEndedTitle": "Tu código de prueba ha terminado",
+    "rejectedTrialExpired": "El periodo de prueba de este código ha terminado. Consigue Power Pack para seguir usando Web Agent y todas las demás funciones de Power Pack.",
+    "codeExpired": "Este código de prueba ha caducado.",
+    "codeAlreadyUsed": "Este código ya se ha canjeado. Cada código de prueba sirve para una sola persona."
+  },
+  "trial": {
+    "bannerTitle": "Prueba de Power Pack activa",
+    "bannerDesc": "Todas las funciones de Power Pack, incluido Web Agent, están desbloqueadas durante 3 días. ¿Tienes un código de prueba? Actívalo ahora o cuando termine esta prueba.",
+    "activeUntil": "Activo hasta",
+    "codeTierLabel": "Prueba de Power Pack",
+    "endedTitle": "Tu prueba de Power Pack ha terminado",
+    "endedDesc": "Gracias por probarlo. ¿Qué tal te ha ido?",
+    "feedback": "Enviar comentarios",
+    "feedbackHint": "Un formulario breve. Nos ayuda a decidir qué arreglar y qué crear después.",
+    "buy": "Conseguir Power Pack",
+    "close": "Cerrar"
   },
   "hotkeys": {
     "title": "Atajos de teclado",

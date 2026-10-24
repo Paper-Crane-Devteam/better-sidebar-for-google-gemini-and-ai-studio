@@ -14,6 +14,7 @@ import React from 'react';
 import { PanelRight, ShieldCheck } from 'lucide-react';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useLicenseStore } from '@/shared/lib/license-store';
+import { useTrialStore } from '@/shared/lib/trial-store';
 import { Button } from '@/shared/components/ui/button';
 import { isPanelFrame } from '@/shared/web-agent/contracts';
 import {
@@ -37,6 +38,7 @@ export const WebView: React.FC = () => {
   );
   // Subscribed only so the blocker below re-evaluates when either gate changes.
   useLicenseStore((s) => s.tier);
+  useTrialStore((s) => s.localTrialStartedAt);
   useWebAgent((s) => s.consented && s.permitted);
   const blocker = webAgentBlocker();
   const inPanel = isPanelFrame();

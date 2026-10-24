@@ -17,8 +17,32 @@ export interface ActivationResult {
   success: boolean;
   tier: LicenseTier;
   signedPayload: string;
+  /** End of the cached validation window (ms). Never later than `endsAt`. */
   expiresAt: number;
+  /**
+   * Hard end (ms) of a time-limited license (trial code, promo key), from the
+   * server's `expires_at`. Null for lifetime licenses.
+   */
+  endsAt: number | null;
   error?: string;
+}
+
+/**
+ * Fold the server's finer `reason` into the error code the client acts on.
+ * Expired / already-redeemed campaign codes arrive as `license_revoked` /
+ * `max_devices_reached` (which older clients already understand) plus a reason.
+ */
+function resolveError(data: { error?: string; reason?: string }, fallback: string): string {
+  if (data.reason === 'trial_expired') return 'trial_expired';
+  if (data.reason === 'code_already_used') return 'code_already_used';
+  return data.error || fallback;
+}
+
+/** Parse the server's `expires_at`; null when absent or malformed. */
+function parseEndsAt(raw: unknown): number | null {
+  if (typeof raw !== 'string') return null;
+  const ms = Date.parse(raw);
+  return Number.isFinite(ms) ? ms : null;
 }
 
 /**
@@ -53,6 +77,7 @@ export async function activateLicense(
       tier: 'none',
       signedPayload: '',
       expiresAt: 0,
+      endsAt: null,
       error: 'invalid_token_format',
     };
   }
@@ -69,13 +94,17 @@ export async function activateLicense(
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      const errorData = (await response.json().catch(() => ({}))) as {
+        error?: string;
+        reason?: string;
+      };
       return {
         success: false,
         tier: 'none',
         signedPayload: '',
         expiresAt: 0,
-        error: (errorData as any).error || `http_${response.status}`,
+        endsAt: null,
+        error: resolveError(errorData, `http_${response.status}`),
       };
     }
 
@@ -83,7 +112,9 @@ export async function activateLicense(
       valid: boolean;
       tier: string;
       signed_payload: string;
+      expires_at?: string;
       error?: string;
+      reason?: string;
     };
 
     if (!data.valid) {
@@ -92,7 +123,8 @@ export async function activateLicense(
         tier: 'none',
         signedPayload: '',
         expiresAt: 0,
-        error: data.error || 'validation_failed',
+        endsAt: null,
+        error: resolveError(data, 'validation_failed'),
       };
     }
 
@@ -100,11 +132,16 @@ export async function activateLicense(
       data.tier === 'pro' ? 'pro' :
       data.tier === 'power_pack' ? 'power_pack' : 'support_pack';
 
+    // Time-limited licenses must not be cached past their end.
+    const endsAt = parseEndsAt(data.expires_at);
+    const cacheUntil = Date.now() + VALIDATION_DURATION_MS;
+
     return {
       success: true,
       tier,
       signedPayload: data.signed_payload,
-      expiresAt: Date.now() + VALIDATION_DURATION_MS,
+      expiresAt: endsAt ? Math.min(cacheUntil, endsAt) : cacheUntil,
+      endsAt,
     };
   } catch (err) {
     return {
@@ -112,6 +149,7 @@ export async function activateLicense(
       tier: 'none',
       signedPayload: '',
       expiresAt: 0,
+      endsAt: null,
       error: 'network_error',
     };
   }
@@ -204,6 +242,9 @@ const REJECTION_CODES = new Set([
   'missing_token',
   'unknown_source',
   'max_devices_reached',
+  // Folded from the server's `reason` (see resolveError).
+  'trial_expired',
+  'code_already_used',
 ]);
 
 export function classifyValidationFailure(error: string | undefined): ValidationFailure {
