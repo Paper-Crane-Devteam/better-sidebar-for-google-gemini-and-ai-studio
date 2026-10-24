@@ -835,6 +835,10 @@
         "title": "Biblioteca de prompts",
         "description": "Salve, organize e reutilize seus prompts favoritos. Suporta variáveis e cópia com um clique."
       },
+      "agent": {
+        "title": "Agent",
+        "description": "Deixe a IA fazer o trabalho por você. Digite <b>&gt;</b> na caixa de chat para começar. Escolha um agente no topo desta aba: organize seus chats e prompts, edite arquivos em um workspace ou arrume suas abas e favoritos."
+      },
       "tags": {
         "title": "Gerenciamento de tags",
         "description": "Crie tags para categorizar suas conversas. Filtre e encontre rapidamente o que precisa."
@@ -843,6 +847,10 @@
         "title": "Favoritos",
         "description": "Acesse rapidamente suas conversas favoritas. Clique com o botão direito em qualquer conversa para adicionar aos favoritos."
       },
+      "snippets": {
+        "title": "Trechos",
+        "description": "Guarde as partes úteis das respostas da IA. Use o botão de salvar em uma mensagem, ou selecione um texto e escolha \"Salvar como Trecho\", e encontre tudo aqui."
+      },
       "myStuff": {
         "title": "Minhas coisas",
         "description": "Acesso rápido à sua biblioteca Gemini — conversas salvas, arquivos e mais."
@@ -850,6 +858,14 @@
       "gems": {
         "title": "Gems",
         "description": "Acesse os Gemini Gems — especialistas em IA personalizados para tarefas específicas."
+      },
+      "notebooks": {
+        "title": "Notebooks",
+        "description": "Navegue pelos seus Notebooks do Gemini e inicie um novo chat em qualquer um deles com um clique."
+      },
+      "spark": {
+        "title": "Spark",
+        "description": "Vá para o Gemini Spark: suas tarefas, agendamentos, habilidades e apps conectados."
       },
       "originalUI": {
         "title": "Alternar para barra lateral original",

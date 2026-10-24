@@ -835,6 +835,10 @@
         "title": "İstem Kitaplığı",
         "description": "Favori istemlerinizi kaydedin, düzenleyin ve yeniden kullanın. Değişkenleri ve tek tıklamayla kopyalamayı destekler."
       },
+      "agent": {
+        "title": "Agent",
+        "description": "İşi yapay zekâya bırakın. Başlamak için sohbet kutusuna <b>&gt;</b> yazın. Bu sekmenin üstünden bir ajan seçin: sohbetlerinizi ve istemlerinizi düzenleyin, bir çalışma alanında dosyaları düzenleyin veya sekmelerinizi ve yer işaretlerinizi toparlayın."
+      },
       "tags": {
         "title": "Etiket Yönetimi",
         "description": "Konuşmalarınızı kategorilere ayırmak için etiketler oluşturun. İhtiyacınız olanı hızla filtreleyin ve bulun."
@@ -843,6 +847,10 @@
         "title": "Sık Kullanılanlar",
         "description": "Yıldızlı ileti dizilerinize hızla erişin. Herhangi bir konuşmayı favorilere eklemek için sağ tıklayın."
       },
+      "snippets": {
+        "title": "Snippet'ler",
+        "description": "Yapay zekâ yanıtlarının işe yarayan kısımlarını saklayın. Bir mesajdaki kaydet düğmesini kullanın ya da metni seçip \"Snippet olarak kaydet\"i seçin; hepsini burada bulursunuz."
+      },
       "myStuff": {
         "title": "Öğelerim",
         "description": "Gemini kitaplığınıza (kaydedilmiş konuşmalar, dosyalar ve daha fazlası) hızlı erişim."
@@ -850,6 +858,14 @@
       "gems": {
         "title": "Gems",
         "description": "Gemini Gems'e erişin - belirli görevler için özelleştirilmiş yapay zeka uzmanları."
+      },
+      "notebooks": {
+        "title": "Not Defterleri",
+        "description": "Gemini not defterlerinize göz atın ve tek tıkla herhangi birinde yeni bir sohbet başlatın."
+      },
+      "spark": {
+        "title": "Spark",
+        "description": "Gemini Spark'a geçin: görevleriniz, programlarınız, becerileriniz ve bağlı uygulamalarınız."
       },
       "originalUI": {
         "title": "Orijinal Kenar Çubuğuna Geç",

@@ -835,6 +835,10 @@
         "title": "Biblioteka podpowiedzi",
         "description": "Zapisuj, organizuj i wykorzystuj ponownie swoje ulubione podpowiedzi. Obsługuje zmienne i kopiowanie jednym kliknięciem."
       },
+      "agent": {
+        "title": "Agent",
+        "description": "Pozwól AI wykonać pracę za Ciebie. Wpisz <b>&gt;</b> w polu czatu, aby zacząć. Wybierz agenta u góry tej karty: porządkuj czaty i prompty, edytuj pliki w przestrzeni roboczej lub uporządkuj karty i zakładki."
+      },
       "tags": {
         "title": "Zarządzanie tagami",
         "description": "Twórz tagi, aby kategoryzować swoje rozmowy. Szybko filtruj i znajdź to, czego potrzebujesz."
@@ -843,6 +847,10 @@
         "title": "Ulubione",
         "description": "Szybki dostęp do rozmów oznaczonych gwiazdką. Kliknij prawym przyciskiem myszy dowolną rozmowę, aby dodać ją do ulubionych."
       },
+      "snippets": {
+        "title": "Fragmenty",
+        "description": "Zachowuj przydatne fragmenty odpowiedzi AI. Użyj przycisku zapisu przy wiadomości albo zaznacz tekst i wybierz „Zapisz jako fragment”, a wszystko znajdziesz tutaj."
+      },
       "myStuff": {
         "title": "Moje rzeczy",
         "description": "Szybki dostęp do biblioteki Gemini — zapisane rozmowy, pliki i nie tylko."
@@ -850,6 +858,14 @@
       "gems": {
         "title": "Gems",
         "description": "Dostęp do Gemini Gems — dostosowanych ekspertów AI do konkretnych zadań."
+      },
+      "notebooks": {
+        "title": "Notatki",
+        "description": "Przeglądaj swoje notatki Gemini i jednym kliknięciem rozpocznij nowy czat w dowolnej z nich."
+      },
+      "spark": {
+        "title": "Spark",
+        "description": "Przejdź do Gemini Spark: Twoje zadania, harmonogramy, umiejętności i połączone aplikacje."
       },
       "originalUI": {
         "title": "Przełącz do oryginalnego paska bocznego",

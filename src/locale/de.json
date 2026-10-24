@@ -835,6 +835,10 @@
         "title": "Prompt-Bibliothek",
         "description": "Speichern, organisieren und verwenden Sie Ihre bevorzugten Prompts wieder. Unterstützt Variablen und das Kopieren mit einem Klick."
       },
+      "agent": {
+        "title": "Agent",
+        "description": "Lassen Sie die KI die Arbeit für Sie erledigen. Geben Sie <b>&gt;</b> im Chatfeld ein, um zu starten. Wählen Sie oben in diesem Tab einen Agenten: Chats und Prompts organisieren, Dateien in einem Workspace bearbeiten oder Tabs und Lesezeichen aufräumen."
+      },
       "tags": {
         "title": "Tag-Verwaltung",
         "description": "Erstellen Sie Tags, um Ihre Konversationen zu kategorisieren. Filtern Sie schnell und finden Sie, was Sie brauchen."
@@ -843,6 +847,10 @@
         "title": "Favoriten",
         "description": "Greifen Sie schnell auf Ihre markierten Konversationen zu. Klicken Sie mit der rechten Maustaste auf eine Konversation, um sie zu Ihren Favoriten hinzuzufügen."
       },
+      "snippets": {
+        "title": "Snippets",
+        "description": "Bewahren Sie die nützlichen Teile von KI-Antworten auf. Nutzen Sie die Speichern-Schaltfläche an einer Nachricht oder markieren Sie Text und wählen Sie „Als Snippet speichern“ – alles finden Sie dann hier."
+      },
       "myStuff": {
         "title": "Meine Sachen",
         "description": "Schneller Zugriff auf Ihre Gemini-Bibliothek – gespeicherte Konversationen, Dateien und mehr."
@@ -850,6 +858,14 @@
       "gems": {
         "title": "Gems",
         "description": "Zugriff auf Gemini Gems – maßgeschneiderte KI-Experten für bestimmte Aufgaben."
+      },
+      "notebooks": {
+        "title": "Notizbücher",
+        "description": "Durchsuchen Sie Ihre Gemini-Notizbücher und starten Sie mit einem Klick einen neuen Chat in einem davon."
+      },
+      "spark": {
+        "title": "Spark",
+        "description": "Springen Sie zu Gemini Spark: Ihre Aufgaben, Zeitpläne, Fähigkeiten und verbundenen Apps."
       },
       "originalUI": {
         "title": "Zur ursprünglichen Seitenleiste wechseln",

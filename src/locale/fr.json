@@ -835,6 +835,10 @@
         "title": "Bibliothèque d'invites",
         "description": "Enregistrez, organisez et réutilisez vos invites préférées. Prend en charge les variables et la copie en un clic."
       },
+      "agent": {
+        "title": "Agent",
+        "description": "Laissez l'IA travailler pour vous. Tapez <b>&gt;</b> dans la zone de saisie pour commencer. Choisissez un agent en haut de cet onglet : organisez vos discussions et vos prompts, modifiez des fichiers dans un espace de travail, ou rangez vos onglets et favoris."
+      },
       "tags": {
         "title": "Gestion des balises",
         "description": "Créez des balises pour catégoriser vos conversations. Filtrez rapidement et trouvez ce dont vous avez besoin."
@@ -843,6 +847,10 @@
         "title": "Favoris",
         "description": "Accédez rapidement à vos conversations favorites. Cliquez avec le bouton droit sur n'importe quelle conversation pour l'ajouter aux favoris."
       },
+      "snippets": {
+        "title": "Extraits",
+        "description": "Conservez les passages utiles des réponses de l'IA. Utilisez le bouton d'enregistrement d'un message, ou sélectionnez du texte et choisissez « Enregistrer en tant qu'extrait », puis retrouvez tout ici."
+      },
       "myStuff": {
         "title": "Mes contenus",
         "description": "Accès rapide à votre bibliothèque Gemini : conversations enregistrées, fichiers et bien plus encore."
@@ -850,6 +858,14 @@
       "gems": {
         "title": "Gems",
         "description": "Accédez à Gemini Gems : des experts en IA personnalisés pour des tâches spécifiques."
+      },
+      "notebooks": {
+        "title": "Carnets",
+        "description": "Parcourez vos carnets Gemini et lancez une nouvelle discussion dans l'un d'eux en un clic."
+      },
+      "spark": {
+        "title": "Spark",
+        "description": "Accédez à Gemini Spark : vos tâches, planifications, compétences et applications connectées."
       },
       "originalUI": {
         "title": "Passer à la barre latérale d'origine",

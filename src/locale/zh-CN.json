@@ -835,6 +835,10 @@
         "title": "Prompt 库",
         "description": "保存、整理和复用常用 Prompt。支持变量替换和一键复制。"
       },
+      "agent": {
+        "title": "Agent",
+        "description": "让 AI 替你干活。在聊天输入框里输入 <b>&gt;</b> 即可开始。在本标签页顶部选择一个 Agent：整理对话和提示词、在工作区里编辑文件，或者整理标签页和书签。"
+      },
       "tags": {
         "title": "标签管理",
         "description": "创建标签对对话进行分类，快速筛选和查找所需内容。"
@@ -843,6 +847,10 @@
         "title": "收藏",
         "description": "快速访问已收藏的对话。右键点击任意对话即可将其添加到收藏。"
       },
+      "snippets": {
+        "title": "片段",
+        "description": "把 AI 回复里有用的部分留下来。点击消息上的保存按钮，或选中文字后选择“保存为片段”，之后都能在这里找到。"
+      },
       "myStuff": {
         "title": "我的内容",
         "description": "快速访问您的 Gemini 资料库——已保存的对话、文件等。"
@@ -850,6 +858,14 @@
       "gems": {
         "title": "Gems",
         "description": "访问 Gemini Gems——为特定任务定制的 AI 专家。"
+      },
+      "notebooks": {
+        "title": "笔记本",
+        "description": "浏览你的 Gemini 笔记本，一键在任意笔记本中开始新对话。"
+      },
+      "spark": {
+        "title": "Spark",
+        "description": "快速进入 Gemini Spark：你的任务、定时任务、技能和已连接应用。"
       },
       "originalUI": {
         "title": "切换到原始侧边栏",
