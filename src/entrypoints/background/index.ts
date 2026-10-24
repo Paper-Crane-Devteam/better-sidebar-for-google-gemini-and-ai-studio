@@ -23,6 +23,7 @@ import {
   LICENSE_RENEWAL_ALARM,
 } from '@/shared/lib/license-renewal';
 import { trace } from '@/shared/lib/trace';
+import { TRIAL_WELCOME_PENDING_KEY } from '@/shared/lib/trial-store';
 import { initWebAgent } from './handlers/web-agent';
 import {
   registerUpdateAvailableListener,
@@ -69,6 +70,10 @@ export default defineBackground(() => {
     setupUninstallUrl();
     if (details.reason === 'install') {
       browser.tabs.create({ url: browser.runtime.getURL('/onboarding.html') });
+      // New installs only: the overlay shows the Power Pack trial welcome once.
+      browser.storage.local
+        .set({ [TRIAL_WELCOME_PENDING_KEY]: true })
+        .catch((err) => console.error('[Background] Failed to flag trial welcome:', err));
       // Seed default prompts after DB is ready
       ensureDbReady()
         .then(() => seedDefaultPrompts())

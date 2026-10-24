@@ -1277,7 +1277,27 @@
     "feedback": "Geri bildirim gönder",
     "feedbackHint": "Kısa bir form. Sırada neyi düzeltip neyi geliştireceğimize karar vermemize yardımcı olur.",
     "buy": "Power Pack edinin",
-    "close": "Kapat"
+    "close": "Kapat",
+    "welcome": {
+      "title": "Better Sidebar'a hoş geldiniz. Başlangıç için küçük bir hediye",
+      "intro": "Better Sidebar, Gemini ve AI Studio sohbetlerinizi düzenli tutmanıza yardımcı olur: klasörler, etiketler, tam metin arama, istem kitaplığı ve dışa aktarma. Bunların hepsi ücretsiz ve ücretsiz kalacak.",
+      "powerPack": "Bunun üzerine bir de Power Pack var: yerleşik yapay zeka ajanlarını yalnızca bilgi bulan yardımcılardan gerçekten iş yapan yardımcılara dönüştüren isteğe bağlı bir eklenti. Yeni olduğunuz için ilk 3 gününüzde açık. Böylece bir karar vermeden önce çalışma şeklinize uyup uymadığını görebilirsiniz.",
+      "unlockedTitle": "Önümüzdeki 3 gün boyunca açık",
+      "sidebarAgentName": "BetterSidebar Agent",
+      "sidebarAgentDesc": "Tek cümleyle anlatın; klasör oluşturur, sohbetlerinizi ayırır ve tüm geçmişinizde toplu etiketleme veya yeniden adlandırma yapar.",
+      "workspaceAgentName": "Workspace Agent",
+      "workspaceAgentDesc": "Word, Excel, PDF ve kod dosyalarınızı analiz etmek veya düzenlemek için daha fazla çalışma alanı ve dosya.",
+      "browserAgentName": "Browser Agent",
+      "browserAgentDesc": "Önerilerle kalmaz: sekmelerinizi gruplar, kopyaları kapatır ve yer imi klasörlerini toparlar. Geri alabileceğiniz bir anlık görüntü de alır.",
+      "webAgentName": "Web Agent",
+      "webAgentDesc": "Ona bir web sayfası verin; formları doldurur, adımları tıklayarak ilerler veya tabloları derler. Her işlemi siz onaylarsınız.",
+      "chromeOnly": "Yalnızca Chrome",
+      "exportName": "Notion ve Obsidian'a dışa aktarma",
+      "exportDesc": "Sohbetleri ve parçacıkları doğrudan notlarınıza gönderin.",
+      "reassurance": "Kart gerekmez, iptal edilecek bir şey yok. Deneme bittiğinde ücretsiz sürüme dönersiniz ve düzenlediğiniz her şey yerinde kalır.",
+      "details": "Power Pack'te neler var",
+      "start": "Keşfetmeye başla"
+    }
   },
   "hotkeys": {
     "title": "Klavye Kısayolları",

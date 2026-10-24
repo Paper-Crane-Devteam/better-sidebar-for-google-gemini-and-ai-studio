@@ -1277,7 +1277,27 @@
     "feedback": "Lascia un feedback",
     "feedbackHint": "Un breve modulo. Ci aiuta a decidere cosa sistemare e cosa sviluppare dopo.",
     "buy": "Ottieni Power Pack",
-    "close": "Chiudi"
+    "close": "Chiudi",
+    "welcome": {
+      "title": "Benvenuto in Better Sidebar. Ecco un piccolo regalo per iniziare",
+      "intro": "Better Sidebar ti aiuta a tenere in ordine le chat di Gemini e AI Studio: cartelle, tag, ricerca full-text, una libreria di prompt ed esportazione. Tutto questo è gratuito e lo resterà.",
+      "powerPack": "In più c'è Power Pack, un componente aggiuntivo opzionale che trasforma gli agenti IA integrati da assistenti che consultano ad assistenti che fanno davvero le cose. Visto che sei nuovo, è sbloccato per i tuoi primi 3 giorni, così puoi capire se fa al caso tuo prima di decidere qualsiasi cosa.",
+      "unlockedTitle": "Sbloccato per i prossimi 3 giorni",
+      "sidebarAgentName": "BetterSidebar Agent",
+      "sidebarAgentDesc": "Descrivilo in una frase: crea cartelle, ordina le chat e applica tag o rinomina in blocco su tutta la cronologia.",
+      "workspaceAgentName": "Workspace Agent",
+      "workspaceAgentDesc": "Più aree di lavoro e più file per analizzare o modificare i tuoi file Word, Excel, PDF e di codice.",
+      "browserAgentName": "Browser Agent",
+      "browserAgentDesc": "Va oltre i suggerimenti: raggruppa le schede, chiude i duplicati e riordina le cartelle dei segnalibri, con un'istantanea che puoi ripristinare.",
+      "webAgentName": "Web Agent",
+      "webAgentDesc": "Affidagli una pagina web: compila moduli, segue i passaggi o raccoglie tabelle, e tu approvi ogni azione.",
+      "chromeOnly": "Solo Chrome",
+      "exportName": "Esporta in Notion e Obsidian",
+      "exportDesc": "Invia conversazioni e snippet direttamente alle tue note.",
+      "reassurance": "Nessuna carta richiesta e niente da disdire. Alla fine della prova torni semplicemente alla versione gratuita, e tutto ciò che hai organizzato resta dov'è.",
+      "details": "Cosa include Power Pack",
+      "start": "Inizia a esplorare"
+    }
   },
   "hotkeys": {
     "title": "Scorciatoie da tastiera",

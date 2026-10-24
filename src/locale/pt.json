@@ -1277,7 +1277,27 @@
     "feedback": "Enviar feedback",
     "feedbackHint": "Um formulário curto. Ele nos ajuda a decidir o que corrigir e criar em seguida.",
     "buy": "Adquirir Power Pack",
-    "close": "Fechar"
+    "close": "Fechar",
+    "welcome": {
+      "title": "Bem-vindo ao Better Sidebar. Aqui está um pequeno presente para começar",
+      "intro": "O Better Sidebar ajuda você a manter seus chats do Gemini e do AI Studio em ordem: pastas, tags, busca em texto completo, uma biblioteca de prompts e exportação. Tudo isso é gratuito e continuará sendo.",
+      "powerPack": "Além disso, existe o Power Pack, um complemento opcional que transforma os agentes de IA integrados de ajudantes que consultam em ajudantes que realmente fazem as coisas. Como você é novo por aqui, ele está liberado nos seus primeiros 3 dias, para você ver se combina com seu jeito de trabalhar antes de decidir qualquer coisa.",
+      "unlockedTitle": "Liberado pelos próximos 3 dias",
+      "sidebarAgentName": "BetterSidebar Agent",
+      "sidebarAgentDesc": "Descreva em uma frase e ele cria pastas, organiza seus chats e aplica tags ou renomeia em lote em todo o seu histórico.",
+      "workspaceAgentName": "Workspace Agent",
+      "workspaceAgentDesc": "Mais espaços de trabalho e mais arquivos para analisar ou editar seus arquivos Word, Excel, PDF e de código.",
+      "browserAgentName": "Browser Agent",
+      "browserAgentDesc": "Vai além de sugestões: agrupa suas abas, fecha duplicadas e organiza pastas de favoritos, com um instantâneo que você pode reverter.",
+      "webAgentName": "Web Agent",
+      "webAgentDesc": "Entregue uma página da web e ele preenche formulários, avança pelas etapas ou monta tabelas, e você aprova cada ação.",
+      "chromeOnly": "Só Chrome",
+      "exportName": "Exportar para Notion e Obsidian",
+      "exportDesc": "Envie conversas e trechos direto para suas notas.",
+      "reassurance": "Sem cartão e nada para cancelar. Quando o teste terminar, você simplesmente volta para a versão gratuita, e tudo o que organizou continua onde está.",
+      "details": "O que vem no Power Pack",
+      "start": "Começar a explorar"
+    }
   },
   "hotkeys": {
     "title": "Atalhos de teclado",

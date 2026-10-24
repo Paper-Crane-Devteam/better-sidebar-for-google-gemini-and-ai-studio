@@ -1276,7 +1276,27 @@
     "feedback": "フィードバックを送る",
     "feedbackHint": "短いフォームです。次に直すべき点や作るべき機能の参考にします。",
     "buy": "Power Pack を購入",
-    "close": "閉じる"
+    "close": "閉じる",
+    "welcome": {
+      "title": "Better Sidebar へようこそ。ささやかなプレゼントをご用意しました",
+      "intro": "Better Sidebar は、Gemini と AI Studio のチャットを整理するためのツールです。フォルダ、タグ、全文検索、プロンプトライブラリ、エクスポートが使えます。これらはすべて無料で、これからも無料です。",
+      "powerPack": "さらに、オプションの Power Pack があります。内蔵の AI エージェントが、情報を調べるだけでなく、実際に作業までこなしてくれるようになります。はじめてご利用の方には最初の 3 日間無料で開放していますので、ご自身の使い方に合うかどうか、決める前にお試しください。",
+      "unlockedTitle": "これから 3 日間使える機能",
+      "sidebarAgentName": "BetterSidebar Agent",
+      "sidebarAgentDesc": "ひと言伝えるだけで、フォルダの作成、チャットの振り分け、履歴全体への一括タグ付けや名前変更を行います。",
+      "workspaceAgentName": "Workspace Agent",
+      "workspaceAgentDesc": "より多くのワークスペースとファイルで、Word、Excel、PDF、コードファイルを分析・編集できます。",
+      "browserAgentName": "Browser Agent",
+      "browserAgentDesc": "提案だけでなく、タブのグループ化、重複タブの削除、ブックマークフォルダの整理まで実際に行います。スナップショットからいつでも元に戻せます。",
+      "webAgentName": "Web Agent",
+      "webAgentDesc": "Web ページを任せると、フォームの入力、手順に沿ったクリック、表の取りまとめを行います。操作はすべてあなたが承認します。",
+      "chromeOnly": "Chrome のみ",
+      "exportName": "Notion・Obsidian へのエクスポート",
+      "exportDesc": "会話やスニペットをそのままノートに送れます。",
+      "reassurance": "カード登録も解約手続きも不要です。お試し期間が終わると無料版に戻るだけで、整理した内容はそのまま残ります。",
+      "details": "Power Pack の内容を見る",
+      "start": "使ってみる"
+    }
   },
   "hotkeys": {
     "title": "キーボードショートカット",

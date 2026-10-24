@@ -1277,7 +1277,27 @@
     "feedback": "Enviar comentarios",
     "feedbackHint": "Un formulario breve. Nos ayuda a decidir qué arreglar y qué crear después.",
     "buy": "Conseguir Power Pack",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "welcome": {
+      "title": "Bienvenido a Better Sidebar. Aquí tienes un pequeño regalo para empezar",
+      "intro": "Better Sidebar te ayuda a mantener en orden tus chats de Gemini y AI Studio: carpetas, etiquetas, búsqueda de texto completo, una biblioteca de prompts y exportación. Todo eso es gratis y seguirá siéndolo.",
+      "powerPack": "Además está Power Pack, un complemento opcional que convierte a los agentes de IA integrados de ayudantes que consultan en ayudantes que de verdad hacen las cosas. Como eres nuevo, está desbloqueado durante tus primeros 3 días, para que veas si encaja en tu forma de trabajar antes de decidir nada.",
+      "unlockedTitle": "Desbloqueado durante los próximos 3 días",
+      "sidebarAgentName": "BetterSidebar Agent",
+      "sidebarAgentDesc": "Descríbelo en una frase y crea carpetas, ordena tus chats y etiqueta o renombra en lote en todo tu historial.",
+      "workspaceAgentName": "Workspace Agent",
+      "workspaceAgentDesc": "Más espacios de trabajo y más archivos para analizar o editar tus archivos de Word, Excel, PDF y código.",
+      "browserAgentName": "Browser Agent",
+      "browserAgentDesc": "Va más allá de las sugerencias: agrupa tus pestañas, cierra duplicados y ordena carpetas de marcadores, con una instantánea que puedes revertir.",
+      "webAgentName": "Web Agent",
+      "webAgentDesc": "Dale una página web y rellena formularios, avanza por los pasos o reúne tablas, y tú apruebas cada acción.",
+      "chromeOnly": "Solo Chrome",
+      "exportName": "Exportar a Notion y Obsidian",
+      "exportDesc": "Envía conversaciones y fragmentos directamente a tus notas.",
+      "reassurance": "Sin tarjeta y sin nada que cancelar. Cuando termine la prueba, simplemente vuelves a la versión gratuita y todo lo que hayas organizado se queda donde está.",
+      "details": "Qué incluye Power Pack",
+      "start": "Empezar a explorar"
+    }
   },
   "hotkeys": {
     "title": "Atajos de teclado",

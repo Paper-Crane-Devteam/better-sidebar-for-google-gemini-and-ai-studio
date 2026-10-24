@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const STORAGE_KEY = 'guided_tour_completed';
+/** Set once the tour is finished or skipped. Other first-run prompts wait on it. */
+export const GUIDED_TOUR_STORAGE_KEY = 'guided_tour_completed';
+const STORAGE_KEY = GUIDED_TOUR_STORAGE_KEY;
 
 export const useGuidedTour = () => {
   /** Whether to show the "want a tour?" prompt dialog */

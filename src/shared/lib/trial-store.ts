@@ -21,6 +21,12 @@ export const TRIAL_STORAGE_KEY = 'better-sidebar-trial';
 /** Prompt id for the local trial; time-limited codes use their token. */
 export const LOCAL_TRIAL_PROMPT_ID = 'local';
 
+/**
+ * Plain storage flag set by the background on a fresh install (never on update),
+ * so only brand-new users get the trial welcome dialog. Removed once shown.
+ */
+export const TRIAL_WELCOME_PENDING_KEY = 'trial_welcome_pending';
+
 export interface TrialState {
   /** When the local trial started (ms). Null until the first overlay run. */
   localTrialStartedAt: number | null;

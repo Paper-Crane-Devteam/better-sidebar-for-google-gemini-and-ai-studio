@@ -1276,7 +1276,27 @@
     "feedback": "填寫回饋",
     "feedbackHint": "一份簡短的問卷，幫我們決定接下來修什麼、做什麼。",
     "buy": "購買 Power Pack",
-    "close": "關閉"
+    "close": "關閉",
+    "welcome": {
+      "title": "歡迎使用 Better Sidebar，先送你一份見面禮",
+      "intro": "Better Sidebar 幫你把 Gemini 和 AI Studio 的對話整理得井井有條：資料夾、標籤、全文搜尋、提示詞庫和匯出。這些都是免費的，而且會一直免費。",
+      "powerPack": "在此之上還有 Power Pack，一個可選的加值包。它讓內建的 AI Agent 從「幫你查」變成「幫你做」。你是新朋友，所以前 3 天直接為你開放，先看看合不合你的使用習慣，再做決定也不遲。",
+      "unlockedTitle": "接下來 3 天可以使用",
+      "sidebarAgentName": "BetterSidebar Agent",
+      "sidebarAgentDesc": "一句話說清楚需求，它就會建立資料夾、歸類對話，並在全部歷史記錄中批次加標籤或重新命名。",
+      "workspaceAgentName": "Workspace Agent",
+      "workspaceAgentDesc": "更多工作區和更多檔案，用來分析或編輯你的 Word、Excel、PDF 和程式碼檔案。",
+      "browserAgentName": "Browser Agent",
+      "browserAgentDesc": "不只給建議，還能直接幫你將分頁分組、關閉重複分頁、整理書籤資料夾，並保留快照可隨時復原。",
+      "webAgentName": "Web Agent",
+      "webAgentDesc": "把網頁交給它，它會幫你填表單、按步驟點擊或整理表格，每一步都由你確認。",
+      "chromeOnly": "僅限 Chrome",
+      "exportName": "匯出到 Notion 和 Obsidian",
+      "exportDesc": "把對話和摘錄直接傳送到你的筆記裡。",
+      "reassurance": "不用綁卡，也不用記得取消。試用結束後會自動回到免費版，你整理好的內容都會原樣保留。",
+      "details": "Power Pack 有什麼",
+      "start": "開始體驗"
+    }
   },
   "hotkeys": {
     "title": "鍵盤快捷鍵",

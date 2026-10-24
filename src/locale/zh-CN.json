@@ -1276,7 +1276,27 @@
     "feedback": "填写反馈",
     "feedbackHint": "一份简短的问卷，帮我们决定接下来修什么、做什么。",
     "buy": "购买 Power Pack",
-    "close": "关闭"
+    "close": "关闭",
+    "welcome": {
+      "title": "欢迎使用 Better Sidebar，先送你一份见面礼",
+      "intro": "Better Sidebar 帮你把 Gemini 和 AI Studio 的对话整理得井井有条：文件夹、标签、全文搜索、提示词库和导出。这些都是免费的，而且会一直免费。",
+      "powerPack": "在此之上还有 Power Pack，一个可选的加成包。它让内置的 AI Agent 从“帮你查”变成“帮你做”。你是新朋友，所以前 3 天直接为你打开，先看看合不合你的使用习惯，再做决定也不迟。",
+      "unlockedTitle": "接下来 3 天可以使用",
+      "sidebarAgentName": "BetterSidebar Agent",
+      "sidebarAgentDesc": "一句话说清楚需求，它就会建文件夹、归类对话，并在全部历史记录里批量打标签或重命名。",
+      "workspaceAgentName": "Workspace Agent",
+      "workspaceAgentDesc": "更多工作区和更多文件，用来分析或编辑你的 Word、Excel、PDF 和代码文件。",
+      "browserAgentName": "Browser Agent",
+      "browserAgentDesc": "不止给建议，还能直接帮你给标签页分组、关闭重复标签页、整理书签文件夹，并留有快照可随时回退。",
+      "webAgentName": "Web Agent",
+      "webAgentDesc": "把网页交给它，它会帮你填表单、按步骤点击或整理表格，每一步都由你确认。",
+      "chromeOnly": "仅限 Chrome",
+      "exportName": "导出到 Notion 和 Obsidian",
+      "exportDesc": "把对话和摘录直接发送到你的笔记里。",
+      "reassurance": "不用绑卡，也不用记得取消。试用结束后会自动回到免费版，你整理好的内容都会原样保留。",
+      "details": "Power Pack 都有什么",
+      "start": "开始体验"
+    }
   },
   "hotkeys": {
     "title": "快捷键",

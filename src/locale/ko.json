@@ -1276,7 +1276,27 @@
     "feedback": "피드백 보내기",
     "feedbackHint": "짧은 설문입니다. 다음에 무엇을 고치고 만들지 정하는 데 도움이 됩니다.",
     "buy": "Power Pack 구매",
-    "close": "닫기"
+    "close": "닫기",
+    "welcome": {
+      "title": "Better Sidebar에 오신 것을 환영합니다. 시작 선물을 준비했어요",
+      "intro": "Better Sidebar는 Gemini와 AI Studio 채팅을 깔끔하게 정리하도록 도와줍니다. 폴더, 태그, 전체 텍스트 검색, 프롬프트 라이브러리, 내보내기까지 모두 무료이며 앞으로도 무료입니다.",
+      "powerPack": "여기에 선택형 애드온인 Power Pack이 있습니다. 내장 AI 에이전트가 찾아보기만 하는 도우미에서 실제로 일을 처리하는 도우미로 바뀝니다. 처음 오셨으니 첫 3일 동안 열어 드려요. 결정하기 전에 내 작업 방식에 맞는지 직접 확인해 보세요.",
+      "unlockedTitle": "앞으로 3일간 사용할 수 있는 기능",
+      "sidebarAgentName": "BetterSidebar Agent",
+      "sidebarAgentDesc": "한 문장으로 말하면 폴더를 만들고, 채팅을 분류하고, 전체 기록에 걸쳐 태그를 일괄로 달거나 이름을 바꿉니다.",
+      "workspaceAgentName": "Workspace Agent",
+      "workspaceAgentDesc": "더 많은 작업 공간과 파일로 Word, Excel, PDF, 코드 파일을 분석하거나 편집할 수 있습니다.",
+      "browserAgentName": "Browser Agent",
+      "browserAgentDesc": "제안에 그치지 않고 탭을 그룹으로 묶고, 중복 탭을 닫고, 북마크 폴더를 정리합니다. 스냅샷으로 언제든 되돌릴 수 있습니다.",
+      "webAgentName": "Web Agent",
+      "webAgentDesc": "웹 페이지를 맡기면 양식을 채우고, 단계를 따라 클릭하고, 표를 정리합니다. 모든 동작은 직접 승인합니다.",
+      "chromeOnly": "Chrome 전용",
+      "exportName": "Notion 및 Obsidian으로 내보내기",
+      "exportDesc": "대화와 스니펫을 노트로 바로 보낼 수 있습니다.",
+      "reassurance": "카드 등록도, 해지할 것도 없습니다. 체험이 끝나면 무료 버전으로 돌아갈 뿐이며, 정리해 둔 내용은 그대로 남습니다.",
+      "details": "Power Pack 구성 보기",
+      "start": "둘러보기"
+    }
   },
   "hotkeys": {
     "title": "키보드 단축키",

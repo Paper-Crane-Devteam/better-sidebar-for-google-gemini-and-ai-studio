@@ -1278,7 +1278,27 @@
     "feedback": "Prześlij opinię",
     "feedbackHint": "Krótki formularz. Pomaga nam zdecydować, co poprawić i co zbudować dalej.",
     "buy": "Kup Power Pack",
-    "close": "Zamknij"
+    "close": "Zamknij",
+    "welcome": {
+      "title": "Witamy w Better Sidebar. Na początek mały prezent",
+      "intro": "Better Sidebar pomaga utrzymać porządek w czatach Gemini i AI Studio: foldery, tagi, wyszukiwanie pełnotekstowe, biblioteka promptów i eksport. Wszystko to jest bezpłatne i takie pozostanie.",
+      "powerPack": "Do tego jest Power Pack, opcjonalny dodatek, dzięki któremu wbudowani agenci AI nie tylko wyszukują informacje, ale naprawdę wykonują pracę. Ponieważ jesteś tu nowy, jest odblokowany przez pierwsze 3 dni, żebyś mógł sprawdzić, czy pasuje do Twojego sposobu pracy, zanim cokolwiek zdecydujesz.",
+      "unlockedTitle": "Odblokowane na najbliższe 3 dni",
+      "sidebarAgentName": "BetterSidebar Agent",
+      "sidebarAgentDesc": "Opisz to jednym zdaniem, a utworzy foldery, posortuje czaty i hurtowo otaguje lub zmieni nazwy w całej historii.",
+      "workspaceAgentName": "Workspace Agent",
+      "workspaceAgentDesc": "Więcej obszarów roboczych i plików do analizowania lub edytowania plików Word, Excel, PDF i kodu.",
+      "browserAgentName": "Browser Agent",
+      "browserAgentDesc": "Nie kończy na sugestiach: grupuje karty, zamyka duplikaty i porządkuje foldery zakładek, a migawka pozwala wszystko cofnąć.",
+      "webAgentName": "Web Agent",
+      "webAgentDesc": "Przekaż mu stronę, a wypełni formularze, przeklika kolejne kroki lub zbierze tabele. Każdą akcję zatwierdzasz sam.",
+      "chromeOnly": "Tylko Chrome",
+      "exportName": "Eksport do Notion i Obsidian",
+      "exportDesc": "Wysyłaj rozmowy i fragmenty prosto do swoich notatek.",
+      "reassurance": "Bez karty i bez niczego do anulowania. Po zakończeniu okresu próbnego po prostu wracasz do wersji bezpłatnej, a wszystko, co uporządkowałeś, zostaje na swoim miejscu.",
+      "details": "Co zawiera Power Pack",
+      "start": "Zaczynajmy"
+    }
   },
   "hotkeys": {
     "title": "Skróty klawiaturowe",

@@ -26,6 +26,7 @@ import { RatingPromptDialog } from '@/entrypoints/overlay.content/shared/modules
 import { UpdateAvailableToast } from '@/entrypoints/overlay.content/shared/modules/extension-update/UpdateAvailableToast';
 import { PowerPackPaywall } from '@/shared/components/PowerPackPaywall';
 import { TrialEndedDialog } from '@/shared/components/TrialEndedDialog';
+import { TrialWelcomeDialog } from '@/shared/components/TrialWelcomeDialog';
 import { HotkeyCheatsheet } from '@/entrypoints/overlay.content/shared/components/HotkeyCheatsheet';
 import { CommandPalette } from '@/entrypoints/overlay.content/shared/modules/command-palette';
 import { useHotkeyListener } from '@/shared/hooks/useHotkeyListener';
@@ -88,6 +89,7 @@ export const GeminiEnhancedFeatures = () => {
       <UpdateAvailableToast />
       <PowerPackPaywall />
       <TrialEndedDialog />
+      <TrialWelcomeDialog afterGuidedTour />
       <HotkeyCheatsheet />
       <CommandPalette />
       {guidedTour.showPrompt && isSidebarExpanded && (

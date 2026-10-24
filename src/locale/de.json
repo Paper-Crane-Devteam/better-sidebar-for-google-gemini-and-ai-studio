@@ -1277,7 +1277,27 @@
     "feedback": "Feedback geben",
     "feedbackHint": "Ein kurzes Formular. Es hilft uns zu entscheiden, was wir als Nächstes verbessern und bauen.",
     "buy": "Power Pack holen",
-    "close": "Schließen"
+    "close": "Schließen",
+    "welcome": {
+      "title": "Willkommen bei Better Sidebar. Hier ist ein kleines Geschenk zum Start",
+      "intro": "Better Sidebar hilft Ihnen, Ihre Gemini- und AI Studio-Chats zu ordnen: Ordner, Tags, Volltextsuche, eine Prompt-Bibliothek und Export. All das ist kostenlos und bleibt es auch.",
+      "powerPack": "Darüber hinaus gibt es Power Pack, eine optionale Erweiterung, die die integrierten KI-Agenten von Helfern, die nur nachschlagen, zu Helfern macht, die Dinge wirklich erledigen. Da Sie neu hier sind, ist es für Ihre ersten 3 Tage freigeschaltet. So können Sie sehen, ob es zu Ihrer Arbeitsweise passt, bevor Sie etwas entscheiden.",
+      "unlockedTitle": "Freigeschaltet für die nächsten 3 Tage",
+      "sidebarAgentName": "BetterSidebar Agent",
+      "sidebarAgentDesc": "Beschreiben Sie es in einem Satz, und er legt Ordner an, sortiert Ihre Chats und vergibt Tags oder benennt um, über Ihren gesamten Verlauf hinweg.",
+      "workspaceAgentName": "Workspace Agent",
+      "workspaceAgentDesc": "Mehr Arbeitsbereiche und mehr Dateien, um Ihre Word-, Excel-, PDF- und Codedateien zu analysieren oder zu bearbeiten.",
+      "browserAgentName": "Browser Agent",
+      "browserAgentDesc": "Macht nicht nur Vorschläge, sondern gruppiert Ihre Tabs, schließt Duplikate und räumt Lesezeichenordner auf, mit einem Snapshot, den Sie zurücksetzen können.",
+      "webAgentName": "Web Agent",
+      "webAgentDesc": "Geben Sie ihm eine Webseite, und er füllt Formulare aus, klickt sich durch Schritte oder stellt Tabellen zusammen. Jede Aktion bestätigen Sie selbst.",
+      "chromeOnly": "Nur Chrome",
+      "exportName": "Export nach Notion & Obsidian",
+      "exportDesc": "Senden Sie Unterhaltungen und Snippets direkt in Ihre Notizen.",
+      "reassurance": "Keine Karte nötig, nichts zu kündigen. Nach dem Testzeitraum kehren Sie einfach zur kostenlosen Version zurück, und alles, was Sie organisiert haben, bleibt, wo es ist.",
+      "details": "Was ist in Power Pack enthalten",
+      "start": "Loslegen"
+    }
   },
   "hotkeys": {
     "title": "Tastaturkürzel",

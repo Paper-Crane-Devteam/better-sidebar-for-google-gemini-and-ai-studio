@@ -1277,7 +1277,27 @@
     "feedback": "Donner mon avis",
     "feedbackHint": "Un court formulaire. Il nous aide à choisir quoi corriger et construire ensuite.",
     "buy": "Obtenir Power Pack",
-    "close": "Fermer"
+    "close": "Fermer",
+    "welcome": {
+      "title": "Bienvenue sur Better Sidebar. Voici un petit cadeau pour commencer",
+      "intro": "Better Sidebar vous aide à garder vos discussions Gemini et AI Studio en ordre : dossiers, étiquettes, recherche plein texte, bibliothèque de prompts et export. Tout cela est gratuit, et le restera.",
+      "powerPack": "En plus, il y a Power Pack, un module optionnel qui transforme les agents IA intégrés : ils ne se contentent plus de chercher, ils agissent vraiment. Comme vous êtes nouveau, il est débloqué pendant vos 3 premiers jours, pour que vous puissiez voir s'il vous convient avant de décider quoi que ce soit.",
+      "unlockedTitle": "Débloqué pour les 3 prochains jours",
+      "sidebarAgentName": "BetterSidebar Agent",
+      "sidebarAgentDesc": "Décrivez-le en une phrase, et il crée des dossiers, trie vos discussions, et étiquette ou renomme en lot sur tout votre historique.",
+      "workspaceAgentName": "Workspace Agent",
+      "workspaceAgentDesc": "Plus d'espaces de travail et plus de fichiers pour analyser ou modifier vos fichiers Word, Excel, PDF et de code.",
+      "browserAgentName": "Browser Agent",
+      "browserAgentDesc": "Va au-delà des suggestions : il regroupe vos onglets, ferme les doublons et range vos dossiers de favoris, avec un instantané que vous pouvez restaurer.",
+      "webAgentName": "Web Agent",
+      "webAgentDesc": "Confiez-lui une page web : il remplit des formulaires, enchaîne les étapes ou compile des tableaux, et vous approuvez chaque action.",
+      "chromeOnly": "Chrome uniquement",
+      "exportName": "Export vers Notion et Obsidian",
+      "exportDesc": "Envoyez discussions et extraits directement dans vos notes.",
+      "reassurance": "Aucune carte requise, rien à résilier. À la fin de l'essai, vous revenez simplement à la version gratuite, et tout ce que vous avez organisé reste en place.",
+      "details": "Ce que comprend Power Pack",
+      "start": "Commencer"
+    }
   },
   "hotkeys": {
     "title": "Raccourcis clavier",

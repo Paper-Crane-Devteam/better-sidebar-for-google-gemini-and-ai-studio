@@ -1277,7 +1277,27 @@
     "feedback": "Share feedback",
     "feedbackHint": "A short form. It tells us what to fix and build next.",
     "buy": "Get Power Pack",
-    "close": "Close"
+    "close": "Close",
+    "welcome": {
+      "title": "Welcome to Better Sidebar. Here's a small gift to start with",
+      "intro": "Better Sidebar helps you keep your Gemini and AI Studio chats in order: folders, tags, full-text search, a prompt library, and export. All of that is free, and it stays free.",
+      "powerPack": "On top of it there's Power Pack, an optional add-on that turns the built-in AI agents from helpers that look things up into helpers that actually get things done. Since you're new here, it's unlocked for your first 3 days, so you can see whether it fits your workflow before deciding anything.",
+      "unlockedTitle": "Unlocked for the next 3 days",
+      "sidebarAgentName": "BetterSidebar Agent",
+      "sidebarAgentDesc": "Describe it in a sentence, and it creates folders, sorts your chats, and batch-tags or renames across your whole history.",
+      "workspaceAgentName": "Workspace Agent",
+      "workspaceAgentDesc": "More workspaces and more files, for analyzing or editing your Word, Excel, PDF and code files.",
+      "browserAgentName": "Browser Agent",
+      "browserAgentDesc": "Goes beyond suggestions to actually group your tabs, close duplicates and tidy up bookmark folders, with a snapshot you can roll back.",
+      "webAgentName": "Web Agent",
+      "webAgentDesc": "Hand it a web page and it fills in forms, clicks through steps or pulls tables together, and you approve every action.",
+      "chromeOnly": "Chrome only",
+      "exportName": "Export to Notion & Obsidian",
+      "exportDesc": "Send conversations and snippets straight to your notes.",
+      "reassurance": "No card needed and nothing to cancel. When the trial ends, you simply go back to the free version, and everything you've organized stays where it is.",
+      "details": "What's in Power Pack",
+      "start": "Start exploring"
+    }
   },
   "hotkeys": {
     "title": "Keyboard Shortcuts",
