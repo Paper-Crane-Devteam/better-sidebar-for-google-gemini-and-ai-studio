@@ -38,15 +38,13 @@ import {
 export const DEFAULT_AGENT_ID: AgentId = 'bettersidebar';
 
 /**
- * Temporary kill switch for the Web Agent.
+ * Kill switch for the Web Agent.
  *
- * ⚠️ Off until the Web Agent Connector companion extension passes Chrome Web Store review —
- * without it the agent can't operate pages, so offering it would only lead to a dead end.
  * With this off the agent drops out of both the Agent tab dropdown and the `>` list, and any
- * stored `web` id falls back to the default agent via `normalizeAgentId`. Flip to `true` once
- * the Connector is live.
+ * stored `web` id falls back to the default agent via `normalizeAgentId`. It was held off
+ * until the Web Agent Connector companion extension passed Chrome Web Store review.
  */
-const WEB_AGENT_ENABLED = false;
+const WEB_AGENT_ENABLED = true;
 
 /**
  * Ids that used to mean something else.
