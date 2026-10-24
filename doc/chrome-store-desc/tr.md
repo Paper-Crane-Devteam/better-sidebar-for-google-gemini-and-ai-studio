@@ -130,7 +130,7 @@ Bir Agent seçmek için ">" yazın, ardından ne istediğinizi günlük dilde a�
 📁 Workspace Agent
 Belgeleri (Word, Excel, PDF, kod dosyaları ve daha fazlası) sürükleyin ve orijinal biçimlendirmeyi korurken yapay zekanın bunları analiz etmesine veya düzenlemesine izin verin. En fazla 5 dosya içeren 1 çalışma alanı için ücretsiz; Power Pack ile daha fazla çalışma alanı ve dosya.
 
-🌐 Browser Agent (Deneysel)
+🌐 Browser Agent
 Tüm pencerelerinizde sekmeleri tekilleştirin, ilgili sekmeleri gruplayın ve dağınık yer imi klasörlerini temizleyin. Sekmeleri düzenlemek, sekmeleri kapatmak, yer imlerini düzenlemek ve yer imlerini silmek için ayrı izin anahtarları. Tek tıklamayla geri alma ile her çalıştırmadan önce bir anlık görüntü alınır. Sekmeleri ve yer imlerini okumak ücretsizdir; Değişikliklerin uygulanması Power Pack gerektirir.
 
 🕹 Web Agent (Deneysel, Power Pack, Chrome)

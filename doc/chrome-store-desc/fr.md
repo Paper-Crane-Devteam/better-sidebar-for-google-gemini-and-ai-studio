@@ -130,7 +130,7 @@ Tapez « > » pour choisir un agent, puis décrivez ce que vous voulez avec vos 
 📁 Workspace Agent
 Glissez des documents (Word, Excel, PDF, fichiers de code, etc.) et laissez l'IA les analyser ou les modifier en conservant la mise en forme d'origine. Gratuit pour 1 espace de travail et jusqu'à 5 fichiers ; davantage d'espaces et de fichiers avec le Power Pack.
 
-🌐 Browser Agent (expérimental)
+🌐 Browser Agent
 Dédoublonnez les onglets sur toutes vos fenêtres, regroupez les onglets liés et rangez les dossiers de favoris en désordre. Des interrupteurs de permission distincts pour organiser les onglets, fermer les onglets, organiser les favoris et supprimer les favoris. Un instantané est pris avant chaque exécution, avec retour arrière en un clic. La lecture des onglets et favoris est gratuite ; appliquer les modifications nécessite le Power Pack.
 
 🕹 Web Agent (expérimental, Power Pack, Chrome)

@@ -130,7 +130,7 @@ Wpisz „>”, aby wybrać agenta, a następnie opisz, czego chcesz, w języku p
 📁 Workspace Agent
 Przeciągaj dokumenty (Word, Excel, PDF, pliki kodu i inne) i pozwól sztucznej inteligencji analizować je lub edytować, zachowując oryginalne formatowanie. Bezpłatnie dla 1 obszaru roboczego z maksymalnie 5 plikami; więcej obszarów roboczych i plików dzięki Power Pack.
 
-🌐 Browser Agent (eksperymentalny)
+🌐 Browser Agent
 Deduplikuj karty we wszystkich oknach, grupuj powiązane karty i sprzątaj bałagan w folderach zakładek. Oddzielne przełączniki uprawnień do porządkowania kart, zamykania kart, porządkowania zakładek i usuwania zakładek. Przed każdym uruchomieniem wykonywana jest migawka, którą można cofnąć jednym kliknięciem. Czytanie kart i zakładek jest bezpłatne; zastosowanie zmian wymaga pakietu Power Pack.
 
 🕹 Web Agent (eksperymentalny, Power Pack, Chrome)

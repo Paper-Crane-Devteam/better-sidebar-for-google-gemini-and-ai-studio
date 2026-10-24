@@ -130,7 +130,7 @@ Digite ">" para escolher um agente e descreva o que deseja em linguagem cotidian
 📁 Workspace Agent
 Arraste documentos (Word, Excel, PDF, arquivos de código e muito mais) e deixe a IA analisá-los ou editá-los, mantendo a formatação original. Gratuito para 1 espaço de trabalho com até 5 arquivos; mais espaços de trabalho e arquivos com o Power Pack.
 
-🌐 Browser Agent (experimental)
+🌐 Browser Agent
 Elimine a duplicação de guias em todas as suas janelas, agrupe guias relacionadas e limpe pastas bagunçadas de favoritos. Chaves de permissão separadas para organizar guias, fechar guias, organizar marcadores e excluir marcadores. Um instantâneo é obtido antes de cada execução, com reversão com um clique. A leitura de guias e marcadores é gratuita; a aplicação de mudanças precisa do Power Pack.
 
 🕹 Web Agent (experimental, Power Pack, Chrome)

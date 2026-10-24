@@ -130,7 +130,7 @@ AI Studio：
 📁 Workspace Agent
 拖入文件（Word、Excel、PDF、程式碼檔案等），讓 AI 幫你分析或編輯，同時保留原有排版。免費版支援 1 個工作區、最多 5 個檔案；更多工作區和檔案需要 Power Pack。
 
-🌐 Browser Agent（實驗性）
+🌐 Browser Agent
 跨所有視窗去除重複分頁、把相關分頁分組、清理雜亂的書籤資料夾。整理分頁、關閉分頁、整理書籤、刪除書籤各有獨立的權限開關。每次執行前都會自動建立快照，支援一鍵復原。讀取分頁和書籤免費；實際套用變更需要 Power Pack。
 
 🕹 Web Agent（實驗性、Power Pack、Chrome）

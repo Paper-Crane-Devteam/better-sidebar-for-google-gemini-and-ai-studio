@@ -130,7 +130,7 @@ Type ">" to pick an agent, then describe what you want in everyday language. Eac
 📁 Workspace Agent
 Drag in documents (Word, Excel, PDF, code files, and more) and let AI analyze or edit them while keeping the original formatting. Free for 1 workspace with up to 5 files; more workspaces and files with Power Pack.
 
-🌐 Browser Agent (Experimental)
+🌐 Browser Agent
 Deduplicate tabs across all your windows, group related tabs, and clean up messy bookmark folders. Separate permission switches for organizing tabs, closing tabs, organizing bookmarks, and deleting bookmarks. A snapshot is taken before every run, with one-click rollback. Reading tabs and bookmarks is free; applying changes needs Power Pack.
 
 🕹 Web Agent (Experimental, Power Pack, Chrome)

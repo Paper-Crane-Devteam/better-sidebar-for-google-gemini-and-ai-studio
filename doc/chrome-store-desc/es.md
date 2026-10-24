@@ -130,7 +130,7 @@ Escribe ">" para elegir un agente y describe lo que quieres con tus propias pala
 📁 Workspace Agent
 Arrastra documentos (Word, Excel, PDF, archivos de código y más) y deja que la IA los analice o edite conservando el formato original. Gratis para 1 espacio de trabajo con hasta 5 archivos; más espacios y archivos con Power Pack.
 
-🌐 Browser Agent (experimental)
+🌐 Browser Agent
 Elimina pestañas duplicadas en todas tus ventanas, agrupa pestañas relacionadas y ordena carpetas de marcadores desordenadas. Interruptores de permiso separados para organizar pestañas, cerrar pestañas, organizar marcadores y eliminar marcadores. Antes de cada ejecución se toma una instantánea, con reversión en un clic. Leer pestañas y marcadores es gratis; aplicar cambios requiere Power Pack.
 
 🕹 Web Agent (experimental, Power Pack, Chrome)

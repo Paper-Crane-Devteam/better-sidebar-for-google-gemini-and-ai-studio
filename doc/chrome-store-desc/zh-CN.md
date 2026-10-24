@@ -130,7 +130,7 @@ AI Studio：
 📁 Workspace Agent
 拖入文档（Word、Excel、PDF、代码文件等），让 AI 帮你分析或编辑，同时保留原有排版。免费版支持 1 个工作区、最多 5 个文件；更多工作区和文件需要 Power Pack。
 
-🌐 Browser Agent（实验性）
+🌐 Browser Agent
 跨所有窗口去重标签页、把相关标签页分组、清理杂乱的书签文件夹。整理标签页、关闭标签页、整理书签、删除书签各有独立的权限开关。每次执行前都会自动创建快照，支持一键回退。读取标签页和书签免费；实际应用更改需要 Power Pack。
 
 🕹 Web Agent（实验性、Power Pack、Chrome）

@@ -130,7 +130,7 @@ Digita ">" per scegliere un agente, quindi descrivi ciò che desideri nel lingua
 📁 Workspace Agent
 Trascina i documenti (Word, Excel, PDF, file di codice e altro) e lascia che l'intelligenza artificiale li analizzi o li modifichi mantenendo la formattazione originale. Gratuito per 1 area di lavoro con un massimo di 5 file; più spazi di lavoro e file con Power Pack.
 
-🌐 Browser Agent (sperimentale)
+🌐 Browser Agent
 Deduplica le schede in tutte le finestre, raggruppa le schede correlate e ripulisci le cartelle di segnalibri disordinate. Interruttori di autorizzazione separati per organizzare le schede, chiudere le schede, organizzare i segnalibri ed eliminare i segnalibri. Prima di ogni esecuzione viene scattata un'istantanea, con rollback con un clic. La lettura di schede e segnalibri è gratuita; per applicare le modifiche è necessario il Power Pack.
 
 🕹 Web Agent (sperimentale, Power Pack, Chrome)
