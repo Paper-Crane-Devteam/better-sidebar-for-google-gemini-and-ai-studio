@@ -3,8 +3,8 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 
-const DURATION = /^(\d+(?:\.\d+)?)(ms|s|m|h)$/;
-const UNIT_MS = { ms: 1, s: 1000, m: 60_000, h: 3_600_000 };
+const DURATION = /^(\d+(?:\.\d+)?)(ms|s|m|h|d)$/;
+const UNIT_MS = { ms: 1, s: 1000, m: 60_000, h: 3_600_000, d: 86_400_000 };
 
 export function parseDuration(v) {
   if (v == null) return null;

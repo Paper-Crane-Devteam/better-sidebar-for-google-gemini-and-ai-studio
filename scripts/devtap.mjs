@@ -35,6 +35,8 @@
  *   net start|stop|clear [ctx]    Capture the host page's XHR + fetch with bodies
  *   net list|dump [ctx]           List / decode captured traffic (net.mjs)
  *   gsend "<text>" [--new]        Type and send a Gemini message (gemini-ui.mjs)
+ *   trial [status|start|left <dur>|end|reset|license off|on]
+ *                                 Fake the Power Pack trial state (trial.mjs)
  *
  * Context labels:
  *   bg     background service worker
@@ -93,8 +95,10 @@ import {
 } from './devtap/commands.mjs';
 import { cmdNet } from './devtap/net.mjs';
 import { cmdGsend } from './devtap/gemini-ui.mjs';
+import { cmdTrial } from './devtap/trial.mjs';
 
 const COMMANDS = {
+  trial: cmdTrial,
   net: cmdNet,
   gsend: cmdGsend,
   targets: cmdTargets,
@@ -123,6 +127,8 @@ const HELP = `devtap — read the running extension from the command line
   net list|dump [ctx]         list / decode (batchexecute rpc, WebChannel protobuf)
                               → .kiro/devlog/net.txt   --grep <url re> --id 3,4
   gsend "<text>" [--new]      type + send a Gemini message, wait for the reply
+  trial [status|start|end|reset|left <dur>|license off|on]
+                              fake the Power Pack trial state (scripts/devtap/trial.mjs)
 
 contexts: bg  off  dbw  docw  gem  ais   (page logs are tagged gem/main, gem/ext)
 
