@@ -646,7 +646,10 @@
     "enablePlatform": "{{platform}} で有効にする",
     "badgeSupporter": "サポーター",
     "badgePower": "Power メンバー",
-    "badgeThanks": "Better Sidebar を応援していただきありがとうございます"
+    "badgeThanks": "Better Sidebar を応援していただきありがとうございます",
+    "badgeTrial": "Power Pack 体験版",
+    "trialDaysLeft_other": "残り {{count}} 日",
+    "trialTooltip": "{{date}} まで Power Pack のすべての機能をご利用いただけます"
   },
   "feedback": {
     "title": "お問い合わせ",

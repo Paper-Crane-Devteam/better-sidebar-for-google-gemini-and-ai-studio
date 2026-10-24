@@ -646,7 +646,10 @@
     "enablePlatform": "在 {{platform}} 啟用",
     "badgeSupporter": "支持者",
     "badgePower": "Power 會員",
-    "badgeThanks": "感謝你對 Better Sidebar 的支持"
+    "badgeThanks": "感謝你對 Better Sidebar 的支持",
+    "badgeTrial": "Power Pack 試用",
+    "trialDaysLeft_other": "剩餘 {{count}} 天",
+    "trialTooltip": "{{date}} 前可使用 Power Pack 的全部功能"
   },
   "feedback": {
     "title": "聯繫我們",

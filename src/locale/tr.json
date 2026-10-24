@@ -646,7 +646,11 @@
     "enablePlatform": "{{platform}} tarihinde etkinleştirin",
     "badgeSupporter": "Destekçi",
     "badgePower": "Güçlü Üye",
-    "badgeThanks": "Better Sidebar'ı desteklediğiniz için teşekkürler"
+    "badgeThanks": "Better Sidebar'ı desteklediğiniz için teşekkürler",
+    "badgeTrial": "Power Pack Deneme",
+    "trialDaysLeft_one": "{{count}} gün kaldı",
+    "trialDaysLeft_other": "{{count}} gün kaldı",
+    "trialTooltip": "Tüm Power Pack özellikleri {{date}} tarihine kadar açık"
   },
   "feedback": {
     "title": "İletişime Geçin",

@@ -25,6 +25,7 @@ import {
   useLicenseStore,
   type LicenseState,
 } from '@/shared/lib/license-store';
+import { localTrialEndsAt, useTrialStore } from '@/shared/lib/trial-store';
 import { browser } from 'wxt/browser';
 import {
   applyCachedExtensionPageTheme,
@@ -87,14 +88,34 @@ function DebouncedSlider({ value, min, max, step = 1, onChange }: {
   );
 }
 
-/** `pro` folds into `power`: it is a superset, and a third badge would be noise. */
-type MemberTier = 'support' | 'power' | null;
+/**
+ * `pro` folds into `power`: it is a superset, and a third badge would be noise.
+ * `trial` is Power Pack on the clock: the local install trial or a time-limited
+ * code. It wears the power lockup, slightly understated, plus a countdown.
+ */
+type MemberTier = 'support' | 'power' | 'trial' | null;
 
-function selectMemberTier(state: LicenseState): MemberTier {
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function selectPaidTier(state: LicenseState): 'support' | 'power' | null {
   if (!isLicenseValid(state)) return null;
   if (state.tier === 'support_pack') return 'support';
-  if (state.tier === 'power_pack' || state.tier === 'pro') return 'power';
+  // A time-limited code is a trial, not a membership.
+  if ((state.tier === 'power_pack' || state.tier === 'pro') && !state.endsAt) return 'power';
   return null;
+}
+
+/** End (ms) of the Power Pack trial currently running, if any. */
+function selectTrialEndsAt(license: LicenseState, localTrialEnd: number | null): number | null {
+  const now = Date.now();
+  const codeEnd =
+    isLicenseValid(license) &&
+    (license.tier === 'power_pack' || license.tier === 'pro') &&
+    license.endsAt
+      ? license.endsAt
+      : null;
+  const ends = [codeEnd, localTrialEnd].filter((t): t is number => !!t && t > now);
+  return ends.length ? Math.max(...ends) : null;
 }
 
 /**
@@ -108,6 +129,15 @@ const MEMBER_TITLE_GRADIENT: Record<Exclude<MemberTier, null>, string> = {
     'linear-gradient(90deg, rgb(var(--foreground)) 40%, rgb(var(--highlight)) 100%)',
   power:
     'linear-gradient(90deg, rgb(var(--foreground)) 30%, rgb(var(--highlight)) 72%, rgb(var(--ring)) 100%)',
+  trial:
+    'linear-gradient(90deg, rgb(var(--foreground)) 30%, rgb(var(--highlight)) 72%, rgb(var(--ring)) 100%)',
+};
+
+/** Crown fill per tier: trial gets an outline only, the "not yet yours" crown. */
+const CROWN_FILL: Record<Exclude<MemberTier, null>, number> = {
+  support: 0.2,
+  power: 0.45,
+  trial: 0,
 };
 
 /**
@@ -119,19 +149,25 @@ const MEMBER_TITLE_GRADIENT: Record<Exclude<MemberTier, null>, string> = {
  * Every colour is a theme token (--highlight, --ring, --background), so it
  * follows whichever preset is active.
  */
-function HeaderLockup({ tier }: { tier: MemberTier }) {
+function HeaderLockup({ tier, trialEndsAt }: { tier: MemberTier; trialEndsAt: number | null }) {
   const { t } = useI18n();
+  const isTrial = tier === 'trial' && !!trialEndsAt;
+  const daysLeft = isTrial ? Math.max(1, Math.ceil((trialEndsAt - Date.now()) / DAY_MS)) : 0;
+
+  const tooltip = isTrial
+    ? t('popup.trialTooltip', { date: new Date(trialEndsAt).toLocaleString() })
+    : tier
+      ? t('popup.badgeThanks')
+      : undefined;
 
   return (
-    <div
-      className="flex items-center gap-3"
-      title={tier ? t('popup.badgeThanks') : undefined}
-    >
+    <div className="flex items-center gap-3" title={tooltip}>
       <div className="relative shrink-0">
         <div
           className={cn(
             'w-10 h-10 rounded-xl bg-gradient-to-br from-primary/80 to-primary shadow-md flex items-center justify-center',
-            tier && 'ring-1 ring-highlight/40 ring-offset-2 ring-offset-background',
+            tier && 'ring-1 ring-offset-2 ring-offset-background',
+            tier && (isTrial ? 'ring-highlight/25' : 'ring-highlight/40'),
           )}
         >
           <img src="/icons/icon128.png" className="w-6 h-6 object-contain drop-shadow-sm" alt="Logo" />
@@ -147,7 +183,7 @@ function HeaderLockup({ tier }: { tier: MemberTier }) {
               className="w-[11px] h-[11px] text-highlight"
               strokeWidth={2.25}
               fill="currentColor"
-              fillOpacity={tier === 'power' ? 0.45 : 0.2}
+              fillOpacity={CROWN_FILL[tier]}
             />
           </span>
         )}
@@ -169,10 +205,22 @@ function HeaderLockup({ tier }: { tier: MemberTier }) {
         >
           {t('popup.title')}
         </h1>
-        {tier && (
-          <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] leading-none text-highlight/90">
-            {t(tier === 'power' ? 'popup.badgePower' : 'popup.badgeSupporter')}
+        {isTrial ? (
+          <span className="mt-0.5 flex items-center gap-1.5 leading-none">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-highlight/90">
+              {t('popup.badgeTrial')}
+            </span>
+            <span className="text-[10px] font-medium text-muted-foreground tabular-nums">
+              · {t('popup.trialDaysLeft', { count: daysLeft })}
+            </span>
           </span>
+        ) : (
+          tier &&
+          tier !== 'trial' && (
+            <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] leading-none text-highlight/90">
+              {t(tier === 'power' ? 'popup.badgePower' : 'popup.badgeSupporter')}
+            </span>
+          )
         )}
       </div>
     </div>
@@ -194,7 +242,12 @@ const Options = ({ initialEnabledState, detectedPlatform }: OptionsProps) => {
     return 'platforms';
   });
 
-  const memberTier = useLicenseStore(selectMemberTier);
+  const paidTier = useLicenseStore(selectPaidTier);
+  const localTrialEnd = useTrialStore((s) => localTrialEndsAt(s));
+  const trialEndsAt = useLicenseStore((s) => selectTrialEndsAt(s, localTrialEnd));
+  // Paid Power Pack never shows the trial; anyone else in a trial does.
+  const memberTier: MemberTier =
+    paidTier === 'power' ? 'power' : trialEndsAt ? 'trial' : paidTier;
   const theme = usePegasusStore((state) => state.theme);
   const customTheme = usePegasusStore((state) => state.customTheme);
 
@@ -244,7 +297,7 @@ const Options = ({ initialEnabledState, detectedPlatform }: OptionsProps) => {
 
       {/* Header */}
       <div className="relative z-10 w-full flex-shrink-0 flex flex-col items-center pt-6 pb-4 space-y-4 bg-background/50 backdrop-blur-sm">
-        <HeaderLockup tier={memberTier} />
+        <HeaderLockup tier={memberTier} trialEndsAt={trialEndsAt} />
 
         <div className="flex bg-muted/50 p-1 rounded-lg w-[85%]">
           <button

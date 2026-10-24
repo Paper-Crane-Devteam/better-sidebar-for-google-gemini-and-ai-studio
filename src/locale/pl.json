@@ -646,7 +646,12 @@
     "enablePlatform": "Włącz na {{platform}}",
     "badgeSupporter": "Wspierający",
     "badgePower": "Członek Power",
-    "badgeThanks": "Dziękujemy za wspieranie Better Sidebar"
+    "badgeThanks": "Dziękujemy za wspieranie Better Sidebar",
+    "badgeTrial": "Wersja próbna Power Pack",
+    "trialDaysLeft": "Pozostałe dni: {{count}}",
+    "trialDaysLeft_one": "Pozostałe dni: {{count}}",
+    "trialDaysLeft_other": "Pozostałe dni: {{count}}",
+    "trialTooltip": "Wszystkie funkcje Power Pack są odblokowane do {{date}}"
   },
   "feedback": {
     "title": "Skontaktuj się",

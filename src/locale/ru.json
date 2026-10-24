@@ -646,7 +646,13 @@
     "enablePlatform": "Включить на {{platform}}",
     "badgeSupporter": "Поддержка",
     "badgePower": "Участник Power",
-    "badgeThanks": "Спасибо, что поддерживаете Better Sidebar"
+    "badgeThanks": "Спасибо, что поддерживаете Better Sidebar",
+    "badgeTrial": "Пробная версия Power Pack",
+    "trialDaysLeft_one": "Остался {{count}} день",
+    "trialDaysLeft_few": "Осталось {{count}} дня",
+    "trialDaysLeft_many": "Осталось {{count}} дней",
+    "trialDaysLeft_other": "Осталось {{count}} дня",
+    "trialTooltip": "Все функции Power Pack доступны до {{date}}"
   },
   "feedback": {
     "title": "Связаться с нами",

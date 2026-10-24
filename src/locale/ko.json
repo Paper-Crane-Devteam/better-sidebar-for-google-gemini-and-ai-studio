@@ -646,7 +646,10 @@
     "enablePlatform": "{{platform}}에서 활성화",
     "badgeSupporter": "후원자",
     "badgePower": "파워 멤버",
-    "badgeThanks": "Better Sidebar를 후원해 주셔서 감사합니다"
+    "badgeThanks": "Better Sidebar를 후원해 주셔서 감사합니다",
+    "badgeTrial": "Power Pack 체험판",
+    "trialDaysLeft_other": "{{count}}일 남음",
+    "trialTooltip": "{{date}}까지 Power Pack의 모든 기능이 잠금 해제됩니다"
   },
   "feedback": {
     "title": "문의하세요",

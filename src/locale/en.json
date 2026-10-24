@@ -646,7 +646,11 @@
     "enablePlatform": "Enable on {{platform}}",
     "badgeSupporter": "Supporter",
     "badgePower": "Power Member",
-    "badgeThanks": "Thank you for supporting Better Sidebar"
+    "badgeThanks": "Thank you for supporting Better Sidebar",
+    "badgeTrial": "Power Pack Trial",
+    "trialDaysLeft_one": "{{count}} day left",
+    "trialDaysLeft_other": "{{count}} days left",
+    "trialTooltip": "Every Power Pack feature is unlocked until {{date}}"
   },
   "feedback": {
     "title": "Get in Touch",
