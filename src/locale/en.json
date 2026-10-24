@@ -835,6 +835,10 @@
         "title": "Prompt Library",
         "description": "Save, organize, and reuse your favorite prompts. Supports variables and one-click copy."
       },
+      "agent": {
+        "title": "Agent",
+        "description": "Let AI do the work for you. Type <b>&gt;</b> in the chat box to start. Pick an agent at the top of this tab: organize your chats and prompts, edit files in a workspace, or tidy up your tabs and bookmarks."
+      },
       "tags": {
         "title": "Tag Management",
         "description": "Create tags to categorize your conversations. Quickly filter and find what you need."
@@ -843,6 +847,10 @@
         "title": "Favorites",
         "description": "Quickly access your starred conversations. Right-click any conversation to add it to favorites."
       },
+      "snippets": {
+        "title": "Snippets",
+        "description": "Keep the useful parts of AI replies. Use the save button on a message, or select text and choose \"Save as Snippet\", then find it all here."
+      },
       "myStuff": {
         "title": "My Stuff",
         "description": "Quick access to your Gemini library — saved conversations, files, and more."
@@ -850,6 +858,14 @@
       "gems": {
         "title": "Gems",
         "description": "Access Gemini Gems — customized AI experts for specific tasks."
+      },
+      "notebooks": {
+        "title": "Notebooks",
+        "description": "Browse your Gemini Notebooks and start a new chat in any of them with one click."
+      },
+      "spark": {
+        "title": "Spark",
+        "description": "Jump to Gemini Spark: your tasks, schedules, skills, and connected apps."
       },
       "originalUI": {
         "title": "Switch to Original Sidebar",
