@@ -1,8 +1,9 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { CopyMinus, Crosshair, Pin, PinOff, X } from 'lucide-react';
+import { CopyMinus, Crosshair, Pin, X } from 'lucide-react';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { Button } from '@/shared/components/ui/button';
+import { cn } from '@/shared/lib/utils/utils';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
 import { FloatingPanel, type FloatingPanelRect } from '../../../../components/FloatingPanel';
 import { OutlineContent, type OutlineContentHandle } from './OutlineContent';
@@ -51,12 +52,13 @@ export const FloatingOutline: React.FC = () => {
             <Button
               variant="ghost"
               size="icon"
-              className={iconBtn}
+              className={cn(iconBtn, pinned && 'text-foreground')}
               onClick={() => setPinned(!pinned)}
               aria-pressed={pinned}
               aria-label={pinned ? t('outline.unpinFade') : t('outline.pinFade')}
             >
-              {pinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
+              {/* Same convention as pinned folders: tilted pin, filled when on. */}
+              <Pin className={cn('h-3.5 w-3.5 rotate-45', pinned && 'fill-current')} />
             </Button>
           </SimpleTooltip>
           <SimpleTooltip content={t('menu.locateCurrent')}>

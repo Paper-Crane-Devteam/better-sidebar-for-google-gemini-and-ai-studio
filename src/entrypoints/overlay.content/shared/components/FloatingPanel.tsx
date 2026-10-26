@@ -29,10 +29,9 @@ interface FloatingPanelProps {
   ariaLabel?: string;
   className?: string;
   /**
-   * Fade to a see-through "ghost" a moment after the pointer leaves, so the
-   * panel stops covering the page. The header stays visible as the way back;
-   * the body becomes click-through. Content reads the state from
-   * `FloatingPanelDimmedContext` to decide what stays legible.
+   * Shrink to just the header a moment after the pointer leaves, so the panel
+   * stops covering the page. The body disappears and becomes click-through;
+   * hovering the header brings it back.
    */
   autoDim?: boolean;
 }
@@ -43,9 +42,6 @@ const KEEP_VISIBLE = 48;
 const DIM_DELAY = 2000;
 /** Grace period after opening, so the panel doesn't vanish before it's noticed. */
 const DIM_INITIAL_DELAY = 4000;
-
-/** True while the enclosing FloatingPanel is faded out. */
-export const FloatingPanelDimmedContext = React.createContext(false);
 
 const SURFACE_STYLE: React.CSSProperties = {
   backgroundColor: 'var(--panel-bg, rgb(var(--popover)))',
@@ -354,8 +350,8 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
       data-dimmed={dimmed || undefined}
       className={cn(
         'fixed left-0 top-0 z-[9000] text-foreground',
-        // Ghost mode is click-through; only the header (and whatever the
-        // content opts back in) keeps receiving the pointer to wake it up.
+        // Collapsed mode is click-through; only the header keeps receiving
+        // the pointer, so hovering it wakes the panel.
         dimmed && 'pointer-events-none',
         className,
       )}
@@ -386,9 +382,13 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
       >
         <div
           className={cn(
-            'shrink-0 flex items-center h-8 pl-3 pr-1 gap-1 select-none cursor-grab active:cursor-grabbing border-b',
-            'transition-[opacity,border-color] ease-out motion-reduce:transition-none',
-            dimmed ? 'pointer-events-auto opacity-60 border-transparent' : 'border-border/40',
+            'shrink-0 flex items-center h-8 pl-3 pr-1 gap-1 select-none cursor-grab active:cursor-grabbing',
+            'transition-[opacity,border-color,background-color] ease-out motion-reduce:transition-none',
+            // Collapsed to a standalone bar: own solid background and border
+            // so the title never sits directly on page text.
+            dimmed
+              ? 'pointer-events-auto opacity-[0.85] rounded-lg border border-border/60 bg-popover'
+              : 'border-b border-border/40',
           )}
           style={{ touchAction: 'none', transitionDuration: dimmed ? '300ms' : '120ms' }}
           onPointerDown={onHeaderPointerDown}
@@ -398,10 +398,15 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
           </div>
           {actions && <div className="flex items-center shrink-0">{actions}</div>}
         </div>
-        <div className="flex-1 min-h-0 overflow-hidden">
-          <FloatingPanelDimmedContext.Provider value={dimmed}>
-            {children}
-          </FloatingPanelDimmedContext.Provider>
+        {/* Hidden, not unmounted: scroll position and expand state survive. */}
+        <div
+          className={cn(
+            'flex-1 min-h-0 overflow-hidden transition-opacity ease-out motion-reduce:transition-none',
+            dimmed && 'opacity-0',
+          )}
+          style={{ transitionDuration: dimmed ? '300ms' : '120ms' }}
+        >
+          {children}
         </div>
       </div>
 
