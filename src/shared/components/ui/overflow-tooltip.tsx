@@ -107,7 +107,24 @@ export const OverflowTooltip: React.FC<OverflowTooltipProps> = ({
     const tooltipEl = tooltipRef.current;
     if (!triggerEl || !tooltipEl) return null;
 
-    const triggerRect = triggerEl.getBoundingClientRect();
+    // For side placements, a container can opt in via `data-tooltip-boundary`
+    // to anchor the tooltip to its own left/right edges instead of the text,
+    // so the tooltip sits beside the whole panel rather than over it.
+    const ownRect = triggerEl.getBoundingClientRect();
+    const boundaryRect =
+      placement === 'left' || placement === 'right'
+        ? triggerEl.closest('[data-tooltip-boundary]')?.getBoundingClientRect()
+        : undefined;
+    const triggerRect = boundaryRect
+      ? {
+          top: ownRect.top,
+          bottom: ownRect.bottom,
+          height: ownRect.height,
+          left: boundaryRect.left,
+          right: boundaryRect.right,
+          width: boundaryRect.width,
+        }
+      : ownRect;
     const tooltipRect = tooltipEl.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
@@ -208,9 +225,12 @@ export const OverflowTooltip: React.FC<OverflowTooltipProps> = ({
 
     if (interactive) {
       // Delay hide to allow cursor to move to the tooltip
+      // Anchored to a boundary the tooltip sits farther from the text, so give
+      // the cursor a bit more time to travel across to it.
+      const anchoredToBoundary = !!triggerRef.current?.closest('[data-tooltip-boundary]');
       hideTimeoutRef.current = setTimeout(() => {
         setIsVisible(false);
-      }, hideDelay);
+      }, anchoredToBoundary ? Math.max(hideDelay, 300) : hideDelay);
     } else {
       setIsVisible(false);
     }

@@ -347,6 +347,7 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
       ref={rootRef}
       role="dialog"
       aria-label={ariaLabel}
+      data-tooltip-boundary
       data-dimmed={dimmed || undefined}
       className={cn(
         'fixed left-0 top-0 z-[9000] text-foreground',
