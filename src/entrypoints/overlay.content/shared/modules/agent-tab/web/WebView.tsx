@@ -11,8 +11,9 @@
  */
 
 import React from 'react';
-import { PanelRight, ShieldCheck } from 'lucide-react';
+import { PanelRight, ShieldCheck, SlidersHorizontal } from 'lucide-react';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { useAppStore } from '@/shared/lib/store';
 import { useLicenseStore } from '@/shared/lib/license-store';
 import { useTrialStore } from '@/shared/lib/trial-store';
 import { Button } from '@/shared/components/ui/button';
@@ -32,6 +33,7 @@ import { WEB_EXAMPLES } from './web-examples';
 
 export const WebView: React.FC = () => {
   const { t } = useI18n();
+  const setSettingsOpen = useAppStore((s) => s.setSettingsOpen);
   const { entryTitle, stage, problem, clearProblem, busy, stopRunning } = useStageExample(
     'web',
     t('agent.agents.web.name', { defaultValue: 'Web Agent' }),
@@ -81,6 +83,13 @@ export const WebView: React.FC = () => {
       />
 
       <div className="space-y-1.5">
+        {/* Same destination as the Better Sidebar panel: the Agents settings page, where
+            the Web Agent has its own section with its tools and skills. */}
+        <DestinationRow
+          icon={<SlidersHorizontal className="h-4 w-4" />}
+          label={t('agent.launcher.manage', { defaultValue: 'Skills & tools' })}
+          onClick={() => setSettingsOpen(true, 'agent')}
+        />
         <DestinationRow
           icon={<ShieldCheck className="h-4 w-4" />}
           label={t('agent.webPanel.riskNotice', { defaultValue: 'Risk notice and permission' })}
