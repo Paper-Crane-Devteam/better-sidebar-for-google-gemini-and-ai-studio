@@ -328,7 +328,7 @@
     "importData": "Importer des données",
     "importDataDescription": "Restaurer à partir d'un fichier de sauvegarde (SQL)",
     "import": "Importer",
-    "gdriveSync": "Google Drive Sync",
+    "gdriveSync": "Synchronisation Google Drive",
     "gdriveNotConnected": "Non connecté",
     "gdriveConnected": "Connecté",
     "gdriveConnect": "Connecter Google Drive",
@@ -1112,7 +1112,9 @@
     "collapseAll": "Tout réduire",
     "navigate": "Aller au message",
     "popOut": "Détacher",
-    "dockBack": "Rattacher à la barre latérale"
+    "dockBack": "Rattacher à la barre latérale",
+    "pinFade": "Garder le plan visible (ne pas l'estomper quand la souris s'éloigne)",
+    "unpinFade": "Estomper le plan quand la souris s'éloigne"
   },
   "firstInstall": {
     "title": "Importer la liste de conversations ?",

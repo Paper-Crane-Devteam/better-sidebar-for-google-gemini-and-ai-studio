@@ -1111,7 +1111,9 @@
     "collapseAll": "모두 축소",
     "navigate": "메시지로 이동",
     "popOut": "분리하기",
-    "dockBack": "사이드바에 다시 고정"
+    "dockBack": "사이드바에 다시 고정",
+    "pinFade": "개요 항상 표시 (마우스가 벗어나도 흐려지지 않음)",
+    "unpinFade": "마우스가 벗어나면 개요를 흐리게 표시"
   },
   "firstInstall": {
     "title": "대화 목록을 가져오시겠습니까?",

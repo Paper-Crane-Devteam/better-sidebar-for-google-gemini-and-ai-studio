@@ -1112,7 +1112,9 @@
     "collapseAll": "Contraer todo",
     "navigate": "Ir al mensaje",
     "popOut": "Desacoplar",
-    "dockBack": "Volver a acoplar a la barra lateral"
+    "dockBack": "Volver a acoplar a la barra lateral",
+    "pinFade": "Mantener el esquema visible (no atenuar al retirar el ratón)",
+    "unpinFade": "Atenuar el esquema al retirar el ratón"
   },
   "firstInstall": {
     "title": "¿Importar lista de conversaciones?",

@@ -328,7 +328,7 @@
     "importData": "Verileri İçe Aktarma",
     "importDataDescription": "Yedekleme dosyasından (SQL) geri yükleme",
     "import": "İçe aktarma",
-    "gdriveSync": "Google Drive Sync",
+    "gdriveSync": "Google Drive Senkronizasyonu",
     "gdriveNotConnected": "Bağlı değil",
     "gdriveConnected": "Bağlı",
     "gdriveConnect": "Google Drive'a bağlan",
@@ -1112,7 +1112,9 @@
     "collapseAll": "Tümünü daralt",
     "navigate": "Mesaja git",
     "popOut": "Ayır",
-    "dockBack": "Kenar çubuğuna geri yerleştir"
+    "dockBack": "Kenar çubuğuna geri yerleştir",
+    "pinFade": "Anahattı görünür tut (fare ayrıldığında soluklaşmasın)",
+    "unpinFade": "Fare ayrıldığında anahattı soluklaştır"
   },
   "firstInstall": {
     "title": "Konuşma Listesini İçe Aktarmak mı istiyorsunuz?",

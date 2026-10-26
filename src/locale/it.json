@@ -328,7 +328,7 @@
     "importData": "Importa dati",
     "importDataDescription": "Ripristina da un file di backup (SQL)",
     "import": "Importa",
-    "gdriveSync": "Google Drive Sync",
+    "gdriveSync": "Sincronizzazione Google Drive",
     "gdriveNotConnected": "Non connesso",
     "gdriveConnected": "Connesso",
     "gdriveConnect": "Connetti Google Drive",
@@ -1112,7 +1112,9 @@
     "collapseAll": "Comprimi tutto",
     "navigate": "Vai al messaggio",
     "popOut": "Stacca",
-    "dockBack": "Riaggancia alla barra laterale"
+    "dockBack": "Riaggancia alla barra laterale",
+    "pinFade": "Mantieni la struttura visibile (non sfumare quando il mouse si allontana)",
+    "unpinFade": "Sfuma la struttura quando il mouse si allontana"
   },
   "firstInstall": {
     "title": "Importare elenco conversazioni?",

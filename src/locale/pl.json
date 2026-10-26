@@ -328,7 +328,7 @@
     "importData": "Importuj dane",
     "importDataDescription": "Przywróć z pliku kopii zapasowej (SQL)",
     "import": "Importuj",
-    "gdriveSync": "Google Drive Sync",
+    "gdriveSync": "Synchronizacja z Google Drive",
     "gdriveNotConnected": "Brak połączenia",
     "gdriveConnected": "Połączono",
     "gdriveConnect": "Połącz Dysk Google",
@@ -1113,7 +1113,9 @@
     "collapseAll": "Zwiń wszystko",
     "navigate": "Przejdź do wiadomość",
     "popOut": "Odłącz",
-    "dockBack": "Przypnij z powrotem do paska bocznego"
+    "dockBack": "Przypnij z powrotem do paska bocznego",
+    "pinFade": "Zachowaj zarys widoczny (bez wygaszania po odsunięciu myszy)",
+    "unpinFade": "Wygaszaj zarys po odsunięciu myszy"
   },
   "firstInstall": {
     "title": "Importuj listę rozmów?",

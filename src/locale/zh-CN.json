@@ -1111,7 +1111,9 @@
     "collapseAll": "折叠全部",
     "navigate": "跳转到消息",
     "popOut": "弹出",
-    "dockBack": "停靠回侧边栏"
+    "dockBack": "停靠回侧边栏",
+    "pinFade": "保持大纲可见（鼠标移开后不再淡出）",
+    "unpinFade": "鼠标移开后让大纲淡出"
   },
   "firstInstall": {
     "title": "是否导入对话列表？",

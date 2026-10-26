@@ -1111,7 +1111,9 @@
     "collapseAll": "全部收合",
     "navigate": "跳轉到訊息",
     "popOut": "彈出",
-    "dockBack": "停靠回側邊欄"
+    "dockBack": "停靠回側邊欄",
+    "pinFade": "保持大綱可見（滑鼠移開後不再淡出）",
+    "unpinFade": "滑鼠移開後讓大綱淡出"
   },
   "firstInstall": {
     "title": "是否匯入對話列表？",

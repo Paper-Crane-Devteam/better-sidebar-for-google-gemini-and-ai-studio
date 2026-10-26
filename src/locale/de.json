@@ -159,7 +159,7 @@
     "untitledSystem": "Unbenanntes System",
     "aiStudioSystemFolderName": "AI Studio-System",
     "variablePromptHint": "Möchten Sie variable Prompts verwenden?",
-    "variablePromptModalTitle": "Variable Prompts",
+    "variablePromptModalTitle": "Variablen-Prompts",
     "variablePromptModalIntro": "Sie können Variablen im Prompt-Inhalt mit doppelten geschweiften Klammern verwenden. Wenn Sie einen Prompt kopieren, der Variablen enthält, werden Sie aufgefordert, deren Werte einzugeben.",
     "variablePromptModalExample": "Texteingabevariable:",
     "dropdownVariableExample": "Dropdown-Variable (durch Kommas getrennte Optionen):",
@@ -275,9 +275,9 @@
     "byDeveloper": "von {{name}}",
     "license": "Lizenz",
     "sourceCode": "Quellcode",
-    "githubRepository": "GitHub Repository",
+    "githubRepository": "GitHub-Repository",
     "changelog": "Änderungsprotokoll",
-    "userGuide": "Getting started guide",
+    "userGuide": "Einstiegsanleitung",
     "moreExtensions": "Mehr von Paper Crane Dev",
     "betterPlaylistsDesc": "Organisiere YouTube-Playlists mit einer Seitenleiste: Stapelweise verschieben, kopieren und entfernen, dazu Suche und Seitennavigation.",
     "update": {
@@ -299,11 +299,11 @@
     }
   },
   "sponsor": {
-    "title": "Share with Friends",
-    "enjoying": "Enjoying Better Sidebar?",
-    "shareDescription": "Share it with friends and help more people discover this free, open-source productivity tool",
-    "sponsorOnGithub": "Star on GitHub",
-    "copyLink": "Copy Link & Text",
+    "title": "Mit Freunden teilen",
+    "enjoying": "Gefällt dir Better Sidebar?",
+    "shareDescription": "Teile es mit Freunden und hilf mehr Menschen, dieses kostenlose Open-Source-Produktivitätstool zu entdecken",
+    "sponsorOnGithub": "Auf GitHub einen Stern geben",
+    "copyLink": "Link & Text kopieren",
     "copied": "Kopiert",
     "weibo": "Weibo",
     "xiaohongshu": "Xiaohongshu",
@@ -328,7 +328,7 @@
     "importData": "Daten importieren",
     "importDataDescription": "Aus einer Sicherungsdatei wiederherstellen (SQL)",
     "import": "Importieren",
-    "gdriveSync": "Google Drive Sync",
+    "gdriveSync": "Google Drive-Synchronisierung",
     "gdriveNotConnected": "Nicht verbunden",
     "gdriveConnected": "Verbunden",
     "gdriveConnect": "Google Drive verbinden",
@@ -1112,7 +1112,9 @@
     "collapseAll": "Alle reduzieren",
     "navigate": "Zur Nachricht gehen",
     "popOut": "Herauslösen",
-    "dockBack": "Wieder an die Seitenleiste andocken"
+    "dockBack": "Wieder an die Seitenleiste andocken",
+    "pinFade": "Gliederung sichtbar halten (nicht ausblenden, wenn die Maus den Bereich verlässt)",
+    "unpinFade": "Gliederung ausblenden, wenn die Maus den Bereich verlässt"
   },
   "firstInstall": {
     "title": "Konversationsliste importieren?",
