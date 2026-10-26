@@ -1080,6 +1080,8 @@
     "restoreToCompactView": "Restaurar a vista compacta",
     "collapseToIcon": "Contraer a icono",
     "expandToFullOutline": "Expandir a esquema completo",
+    "popOutOutline": "Abrir el esquema completo en una ventana flotante",
+    "dockOutline": "Cerrar el esquema flotante",
     "eraseTooltip": "¿El esquema no coincide con la página? Borra los mensajes guardados de esta conversación y recarga para capturarlos de nuevo.",
     "eraseConfirmTitle": "¿Borrar los mensajes guardados?",
     "eraseConfirmContent": "Elimina todos los mensajes que esta extensión guardó para la conversación actual y recarga la página para capturarlos otra vez desde el chat. La conversación en Gemini no se modifica.",

@@ -1080,6 +1080,8 @@
     "restoreToCompactView": "Sıkıştırılmış görünüme geri yükle",
     "collapseToIcon": "Simgeye daralt",
     "expandToFullOutline": "Tam olarak genişlet anahat",
+    "popOutOutline": "Tam ana hattı kayan bir pencerede aç",
+    "dockOutline": "Kayan ana hattı kapat",
     "eraseTooltip": "Anahat sayfayla eşleşmiyor mu? Bu görüşmenin kayıtlı mesajlarını temizleyin ve tekrar yakalamak için yeniden yükleyin.",
     "eraseConfirmTitle": "Kayıtlı mesajlar temizlensin mi?",
     "eraseConfirmContent": "Bu uzantının mevcut görüşme için kaydettiği tüm mesajları siler, ardından sohbetten tekrar yakalanmaları için sayfayı yeniden yükler. Gemini'deki ileti dizisine dokunulmadı.",

@@ -1079,6 +1079,8 @@
     "restoreToCompactView": "간단한 보기로 복원",
     "collapseToIcon": "아이콘으로 축소",
     "expandToFullOutline": "전체 개요로 확장",
+    "popOutOutline": "전체 개요를 플로팅 창으로 열기",
+    "dockOutline": "플로팅 개요 닫기",
     "eraseTooltip": "개요가 페이지와 일치하지 않습니까? 이 대화에 저장된 메시지를 지우고 다시 로드하여 다시 캡처하세요.",
     "eraseConfirmTitle": "저장된 메시지를 지우시겠습니까?",
     "eraseConfirmContent": "현재 대화에 대해 이 확장 프로그램에 저장된 모든 메시지를 삭제한 다음 페이지를 다시 로드하여 채팅에서 다시 캡처합니다. Gemini의 대화는 그대로 유지됩니다.",

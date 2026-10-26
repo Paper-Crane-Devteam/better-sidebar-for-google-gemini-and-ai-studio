@@ -1081,6 +1081,8 @@
     "restoreToCompactView": "Przywróć do widoku kompaktowego",
     "collapseToIcon": "Zwiń do ikony",
     "expandToFullOutline": "Rozwiń do pełnego konspekt",
+    "popOutOutline": "Otwórz pełny konspekt w pływającym oknie",
+    "dockOutline": "Zamknij pływający konspekt",
     "eraseTooltip": "Konspekt nie pasuje do strony? Wyczyść zapisane wiadomości w tej rozmowie i załaduj ją ponownie, aby przechwycić je ponownie.",
     "eraseConfirmTitle": "Wyczyścić zapisane wiadomości?",
     "eraseConfirmContent": "Usuwa wszystkie wiadomości zapisane przez to rozszerzenie dla bieżącej rozmowy, a następnie ponownie ładuje stronę, aby ponownie zostały przechwycone z czatu. Wątek w Gemini pozostaje niezmieniony.",

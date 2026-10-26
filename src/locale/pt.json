@@ -1080,6 +1080,8 @@
     "restoreToCompactView": "Restaurar para vista compacta",
     "collapseToIcon": "Recolher para ícone",
     "expandToFullOutline": "Expandir para esboço completo",
+    "popOutOutline": "Abrir o esboço completo em uma janela flutuante",
+    "dockOutline": "Fechar o esboço flutuante",
     "eraseTooltip": "O esboço não corresponde à página? Limpe as mensagens salvas desta conversa e recarregue para capturá-las de novo.",
     "eraseConfirmTitle": "Limpar as mensagens salvas?",
     "eraseConfirmContent": "Exclui todas as mensagens que esta extensão salvou para a conversa atual e recarrega a página para capturá-las novamente do chat. A conversa no Gemini não é alterada.",

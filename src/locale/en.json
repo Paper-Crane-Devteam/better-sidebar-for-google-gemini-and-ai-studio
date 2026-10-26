@@ -1080,6 +1080,8 @@
     "restoreToCompactView": "Restore to compact view",
     "collapseToIcon": "Collapse to icon",
     "expandToFullOutline": "Expand to full outline",
+    "popOutOutline": "Open the full outline in a floating window",
+    "dockOutline": "Close the floating outline",
     "eraseTooltip": "Outline not matching the page? Clear this conversation's saved messages and reload to capture them again.",
     "eraseConfirmTitle": "Clear saved messages?",
     "eraseConfirmContent": "Deletes every message this extension saved for the current conversation, then reloads the page so they are captured again from the chat. The conversation on Gemini is untouched.",

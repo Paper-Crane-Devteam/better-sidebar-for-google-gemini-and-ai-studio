@@ -1080,6 +1080,8 @@
     "restoreToCompactView": "In kompakter Ansicht wiederherstellen",
     "collapseToIcon": "Auf Symbol reduzieren",
     "expandToFullOutline": "Auf Vollbild erweitern Gliederung",
+    "popOutOutline": "Vollständige Gliederung in einem schwebenden Fenster öffnen",
+    "dockOutline": "Schwebende Gliederung schließen",
     "eraseTooltip": "Gliederung passt nicht zur Seite? Löschen Sie die gespeicherten Nachrichten dieser Konversation und laden Sie sie neu, um sie erneut zu erfassen.",
     "eraseConfirmTitle": "Gespeicherte Nachrichten löschen?",
     "eraseConfirmContent": "Löscht alle Nachrichten, die diese Erweiterung für die aktuelle Konversation gespeichert hat, und lädt dann die Seite neu, damit sie erneut aus dem Chat erfasst werden. Die Konversation auf Gemini ist unverändert.",

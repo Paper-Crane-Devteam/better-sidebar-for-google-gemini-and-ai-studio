@@ -1079,6 +1079,8 @@
     "restoreToCompactView": "コンパクトビューに戻す",
     "collapseToIcon": "アイコンに折りたたむ",
     "expandToFullOutline": "完全なアウトラインに展開",
+    "popOutOutline": "アウトライン全体をフローティングウィンドウで開く",
+    "dockOutline": "フローティングアウトラインを閉じる",
     "eraseTooltip": "アウトラインがページと合わない場合：この会話の保存済みメッセージを消去して再読み込みし、もう一度取得します。",
     "eraseConfirmTitle": "保存済みメッセージを消去しますか？",
     "eraseConfirmContent": "この拡張機能が現在の会話について保存したすべてのメッセージを削除し、ページを再読み込みしてチャットから再取得します。Gemini 上の会話自体は変更されません。",

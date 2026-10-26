@@ -1080,6 +1080,8 @@
     "restoreToCompactView": "Ripristina visualizzazione compatta",
     "collapseToIcon": "Comprimi nell'icona",
     "expandToFullOutline": "Espandi completamente struttura",
+    "popOutOutline": "Apri la struttura completa in una finestra mobile",
+    "dockOutline": "Chiudi la struttura mobile",
     "eraseTooltip": "La struttura non corrisponde alla pagina? Cancella i messaggi salvati di questa conversazione e ricarica per catturarli di nuovo.",
     "eraseConfirmTitle": "Cancellare i messaggi salvati?",
     "eraseConfirmContent": "Elimina tutti i messaggi salvati da questa estensione per la conversazione corrente, quindi ricarica la pagina in modo che vengano catturati nuovamente dalla chat. La conversazione su Gemini è intatta.",

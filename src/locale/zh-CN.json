@@ -1079,6 +1079,8 @@
     "restoreToCompactView": "恢复为紧凑视图",
     "collapseToIcon": "折叠为图标",
     "expandToFullOutline": "展开完整大纲",
+    "popOutOutline": "在浮动窗口中打开完整大纲",
+    "dockOutline": "关闭浮动大纲",
     "eraseTooltip": "大纲和页面对不上？清空本对话已保存的消息并刷新，重新抓取一遍。",
     "eraseConfirmTitle": "清空已保存的消息？",
     "eraseConfirmContent": "删除本插件为当前对话保存的所有消息，然后刷新页面，从聊天记录重新抓取。Gemini 上的对话本身不受影响。",

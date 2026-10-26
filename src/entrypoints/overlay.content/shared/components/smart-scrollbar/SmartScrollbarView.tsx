@@ -40,6 +40,10 @@ interface VariantStyles {
   /** Outline toggle button in the collapsed / expanded header */
   toggleCollapsed: string;
   toggleExpanded: string;
+  /** Wrapper for the icon buttons on the right of the expanded header */
+  headerActions: string;
+  /** One compact icon button in that wrapper */
+  headerAction: string;
   icon: string;
   /** Clickable cell around each dot */
   dotCell: string;
@@ -58,6 +62,8 @@ const VARIANT_STYLES: Record<SmartScrollbarVariant, VariantStyles> = {
     collapsedWidth: 'w-8',
     toggleCollapsed: 'p-2',
     toggleExpanded: 'px-3 py-2',
+    headerActions: 'gap-0.5 pr-1.5',
+    headerAction: 'h-6 w-6 rounded-md',
     icon: 'h-4 w-4',
     dotCell: 'h-4 w-6',
     dot: 'rounded-full',
@@ -73,6 +79,8 @@ const VARIANT_STYLES: Record<SmartScrollbarVariant, VariantStyles> = {
     collapsedWidth: 'w-6',
     toggleCollapsed: 'p-1.5',
     toggleExpanded: 'px-2.5 py-1.5',
+    headerActions: 'gap-0.5 pr-1',
+    headerAction: 'h-5 w-5 rounded-sm',
     icon: 'h-3.5 w-3.5',
     dotCell: 'h-3.5 w-5',
     dot: 'rounded-full',
@@ -200,8 +208,17 @@ export const SmartScrollbarView: React.FC<Props> = ({
             )}
           </button>
 
-          {expanded && showErase && <EraseMessagesButton />}
-          {expanded && <PopoutOutlineButton styles={styles} />}
+          {expanded && (
+            <div className={cn('flex items-center shrink-0', styles.headerActions)}>
+              {showErase && (
+                <EraseMessagesButton
+                  className={styles.headerAction}
+                  iconClassName={styles.icon}
+                />
+              )}
+              <PopoutOutlineButton styles={styles} />
+            </div>
+          )}
         </div>
 
         {/* Content area */}
@@ -279,7 +296,7 @@ const PopoutOutlineButton: React.FC<{ styles: VariantStyles }> = ({ styles }) =>
   const { t } = useI18n();
   const open = useSettingsStore((s) => s.outlinePopout.open);
   const setOpen = useSettingsStore((s) => s.setOutlinePopoutOpen);
-  const label = open ? t('outline.dockBack') : t('outline.popOut');
+  const label = open ? t('smartScrollbar.dockOutline') : t('smartScrollbar.popOutOutline');
 
   return (
     <SimpleTooltip content={label} side="left" sideOffset={8} delayDuration={100}>
@@ -289,7 +306,7 @@ const PopoutOutlineButton: React.FC<{ styles: VariantStyles }> = ({ styles }) =>
         aria-pressed={open}
         className={cn(
           'flex items-center justify-center shrink-0',
-          styles.toggleExpanded,
+          styles.headerAction,
           'transition-colors duration-150 hover:bg-accent/60',
           open ? 'text-primary' : 'text-muted-foreground hover:text-foreground',
         )}

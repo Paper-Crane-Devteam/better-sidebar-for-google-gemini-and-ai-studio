@@ -1080,6 +1080,8 @@
     "restoreToCompactView": "Restaurer en vue compacte",
     "collapseToIcon": "Réduire en icône",
     "expandToFullOutline": "Agrandir le plan complet",
+    "popOutOutline": "Ouvrir le plan complet dans une fenêtre flottante",
+    "dockOutline": "Fermer le plan flottant",
     "eraseTooltip": "Le plan ne correspond pas à la page ? Effacez les messages enregistrés de cette conversation et rechargez-les pour les capturer à nouveau.",
     "eraseConfirmTitle": "Effacer les messages enregistrés ?",
     "eraseConfirmContent": "Supprime tous les messages enregistrés par cette extension pour la conversation en cours, puis recharge la page afin qu'ils soient à nouveau capturés à partir du chat. La conversation sur Gemini est intacte.",

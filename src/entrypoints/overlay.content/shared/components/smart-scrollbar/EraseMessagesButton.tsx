@@ -24,7 +24,10 @@ import { toast } from '@/shared/lib/toast';
  * affordance is there whenever someone needs it. The confirm dialog is what keeps
  * a stray click harmless.
  */
-export const EraseMessagesButton: React.FC = () => {
+export const EraseMessagesButton: React.FC<{ className?: string; iconClassName?: string }> = ({
+  className,
+  iconClassName = 'h-4 w-4',
+}) => {
   const { t } = useI18n();
   const conversationDbId = useConversationMessagesStore((s) => s.conversationDbId);
   const [busy, setBusy] = useState(false);
@@ -75,15 +78,16 @@ export const EraseMessagesButton: React.FC = () => {
         disabled={busy}
         aria-label={t('smartScrollbar.eraseTooltip')}
         className={cn(
-          'flex items-center justify-center shrink-0 px-3 py-2',
+          'flex items-center justify-center shrink-0',
+          className ?? 'px-3 py-2',
           'transition-colors duration-150',
           'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
         )}
       >
         {busy ? (
-          <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+          <Loader2 className={cn(iconClassName, 'shrink-0 animate-spin')} />
         ) : (
-          <Eraser className="h-4 w-4 shrink-0" />
+          <Eraser className={cn(iconClassName, 'shrink-0')} />
         )}
       </button>
     </SimpleTooltip>
