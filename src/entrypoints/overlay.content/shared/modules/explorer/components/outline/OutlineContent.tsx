@@ -55,26 +55,8 @@ export const OutlineContent = forwardRef<OutlineContentHandle>((_, ref) => {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const activeRef = useRef<HTMLDivElement>(null!);
   const containerRef = useRef<HTMLDivElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
   // Only ever true inside the floating outline; the docked one has no provider.
   const dimmed = useContext(FloatingPanelDimmedContext);
-
-  // While faded, the active row is the only thing left to read, so keep it
-  // in view as the conversation scrolls. Scroll the list itself rather than
-  // scrollIntoView, which could also move the host page.
-  useEffect(() => {
-    if (!dimmed) return;
-    const list = listRef.current;
-    const row = activeRef.current?.firstElementChild as HTMLElement | null | undefined;
-    if (!list || !row) return;
-    const lr = list.getBoundingClientRect();
-    const rr = row.getBoundingClientRect();
-    if (rr.top >= lr.top && rr.bottom <= lr.bottom) return;
-    list.scrollTo({
-      top: list.scrollTop + (rr.top - lr.top) - lr.height / 3,
-      behavior: 'smooth',
-    });
-  }, [dimmed, activeMessageId]);
 
   useEffect(() => {
     setLocalQuery(searchQuery);
@@ -223,10 +205,9 @@ export const OutlineContent = forwardRef<OutlineContentHandle>((_, ref) => {
       {toolbar}
 
       <div
-        ref={listRef}
         className={cn(
           'flex-1 min-h-0 overflow-y-auto overflow-x-hidden custom-scrollbar',
-          dimmed && '[&::-webkit-scrollbar-thumb]:bg-transparent',
+          fade(dimmed),
         )}
       >
         <div className="py-1">
@@ -241,7 +222,6 @@ export const OutlineContent = forwardRef<OutlineContentHandle>((_, ref) => {
               activeRef={
                 section.userMessageId === activeMessageId ? activeRef : undefined
               }
-              dimmed={dimmed}
             />
           ))}
         </div>
