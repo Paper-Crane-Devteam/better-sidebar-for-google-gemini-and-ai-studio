@@ -546,6 +546,11 @@ export const exportDB = async (): Promise<string> => {
   return sendWorkerMessage('EXPORT');
 };
 
+/** Drop everything in the open database and rebuild it as a fresh install. */
+export const resetDB = async (): Promise<void> => {
+  return sendWorkerMessage('RESET');
+};
+
 export const importDB = async (data: string, chunk?: { index: number; total: number }): Promise<void> => {
   return sendWorkerMessage('IMPORT', { data, chunk });
 };

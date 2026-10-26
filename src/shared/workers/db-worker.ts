@@ -186,6 +186,50 @@ const closeDB = async () => {
   }
 };
 
+/**
+ * Wipe the open database back to a fresh install: every table, index and
+ * trigger goes, then SCHEMA and the migrations run exactly as on first open.
+ *
+ * Done here rather than with DROP statements from the caller for two reasons:
+ *  - Enumerating sqlite_master catches every table, including ones added later.
+ *    A hand-kept drop list is how notebooks, snippets and the agent tables used
+ *    to survive a "reset".
+ *  - Several columns only exist through migrations (gems.is_pinned, folder_id,
+ *    default_folder_id, …). Recreating tables from SCHEMA alone left them out
+ *    until the next DB open, so a sync-down right after a reset silently dropped
+ *    those columns and pin/move writes failed.
+ */
+const resetDatabase = async () => {
+  if (!db) throw new Error('DB not initialized');
+  const names = async (sql: string): Promise<string[]> =>
+    ((await db.run(sql)) as { name: string }[]).map((r) => r.name);
+
+  await db.run('PRAGMA foreign_keys = OFF;');
+  try {
+    for (const name of await names("SELECT name FROM sqlite_master WHERE type = 'trigger'")) {
+      await db.run(`DROP TRIGGER IF EXISTS "${name}"`);
+    }
+    // Virtual tables first: they take their shadow tables (messages_fts_data, …)
+    // with them, and those can't be dropped on their own.
+    for (const name of await names(
+      "SELECT name FROM sqlite_master WHERE type = 'table' AND sql LIKE 'CREATE VIRTUAL%'",
+    )) {
+      await db.run(`DROP TABLE IF EXISTS "${name}"`);
+    }
+    for (const name of await names(
+      "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'",
+    )) {
+      await db.run(`DROP TABLE IF EXISTS "${name}"`);
+    }
+
+    await db.run(SCHEMA);
+    await runMigrations(db);
+  } finally {
+    await db.run('PRAGMA foreign_keys = ON;');
+  }
+  await db.run('VACUUM');
+};
+
 const DB_LOG_PREFIX = '[DB]';
 
 // Helper to execute SQL with binding
@@ -513,6 +557,12 @@ const processMessage = async (e: MessageEvent) => {
       case 'EXPORT': {
         await handleExport(id);
         // postMessage is handled inside handleExport via chunks
+        break;
+      }
+
+      case 'RESET': {
+        await resetDatabase();
+        self.postMessage({ id, success: true });
         break;
       }
 
