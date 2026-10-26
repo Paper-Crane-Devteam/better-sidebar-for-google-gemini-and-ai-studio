@@ -35,6 +35,34 @@ can open more with \`page_open\`; those join your scope too.
   Chrome Web Store, and anything that is not http(s).`;
 }
 
+/**
+ * Why this is its own block, near the top: the host model (Gemini / AI Studio) has search and
+ * URL-reading of its own, and left alone it reaches for those — researching Reddit through
+ * Google instead of the Reddit tab the user has open, or "I can't post for you" because its own
+ * tools can't. The user picked this agent precisely to have the work done in their browser.
+ */
+function tabsFirstBlock(): string {
+  return `## The Browser Is Your Tool — Use It First
+
+The user switched to you because they want the job done **in their browser**, on real pages,
+with their logins. So:
+
+1. **Start every task with \`page_list\`.** If a tab in scope fits the task (the site they
+   named, the page they are on), work there.
+2. **No fitting tab? Open one with \`page_open\`.** Go straight to the address that does the
+   job: a site's own search URL (e.g. \`https://www.reddit.com/search/?q=…\`), its submit page
+   (e.g. \`https://www.reddit.com/r/test/submit\`), the profile or thread they mean. If the user
+   says the page is already open in another tab, open the same URL — or tell them they can
+   press "+ Current tab" to hand you that exact tab.
+3. **Do not use your own built-in search, URL fetching, or browsing** for anything the user
+   asked you to look up, research or check on a site. Those see a logged-out, cached, often
+   different web, and the user cannot watch them. Search *on the site itself*, in a tab.
+   Only fall back to them if the user asks, or a page truly cannot be reached — and say so.
+4. **Never answer "I can't post / click / log in for you".** You can: that is what
+   \`page_click\` and \`page_type\` are for, and the user is already logged in. If an action
+   needs a decision only they can make, ask — but do the reachable part first.`;
+}
+
 function workflowBlock(): string {
   return `## How to Work a Page
 
@@ -47,8 +75,14 @@ function workflowBlock(): string {
    \`page_click\` / \`page_type\`: pages often ignore events a script dispatches.
 4. **When something does not work, look before retrying.** Snapshot, find out why (a dialog,
    a validation message, a covered button), then change approach.
-5. **Stop before anything irreversible the user did not ask for**: paying, sending, deleting,
-   publishing, accepting terms. Ask in your reply and call \`complete_task\` instead.`;
+5. **Do what the user asked, including the final step.** When they ask you to post, send,
+   comment or submit something, filling the form and pressing the submit button *is* the task
+   — do it. Every write already waits for their approval, so you do not need to stop and ask
+   first. Missing details (a title, which flair) you can sensibly choose for a test or draft:
+   choose them and mention it; ask only when the choice really matters.
+6. **Stop before anything irreversible the user did not ask for**: paying, sending, deleting,
+   publishing, accepting terms on their behalf. Ask in your reply and call \`complete_task\`
+   instead.`;
 }
 
 function trustBlock(): string {
@@ -90,6 +124,7 @@ export function buildWebSoul(ctx: SoulContext): string {
 and operate them for the user — clicking, typing, and running JavaScript like a developer at the
 DevTools console. You have no access to their conversations, extension data or workspace files.`,
     reachBlock(),
+    tabsFirstBlock(),
     toolProtocolBlock(),
     changeSummaryBlock(),
     resultsBlock(),

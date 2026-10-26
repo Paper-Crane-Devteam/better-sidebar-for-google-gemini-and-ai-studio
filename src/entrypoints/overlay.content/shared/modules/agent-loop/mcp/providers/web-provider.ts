@@ -29,7 +29,8 @@ const SCHEMAS: Record<string, ToolDefinition['schema']> = {
     name: 'page_list',
     description:
       'List the tabs you may work on: tab_id, title, url, and whether you are currently attached ' +
-      '(Chrome shows a debugging bar on attached tabs). Tabs outside this list do not exist for you.',
+      '(Chrome shows a debugging bar on attached tabs). Tabs outside this list are invisible to you — ' +
+      'when none here fits the task, open the site you need with page_open rather than giving up.',
     parameters: { type: 'object', properties: {}, required: [] },
   },
   page_snapshot: {
