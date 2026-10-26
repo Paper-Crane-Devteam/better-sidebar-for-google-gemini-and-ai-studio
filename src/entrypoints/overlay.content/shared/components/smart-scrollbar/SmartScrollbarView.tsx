@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { List } from 'lucide-react';
+import { List, PictureInPicture2 } from 'lucide-react';
+import { useSettingsStore } from '@/shared/lib/settings-store';
 import { cn } from '@/shared/lib/utils/utils';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
 import { Z_INDEX } from '@/shared/lib/z-index';
@@ -200,6 +201,7 @@ export const SmartScrollbarView: React.FC<Props> = ({
           </button>
 
           {expanded && showErase && <EraseMessagesButton />}
+          {expanded && <PopoutOutlineButton styles={styles} />}
         </div>
 
         {/* Content area */}
@@ -268,6 +270,35 @@ export const SmartScrollbarView: React.FC<Props> = ({
 };
 
 // ── Sub-components ──────────────────────────────────────────────────
+
+/**
+ * Toggles the floating outline (the same one the Explorer pops out). Reads the
+ * shared store, so closing the panel from its own X flips this back too.
+ */
+const PopoutOutlineButton: React.FC<{ styles: VariantStyles }> = ({ styles }) => {
+  const { t } = useI18n();
+  const open = useSettingsStore((s) => s.outlinePopout.open);
+  const setOpen = useSettingsStore((s) => s.setOutlinePopoutOpen);
+  const label = open ? t('outline.dockBack') : t('outline.popOut');
+
+  return (
+    <SimpleTooltip content={label} side="left" sideOffset={8} delayDuration={100}>
+      <button
+        onClick={() => setOpen(!open)}
+        aria-label={label}
+        aria-pressed={open}
+        className={cn(
+          'flex items-center justify-center shrink-0',
+          styles.toggleExpanded,
+          'transition-colors duration-150 hover:bg-accent/60',
+          open ? 'text-primary' : 'text-muted-foreground hover:text-foreground',
+        )}
+      >
+        <PictureInPicture2 className={cn(styles.icon, 'shrink-0')} />
+      </button>
+    </SimpleTooltip>
+  );
+};
 
 interface DotItemProps {
   item: SmartScrollbarItem;
