@@ -369,8 +369,8 @@ const clip = (text: string, max = RESULT_CAP) => text.length > max ? `${text.sli
  * The projection: visible interactive elements with a ref, and the text between them.
  *
  * Refs live in `window.__bsAgentRefs`, rebuilt on every call — so a ref is only valid until
- * the next snapshot, which is the rule the tool descriptions state. Shadow roots are walked;
- * iframes are not (POC).
+ * the next snapshot, which is the rule the tool descriptions state. The walk follows the
+ * rendered (flat) tree, through open shadow roots and slots; iframes are not walked (POC).
  */
 const SNAPSHOT_JS = String.raw`(function (maxChars) {
   var INTERACTIVE = 'a[href],button,input,select,textarea,summary,[role=button],[role=link],[role=checkbox],[role=radio],[role=tab],[role=menuitem],[role=option],[role=switch],[role=combobox],[role=textbox],[contenteditable=""],[contenteditable=true],[onclick]';
@@ -380,6 +380,7 @@ const SNAPSHOT_JS = String.raw`(function (maxChars) {
   function push(line) { if (used + line.length + 1 > maxChars) { omitted++; return; } lines.push(line); used += line.length + 1; }
   function shown(el, st) {
     if (st.display === 'none' || st.visibility === 'hidden') return false;
+    if (el.checkVisibility && !el.checkVisibility()) return false;
     var r = el.getBoundingClientRect();
     return r.width > 0 || r.height > 0;
   }
@@ -413,6 +414,26 @@ const SNAPSHOT_JS = String.raw`(function (maxChars) {
     if (el.disabled || el.getAttribute('aria-disabled') === 'true') p.push('disabled');
     return p.join(' ');
   }
+  // Children as rendered (the flat tree): a shadow host shows its shadow root, not its light
+  // children; those only appear where a <slot> pulls them in. Walking light children as well
+  // printed unslotted, never-rendered content (hidden forms, inline scripts) as page text.
+  function kids(el) {
+    if (el.shadowRoot) return el.shadowRoot.childNodes;
+    if (el.tagName === 'SLOT') { var a = el.assignedNodes({ flatten: true }); return a.length ? a : el.childNodes; }
+    return el.childNodes;
+  }
+  // Bit 1: the rendered subtree holds an interactive element. Bit 2: it crosses a shadow root
+  // or slot. Either one rules out the innerText shortcut — querySelector and innerText both
+  // stop at shadow boundaries, which is how Reddit's title box and Post button went missing.
+  var memo = new WeakMap();
+  function deep(el) {
+    var m = memo.get(el); if (m !== undefined) return m;
+    var r = (el.shadowRoot || el.tagName === 'SLOT') ? 2 : 0;
+    if (el.matches(INTERACTIVE)) r |= 1;
+    var k = kids(el);
+    for (var i = 0; i < k.length && r !== 3; i++) if (k[i].nodeType === 1 && !SKIP[k[i].tagName]) r |= deep(k[i]);
+    memo.set(el, r); return r;
+  }
   function walk(el) {
     if (SKIP[el.tagName]) return;
     var st = getComputedStyle(el);
@@ -423,16 +444,17 @@ const SNAPSHOT_JS = String.raw`(function (maxChars) {
       return;
     }
     var block = st.display !== 'inline' && st.display !== 'contents';
-    if (block && !el.shadowRoot && !el.querySelector(INTERACTIVE) && st.visibility !== 'hidden') {
+    if (block && !deep(el) && st.visibility !== 'hidden') {
       var text = clip(el.innerText, 500);
       if (text) { var h = /^H[1-6]$/.test(el.tagName) ? '#'.repeat(+el.tagName[1]) + ' ' : ''; push(h + text); }
       return;
     }
-    for (var c = el.firstChild; c; c = c.nextSibling) {
+    var k = kids(el);
+    for (var i = 0; i < k.length; i++) {
+      var c = k[i];
       if (c.nodeType === 3) { var t = clip(c.nodeValue, 300); if (t && st.visibility !== 'hidden') push(t); }
       else if (c.nodeType === 1) walk(c);
     }
-    if (el.shadowRoot) for (var s = el.shadowRoot.firstElementChild; s; s = s.nextElementSibling) walk(s);
   }
   if (document.body) walk(document.body);
   window.__bsAgentRefs = refs;
@@ -448,8 +470,12 @@ const LOCATE_JS = String.raw`(function (ref) {
   el.scrollIntoView({ block: 'center', inline: 'center' });
   var r = el.getBoundingClientRect();
   var x = r.left + r.width / 2, y = r.top + r.height / 2;
+  // elementFromPoint stops at the outermost shadow host; drill down to what is really there.
   var top = document.elementFromPoint(x, y);
-  var covered = top && top !== el && !el.contains(top) && !top.contains(el) && !(el.getRootNode() && el.getRootNode().host === top);
+  while (top && top.shadowRoot) { var d = top.shadowRoot.elementFromPoint(x, y); if (!d || d === top) break; top = d; }
+  // Ancestry across shadow boundaries: parentNode, or the host once a shadow root is reached.
+  function within(node, anc) { for (; node; node = node.parentNode || node.host) if (node === anc) return true; return false; }
+  var covered = top && !within(top, el) && !within(el, top);
   return { x: x, y: y, covered: covered ? (top.tagName.toLowerCase() + (top.id ? '#' + top.id : '')) : null };
 })`;
 
@@ -462,7 +488,10 @@ const FOCUS_JS = String.raw`(function (ref, clear) {
     if (typeof el.select === 'function') el.select();
     else if (el.isContentEditable) { var range = document.createRange(); range.selectNodeContents(el); var sel = getSelection(); sel.removeAllRanges(); sel.addRange(range); }
   }
-  return document.activeElement === el || el.contains(document.activeElement) ? 'ok' : 'unfocused';
+  // document.activeElement is the outermost shadow host; follow it to the real focus.
+  var a = document.activeElement;
+  while (a && a.shadowRoot && a.shadowRoot.activeElement) a = a.shadowRoot.activeElement;
+  return a === el || el.contains(a) || (el.shadowRoot && el.shadowRoot.contains(a)) ? 'ok' : 'unfocused';
 })`;
 
 const STALE = 'ERROR: That ref is from an older snapshot, or the element is gone. Call page_snapshot again and use a fresh ref.';

@@ -40,7 +40,7 @@
  */
 
 import type { ParsedToolCall, ParseResult } from '../../types';
-import { MAX_TOOL_CALLS, TOOL_BLOCK_PATTERN, findMissingParams, isSupportedTool } from './tool-schema';
+import { MAX_TOOL_CALLS, TOOL_BLOCK_PATTERN, findMissingParams, innermostToolBlock, isSupportedTool } from './tool-schema';
 import { describeJsonFault, tryParseJson, tryParseUnstructured } from './fallbacks';
 
 export {
@@ -67,7 +67,7 @@ export function parseToolCalls(responseText: string): ParseResult {
       break;
     }
 
-    const block = match[1];
+    const block = innermostToolBlock(match[1]);
     const parsed = tryParseJson(block) || tryParseUnstructured(block);
 
     if (!parsed) {

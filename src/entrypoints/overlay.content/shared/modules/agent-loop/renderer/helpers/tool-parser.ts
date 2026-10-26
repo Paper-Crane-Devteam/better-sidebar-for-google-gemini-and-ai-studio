@@ -13,6 +13,7 @@ import {
   TOOL_BLOCK_PATTERN,
   TOOL_CLOSE_PATTERN,
   TOOL_OPEN_PATTERN,
+  innermostToolBlock,
 } from '../../engine/parser/tool-schema';
 import type { ParsedToolCall } from '../../types';
 import { tryParseJson, tryParseUnstructured } from '../../engine/parser/fallbacks';
@@ -32,6 +33,13 @@ export interface ExtractedToolCall {
    * instead of leaving a gap that fills in all at once when the turn ends.
    */
   pending: boolean;
+}
+
+/** Offset of the last open tag in a matched block (0 when there is only the one). */
+function lastOpenOffset(block: string): number {
+  let at = 0;
+  for (const m of block.matchAll(new RegExp(TOOL_OPEN_PATTERN, 'g'))) at = m.index ?? at;
+  return at;
 }
 
 /** Strip the `<bs_agent_tool>` wrapper if there is one */
@@ -67,15 +75,18 @@ export function parseAllToolCallsFromText(
   let consumedTo = 0;
 
   while ((match = tagRegex.exec(text)) !== null) {
-    const fullMatch = match[0];
-    consumedTo = match.index + fullMatch.length;
+    consumedTo = match.index + match[0].length;
+    // Same pairing as the engine (`innermostToolBlock`): start at the last open tag, so a
+    // tag mentioned in prose before the call stays prose instead of joining the card.
+    const startIndex = match.index + lastOpenOffset(match[0]);
+    const fullMatch = text.slice(startIndex, consumedTo);
     const parsed = parseToolCallFromText(fullMatch);
     if (parsed) {
       results.push({
         toolCall: parsed,
-        rawText: match[1].trim(),
+        rawText: innermostToolBlock(match[1]).trim(),
         matchString: fullMatch,
-        startIndex: match.index,
+        startIndex,
         endIndex: consumedTo,
         pending: false,
       });

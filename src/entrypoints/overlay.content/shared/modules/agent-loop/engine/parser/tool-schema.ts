@@ -211,9 +211,24 @@ export function deliversResultToAI(name: string): boolean {
  * from the top, which wastes a round and can re-run the first half.
  */
 export function hasUnclosedToolBlock(responseText: string): boolean {
-  const opens = [...responseText.matchAll(new RegExp(TOOL_OPEN_PATTERN, 'g'))].length;
-  const closes = [...responseText.matchAll(new RegExp(TOOL_CLOSE_PATTERN, 'g'))].length;
-  return opens > closes;
+  // Only an open tag *after* the last close counts. Comparing totals misread a tag merely
+  // mentioned in prose ("let me write the call using <bs_agent_tool>") as a cut-off
+  // response, even though the real call after it was complete.
+  const lastIndex = (pattern: string) =>
+    [...responseText.matchAll(new RegExp(pattern, 'g'))].reduce((at, m) => m.index ?? at, -1);
+  return lastIndex(TOOL_OPEN_PATTERN) > lastIndex(TOOL_CLOSE_PATTERN);
+}
+
+/**
+ * The call inside a matched block: whatever follows the *last* open tag in it.
+ *
+ * The block regex is lazy from the first open tag, so a tag mentioned in prose before the
+ * real call swallows the prose into the block and the JSON never parses. Pairing each close
+ * with its nearest open is what the model meant.
+ */
+export function innermostToolBlock(block: string): string {
+  const parts = block.split(new RegExp(TOOL_OPEN_PATTERN));
+  return parts[parts.length - 1];
 }
 
 export function isSupportedTool(name: string): boolean {

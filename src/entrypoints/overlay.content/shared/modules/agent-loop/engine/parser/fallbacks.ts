@@ -50,13 +50,18 @@ function buildCall(json: string): ParsedToolCall | null {
     const obj = JSON.parse(json);
     if (typeof obj.name !== 'string') return null;
 
+    // No `params` object: the model put the params at the top level, next to `name`
+    // (seen as `{"name":"complete_task","summary":"…","status":"success"}`). Nothing else
+    // could be meant by those keys, so read them as the params instead of bouncing the call.
+    const hasParams = typeof obj.params === 'object' && obj.params !== null;
+    const rawParams: Record<string, unknown> = hasParams
+      ? obj.params
+      : Object.fromEntries(Object.entries(obj).filter(([k]) => k !== 'name' && k !== 'description' && k !== 'params'));
+
     return {
       name: obj.name.trim(),
       description: typeof obj.description === 'string' ? obj.description.trim() : undefined,
-      params:
-        typeof obj.params === 'object' && obj.params !== null
-          ? Object.fromEntries(Object.entries(obj.params).map(([k, v]) => [k, asParamValue(v)]))
-          : {},
+      params: Object.fromEntries(Object.entries(rawParams).map(([k, v]) => [k, asParamValue(v)])),
     };
   } catch {
     return null;
