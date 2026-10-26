@@ -114,8 +114,26 @@ export const OverflowTooltip: React.FC<OverflowTooltipProps> = ({
 
     let top = 0;
     let left = 0;
+    const margin = 8;
 
-    switch (placement) {
+    // Flip to the opposite side when the preferred side can't fit the tooltip
+    // (e.g. a popped-out outline docked against the right edge). If neither
+    // side fits, use whichever has more room and let clamping handle the rest.
+    const room = {
+      right: viewportWidth - margin - (triggerRect.right + offset),
+      left: triggerRect.left - offset - margin,
+      bottom: viewportHeight - margin - (triggerRect.bottom + offset),
+      top: triggerRect.top - offset - margin,
+    };
+    const opposite = { right: 'left', left: 'right', top: 'bottom', bottom: 'top' } as const;
+    const needed = placement === 'left' || placement === 'right' ? tooltipRect.width : tooltipRect.height;
+    let side: OverflowTooltipPlacement = placement;
+    if (room[placement] < needed) {
+      const alt = opposite[placement];
+      if (room[alt] >= needed || room[alt] > room[placement]) side = alt;
+    }
+
+    switch (side) {
       case 'right':
         top = triggerRect.top + triggerRect.height / 2 - tooltipRect.height / 2;
         left = triggerRect.right + offset;
@@ -137,7 +155,6 @@ export const OverflowTooltip: React.FC<OverflowTooltipProps> = ({
     }
 
     // Viewport clamping
-    const margin = 8;
     if (top < margin) top = margin;
     if (top + tooltipRect.height > viewportHeight - margin)
       top = viewportHeight - margin - tooltipRect.height;
@@ -152,6 +169,9 @@ export const OverflowTooltip: React.FC<OverflowTooltipProps> = ({
   useEffect(() => {
     if (isVisible) {
       setIsPositioned(false);
+      // Measure from the top-left corner so a previous right-edge position
+      // can't shrink-wrap the tooltip and skew the flip decision.
+      setPosition({ top: 0, left: 0 });
       // Double rAF: first frame renders the invisible tooltip so we can measure,
       // second frame applies position directly to DOM and reveals.
       requestAnimationFrame(() => {
