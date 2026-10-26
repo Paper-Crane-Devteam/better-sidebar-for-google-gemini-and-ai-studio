@@ -77,7 +77,12 @@ export function OutlineSectionItem({
 
         <div className="flex-1 min-w-0 flex items-center overflow-hidden node-text-content">
           <OverflowTooltip
-            content={section.userQueryFull || section.userQuery}
+            content={
+              // Same cap as node previews: long prompts scroll inside the tooltip.
+              <div className="max-h-[300px] overflow-y-auto custom-scrollbar-inverted">
+                {section.userQueryFull || section.userQuery}
+              </div>
+            }
             placement="right"
             interactive
             className={cn(

@@ -3,6 +3,8 @@ import { createPortal } from 'react-dom';
 import { cn } from '@/shared/lib/utils/utils';
 import { TooltipHelper } from '@/shared/lib/tooltip-helper';
 
+const stopPropagation = (e: React.SyntheticEvent) => e.stopPropagation();
+
 export type OverflowTooltipPlacement = 'top' | 'bottom' | 'left' | 'right';
 
 export interface OverflowTooltipProps {
@@ -344,6 +346,14 @@ export const OverflowTooltip: React.FC<OverflowTooltipProps> = ({
             }}
             onMouseEnter={interactive ? handleTooltipMouseEnter : undefined}
             onMouseLeave={interactive ? handleTooltipMouseLeave : undefined}
+            // React bubbles synthetic events through portals along the component
+            // tree, so without this a click inside the tooltip would reach the
+            // trigger's ancestors (e.g. toggle an outline node).
+            onClick={stopPropagation}
+            onDoubleClick={stopPropagation}
+            onMouseDown={stopPropagation}
+            onPointerDown={stopPropagation}
+            onContextMenu={stopPropagation}
           >
             {typeof content === 'function' ? content(isOverflowing) : (content ?? children)}
           </div>,
