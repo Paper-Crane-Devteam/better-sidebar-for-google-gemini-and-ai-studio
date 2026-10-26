@@ -28,16 +28,36 @@ interface FloatingPanelProps {
   minHeight?: number;
   ariaLabel?: string;
   className?: string;
+  /**
+   * Fade to a see-through "ghost" a moment after the pointer leaves, so the
+   * panel stops covering the page. The header stays visible as the way back;
+   * the body becomes click-through. Content reads the state from
+   * `FloatingPanelDimmedContext` to decide what stays legible.
+   */
+  autoDim?: boolean;
 }
 
 /** How much of the panel must stay on screen so it can always be grabbed again. */
 const KEEP_VISIBLE = 48;
+/** Delay after the pointer leaves before fading out. */
+const DIM_DELAY = 2000;
+/** Grace period after opening, so the panel doesn't vanish before it's noticed. */
+const DIM_INITIAL_DELAY = 4000;
+
+/** True while the enclosing FloatingPanel is faded out. */
+export const FloatingPanelDimmedContext = React.createContext(false);
 
 const SURFACE_STYLE: React.CSSProperties = {
   backgroundColor: 'var(--panel-bg, rgb(var(--popover)))',
   boxShadow: 'var(--shadow-panel)',
   backdropFilter: 'var(--panel-blur)',
   WebkitBackdropFilter: 'var(--panel-blur)',
+};
+const DIMMED_SURFACE_STYLE: React.CSSProperties = {
+  backgroundColor: 'transparent',
+  boxShadow: 'none',
+  backdropFilter: 'none',
+  WebkitBackdropFilter: 'none',
 };
 const HEADER_HEIGHT = 32;
 
@@ -125,6 +145,7 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
   minHeight = 160,
   ariaLabel,
   className,
+  autoDim = false,
 }) => {
   const container = usePanelLayer();
 
@@ -139,6 +160,70 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
     startY: number;
     start: FloatingPanelRect;
   } | null>(null);
+
+  // ── Auto-dim ─────────────────────────────────────────────────────
+  // Hover/focus live in refs so the timer callback sees current values
+  // without re-creating handlers; only `dimmed` itself is React state.
+  const [dimmed, setDimmed] = useState(false);
+  const hoverRef = useRef(false);
+  const focusRef = useRef(false);
+  const dimTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const clearDimTimer = () => {
+    if (dimTimerRef.current) clearTimeout(dimTimerRef.current);
+    dimTimerRef.current = undefined;
+  };
+
+  const scheduleDim = useCallback(
+    (delay: number) => {
+      clearDimTimer();
+      if (!autoDim) return;
+      dimTimerRef.current = setTimeout(() => {
+        dimTimerRef.current = undefined;
+        if (hoverRef.current || focusRef.current || dragRef.current) return;
+        setDimmed(true);
+      }, delay);
+    },
+    [autoDim],
+  );
+
+  const wake = () => {
+    clearDimTimer();
+    setDimmed(false);
+  };
+
+  useEffect(() => {
+    if (!autoDim) {
+      clearDimTimer();
+      setDimmed(false);
+    } else if (!hoverRef.current && !focusRef.current) {
+      scheduleDim(DIM_INITIAL_DELAY);
+    }
+    return clearDimTimer;
+  }, [autoDim, scheduleDim]);
+
+  const onPointerEnter = () => {
+    hoverRef.current = true;
+    wake();
+  };
+  const onPointerLeave = () => {
+    hoverRef.current = false;
+    if (!dragRef.current && !focusRef.current) scheduleDim(DIM_DELAY);
+  };
+  const onFocus = (e: React.FocusEvent) => {
+    // Only focus that implies the user is working in the panel (keyboard,
+    // or typing in an input) holds it open. A mouse click leaves the button
+    // focused, which would otherwise block the fade until something else
+    // takes focus.
+    const el = e.target as HTMLElement;
+    focusRef.current = !!el.matches?.(':focus-visible');
+    if (focusRef.current) wake();
+  };
+  const onBlur = (e: React.FocusEvent) => {
+    if (rootRef.current?.contains(e.relatedTarget as Node | null)) return;
+    focusRef.current = false;
+    if (!hoverRef.current) scheduleDim(DIM_DELAY);
+  };
 
   const applyRect = useCallback(() => {
     const el = rootRef.current;
@@ -252,6 +337,9 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
     applyRect();
     setInteracting(false);
     onRectCommit?.({ ...rectRef.current });
+    // Released outside the panel: pointerleave may have fired mid-drag and
+    // been ignored, so start the fade from here.
+    if (!hoverRef.current && !focusRef.current) scheduleDim(DIM_DELAY);
   };
 
   if (!container) return null;
@@ -263,7 +351,14 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
       ref={rootRef}
       role="dialog"
       aria-label={ariaLabel}
-      className={cn('fixed left-0 top-0 z-[9000] text-foreground', className)}
+      data-dimmed={dimmed || undefined}
+      className={cn(
+        'fixed left-0 top-0 z-[9000] text-foreground',
+        // Ghost mode is click-through; only the header (and whatever the
+        // content opts back in) keeps receiving the pointer to wake it up.
+        dimmed && 'pointer-events-none',
+        className,
+      )}
       style={{
         transform: `translate3d(${r.x}px, ${r.y}px, 0)`,
         width: r.width,
@@ -274,15 +369,28 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
       onPointerUp={end}
       onPointerCancel={end}
       onLostPointerCapture={end}
+      onPointerEnter={onPointerEnter}
+      onPointerLeave={onPointerLeave}
+      onFocus={onFocus}
+      onBlur={onBlur}
     >
       <div
         ref={surfaceRef}
-        className="absolute inset-0 flex flex-col rounded-lg overflow-hidden border border-border/60"
-        style={SURFACE_STYLE}
+        className={cn(
+          'absolute inset-0 flex flex-col rounded-lg overflow-hidden border',
+          'transition-[background-color,box-shadow,border-color] ease-out motion-reduce:transition-none',
+          dimmed ? 'border-transparent' : 'border-border/60',
+        )}
+        // Fade out slowly, come back fast so waking never feels sluggish.
+        style={{ ...(dimmed ? DIMMED_SURFACE_STYLE : SURFACE_STYLE), transitionDuration: dimmed ? '300ms' : '120ms' }}
       >
         <div
-          className="shrink-0 flex items-center h-8 pl-3 pr-1 gap-1 select-none cursor-grab active:cursor-grabbing border-b border-border/40"
-          style={{ touchAction: 'none' }}
+          className={cn(
+            'shrink-0 flex items-center h-8 pl-3 pr-1 gap-1 select-none cursor-grab active:cursor-grabbing border-b',
+            'transition-[opacity,border-color] ease-out motion-reduce:transition-none',
+            dimmed ? 'pointer-events-auto opacity-60 border-transparent' : 'border-border/40',
+          )}
+          style={{ touchAction: 'none', transitionDuration: dimmed ? '300ms' : '120ms' }}
           onPointerDown={onHeaderPointerDown}
         >
           <div className="flex-1 min-w-0 truncate text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -290,7 +398,11 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
           </div>
           {actions && <div className="flex items-center shrink-0">{actions}</div>}
         </div>
-        <div className="flex-1 min-h-0 overflow-hidden">{children}</div>
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <FloatingPanelDimmedContext.Provider value={dimmed}>
+            {children}
+          </FloatingPanelDimmedContext.Provider>
+        </div>
       </div>
 
       {HANDLES.map(({ dir, className: handleClass }) => (

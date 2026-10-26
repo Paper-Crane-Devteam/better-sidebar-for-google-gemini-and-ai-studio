@@ -1,4 +1,12 @@
-import { useState, useRef, useImperativeHandle, forwardRef, useCallback, useEffect } from 'react';
+import {
+  useState,
+  useRef,
+  useImperativeHandle,
+  forwardRef,
+  useCallback,
+  useEffect,
+  useContext,
+} from 'react';
 import { List, Search, X, Filter } from 'lucide-react';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useOutline } from './useOutline';
@@ -8,6 +16,14 @@ import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/entrypoints/overlay.content/shared/components/ui/input';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
 import { debounce } from 'lodash';
+import { cn } from '@/shared/lib/utils/utils';
+import { FloatingPanelDimmedContext } from '../../../../components/FloatingPanel';
+
+const fade = (dimmed: boolean) =>
+  cn(
+    'transition-opacity ease-out motion-reduce:transition-none',
+    dimmed ? 'duration-300 opacity-[0.12]' : 'duration-150',
+  );
 
 export interface OutlineContentHandle {
   collapseAll: () => void;
@@ -39,6 +55,26 @@ export const OutlineContent = forwardRef<OutlineContentHandle>((_, ref) => {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const activeRef = useRef<HTMLDivElement>(null!);
   const containerRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  // Only ever true inside the floating outline; the docked one has no provider.
+  const dimmed = useContext(FloatingPanelDimmedContext);
+
+  // While faded, the active row is the only thing left to read, so keep it
+  // in view as the conversation scrolls. Scroll the list itself rather than
+  // scrollIntoView, which could also move the host page.
+  useEffect(() => {
+    if (!dimmed) return;
+    const list = listRef.current;
+    const row = activeRef.current?.firstElementChild as HTMLElement | null | undefined;
+    if (!list || !row) return;
+    const lr = list.getBoundingClientRect();
+    const rr = row.getBoundingClientRect();
+    if (rr.top >= lr.top && rr.bottom <= lr.bottom) return;
+    list.scrollTo({
+      top: list.scrollTop + (rr.top - lr.top) - lr.height / 3,
+      behavior: 'smooth',
+    });
+  }, [dimmed, activeMessageId]);
 
   useEffect(() => {
     setLocalQuery(searchQuery);
@@ -88,8 +124,15 @@ export const OutlineContent = forwardRef<OutlineContentHandle>((_, ref) => {
   const hasActiveFilter = filter !== 'all';
 
   // ── Toolbar ──────────────────────────────────────────────────────
+  // Faded out entirely (not just dimmed) in ghost mode, but kept in layout
+  // so the list doesn't jump when the panel wakes.
   const toolbar = (
-    <div className="flex flex-col">
+    <div
+      className={cn(
+        'flex flex-col transition-opacity ease-out motion-reduce:transition-none',
+        dimmed ? 'duration-300 opacity-0' : 'duration-150',
+      )}
+    >
       {/* Search row with filter icon on left */}
       <div className="pl-2 pr-3 py-2 flex items-center gap-1">
         <SimpleTooltip content={t('explorerHeader.moreFilters')}>
@@ -142,7 +185,7 @@ export const OutlineContent = forwardRef<OutlineContentHandle>((_, ref) => {
     return (
       <div className="flex flex-col h-full">
         {toolbar}
-        <div className="flex flex-col items-center justify-center py-6 px-4 text-center text-muted-foreground min-h-[80px]">
+        <div className={cn('flex flex-col items-center justify-center py-6 px-4 text-center text-muted-foreground min-h-[80px]', fade(dimmed))}>
           <List className="h-5 w-5 mb-2 opacity-40" />
           <p className="text-xs">{t('outline.placeholder')}</p>
         </div>
@@ -154,7 +197,7 @@ export const OutlineContent = forwardRef<OutlineContentHandle>((_, ref) => {
     return (
       <div className="flex flex-col h-full">
         {toolbar}
-        <div className="flex items-center justify-center py-6 min-h-[80px]">
+        <div className={cn('flex items-center justify-center py-6 min-h-[80px]', fade(dimmed))}>
           <div className="h-4 w-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
         </div>
       </div>
@@ -165,7 +208,7 @@ export const OutlineContent = forwardRef<OutlineContentHandle>((_, ref) => {
     return (
       <div className="flex flex-col h-full">
         {toolbar}
-        <div className="flex flex-col items-center justify-center py-6 px-4 text-center text-muted-foreground min-h-[80px]">
+        <div className={cn('flex flex-col items-center justify-center py-6 px-4 text-center text-muted-foreground min-h-[80px]', fade(dimmed))}>
           <List className="h-5 w-5 mb-2 opacity-40" />
           <p className="text-xs">
             {searchQuery ? t('outline.noResults') : t('outline.empty')}
@@ -179,7 +222,13 @@ export const OutlineContent = forwardRef<OutlineContentHandle>((_, ref) => {
     <div ref={containerRef} className="flex flex-col h-full min-h-0">
       {toolbar}
 
-      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden custom-scrollbar">
+      <div
+        ref={listRef}
+        className={cn(
+          'flex-1 min-h-0 overflow-y-auto overflow-x-hidden custom-scrollbar',
+          dimmed && '[&::-webkit-scrollbar-thumb]:bg-transparent',
+        )}
+      >
         <div className="py-1">
           {sections.map((section) => (
             <OutlineSectionItem
@@ -192,6 +241,7 @@ export const OutlineContent = forwardRef<OutlineContentHandle>((_, ref) => {
               activeRef={
                 section.userMessageId === activeMessageId ? activeRef : undefined
               }
+              dimmed={dimmed}
             />
           ))}
         </div>

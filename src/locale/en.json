@@ -1108,7 +1108,9 @@
     "collapseAll": "Collapse all",
     "navigate": "Go to message",
     "popOut": "Pop out",
-    "dockBack": "Dock back to sidebar"
+    "dockBack": "Dock back to sidebar",
+    "pinFade": "Keep the outline visible (stop fading when the mouse leaves)",
+    "unpinFade": "Let the outline fade when the mouse leaves"
   },
   "firstInstall": {
     "title": "Import Conversation List?",

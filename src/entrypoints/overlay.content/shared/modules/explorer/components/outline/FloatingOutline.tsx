@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { CopyMinus, Crosshair, X } from 'lucide-react';
+import { CopyMinus, Crosshair, Pin, PinOff, X } from 'lucide-react';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useSettingsStore } from '@/shared/lib/settings-store';
 import { Button } from '@/shared/components/ui/button';
@@ -26,6 +26,8 @@ export const FloatingOutline: React.FC = () => {
   const savedRect = useSettingsStore((s) => s.outlinePopout.rect);
   const setOpen = useSettingsStore((s) => s.setOutlinePopoutOpen);
   const setRect = useSettingsStore((s) => s.setOutlinePopoutRect);
+  const pinned = useSettingsStore((s) => !!s.outlinePopout.pinned);
+  const setPinned = useSettingsStore((s) => s.setOutlinePopoutPinned);
   const [fallbackRect] = useState(defaultRect);
   const outlineRef = useRef<OutlineContentHandle>(null);
 
@@ -42,8 +44,21 @@ export const FloatingOutline: React.FC = () => {
       ariaLabel={t('outline.title')}
       rect={savedRect ?? fallbackRect}
       onRectCommit={setRect}
+      autoDim={!pinned}
       actions={
         <>
+          <SimpleTooltip content={pinned ? t('outline.unpinFade') : t('outline.pinFade')}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={iconBtn}
+              onClick={() => setPinned(!pinned)}
+              aria-pressed={pinned}
+              aria-label={pinned ? t('outline.unpinFade') : t('outline.pinFade')}
+            >
+              {pinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
+            </Button>
+          </SimpleTooltip>
           <SimpleTooltip content={t('menu.locateCurrent')}>
             <Button variant="ghost" size="icon" className={iconBtn} onClick={handleLocate}>
               <Crosshair className="h-3.5 w-3.5" />

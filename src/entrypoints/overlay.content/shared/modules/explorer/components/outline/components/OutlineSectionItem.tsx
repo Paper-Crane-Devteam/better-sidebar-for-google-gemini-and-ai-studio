@@ -14,6 +14,7 @@ export function OutlineSectionItem({
   onToggle,
   onNavigate,
   activeRef,
+  dimmed = false,
 }: {
   section: OutlineSection;
   isActive: boolean;
@@ -21,6 +22,8 @@ export function OutlineSectionItem({
   onToggle: () => void;
   onNavigate: (messageId: string, headingLabel?: string, headingLevel?: string) => void;
   activeRef?: React.RefObject<HTMLDivElement>;
+  /** Floating outline faded out: only the active row stays legible. */
+  dimmed?: boolean;
 }) {
   const { t } = useI18n();
   const hasChildren = section.children.length > 0;
@@ -39,12 +42,22 @@ export function OutlineSectionItem({
   };
 
   return (
-    <div ref={activeRef} className="mx-1 rounded-md">
+    <div
+      ref={activeRef}
+      className={cn(
+        'mx-1 rounded-md transition-opacity ease-out motion-reduce:transition-none',
+        dimmed ? 'duration-300' : 'duration-150',
+        dimmed && !isActive && 'opacity-[0.12]',
+      )}
+    >
       <div
         className={cn(
           'group flex items-center gap-1 px-2 py-1 rounded-md relative min-w-0',
           hasChildren && 'cursor-pointer',
           'hover:bg-accent/50',
+          // Its own opaque pill so it reads over page text; also opts back
+          // into the pointer so hovering it wakes the panel.
+          dimmed && isActive && 'pointer-events-auto bg-popover/95 shadow-sm',
         )}
         onClick={() => hasChildren && onToggle()}
       >
@@ -113,7 +126,13 @@ export function OutlineSectionItem({
       </div>
 
       {hasChildren && !isCollapsed && (
-        <div className="ml-4 border-l border-border/25 pl-2 mb-1">
+        <div
+          className={cn(
+            'ml-4 border-l border-border/25 pl-2 mb-1 transition-opacity ease-out motion-reduce:transition-none',
+            dimmed ? 'duration-300' : 'duration-150',
+            dimmed && isActive && 'opacity-[0.12]',
+          )}
+        >
           {section.children.map((node) => (
             <OutlineNodeItem
               key={node.id}

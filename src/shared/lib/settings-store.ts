@@ -76,6 +76,8 @@ interface SettingsState {
   outlinePopout: {
     open: boolean;
     rect: { x: number; y: number; width: number; height: number } | null;
+    /** Pinned = never fade out when the pointer leaves. Absent in older persisted state. */
+    pinned?: boolean;
   };
   /** Cached page index for the theme grid pagination (session-only, not persisted) */
   themeGridPage: number;
@@ -102,6 +104,7 @@ interface SettingsState {
   setOutlineHeight: (height: number) => void;
   setOutlinePopoutOpen: (open: boolean) => void;
   setOutlinePopoutRect: (rect: SettingsState['outlinePopout']['rect']) => void;
+  setOutlinePopoutPinned: (pinned: boolean) => void;
   setThemeGridPage: (page: number) => void;
 }
 
@@ -263,6 +266,8 @@ export const useSettingsStore = create<SettingsState>()(
         set((state) => ({ outlinePopout: { ...state.outlinePopout, open } })),
       setOutlinePopoutRect: (rect) =>
         set((state) => ({ outlinePopout: { ...state.outlinePopout, rect } })),
+      setOutlinePopoutPinned: (pinned) =>
+        set((state) => ({ outlinePopout: { ...state.outlinePopout, pinned } })),
       setThemeGridPage: (page) => set({ themeGridPage: page }),
     }),
     {
