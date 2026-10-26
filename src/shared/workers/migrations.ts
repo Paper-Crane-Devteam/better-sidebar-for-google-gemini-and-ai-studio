@@ -408,6 +408,38 @@ export const runMigrations = async (db: any) => {
       }
     });
 
+    // Panel folders for gems/notebooks. SCHEMA creates the table on its own;
+    // repeated here so a profile whose SCHEMA run predates it still gets one.
+    await step('create collection_folders table', async () => {
+      await db.run(`
+        CREATE TABLE IF NOT EXISTS collection_folders (
+          id TEXT PRIMARY KEY,
+          scope TEXT NOT NULL,
+          name TEXT NOT NULL,
+          parent_id TEXT,
+          order_index INTEGER DEFAULT 0,
+          is_pinned INTEGER DEFAULT 0,
+          created_at INTEGER DEFAULT (unixepoch()),
+          updated_at INTEGER DEFAULT (unixepoch()),
+          FOREIGN KEY(parent_id) REFERENCES collection_folders(id) ON DELETE CASCADE
+        )
+      `);
+      await db.run(
+        'CREATE INDEX IF NOT EXISTS idx_collection_folders_scope ON collection_folders(scope, parent_id)',
+      );
+    });
+
+    // Which panel folder a gem/notebook sits in. Separate from default_folder_id,
+    // which points at a Library folder and means something else entirely.
+    await step('add folder_id to gems and notebooks', async () => {
+      if (!(await hasColumn('gems', 'folder_id'))) {
+        await db.run('ALTER TABLE gems ADD COLUMN folder_id TEXT');
+      }
+      if (!(await hasColumn('notebooks', 'folder_id'))) {
+        await db.run('ALTER TABLE notebooks ADD COLUMN folder_id TEXT');
+      }
+    });
+
     // Migration: Migrate legacy conversation inbox folders to deterministic IDs
     await step('migrate legacy conversation inbox folders', async () => {
       const legacyFolders = await db.run(`

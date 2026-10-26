@@ -1056,6 +1056,10 @@
     "setDefaultFolder": "Ustaw folder domyślny",
     "defaultFolderSet": "Folder domyślny zaktualizowano"
   },
+  "collections": {
+    "moveToFolder": "Przenieś do folderu",
+    "folderNotEmpty": "Można usuwać tylko puste foldery. Najpierw przenieś lub usuń ich zawartość."
+  },
   "whatsNew": {
     "title": "Co nowego w v{{version}}",
     "changelogSubtitle": "Pełny dziennik zmian i informacje o wersji",

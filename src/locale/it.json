@@ -1055,6 +1055,10 @@
     "setDefaultFolder": "Imposta cartella predefinita",
     "defaultFolderSet": "Cartella predefinita aggiornato"
   },
+  "collections": {
+    "moveToFolder": "Sposta nella cartella",
+    "folderNotEmpty": "Si possono eliminare solo cartelle vuote. Sposta o elimina prima il contenuto."
+  },
   "whatsNew": {
     "title": "Novità in v{{version}}",
     "changelogSubtitle": "Registro completo delle modifiche e note di rilascio",

@@ -6,6 +6,7 @@ import type {
 import type { MessageSender } from '../types';
 import { notifyDataChanged } from '../notify';
 import { CONVERSATION_DELETE_SCOPES } from '@/shared/types/data-scope';
+import { triggerAutoSync } from './gdrive-sync';
 
 export async function handleGems(
   message: ExtensionMessage,
@@ -45,6 +46,8 @@ export async function handleGems(
     case 'UPDATE_GEM': {
       await gemRepo.update(message.payload.id, message.payload.updates);
       await notifyDataChanged('gems');
+      // Pin / default folder are user settings, unlike the scan writes above.
+      triggerAutoSync();
       return { success: true };
     }
     case 'GET_GEM_CONVERSATIONS': {

@@ -25,6 +25,7 @@ export const KNOWN_TABLES: readonly string[] = [
   'notebooks',
   'snippet_folders',
   'snippets',
+  'collection_folders',
 ];
 
 /**
@@ -39,6 +40,8 @@ const CASCADE_CHILDREN: Record<string, readonly string[]> = {
   conversations: ['messages', 'conversation_tags'],
   tags: ['conversation_tags'],
   snippet_folders: ['snippet_folders', 'snippets'],
+  // Subfolders only: gems/notebooks point at it without a foreign key.
+  collection_folders: ['collection_folders'],
 };
 
 /**
@@ -58,6 +61,7 @@ export const RESTORE_ORDER: readonly string[] = [
   'snippet_folders',
   'snippets',
   'favorites',
+  'collection_folders',
   'gems',
   'notebooks',
 ];

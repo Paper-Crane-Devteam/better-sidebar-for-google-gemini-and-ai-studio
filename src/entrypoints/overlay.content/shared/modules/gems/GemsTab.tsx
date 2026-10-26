@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAppStore } from '@/shared/lib/store';
 import { GemsHeader } from './components/GemsHeader';
-import { GemsTreeView, GemsTreeHandle } from './components/GemsTreeView';
+import { GemNode } from './components/GemNode';
+import {
+  CollectionTreeView,
+  type CollectionTreeHandle,
+} from '../collections/CollectionTreeView';
 import { FilterBar } from '../../components/FilterBar';
 import { useStoreFilter } from '../../hooks/useStoreFilter';
 import { Loader2, Plus, ScanSearch } from 'lucide-react';
@@ -23,17 +27,19 @@ export const GemsTab = ({ menuActions }: GemsTabProps) => {
   const { t } = useI18n();
   const {
     gems,
+    hasFolders,
     tags: allTags,
     fetchData,
   } = useAppStore(
     useShallow((s) => ({
       gems: s.gems,
+      hasFolders: s.collectionFolders.some((f) => f.scope === 'gems'),
       tags: s.tags,
       fetchData: s.fetchData,
     })),
   );
   const filter = useStoreFilter('gems');
-  const treeRef = useRef<GemsTreeHandle>(null);
+  const treeRef = useRef<CollectionTreeHandle>(null);
   const [isScanningGems, setIsScanningGems] = useState(false);
 
   // Listen for new gem conversations created via BETTER_SIDEBAR_PROMPT_CREATE
@@ -96,6 +102,7 @@ export const GemsTab = ({ menuActions }: GemsTabProps) => {
     <div className="flex flex-col h-full w-full relative">
       <GemsHeader
         onCollapseAll={handleCollapseAll}
+        onNewFolder={() => void treeRef.current?.createRootFolder()}
         filter={filter}
         menuActions={allMenuActions}
         isScanningGems={isScanningGems}
@@ -111,7 +118,7 @@ export const GemsTab = ({ menuActions }: GemsTabProps) => {
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground/50" />
             <p className="text-sm">{t('gems.scanningGems')}</p>
           </div>
-        ) : gems.length === 0 ? (
+        ) : gems.length === 0 && !hasFolders ? (
           <div className="flex flex-col items-center justify-center h-full p-4 text-center text-muted-foreground gap-3">
             <UIcon icon="tabler:diamond" className="h-10 w-10 opacity-50" />
             <p className="text-sm">{t('gems.empty')}</p>
@@ -135,7 +142,12 @@ export const GemsTab = ({ menuActions }: GemsTabProps) => {
             </div>
           </div>
         ) : (
-          <GemsTreeView ref={treeRef} onSelect={handleSelect} />
+          <CollectionTreeView
+            ref={treeRef}
+            scope="gems"
+            itemNode={GemNode}
+            onSelect={handleSelect}
+          />
         )}
       </div>
     </div>

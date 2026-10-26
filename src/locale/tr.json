@@ -1055,6 +1055,10 @@
     "setDefaultFolder": "Varsayılan Klasörü Ayarla",
     "defaultFolderSet": "Varsayılan klasör güncellendi"
   },
+  "collections": {
+    "moveToFolder": "Klasöre taşı",
+    "folderNotEmpty": "Yalnızca boş klasörler silinebilir. Önce içindekileri taşıyın veya silin."
+  },
   "whatsNew": {
     "title": "v{{version}}'daki Yenilikler",
     "changelogSubtitle": "Tüm değişiklik günlüğü ve sürüm notları",

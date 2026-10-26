@@ -16,6 +16,7 @@ export const SYNC_TABLES = [
   'prompt_folders',
   'prompts',
   'folders',
+  'collection_folders',
   'gems',
   'notebooks',
   'conversations',

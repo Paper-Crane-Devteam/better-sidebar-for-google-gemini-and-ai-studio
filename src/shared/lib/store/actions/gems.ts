@@ -9,7 +9,6 @@ export function createGemsActions(
   | 'setGemsSearch'
   | 'setGemsTags'
   | 'setGemsOnlyFavorites'
-  | 'setGemsSortOrder'
 > {
   return {
     setGems: (gems) => set({ gems }),
@@ -42,10 +41,6 @@ export function createGemsActions(
     setGemsOnlyFavorites: (onlyFavorites) =>
       set((state) => ({
         ui: { ...state.ui, gems: { ...state.ui.gems, onlyFavorites } },
-      })),
-    setGemsSortOrder: (sortOrder) =>
-      set((state) => ({
-        ui: { ...state.ui, gems: { ...state.ui.gems, sortOrder } },
       })),
   };
 }

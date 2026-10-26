@@ -60,6 +60,7 @@ const PIN_TABLE_SCOPE: Record<Parameters<AppState['togglePin']>[1], DataScope> =
   gems: 'gems',
   notebooks: 'notebooks',
   snippet_folders: 'snippetFolders',
+  collection_folders: 'collectionFolders',
 };
 
 /** Shallow row comparison; nested values (rare) fall back to JSON. */
@@ -541,6 +542,7 @@ export function createDataActions(
           gems: 'UPDATE_GEM',
           notebooks: 'UPDATE_NOTEBOOK',
           snippet_folders: 'UPDATE_SNIPPET_FOLDER',
+          collection_folders: 'UPDATE_COLLECTION_FOLDER',
         };
         await browser.runtime.sendMessage({
           type: messageTypeMap[table],

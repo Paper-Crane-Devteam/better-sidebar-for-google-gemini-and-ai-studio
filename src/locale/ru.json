@@ -1057,6 +1057,10 @@
     "setDefaultFolder": "Установить папку по умолчанию",
     "defaultFolderSet": "Папка по умолчанию обновлена"
   },
+  "collections": {
+    "moveToFolder": "Переместить в папку",
+    "folderNotEmpty": "Удалять можно только пустые папки. Сначала переместите или удалите их содержимое."
+  },
   "whatsNew": {
     "title": "Что нового в v{{version}}",
     "changelogSubtitle": "Полный журнал изменений",

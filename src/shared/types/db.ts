@@ -50,7 +50,10 @@ export interface Gem {
   order_index: number;
   is_pinned: number;
   is_deleted: number;
+  /** Library folder new chats with this gem are filed into. */
   default_folder_id: string | null;
+  /** Folder in the Gems panel (`collection_folders`), null = top level. */
+  folder_id: string | null;
   created_at: number;
   updated_at: number;
 }
@@ -66,7 +69,33 @@ export interface Notebook {
   order_index: number;
   is_pinned: number;
   is_deleted: number;
+  /** Library folder new chats in this notebook are filed into. */
   default_folder_id: string | null;
+  /** Folder in the Notebooks panel (`collection_folders`), null = top level. */
+  folder_id: string | null;
+  created_at: number;
+  updated_at: number;
+}
+
+/**
+ * Which panel a collection folder belongs to. Doubles as the name of the table
+ * holding the items, so it is whitelisted wherever it reaches SQL.
+ */
+export type CollectionScope = 'gems' | 'notebooks';
+
+export const COLLECTION_SCOPES: readonly CollectionScope[] = ['gems', 'notebooks'];
+
+/**
+ * A user folder in the Gems or Notebooks panel. Independent of Library folders:
+ * it only groups the gems/notebooks themselves, never their conversations.
+ */
+export interface CollectionFolder {
+  id: string;
+  scope: CollectionScope;
+  name: string;
+  parent_id: string | null;
+  order_index: number;
+  is_pinned: number;
   created_at: number;
   updated_at: number;
 }

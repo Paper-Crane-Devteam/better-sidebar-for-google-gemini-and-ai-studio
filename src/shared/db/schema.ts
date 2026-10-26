@@ -222,6 +222,24 @@ CREATE TABLE IF NOT EXISTS notebooks (
 
 CREATE INDEX IF NOT EXISTS idx_notebooks_platform ON notebooks(platform);
 
+-- User folders of the Gems and Notebooks panels, told apart by scope
+-- ('gems' | 'notebooks'). Membership lives on gems.folder_id / notebooks.folder_id
+-- (added by migration, no FK: those rows come from Gemini and an unknown
+-- folder id just reads as top level). Only empty folders can be deleted.
+CREATE TABLE IF NOT EXISTS collection_folders (
+  id TEXT PRIMARY KEY,
+  scope TEXT NOT NULL,
+  name TEXT NOT NULL,
+  parent_id TEXT,
+  order_index INTEGER DEFAULT 0,
+  is_pinned INTEGER DEFAULT 0,
+  created_at INTEGER DEFAULT (unixepoch()),
+  updated_at INTEGER DEFAULT (unixepoch()),
+  FOREIGN KEY(parent_id) REFERENCES collection_folders(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_collection_folders_scope ON collection_folders(scope, parent_id);
+
 CREATE TABLE IF NOT EXISTS snippet_folders (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,

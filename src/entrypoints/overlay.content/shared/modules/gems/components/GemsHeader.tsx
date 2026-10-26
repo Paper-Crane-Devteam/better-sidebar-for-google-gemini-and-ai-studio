@@ -1,23 +1,17 @@
-import { useAppStore } from '@/shared/lib/store';
 import { Button } from '@/shared/components/ui/button';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
-import {
-  CopyMinus,
-  ArrowDownAZ,
-  Clock,
-  Eye,
-  ScanSearch,
-} from 'lucide-react';
+import { CopyMinus, Eye, ScanSearch } from 'lucide-react';
 import { GemWithPlus } from '@/shared/components/icons/gem-composite-icons';
 import { SidePanelMenu } from '@/entrypoints/overlay.content/shared/components/menu/SidePanelMenu';
 import { FilterActions } from '../../../components/FilterActions';
 import type { FilterState, ExplorerTypeFilter } from '../../../types/filter';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { navigate } from '@/shared/lib/navigation';
-import { useShallow } from 'zustand/react/shallow';
+import { CollectionHeaderButtons } from '../../collections/CollectionHeaderButtons';
 
 interface GemsHeaderProps {
   onCollapseAll: () => void;
+  onNewFolder: () => void;
   filter: FilterState<ExplorerTypeFilter>;
   menuActions?: {
     onViewHistory?: () => void;
@@ -31,6 +25,7 @@ interface GemsHeaderProps {
 
 export const GemsHeader = ({
   onCollapseAll,
+  onNewFolder,
   filter,
   menuActions,
   isScanningGems,
@@ -38,21 +33,6 @@ export const GemsHeader = ({
   onScanGems,
 }: GemsHeaderProps) => {
   const { t } = useI18n();
-  const {
-    ui,
-    setGemsSortOrder,
-  } = useAppStore(
-    useShallow((s) => ({
-      ui: s.ui,
-      setGemsSortOrder: s.setGemsSortOrder,
-    })),
-  );
-  const { sortOrder } = ui.gems;
-
-  const handleSort = () => {
-    const newOrder = sortOrder === 'alpha' ? 'date' : 'alpha';
-    setGemsSortOrder(newOrder);
-  };
 
   const handleCreateGem = () => {
     navigate('https://gemini.google.com/gems/create');
@@ -71,17 +51,7 @@ export const GemsHeader = ({
             </Button>
           </SimpleTooltip>
 
-          <SimpleTooltip
-            content={sortOrder === 'alpha' ? t('menu.sortByDate') : t('menu.sortAlphabetically')}
-          >
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleSort}>
-              {sortOrder === 'alpha' ? (
-                <ArrowDownAZ className="h-4 w-4" />
-              ) : (
-                <Clock className="h-4 w-4" />
-              )}
-            </Button>
-          </SimpleTooltip>
+          <CollectionHeaderButtons scope="gems" onNewFolder={onNewFolder} />
 
           <SidePanelMenu menuActions={{ ...menuActions, isScanningGems }} />
         </div>

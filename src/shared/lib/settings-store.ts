@@ -40,6 +40,11 @@ interface SettingsState {
     enableRightClickRename: boolean;
   };
   /**
+   * Sort mode of the Gems / Notebooks panels. Persisted so a `custom`
+   * arrangement is still shown after a reload. Absent in older persisted state.
+   */
+  collectionSortOrder?: Partial<Record<'gems' | 'notebooks', 'alpha' | 'date' | 'custom'>>;
+  /**
    * User customisation of the sidebar icon bar.
    *
    * Which icons exist, which block they sit in and which of them cannot be
@@ -93,6 +98,10 @@ interface SettingsState {
   setExplorerSortOrder: (order: 'alpha' | 'date' | 'custom') => void;
   setExplorerIgnoredFolders: (folders: string[]) => void;
   setExplorerEnableRightClickRename: (enabled: boolean) => void;
+  setCollectionSortOrder: (
+    scope: 'gems' | 'notebooks',
+    order: 'alpha' | 'date' | 'custom',
+  ) => void;
   setIconVisible: (id: string, visible: boolean) => void;
   setIconBarOrder: (group: string, ids: string[]) => void;
   resetIconBar: () => void;
@@ -198,6 +207,7 @@ export const useSettingsStore = create<SettingsState>()(
         ignoredFolders: [],
         enableRightClickRename: true,
       },
+      collectionSortOrder: {},
       iconBar: defaultIconBar(),
       integrations: {
         notion: {
@@ -231,6 +241,10 @@ export const useSettingsStore = create<SettingsState>()(
       setExplorerEnableRightClickRename: (enableRightClickRename) =>
         set((state) => ({
           explorer: { ...state.explorer, enableRightClickRename },
+        })),
+      setCollectionSortOrder: (scope, order) =>
+        set((state) => ({
+          collectionSortOrder: { ...state.collectionSortOrder, [scope]: order },
         })),
       setIconVisible: (id, visible) =>
         set((state) => {

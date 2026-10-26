@@ -1,5 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useMemo } from 'react';
-import { Tree, NodeRendererProps, RowRendererProps } from 'react-arborist';
+import { Tree, NodeRendererProps, RowRendererProps, NodeApi } from 'react-arborist';
 import { FolderTreeNodeData, FolderTreeHandle } from './types';
 import { useFolderTree, UseFolderTreeOptions } from './useFolderTree';
 import { getTreeDndManager } from './dnd-manager';
@@ -16,10 +16,36 @@ export interface FolderTreeProps extends UseFolderTreeOptions {
   renderRow?: (props: RowRendererProps<FolderTreeNodeData>) => React.ReactElement;
   /** Override row height (defaults to 32) */
   rowHeight?: number;
+  /** Rows that can't be dragged. Default: every row can. */
+  disableDrag?: (data: FolderTreeNodeData) => boolean;
+  /** Drop targets to refuse. Default: anywhere except into a row's own subtree. */
+  disableDrop?: (args: {
+    parentNode: NodeApi<FolderTreeNodeData>;
+    dragNodes: NodeApi<FolderTreeNodeData>[];
+    index: number;
+  }) => boolean;
+  /**
+   * Rows that can't be renamed. Default: none when `onRenameItem` is set, all
+   * otherwise. Needed when only some rows of a tree are renamable.
+   */
+  disableEdit?: (data: FolderTreeNodeData) => boolean;
 }
 
 export const FolderTree = forwardRef<FolderTreeHandle, FolderTreeProps>(
-  ({ data, onSelect, renderNode, renderRow, rowHeight: rowHeightProp, ...hookOptions }, ref) => {
+  (
+    {
+      data,
+      onSelect,
+      renderNode,
+      renderRow,
+      rowHeight: rowHeightProp,
+      disableDrag,
+      disableDrop,
+      disableEdit,
+      ...hookOptions
+    },
+    ref,
+  ) => {
     const {
       treeRef,
       containerRef,
@@ -71,7 +97,9 @@ export const FolderTree = forwardRef<FolderTreeHandle, FolderTreeProps>(
           onRename={onRename}
           // No rename handler means the tree's items cannot be renamed here (gems:
           // names live in Gemini). Without this F2 opens an input that saves nothing.
-          disableEdit={!hookOptions.onRenameItem}
+          disableEdit={!hookOptions.onRenameItem || disableEdit}
+          disableDrag={disableDrag}
+          disableDrop={disableDrop}
           onDelete={onDelete}
           onSelect={onSelect}
           onToggle={handleToggle}

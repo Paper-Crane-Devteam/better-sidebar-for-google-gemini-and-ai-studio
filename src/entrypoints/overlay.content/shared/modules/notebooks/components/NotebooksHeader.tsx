@@ -1,26 +1,16 @@
-import { useAppStore } from '@/shared/lib/store';
 import { Button } from '@/shared/components/ui/button';
 import { SimpleTooltip } from '@/shared/components/ui/tooltip';
-import {
-  CopyMinus,
-  ArrowDownAZ,
-  Clock,
-  Eye,
-  RefreshCw,
-  Plus,
-} from 'lucide-react';
+import { CopyMinus, Eye, RefreshCw, Plus } from 'lucide-react';
 import { SidePanelMenu } from '@/entrypoints/overlay.content/shared/components/menu/SidePanelMenu';
 import { FilterActions } from '../../../components/FilterActions';
-import type {
-  FilterState,
-  ExplorerTypeFilter,
-} from '../../../types/filter';
+import type { FilterState, ExplorerTypeFilter } from '../../../types/filter';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { navigate } from '@/shared/lib/navigation';
-import { useShallow } from 'zustand/react/shallow';
+import { CollectionHeaderButtons } from '../../collections/CollectionHeaderButtons';
 
 interface NotebooksHeaderProps {
   onCollapseAll: () => void;
+  onNewFolder: () => void;
   filter: FilterState<ExplorerTypeFilter>;
   menuActions?: {
     onViewHistory?: () => void;
@@ -33,6 +23,7 @@ interface NotebooksHeaderProps {
 
 export const NotebooksHeader = ({
   onCollapseAll,
+  onNewFolder,
   filter,
   menuActions,
   isScanning,
@@ -40,20 +31,6 @@ export const NotebooksHeader = ({
   onScan,
 }: NotebooksHeaderProps) => {
   const { t } = useI18n();
-  const {
-    ui,
-    setNotebooksSortOrder,
-  } = useAppStore(
-    useShallow((s) => ({
-      ui: s.ui,
-      setNotebooksSortOrder: s.setNotebooksSortOrder,
-    })),
-  );
-  const { sortOrder } = ui.notebooks;
-
-  const handleSort = () => {
-    setNotebooksSortOrder(sortOrder === 'alpha' ? 'date' : 'alpha');
-  };
 
   const handleCreateNotebook = () => {
     navigate('https://gemini.google.com/notebooks/create');
@@ -67,36 +44,12 @@ export const NotebooksHeader = ({
         </h1>
         <div className="flex items-center gap-0.5">
           <SimpleTooltip content={t('menu.collapseAll')}>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7"
-              onClick={onCollapseAll}
-            >
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onCollapseAll}>
               <CopyMinus className="h-4 w-4" />
             </Button>
           </SimpleTooltip>
 
-          <SimpleTooltip
-            content={
-              sortOrder === 'alpha'
-                ? t('menu.sortByDate')
-                : t('menu.sortAlphabetically')
-            }
-          >
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7"
-              onClick={handleSort}
-            >
-              {sortOrder === 'alpha' ? (
-                <ArrowDownAZ className="h-4 w-4" />
-              ) : (
-                <Clock className="h-4 w-4" />
-              )}
-            </Button>
-          </SimpleTooltip>
+          <CollectionHeaderButtons scope="notebooks" onNewFolder={onNewFolder} />
 
           <SidePanelMenu menuActions={menuActions} />
         </div>
@@ -104,40 +57,23 @@ export const NotebooksHeader = ({
 
       <div className="tab-header px-3 pb-2 pt-1 flex items-center justify-between">
         <div className="flex-1 mr-2">
-          <FilterActions
-            filter={filter}
-            visibleFilters={['search', 'tags', 'favorites']}
-          />
+          <FilterActions filter={filter} visibleFilters={['search', 'tags', 'favorites']} />
         </div>
         <div className="flex items-center gap-1">
           <SimpleTooltip content={t('notebooks.newNotebook')}>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7"
-              onClick={handleCreateNotebook}
-            >
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleCreateNotebook}>
               <Plus className="h-4 w-4" />
             </Button>
           </SimpleTooltip>
 
           <SimpleTooltip content={t('notebooks.viewNotebooks')}>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7"
-              onClick={onViewNotebooks}
-            >
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onViewNotebooks}>
               <Eye className="h-4 w-4" />
             </Button>
           </SimpleTooltip>
 
           <SimpleTooltip
-            content={
-              isScanning
-                ? t('notebooks.scanningNotebooks')
-                : t('notebooks.scanNotebooks')
-            }
+            content={isScanning ? t('notebooks.scanningNotebooks') : t('notebooks.scanNotebooks')}
           >
             <Button
               variant="ghost"

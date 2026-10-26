@@ -1055,6 +1055,10 @@
     "setDefaultFolder": "Establecer carpeta predeterminada",
     "defaultFolderSet": "Carpeta predeterminada actualizada"
   },
+  "collections": {
+    "moveToFolder": "Mover a carpeta",
+    "folderNotEmpty": "Solo se pueden eliminar carpetas vacías. Mueve o elimina primero su contenido."
+  },
   "whatsNew": {
     "title": "Novedades en v{{version}}",
     "changelogSubtitle": "Registro completo de cambios",

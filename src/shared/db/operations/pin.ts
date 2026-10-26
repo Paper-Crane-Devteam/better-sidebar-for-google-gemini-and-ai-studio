@@ -1,7 +1,7 @@
 import { runCommand } from '../index';
 import { updateWithTimestamp } from './helpers';
 
-export type PinnableTable = 'folders' | 'prompt_folders' | 'gems' | 'notebooks';
+export type PinnableTable = 'folders' | 'prompt_folders' | 'gems' | 'notebooks' | 'collection_folders';
 
 export const pinRepo = {
   /**

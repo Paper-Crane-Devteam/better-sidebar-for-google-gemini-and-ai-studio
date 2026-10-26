@@ -1055,6 +1055,10 @@
     "setDefaultFolder": "Standardordner festlegen",
     "defaultFolderSet": "Standardordner aktualisiert"
   },
+  "collections": {
+    "moveToFolder": "In Ordner verschieben",
+    "folderNotEmpty": "Nur leere Ordner können gelöscht werden. Verschieben oder löschen Sie zuerst den Inhalt."
+  },
   "whatsNew": {
     "title": "Was ist neu in v{{version}}",
     "changelogSubtitle": "Vollständiges Änderungsprotokoll und Versionshinweise",

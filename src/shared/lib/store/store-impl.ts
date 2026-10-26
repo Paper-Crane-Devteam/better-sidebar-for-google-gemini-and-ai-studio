@@ -15,6 +15,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   notebooks: [],
   snippetFolders: [],
   snippets: [],
+  collectionFolders: [],
   isLoading: false,
   ui: initialUIState,
 

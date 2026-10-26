@@ -1055,6 +1055,10 @@
     "setDefaultFolder": "Set Default Folder",
     "defaultFolderSet": "Default folder updated"
   },
+  "collections": {
+    "moveToFolder": "Move to Folder",
+    "folderNotEmpty": "Only empty folders can be deleted. Move or delete what's inside first."
+  },
   "whatsNew": {
     "title": "What's New in v{{version}}",
     "changelogSubtitle": "Full changelog and release notes",

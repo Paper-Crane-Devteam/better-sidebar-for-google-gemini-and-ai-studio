@@ -8,6 +8,8 @@ import {
   Notebook,
   Snippet,
   SnippetFolder,
+  CollectionFolder,
+  CollectionScope,
 } from '../../types/db';
 import type { Platform } from '../../types/platform';
 import type { DataScope } from '../../types/data-scope';
@@ -48,6 +50,12 @@ export interface Conversation {
  * manual (`order_index`) order, whatever the mode.
  */
 export type ExplorerSortOrder = 'alpha' | 'date' | 'custom';
+
+/**
+ * Gems / Notebooks panel sort mode. Applies to the gems/notebooks themselves;
+ * their folders always keep their manual order.
+ */
+export type CollectionSortOrder = 'alpha' | 'date' | 'custom';
 
 /** Sections available in the settings modal sidebar. */
 export type SettingsSection =
@@ -136,17 +144,16 @@ export interface UIState {
     tags: { isOpen: boolean; selected: string[] };
     typeFilter: 'all' | 'conversation' | 'text-to-image' | 'gem' | 'notebook';
   };
+  // Sort order for these two lives in the settings store (persisted).
   gems: {
     search: { isOpen: boolean; query: string };
     tags: { isOpen: boolean; selected: string[] };
     onlyFavorites: boolean;
-    sortOrder: 'alpha' | 'date';
   };
   notebooks: {
     search: { isOpen: boolean; query: string };
     tags: { isOpen: boolean; selected: string[] };
     onlyFavorites: boolean;
-    sortOrder: 'alpha' | 'date';
   };
   snippets: {
     search: { isOpen: boolean; query: string };
@@ -173,6 +180,8 @@ export interface AppState {
   notebooks: Notebook[];
   snippetFolders: SnippetFolder[];
   snippets: Snippet[];
+  /** Folders of the Gems and Notebooks panels (both scopes). */
+  collectionFolders: CollectionFolder[];
   isLoading: boolean;
   ui: UIState;
 
@@ -318,14 +327,34 @@ export interface AppState {
   setGemsSearch: (isOpen: boolean, query?: string) => void;
   setGemsTags: (isOpen: boolean, selected?: string[]) => void;
   setGemsOnlyFavorites: (onlyFavorites: boolean) => void;
-  setGemsSortOrder: (order: 'alpha' | 'date') => void;
 
   // Notebooks
   setNotebooks: (notebooks: Notebook[]) => void;
   setNotebooksSearch: (isOpen: boolean, query?: string) => void;
   setNotebooksTags: (isOpen: boolean, selected?: string[]) => void;
   setNotebooksOnlyFavorites: (onlyFavorites: boolean) => void;
-  setNotebooksSortOrder: (order: 'alpha' | 'date') => void;
+
+  // Gems / Notebooks panel folders
+  /** Returns the new folder id, or null on failure. */
+  createCollectionFolder: (
+    scope: CollectionScope,
+    name: string,
+    parentId: string | null,
+  ) => Promise<string | null>;
+  renameCollectionFolder: (id: string, name: string) => Promise<void>;
+  moveCollectionFolder: (id: string, parentId: string | null) => Promise<void>;
+  /** False when the folder still has contents and was left in place. */
+  deleteCollectionFolder: (id: string) => Promise<boolean>;
+  /** Write positions for sibling folders, in this order. */
+  reorderCollectionFolders: (orderedIds: string[]) => Promise<void>;
+  /** Put a gem/notebook into a folder (null = top level). */
+  moveCollectionItem: (
+    scope: CollectionScope,
+    id: string,
+    folderId: string | null,
+  ) => Promise<void>;
+  /** Manual ranks 1..n for the gems/notebooks of one folder, in this order. */
+  reorderCollectionItems: (scope: CollectionScope, orderedIds: string[]) => Promise<void>;
 
   // Pin
   reorderFolders: (
@@ -340,7 +369,13 @@ export interface AppState {
 
   togglePin: (
     id: string,
-    table: 'folders' | 'prompt_folders' | 'gems' | 'notebooks' | 'snippet_folders',
+    table:
+      | 'folders'
+      | 'prompt_folders'
+      | 'gems'
+      | 'notebooks'
+      | 'snippet_folders'
+      | 'collection_folders',
     currentlyPinned: boolean,
   ) => Promise<void>;
 

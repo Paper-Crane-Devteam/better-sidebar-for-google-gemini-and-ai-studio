@@ -19,6 +19,7 @@ export const DATA_SCOPES = [
   'notebooks',
   'snippetFolders',
   'snippets',
+  'collectionFolders',
 ] as const;
 
 export type DataScope = (typeof DATA_SCOPES)[number];
@@ -36,6 +37,7 @@ export const DATA_SCOPE_REQUEST: Record<DataScope, string> = {
   notebooks: 'GET_NOTEBOOKS',
   snippetFolders: 'GET_SNIPPET_FOLDERS',
   snippets: 'GET_SNIPPETS',
+  collectionFolders: 'GET_COLLECTION_FOLDERS',
 };
 
 /**

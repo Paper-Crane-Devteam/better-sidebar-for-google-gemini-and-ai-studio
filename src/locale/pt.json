@@ -1055,6 +1055,10 @@
     "setDefaultFolder": "Definir pasta padrão",
     "defaultFolderSet": "Pasta padrão atualizada"
   },
+  "collections": {
+    "moveToFolder": "Mover para pasta",
+    "folderNotEmpty": "Só é possível excluir pastas vazias. Mova ou exclua o conteúdo primeiro."
+  },
   "whatsNew": {
     "title": "Novidades na v{{version}}",
     "changelogSubtitle": "Registro completo de alterações",

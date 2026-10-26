@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAppStore } from '@/shared/lib/store';
 import { NotebooksHeader } from './components/NotebooksHeader';
+import { NotebookNode } from './components/NotebookNode';
 import {
-  NotebooksTreeView,
-  NotebooksTreeHandle,
-} from './components/NotebooksTreeView';
+  CollectionTreeView,
+  type CollectionTreeHandle,
+} from '../collections/CollectionTreeView';
 import { FilterBar } from '../../components/FilterBar';
 import { useStoreFilter } from '../../hooks/useStoreFilter';
 import { Loader2, Plus, RefreshCw } from 'lucide-react';
@@ -26,17 +27,19 @@ export const NotebooksTab = ({ menuActions }: NotebooksTabProps) => {
   const { t } = useI18n();
   const {
     notebooks,
+    hasFolders,
     tags: allTags,
     fetchData,
   } = useAppStore(
     useShallow((s) => ({
       notebooks: s.notebooks,
+      hasFolders: s.collectionFolders.some((f) => f.scope === 'notebooks'),
       tags: s.tags,
       fetchData: s.fetchData,
     })),
   );
   const filter = useStoreFilter('notebooks');
-  const treeRef = useRef<NotebooksTreeHandle>(null);
+  const treeRef = useRef<CollectionTreeHandle>(null);
   const [isScanning, setIsScanning] = useState(false);
 
   // Listen for new notebook conversations created via BETTER_SIDEBAR_PROMPT_CREATE
@@ -103,6 +106,7 @@ export const NotebooksTab = ({ menuActions }: NotebooksTabProps) => {
     <div className="flex flex-col h-full w-full relative">
       <NotebooksHeader
         onCollapseAll={handleCollapseAll}
+        onNewFolder={() => void treeRef.current?.createRootFolder()}
         filter={filter}
         menuActions={menuActions}
         isScanning={isScanning}
@@ -118,7 +122,7 @@ export const NotebooksTab = ({ menuActions }: NotebooksTabProps) => {
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground/50" />
             <p className="text-sm">{t('notebooks.scanningNotebooks')}</p>
           </div>
-        ) : notebooks.length === 0 ? (
+        ) : notebooks.length === 0 && !hasFolders ? (
           <div className="flex flex-col items-center justify-center h-full p-4 text-center text-muted-foreground gap-3">
             <UIcon icon="tabler:notebook" className="h-10 w-10 opacity-50" />
             <p className="text-sm">{t('notebooks.empty')}</p>
@@ -140,7 +144,12 @@ export const NotebooksTab = ({ menuActions }: NotebooksTabProps) => {
             </div>
           </div>
         ) : (
-          <NotebooksTreeView ref={treeRef} onSelect={handleSelect} />
+          <CollectionTreeView
+            ref={treeRef}
+            scope="notebooks"
+            itemNode={NotebookNode}
+            onSelect={handleSelect}
+          />
         )}
       </div>
     </div>

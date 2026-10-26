@@ -14,5 +14,6 @@ export * from './notebooks';
 export * from './pin';
 export * from './snippets';
 export * from './snippetFolders';
+export * from './collectionFolders';
 export * from './agentRuns';
 export * from './browserAgent';

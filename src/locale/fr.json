@@ -1055,6 +1055,10 @@
     "setDefaultFolder": "Définir le dossier par défaut",
     "defaultFolderSet": "Dossier par défaut mis à jour"
   },
+  "collections": {
+    "moveToFolder": "Déplacer vers un dossier",
+    "folderNotEmpty": "Seuls les dossiers vides peuvent être supprimés. Déplacez ou supprimez d'abord leur contenu."
+  },
   "whatsNew": {
     "title": "Quoi de neuf dans la v{{version}}",
     "changelogSubtitle": "Journal complet des modifications et notes de version",

@@ -14,6 +14,7 @@ export { handleGdriveSync } from './gdrive-sync';
 export { handleGems } from './gems';
 export { handleNotebooks } from './notebooks';
 export { handleSnippets } from './snippets';
+export { handleCollectionFolders } from './collection-folders';
 export { handleNotionProxy } from './notion-proxy';
 export { handleBackup } from './backup';
 export { handleBackfill } from './backfill';

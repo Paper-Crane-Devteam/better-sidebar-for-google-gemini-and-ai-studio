@@ -7,6 +7,7 @@ import type {
 import type { MessageSender } from '../types';
 import { notifyDataChanged } from '../notify';
 import { CONVERSATION_DELETE_SCOPES } from '@/shared/types/data-scope';
+import { triggerAutoSync } from './gdrive-sync';
 
 export async function handleNotebooks(
   message: ExtensionMessage,
@@ -46,6 +47,8 @@ export async function handleNotebooks(
     case 'UPDATE_NOTEBOOK': {
       await notebookRepo.update(message.payload.id, message.payload.updates);
       await notifyDataChanged('notebooks');
+      // Pin / default folder are user settings, unlike the scan writes above.
+      triggerAutoSync();
       return { success: true };
     }
     case 'GET_NOTEBOOK_CONVERSATIONS': {

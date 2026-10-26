@@ -1054,6 +1054,10 @@
     "setDefaultFolder": "设置默认文件夹",
     "defaultFolderSet": "默认文件夹已更新"
   },
+  "collections": {
+    "moveToFolder": "移动到文件夹",
+    "folderNotEmpty": "只能删除空文件夹，请先移走或删除里面的内容。"
+  },
   "whatsNew": {
     "title": "v{{version}} 更新内容",
     "changelogSubtitle": "完整更新日志",

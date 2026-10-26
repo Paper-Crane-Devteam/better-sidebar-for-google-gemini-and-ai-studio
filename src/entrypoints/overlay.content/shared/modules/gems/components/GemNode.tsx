@@ -1,423 +1,122 @@
-import React, { useState, useRef, useCallback } from 'react';
-import {
-  ChevronRight,
-  ChevronDown,
-  Edit2,
-  Copy,
-  Trash2,
-  ExternalLink,
-  Star,
-  MessageSquarePlus,
-  Pin,
-  PinOff,
-  FolderInput,
-} from 'lucide-react';
+import React from 'react';
+import { Copy, Edit2, ExternalLink, MessageSquarePlus, Trash2 } from 'lucide-react';
 import { UIcon } from '@/shared/components/ui/icon';
-import { cn } from '@/shared/lib/utils/utils';
-import { navigateToConversation, navigateToGem, navigate } from '@/shared/lib/navigation';
+import { navigate, navigateToGem } from '@/shared/lib/navigation';
 import { useAppStore } from '@/shared/lib/store';
-import { useSettingsStore } from '@/shared/lib/settings-store';
 import { useI18n } from '@/shared/hooks/useI18n';
-import { useCurrentConversationId } from '../../../../shared/hooks/useCurrentConversationId';
+import { modal } from '@/shared/lib/modal';
 import type { NodeRendererProps } from 'react-arborist';
 import type { FolderTreeNodeData } from '../../../components/folder-tree/types';
-import {
-  ContextMenuContent,
-  ContextMenuTrigger,
-} from '@/entrypoints/overlay.content/shared/components/ui/context-menu';
-import { ExclusiveContextMenu } from '@/entrypoints/overlay.content/shared/components/ui/exclusive-context-menu';
-import { modal } from '@/shared/lib/modal';
-import { toast } from '@/shared/lib/toast';
-import { NodeContextMenu } from '../../explorer/components/node/NodeContextMenu';
-import { NodeActionBar } from '@/entrypoints/overlay.content/shared/components/node-action-bar';
-import { useExplorerMenuItems } from '../../explorer/components/node/useExplorerMenuItems';
-import { renderMenuItems } from '@/entrypoints/overlay.content/shared/components/node-action-bar';
-import type { MenuEntryDef } from '@/entrypoints/overlay.content/shared/components/node-action-bar';
-import { FolderTreeNodeContent } from '../../../components/folder-tree';
-import { useNodeTooltip } from '../../../hooks/useNodeTooltip';
-import { MoveItemsDialog } from '../../explorer/components/batch/MoveItemsDialog';
-import { useShallow } from 'zustand/react/shallow';
+import type {
+  ActionButtonDef,
+  MenuEntryDef,
+} from '@/entrypoints/overlay.content/shared/components/node-action-bar';
+import { CollectionItemNode, type SharedItemMenu } from '../../collections/CollectionItemNode';
 
-export const GemNode = ({
-  node,
-  style,
-  dragHandle,
-  tree,
-  preview,
-}: NodeRendererProps<FolderTreeNodeData>) => {
+/** A gem row (or one of its chats) in the Gems panel. */
+export const GemNode = (props: NodeRendererProps<FolderTreeNodeData>) => {
+  const { node } = props;
   const { t } = useI18n();
-  const {
-    favorites,
-    toggleFavorite,
-    fetchData,
-    conversationTags,
-    addTagToConversation,
-    removeTagFromConversation,
-  } = useAppStore(
-    useShallow((s) => ({
-      favorites: s.favorites,
-      toggleFavorite: s.toggleFavorite,
-      fetchData: s.fetchData,
-      conversationTags: s.conversationTags,
-      addTagToConversation: s.addTagToConversation,
-      removeTagFromConversation: s.removeTagFromConversation,
-    })),
-  );
-  const currentConversationId = useCurrentConversationId();
-  const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [newName, setNewName] = useState(node.data.name);
-  const nodeRowRef = useRef<HTMLDivElement>(null);
-  const { tooltipContent, forceShowTooltip } = useNodeTooltip(node);
-
-  const combinedRef = useCallback(
-    (el: HTMLDivElement | null) => {
-      (nodeRowRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
-      if (dragHandle) dragHandle(el);
-    },
-    [dragHandle],
-  );
-
-  const isGem = node.data.data?.isGem;
-  const isFile = node.data.type === 'file';
-  const isFavorite = isFile && favorites.some(
-    (f) => f.target_id === node.data.id && f.target_type === 'conversation',
-  );
-  const url = isFile ? node.data.data?.external_url : undefined;
-  const isCurrentConversation = isFile && node.data.id === currentConversationId;
-  const isActive = node.isSelected;
-
-  const handleClick = (e: React.MouseEvent) => {
-    if (isFile && url) {
-      e.preventDefault();
-      node.select();
-      navigateToConversation(node.data.id);
-    } else if (isGem) {
-      node.select();
-      node.toggle();
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    if (isFile && url) {
-      navigateToConversation(node.data.id);
-    } else if (isGem) {
-      node.toggle();
-    }
-  };
-
-  const handleToggle = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    node.toggle();
-  };
+  const searchQuery = useAppStore((state) => state.ui.gems.search.query);
+  const gemUrl: string | undefined = node.data.data?.external_url;
 
   const handleDeleteGem = async () => {
     const confirmed = await modal.confirmDelete({
       title: t('gems.deleteGem'),
       content: t('gems.deleteGemConfirm', { name: node.data.name }),
     });
-    if (confirmed) {
-      // Call Gemini API to delete the gem
-      try {
-        window.dispatchEvent(
-          new CustomEvent('GEMINI_API_EXECUTE', {
-            detail: {
-              rpcid: 'UXcSJb',
-              payload: [node.data.id],
-              callbackEvent: `GEMINI_DELETE_GEM_RESULT_${node.data.id}`,
-            },
-          }),
-        );
-      } catch {
-        // non-critical
-      }
-
-      await browser.runtime.sendMessage({
-        type: 'DELETE_GEM',
-        payload: { id: node.data.id },
-      });
-      fetchData(true);
+    if (!confirmed) return;
+    // Delete on Gemini first; our row goes regardless.
+    try {
+      window.dispatchEvent(
+        new CustomEvent('GEMINI_API_EXECUTE', {
+          detail: {
+            rpcid: 'UXcSJb',
+            payload: [node.data.id],
+            callbackEvent: `GEMINI_DELETE_GEM_RESULT_${node.data.id}`,
+          },
+        }),
+      );
+    } catch {
+      // non-critical
     }
-  };
-
-  const handleTagToggle = async (tagId: string, checked: boolean) => {
-    const hasTag = conversationTags.some(
-      (ct) => ct.conversation_id === node.data.id && ct.tag_id === tagId,
-    );
-    if (checked && !hasTag) await addTagToConversation(node.data.id, tagId);
-    if (!checked && hasTag) await removeTagFromConversation(node.data.id, tagId);
-  };
-
-  const handleDeleteConversation = async () => {
-    const { deleteItem } = useAppStore.getState();
-    if (useSettingsStore.getState().skipDeleteConfirm ?? false) {
-      await deleteItem(node.data.id, 'file');
-      return;
-    }
-    const confirmed = await modal.confirmDelete({
-      title: t('node.deleteItem'),
-      content: t('node.deleteConfirm', { name: node.data.name }),
+    await browser.runtime.sendMessage({
+      type: 'DELETE_GEM',
+      payload: { id: node.data.id },
     });
-    if (confirmed) {
-      await deleteItem(node.data.id, 'file');
-    }
+    useAppStore.getState().fetchData(true);
   };
 
-  const handleSetDefaultFolder = async () => {
-    let targetFolderId: string | null = node.data.data?.default_folder_id || null;
-
-    const confirmed = await modal.confirm({
-      title: t('gems.setDefaultFolder'),
-      content: (
-        <MoveItemsDialog
-          selectedIds={[]}
-          onSelect={(id) => (targetFolderId = id)}
-          initialSelectedId={targetFolderId}
-        />
-      ),
-      modalClassName: 'max-w-xl',
-      confirmText: t('common.save'),
-      cancelText: t('common.cancel'),
-    });
-
-    if (confirmed) {
-      await browser.runtime.sendMessage({
-        type: 'UPDATE_GEM',
-        payload: { id: node.data.id, updates: { default_folder_id: targetFolderId } },
-      });
-      fetchData(true);
-      toast.success(t('gems.defaultFolderSet'));
-    }
-  };
-
-  const toggleIcon = isGem ? (
-    node.isOpen ? (
-      <ChevronDown className="w-3.5 h-3.5" strokeWidth={2.5} />
-    ) : (
-      <ChevronRight className="w-3.5 h-3.5" strokeWidth={2.5} />
-    )
-  ) : null;
-
-  const hasHoverActions = isFile || isGem;
-
-  // Menu items for gem nodes
-  const gemMenuItems: MenuEntryDef[] = isGem ? [
-    // — Pin —
-    {
-      type: 'item' as const,
-      key: 'toggle-pin',
-      icon: node.data.data?.is_pinned
-        ? <PinOff className="h-4 w-4" />
-        : <Pin className="h-4 w-4 rotate-45" />,
-      label: node.data.data?.is_pinned ? t('node.unpinFromTop') : t('node.pinToTop'),
-      onClick: () => {
-        useAppStore.getState().togglePin(node.data.id, 'gems', !!node.data.data?.is_pinned);
-      },
-    },
+  const buildItemMenu = ({ pin, moveToFolder, setDefaultFolder }: SharedItemMenu): MenuEntryDef[] => [
+    pin,
     // — Navigation —
     {
-      type: 'item' as const,
+      type: 'item',
       key: 'open-gem',
       icon: <UIcon icon="tabler:diamond" className="h-4 w-4" />,
       label: t('gems.openGem'),
       onClick: () => {
-        const gemUrl = node.data.data?.external_url;
         if (gemUrl) navigateToGem(gemUrl);
       },
     },
     {
-      type: 'item' as const,
+      type: 'item',
       key: 'open-new-tab',
       icon: <ExternalLink className="h-4 w-4" />,
       label: t('gems.openInNewTab'),
       onClick: () => {
-        const gemUrl = node.data.data?.external_url;
         if (gemUrl) window.open(gemUrl, '_blank');
       },
     },
-    { type: 'separator' as const, key: 'sep-nav' },
+    { type: 'separator', key: 'sep-nav' },
     // — Manage —
+    moveToFolder,
+    setDefaultFolder,
     {
-      type: 'item' as const,
-      key: 'set-default-folder',
-      icon: <FolderInput className="h-4 w-4" />,
-      label: t('gems.setDefaultFolder'),
-      onClick: () => void handleSetDefaultFolder(),
-    },
-    {
-      type: 'item' as const,
+      type: 'item',
       key: 'edit-gem',
       icon: <Edit2 className="h-4 w-4" />,
       label: t('gems.editGem'),
-      onClick: () => {
-        navigate(`https://gemini.google.com/gems/edit/${node.data.id}`);
-      },
+      onClick: () => navigate(`https://gemini.google.com/gems/edit/${node.data.id}`),
     },
     {
-      type: 'item' as const,
+      type: 'item',
       key: 'copy-gem',
       icon: <Copy className="h-4 w-4" />,
       label: t('gems.copyGem'),
-      onClick: () => {
-        navigate(`https://gemini.google.com/gems/copy/${node.data.id}`);
-      },
+      onClick: () => navigate(`https://gemini.google.com/gems/copy/${node.data.id}`),
     },
-    { type: 'separator' as const, key: 'sep-manage' },
+    { type: 'separator', key: 'sep-manage' },
     // — Destructive —
     {
-      type: 'item' as const,
+      type: 'item',
       key: 'delete-gem',
       icon: <Trash2 className="h-4 w-4" />,
       label: t('gems.deleteGem'),
       className: 'text-destructive focus:text-destructive',
       onClick: () => void handleDeleteGem(),
     },
-  ] : [];
+  ];
 
-  const fileMenuItems = useExplorerMenuItems({
-    node,
-    isFavorite,
-    folderColor: null,
-    isPinned: false,
-    onDelete: handleDeleteConversation,
-    onTagToggle: handleTagToggle,
-    onColorChange: async () => {},
-    onCreateFolder: async () => {},
-    onToggleFavorite: (id: string, isFav: boolean) =>
-      toggleFavorite(id, 'conversation', isFav),
-    onTogglePin: () => {},
-  });
-
-  const activeMenuItems = isGem ? gemMenuItems : isFile ? fileMenuItems : [];
-  const isMenuActive = isContextMenuOpen || isDropdownOpen;
-
-  // --- Outer wrapper classes (visual states: hover, selected, etc.) ---
-  const wrapperClasses = cn(
-    'outline-none h-[calc(100%-2px)] w-[calc(100%-4px)] mx-auto mt-[1px]',
-    'rounded-md cursor-pointer',
-    !isActive && !isCurrentConversation && 'hover:bg-accent/50',
-    isActive && 'node-item-selected',
-    !isActive && isCurrentConversation && 'node-item-current',
-    node.willReceiveDrop && 'bg-accent/50 border border-primary/40',
-    isMenuActive && 'bg-accent/50',
-    isMenuActive && 'node-menu-active',
-  );
-
-  // --- Inner content classes (layout only) ---
-  const nodeClasses = cn(
-    'flex items-center gap-2 px-1 pr-2 h-full',
-    'group relative',
-    'no-underline outline-none',
-    'text-density text-foreground/80 font-medium',
-  );
-
-  const searchQuery = useAppStore((state) => state.ui.gems.search.query);
+  const itemActions: ActionButtonDef[] = [
+    {
+      icon: <MessageSquarePlus className="h-3.5 w-3.5" />,
+      tooltip: t('gems.newGemChat'),
+      onClick: (e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+        navigateToGem(node.data.id);
+      },
+    },
+  ];
 
   return (
-    <ExclusiveContextMenu onOpenChange={setIsContextMenuOpen}>
-      <ContextMenuTrigger asChild>
-        <div
-          style={style}
-          className={wrapperClasses}
-        >
-          <div
-            ref={combinedRef}
-            role="button"
-            tabIndex={0}
-            className={nodeClasses}
-            onClick={handleClick}
-            onKeyDown={handleKeyDown}
-          >
-            {/* Use shared FolderTreeNodeContent for both gem headers and file children */}
-            <FolderTreeNodeContent
-              node={node}
-              folderIcon={null}
-              fileIcon={null}
-              toggleIcon={toggleIcon}
-              handleToggle={handleToggle}
-              newName={newName}
-              setNewName={setNewName}
-              hoverRef={nodeRowRef}
-              isPinned={isGem && !!node.data.data?.is_pinned}
-              tooltipContent={tooltipContent}
-              forceShowTooltip={forceShowTooltip}
-              searchQuery={searchQuery}
-            />
-
-            {/* Action bar with three-dot menu */}
-            {hasHoverActions && (
-              <NodeActionBar
-                actions={
-                  isGem
-                    ? [
-                        // Unpin button for pinned gems — always shown, leftmost
-                        ...(node.data.data?.is_pinned ? [{
-                          icon: <Pin className="h-3.5 w-3.5 rotate-45 fill-current" />,
-                          tooltip: t('node.unpinFromTop'),
-                          onClick: (e: React.MouseEvent) => {
-                            e.stopPropagation();
-                            e.preventDefault();
-                            useAppStore.getState().togglePin(node.data.id, 'gems', true);
-                          },
-                          persistent: true,
-                        }] : []),
-                        {
-                          icon: <MessageSquarePlus className="h-3.5 w-3.5" />,
-                          tooltip: t('gems.newGemChat'),
-                          onClick: (e: React.MouseEvent) => {
-                            e.stopPropagation();
-                            e.preventDefault();
-                            navigateToGem(node.data.id);
-                          },
-                        },
-                      ]
-                    : isFile && isFavorite
-                      ? [{
-                          icon: <Star className="h-3.5 w-3.5 fill-highlight text-highlight" />,
-                          tooltip: t('tooltip.removeFromFavorites'),
-                          onClick: (e: React.MouseEvent) => {
-                            e.stopPropagation();
-                            e.preventDefault();
-                            toggleFavorite(node.data.id, 'conversation', isFavorite);
-                          },
-                          className: 'text-highlight hover:text-highlight/80',
-                          persistent: true,
-                        }]
-                      : []
-                }
-                menuItems={activeMenuItems}
-                forceVisible={isMenuActive}
-                onDropdownOpenChange={setIsDropdownOpen}
-              />
-            )}
-          </div>
-        </div>
-      </ContextMenuTrigger>
-      {/* Context menu - reuses same menu items as the three-dot dropdown */}
-      {isGem && (
-        <ContextMenuContent className="z-[9999] w-48">
-          {renderMenuItems(gemMenuItems, 'context')}
-        </ContextMenuContent>
-      )}
-      {isFile && (
-        <NodeContextMenu
-          node={node}
-          onToggleFavorite={(id: string, isFav: boolean) =>
-            toggleFavorite(id, 'conversation', isFav)
-          }
-          onCreateFolder={async () => {}}
-          onDelete={handleDeleteConversation}
-          onTagToggle={handleTagToggle}
-          onColorChange={async () => {}}
-          isFavorite={isFavorite}
-          folderColor={null}
-          style={style}
-          dragHandle={dragHandle}
-          tree={tree}
-          preview={preview}
-        />
-      )}
-    </ExclusiveContextMenu>
+    <CollectionItemNode
+      {...props}
+      scope="gems"
+      buildItemMenu={buildItemMenu}
+      itemActions={itemActions}
+      searchQuery={searchQuery}
+    />
   );
 };

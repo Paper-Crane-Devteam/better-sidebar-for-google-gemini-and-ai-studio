@@ -1,4 +1,4 @@
-import { Folder, Tag, Prompt, PromptFolder } from './db';
+import { Folder, Tag, Prompt, PromptFolder, CollectionScope } from './db';
 
 export type ExtensionMessage = (
   | { type: 'BROWSER_AGENT'; payload: import('../browser-agent/contracts').BrowserRequest }
@@ -467,7 +467,7 @@ export type ExtensionMessage = (
       type: 'UPDATE_GEM';
       payload: {
         id: string;
-        updates: Partial<{ name: string; description: string; icon_url: string; is_pinned: number }>;
+        updates: Partial<{ name: string; description: string; icon_url: string; is_pinned: number; default_folder_id: string | null }>;
       };
     }
   | { type: 'GET_GEM_CONVERSATIONS'; payload: { gemId: string } }
@@ -504,10 +504,34 @@ export type ExtensionMessage = (
       type: 'UPDATE_NOTEBOOK';
       payload: {
         id: string;
-        updates: Partial<{ name: string; description: string; icon_url: string; is_pinned: number }>;
+        updates: Partial<{ name: string; description: string; icon_url: string; is_pinned: number; default_folder_id: string | null }>;
       };
     }
   | { type: 'GET_NOTEBOOK_CONVERSATIONS'; payload: { notebookId: string } }
+  // Gems / Notebooks panel folders
+  | { type: 'GET_COLLECTION_FOLDERS' }
+  | {
+      type: 'CREATE_COLLECTION_FOLDER';
+      payload: { id: string; scope: CollectionScope; name: string; parentId?: string | null };
+    }
+  | {
+      type: 'UPDATE_COLLECTION_FOLDER';
+      payload: {
+        id: string;
+        updates: Partial<{ name: string; parent_id: string | null; is_pinned: number }>;
+      };
+    }
+  /** Responds `data: { deleted: false }` when the folder still has contents. */
+  | { type: 'DELETE_COLLECTION_FOLDER'; payload: { id: string } }
+  | { type: 'REORDER_COLLECTION_FOLDERS'; payload: { orderedIds: string[] } }
+  | {
+      type: 'MOVE_COLLECTION_ITEM';
+      payload: { scope: CollectionScope; id: string; folderId: string | null };
+    }
+  | {
+      type: 'REORDER_COLLECTION_ITEMS';
+      payload: { scope: CollectionScope; orderedIds: string[] };
+    }
   // Google Drive sync
   | { type: 'GDRIVE_AUTH' }
   | { type: 'GDRIVE_DISCONNECT' }

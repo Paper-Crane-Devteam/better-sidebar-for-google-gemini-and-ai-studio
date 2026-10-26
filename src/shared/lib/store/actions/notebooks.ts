@@ -9,7 +9,6 @@ export function createNotebooksActions(
   | 'setNotebooksSearch'
   | 'setNotebooksTags'
   | 'setNotebooksOnlyFavorites'
-  | 'setNotebooksSortOrder'
 > {
   return {
     setNotebooks: (notebooks) => set({ notebooks }),
@@ -45,10 +44,6 @@ export function createNotebooksActions(
           ...state.ui,
           notebooks: { ...state.ui.notebooks, onlyFavorites },
         },
-      })),
-    setNotebooksSortOrder: (sortOrder) =>
-      set((state) => ({
-        ui: { ...state.ui, notebooks: { ...state.ui.notebooks, sortOrder } },
       })),
   };
 }
