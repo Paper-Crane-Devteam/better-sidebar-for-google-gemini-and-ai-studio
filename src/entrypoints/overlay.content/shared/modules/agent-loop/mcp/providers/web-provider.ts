@@ -98,13 +98,22 @@ const SCHEMAS: Record<string, ToolDefinition['schema']> = {
       'function: use `await` freely and `return` the value you want back (JSON-serialisable; ' +
       'large results are truncated). `__bsRef("e12")` returns the element behind a ref from the ' +
       'last snapshot. Best for reading tables, lists or anything the snapshot cut off, and for ' +
-      'scrolling (`scrollBy(0, innerHeight)`). The user sees and approves the exact code. ' +
-      'Prefer page_click / page_type for interacting — synthetic events from scripts are often ' +
-      'ignored by pages.',
+      'scrolling (`scrollBy(0, innerHeight)`). Set read_only to "true" when the script only ' +
+      'reads or scrolls — it then runs without asking. Otherwise the user sees and approves the ' +
+      'exact code. Prefer page_click / page_type for interacting when they work — synthetic ' +
+      'events from scripts are often ignored by pages.',
     parameters: {
       type: 'object',
       properties: {
         code: { type: 'string', description: 'Function body. End with `return …` to get a value.' },
+        read_only: {
+          type: 'string',
+          description:
+            '"true" only when the script changes nothing: reading the DOM, location, storage, ' +
+            'computed styles; scrolling. Anything that clicks, types, submits, navigates, sends ' +
+            'a request with side effects (fetch POST etc.), or edits the page/storage must leave ' +
+            'this out — it needs approval.',
+        },
         tab_id: TAB_ID,
         change_summary: CHANGE_SUMMARY,
       },

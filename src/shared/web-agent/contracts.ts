@@ -64,6 +64,21 @@ export const WEB_TOOLS: readonly string[] = [...WEB_READ_TOOLS, ...WEB_WRITE_TOO
 export const isWebTool = (name: string) => WEB_TOOLS.includes(name);
 export const isWebWrite = (name: string) => (WEB_WRITE_TOOLS as readonly string[]).includes(name);
 
+/**
+ * Whether this call is a write that needs the user's approval.
+ *
+ * `page_run_js` declared `read_only: "true"` by the model counts as a read and runs without
+ * approval. ⚠️ This trusts the model's own judgement — nothing checks the script. It was a
+ * deliberate product call: approving every `return location.href` made the agent unusable on
+ * pages where snapshot alone doesn't cut it. The soul tells the model exactly when it may set
+ * the flag (see `web-soul.ts`).
+ */
+export function isWebWriteCall(name: string, params: Record<string, string | undefined>): boolean {
+  if (!isWebWrite(name)) return false;
+  if (name === 'page_run_js' && params.read_only?.trim().toLowerCase() === 'true') return false;
+  return true;
+}
+
 /** What the panel picks up when it opens: a task sent from a tab, or a page to work on. */
 export interface WebHandoff {
   /** Text to put after the `>Web Agent` capsule. */
