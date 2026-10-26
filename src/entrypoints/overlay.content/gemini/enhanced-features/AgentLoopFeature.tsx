@@ -5,6 +5,7 @@ import {
   reportPanelRunning,
   sendToPanel,
 } from '@/entrypoints/overlay.content/shared/modules/agent-loop/web/web-store';
+import { loadWebScopeBlock } from '@/entrypoints/overlay.content/shared/modules/agent-loop/prompts/souls/web-soul';
 import { isPanelFrame, PANEL_NUDGE, WEB_AGENT_ID } from '@/shared/web-agent/contracts';
 /**
  * AgentLoopFeature — Gemini entry point for Agent Loop.
@@ -325,6 +326,9 @@ export const AgentLoopFeature: React.FC = () => {
   const handleConfirmSelectionRef = useRef(handleConfirmSelection);
   handleConfirmSelectionRef.current = handleConfirmSelection;
 
+  /** True while a Web Agent send waits for its scope read; see `composeAndSend`. */
+  const webComposingRef = useRef(false);
+
   // ─── Compose + send (shared by Enter, send button and launcher) ─────
 
   const composeAndSend = useCallback(
@@ -458,69 +462,99 @@ export const AgentLoopFeature: React.FC = () => {
         return true;
       }
 
-      /**
-       * Assembled before the editor is touched. It used to run after
-       * `expandAllCapsules`, so anything throwing in here left the expanded skill
-       * text sitting in the composer while the exception escaped the click handler —
-       * and since nothing had called `preventDefault`, Gemini sent it.
-       */
-      let basePrompt: string;
-      try {
-        basePrompt = assembleFinalPrompt({
-          agentId: entry.agent.id,
-          platform: getCurrentPlatformId(),
+      /** Everything from prompt assembly to the click. `scopeBlock` is the Web Agent's tab list, or ''. */
+      const finish = (scopeBlock: string): boolean => {
+        /**
+         * Assembled before the editor is touched. It used to run after
+         * `expandAllCapsules`, so anything throwing in here left the expanded skill
+         * text sitting in the composer while the exception escaped the click handler —
+         * and since nothing had called `preventDefault`, Gemini sent it.
+         */
+        let basePrompt: string;
+        try {
+          basePrompt = assembleFinalPrompt({
+            agentId: entry.agent.id,
+            platform: getCurrentPlatformId(),
+          }) + scopeBlock;
+        } catch (err) {
+          console.error('[AgentLoop] Prompt assembly failed', err);
+          return abort('prompt assembly failed', i18n.t('agent.send.assembleFailed'));
+        }
+
+        // Expand all capsules (both / and >) to read the full editor text
+        expandAllCapsules(editor);
+
+        // Whatever the user typed around the capsule
+        const editorText = editor.textContent || '';
+        const userInput = capsuleContent
+          ? editorText.replace(capsuleContent, '').trim()
+          : editorText.trim();
+
+        // ⚠️ Not `substring(0, MAX)` on the assembled message. The user's request is
+        // appended last, so cutting from the end removes the task and keeps the
+        // instructions — see `prompts/initial-message.ts`.
+        const { text: fullMessage } = buildInitialMessage({
+          marker: buildPromptMarker(entryId),
+          basePrompt,
+          userInput,
         });
-      } catch (err) {
-        console.error('[AgentLoop] Prompt assembly failed', err);
-        return abort('prompt assembly failed', i18n.t('agent.send.assembleFailed'));
-      }
 
-      // Expand all capsules (both / and >) to read the full editor text
-      expandAllCapsules(editor);
+        const title = userInput || entry.title || 'Agent task';
 
-      // Whatever the user typed around the capsule
-      const editorText = editor.textContent || '';
-      const userInput = capsuleContent
-        ? editorText.replace(capsuleContent, '').trim()
-        : editorText.trim();
+        adapter.insertText(fullMessage);
 
-      // ⚠️ Not `substring(0, MAX)` on the assembled message. The user's request is
-      // appended last, so cutting from the end removes the task and keeps the
-      // instructions — see `prompts/initial-message.ts`.
-      const { text: fullMessage } = buildInitialMessage({
-        marker: buildPromptMarker(entryId),
-        basePrompt,
-        userInput,
-      });
+        /**
+         * Confirm the payload actually landed before clicking send.
+         *
+         * The composer still holds the expanded skill instructions at this point, so a
+         * staging failure doesn't leave us with an empty box to send — it leaves us
+         * with the wrong message ready to go.
+         */
+        if (!(editor.textContent || '').includes(buildPromptMarker(entryId))) {
+          console.error('[AgentLoop] Prompt did not land in the composer', {
+            expectedLength: fullMessage.length,
+            actualLength: (editor.textContent || '').length,
+          });
+          return abort('prompt did not land in the composer', i18n.t('agent.send.stagingFailed'));
+        }
 
-      const title = userInput || entry.title || 'Agent task';
+        // User pressed Enter / clicked send, so no artificial pause. Only start the
+        // engine if the message actually went out — otherwise it would sit waiting
+        // for a response to a prompt that was never delivered.
+        adapter.triggerSend({ humanDelay: false }).then((sent) => {
+          if (sent) startAgentEngine({ title, agentId: entry.agent.id });
+          else console.warn('[AgentLoop] Initial prompt was not sent, engine not started');
+        });
 
-      adapter.insertText(fullMessage);
+        return true; // We handled sending
+      };
 
       /**
-       * Confirm the payload actually landed before clicking send.
+       * The Web Agent starts with its scope already in the prompt, which saves the round the
+       * model would otherwise spend on `page_list`. That read is async and this handler is
+       * not, so the send is claimed now and finished once the list is back.
        *
-       * The composer still holds the expanded skill instructions at this point, so a
-       * staging failure doesn't leave us with an empty box to send — it leaves us
-       * with the wrong message ready to go.
+       * Nothing touches the editor until then, so a failure in the gap leaves the capsule
+       * as it was. A failed or slow read just means no list: the soul then tells the model
+       * to call `page_list` itself.
        */
-      if (!(editor.textContent || '').includes(buildPromptMarker(entryId))) {
-        console.error('[AgentLoop] Prompt did not land in the composer', {
-          expectedLength: fullMessage.length,
-          actualLength: (editor.textContent || '').length,
+      if (entry.agent.id === WEB_AGENT_ID) {
+        if (webComposingRef.current) return true; // A second Enter while the read is out.
+        webComposingRef.current = true;
+        void loadWebScopeBlock().then((scopeBlock) => {
+          webComposingRef.current = false;
+          // The user may have cleared the composer or started something else meanwhile.
+          if (!editor.isConnected || !editor.contains(capsule)) return;
+          if (useAgentLoopStore.getState().status !== 'idle') {
+            abort('a task started while reading the Web Agent scope', i18n.t('agent.send.sessionBusy'));
+            return;
+          }
+          finish(scopeBlock);
         });
-        return abort('prompt did not land in the composer', i18n.t('agent.send.stagingFailed'));
+        return true;
       }
 
-      // User pressed Enter / clicked send, so no artificial pause. Only start the
-      // engine if the message actually went out — otherwise it would sit waiting
-      // for a response to a prompt that was never delivered.
-      adapter.triggerSend({ humanDelay: false }).then((sent) => {
-        if (sent) startAgentEngine({ title, agentId: entry.agent.id });
-        else console.warn('[AgentLoop] Initial prompt was not sent, engine not started');
-      });
-
-      return true; // We handled sending
+      return finish('');
     },
     [getAdapter, startAgentEngine],
   );
